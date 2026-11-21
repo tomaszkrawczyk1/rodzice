@@ -115,6 +115,9 @@ export default function Home() {
                 <b>{m.tytul}</b><span>{m.opis}</span>
               </button>
             ))}
+            <Link href="/kalendarz" className="tile">
+              <b>Kalendarz ciąży i połogu</b><span>Badania, wizyty i terminy ZUS na jednej osi czasu</span>
+            </Link>
             <Link href="/sprawa/adopcja" className="tile">
               <b>Adopcja lub rodzina zastępcza</b><span>Urlopy, zasiłek i terminy po przyjęciu dziecka</span>
             </Link>
@@ -131,6 +134,11 @@ export default function Home() {
             <Link href="/kreator?sciezka=ojciec" className="tile">
               <b>Urlopy dla taty i drugiego rodzica</b><span>Urlop ojcowski i podział urlopu rodzicielskiego</span>
             </Link>
+            {(moment === "ciaza" || moment === "dziecko") && (
+              <Link href="/kalendarz" className="tile">
+                <b>Kalendarz ciąży i połogu</b><span>Badania, wizyty i terminy ZUS na jednej osi czasu</span>
+              </Link>
+            )}
             {MOMENTY[moment].sprawy.map((id) => {
               const s = sprawa(id);
               return s && <Link key={id} href={`/sprawa/${id}`} className="tile">

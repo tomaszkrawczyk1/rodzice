@@ -6,11 +6,12 @@ import { useSesja } from "@/lib/sesja";
 import Dostepnosc from "./Dostepnosc";
 
 const NAV = [
-  ["/", "Start"], ["/sprawy", "Sprawy"], ["/poradnik", "Poradnik"], ["/kalkulator", "Kalkulator"], ["/druki", "Druki"], ["/wnioski", "Wnioski"], ["/wgraj", "Wgraj wniosek"], ["/pue", "PUE"],
+  ["/", "Start"], ["/sprawy", "Sprawy"], ["/kalendarz", "Kalendarz"], ["/poradnik", "Poradnik"], ["/kalkulator", "Kalkulator"], ["/druki", "Druki"], ["/wnioski", "Wnioski"], ["/wgraj", "Wgraj wniosek"], ["/pue", "PUE"],
 ] as const;
 
 const NAZWY: Record<string, string> = {
   "/sprawy": "Sprawy",
+  "/kalendarz": "Kalendarz ciąży i połogu",
   "/poradnik": "Poradnik",
   "/kalkulator": "Kalkulator",
   "/druki": "Druki",

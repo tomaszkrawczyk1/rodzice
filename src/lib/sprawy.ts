@@ -626,7 +626,7 @@ export const SPRAWY: Sprawa[] = [
       return {
         glowne: bliski ? `Najbliższy termin: ${bliski.co} – do ${dataPL(bliski.do)} (${zaIle(bliski.do)}).` : "Wszystkie główne terminy dla tej daty już minęły. Złóż wnioski jak najszybciej.",
         terminy: wszystkie, zrob: [{ tekst: "Wpisz najważniejsze daty do kalendarza w telefonie." }, { tekst: "W razie wątpliwości zapytaj konsultanta ZUS przez konto PUE / eZUS." }],
-        linki: [{ href: "/pue", etykieta: "Zadaj pytanie w ZUS (PUE / eZUS)" }], status: "ok", nastepne: o.rodzajZdarzenia === "porod" ? ["wniosek-zasilek", "urlop-pracodawca"] : ["adopcja"],
+        linki: [{ href: "/kalendarz", etykieta: "Zobacz terminy ZUS razem z badaniami i wizytami" }, { href: "/pue", etykieta: "Zadaj pytanie w ZUS (PUE / eZUS)" }], status: "ok", nastepne: o.rodzajZdarzenia === "porod" ? ["wniosek-zasilek", "urlop-pracodawca"] : ["adopcja"],
         ostrzezenia: ["Terminy wniosków o urlop rodzicielski i ojcowski zależą od wybranej daty startu – poznasz je w sprawach „Podzielić urlop” i „Poprosić pracodawcę o urlop”."],
       };
     },
