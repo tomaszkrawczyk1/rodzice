@@ -42,7 +42,7 @@ export default function Szukaj() {
               <div className="grid g3 mt">
                 {w.sprawy.map((s) => (
                   <Link key={s.id} href={`/sprawa/${s.id}`} className="tile">
-                    <span className="ic">{s.ikona}</span>
+                    <span className={`ic ic-${s.id}`} aria-hidden="true">{s.ikona}</span>
                     <b>{s.tytul}</b>
                     <span>{s.krotko}</span>
                   </Link>

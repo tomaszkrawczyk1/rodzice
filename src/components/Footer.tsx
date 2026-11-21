@@ -1,25 +1,29 @@
-import Link from "next/link";
-
 export default function Footer() {
   return (
-    <footer className="footer" role="contentinfo">
-      <div className="container footer__grid">
-        <div className="footer__note">
-          <p><b>Przewodnik Przyszłego Rodzica</b> – prototyp wykonany w ramach HackNation 2026 (zadanie ZUS). To nie jest oficjalna usługa ZUS ani porada prawna.
-            Wyliczenia mają charakter orientacyjny; wiążące decyzje wydaje ZUS lub płatnik składek.</p>
-          <p>Oficjalne informacje: <a href="https://www.zus.pl" target="_blank" rel="noreferrer">zus.pl</a> · <a href="https://www.gov.pl/web/rodzina/urlop-rodzicielski" target="_blank" rel="noreferrer">gov.pl – urlop rodzicielski</a> ·{" "}
-            <a href="https://www.pip.gov.pl/dla-pracodawcow/porady-prawne/rodzicielstwo" target="_blank" rel="noreferrer">PIP – rodzicielstwo</a></p>
+    <footer className="footer zus-footer" role="contentinfo">
+      <div className="container footer__cols">
+        <div>
+          <h2 className="footer__h">zus.pl</h2>
+          <ul className="footer__links">
+            <li><a href="https://www.zus.pl/" target="_blank" rel="noreferrer">Strona główna ZUS</a></li>
+            <li><a href="https://www.zus.pl/swiadczenia" target="_blank" rel="noreferrer">Świadczenia</a></li>
+            <li><a href="https://www.zus.pl/wzory-formularzy" target="_blank" rel="noreferrer">Wzory formularzy</a></li>
+            <li><a href="https://www.zus.pl/ezus/logowanie?jezyk=pl" target="_blank" rel="noreferrer">Logowanie do PUE/eZUS</a></li>
+          </ul>
         </div>
-        <ul className="footer__links">
-          <li><Link href="/kreator">Kreator</Link></li>
-          <li><Link href="/ryzyka">Ryzyka</Link></li>
-          <li><Link href="/trudne">Trudne sytuacje</Link></li>
-          <li><Link href="/dokumenty">Dokumenty i terminy</Link></li>
-          <li><Link href="/o-projekcie">O projekcie i użyciu AI</Link></li>
-          <li><Link href="/odpis">Odpis aktu urodzenia</Link></li>
-          <li><Link href="/admin">Panel administratora</Link></li>
-        </ul>
-        <a className="to-top" href="#header"><span aria-hidden="true">↑ </span>Do góry</a>
+        <div>
+          <h2 className="footer__h">Kontakt i dostępność</h2>
+          <ul className="footer__links">
+            <li><a href="https://www.zus.pl/o-zus/kontakt/centrum-obslugi-telefonicznej-cot-" target="_blank" rel="noreferrer">Centrum Obsługi Telefonicznej</a></li>
+            <li><a href="https://www.zus.pl/o-zus/kontakt/obsluga-osob-z-niepelnosprawnosciami" target="_blank" rel="noreferrer">Obsługa osób z niepełnosprawnościami</a></li>
+            <li><a href="https://www.zus.pl/dostepnosc/deklaracja-dostepnosci-zus.pl" target="_blank" rel="noreferrer">Deklaracja dostępności zus.pl</a></li>
+            <li><a href="https://bip.zus.pl/" target="_blank" rel="noreferrer">Biuletyn Informacji Publicznej</a></li>
+          </ul>
+        </div>
+        <div className="footer__side">
+          <a className="to-top" href="#header"><span aria-hidden="true">↑ </span>Do góry</a>
+          <p className="footer__note">Przewodnik Przyszłego Rodzica to prototyp. Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
+        </div>
       </div>
     </footer>
   );
