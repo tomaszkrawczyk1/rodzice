@@ -1,5 +1,5 @@
 export function dataZFormularza(wartosc: string): string {
-  const dopasowanie = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(wartosc.trim());
+  const dopasowanie = /^(\d{1,2})[.,\-/ ](\d{1,2})[.,\-/ ](\d{4})$/.exec(wartosc.trim());
   if (!dopasowanie) return "";
   const [, dzien, miesiac, rok] = dopasowanie;
   if (Number(rok) === 0) return "";

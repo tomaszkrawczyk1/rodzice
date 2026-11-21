@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { DRZEWO, DRZEWO_START, DRUKI, kalkulatorLink, pytanie } from "@/content/poradnik";
 import { odczytajPostep, rozwinPostep } from "@/lib/postep-kreatora";
+import { przejdzDoKroku } from "@/lib/ekran";
 
 function Pytania({ start }: { start: string }) {
   const klucz = `rodzice.kreator.v1.${start}`;
@@ -26,7 +27,7 @@ function Pytania({ start }: { start: string }) {
   useEffect(() => {
     if (!przeniesFokus.current) return;
     przeniesFokus.current = false;
-    naglowek.current?.focus();
+    przejdzDoKroku(naglowek.current, naglowek.current);
   }, [postep]);
 
   function zapisz(kroki: number[]) {

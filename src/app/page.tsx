@@ -5,7 +5,9 @@ import { api, useSesja } from "@/lib/sesja";
 import { dataPL, pln, dzis, opisTerminu } from "@/lib/format";
 import { nazwaUbezpieczenia, rodzajChorobowego, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
 import { Alert } from "@/components/ui";
+import Szkielet from "@/components/Szkielet";
 import Szukaj from "@/components/Szukaj";
+import { przejdzDoKroku } from "@/lib/ekran";
 import { najpilniejsze, sprawa, zaIle, type Moment } from "@/lib/sprawy";
 
 const MOMENTY = {
@@ -37,10 +39,10 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
   }, [pesel]);
 
   return (
-    <section className="card mt">
+    <section className={"card mt" + (dane || blad ? "" : " slot-profil")}>
       <h2>Dane z profilu testowego</h2>
       {blad && <Alert t="err">Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.</Alert>}
-      {!dane && !blad && <p role="status">Wczytujemy dane profilu…</p>}
+      {!dane && !blad && <Szkielet etykieta="Wczytujemy dane profilu…" wiersze={3} />}
       {dane && <>
         <dl>
           <dt>Dni ubezpieczenia chorobowego</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
@@ -76,7 +78,7 @@ export default function Home() {
   useEffect(() => {
     if (!poWyborze.current) return;
     poWyborze.current = false;
-    etapy.current?.focus();
+    przejdzDoKroku(etapy.current, etapy.current);
   }, [moment]);
   const [pilnaSprawa, setPilnaSprawa] = useState<{ token: string; termin: Awaited<ReturnType<typeof najpilniejsze>> } | null>(null);
   const pilne = sesja && pilnaSprawa?.token === sesja.token ? pilnaSprawa.termin : null;
@@ -97,13 +99,18 @@ export default function Home() {
         <p>Wybierz sytuację, która dotyczy Ciebie lub bliskiej osoby. Możesz przejść przez sprawę bez logowania.</p>
       </section>
 
-      {pilne && (
-        <section className="card urgent mb" style={{ overflowWrap: "anywhere" }}>
-          <h2>Najbliższy termin z profilu</h2>
-          <p>{opisTerminu(pilne.co)}</p>
-          <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
-          <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
-        </section>
+      {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
+      {(
+        <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
+          {sesja && (pilne ? (
+            <section className="card urgent mb" style={{ overflowWrap: "anywhere" }}>
+              <h2>Najbliższy termin z profilu</h2>
+              <p>{opisTerminu(pilne.co)}</p>
+              <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
+              <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
+            </section>
+          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
+        </div>
       )}
 
       {!moment ? (

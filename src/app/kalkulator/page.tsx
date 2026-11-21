@@ -240,10 +240,10 @@ function PlanRodziny() {
               </div>
               <div className="card"><h3>Oś czasu</h3><Timeline okresy={wyn.okresy} start={f.data} etykiety={{ matka: rodzicPierwszy, ojciec: rodzicDrugi }} /></div>
               <div className="card"><h3>Okresy i kwoty</h3>
-                <div className="tbl-wrap"><table className="tbl"><thead><tr><th>Rodzaj</th><th>Kto</th><th>Od – do</th><th className="num">Dni</th><th className="num">%</th><th className="num">Kwota</th></tr></thead>
-                  <tbody>{zasilki.map((o: any, i: number) => <tr key={i}><td>{RODZAJE[o.rodzaj] ?? "Okres zasiłku"}{o.podwyzszoneDoSwiadczeniaRodzicielskiego && <span className="badge warn"> do {pln(parametry.kwoty.swiadczenie_rodzicielskie_miesieczne)}</span>}{o.uwagi && <div className="small muted">{o.uwagi}</div>}</td><td>{rola(o.kto)}</td>
-                    <td>{dataPL(o.od)} do {dataPL(o.do)}</td><td className="num">{o.dni}</td><td className="num">{liczba(o.procent)}{o.wspolczynnikZasilku !== 1 ? ` × ${liczba(o.wspolczynnikZasilku)}` : ""}</td><td className="num">{pln(o.kwota)}</td></tr>)}</tbody>
-                  <tfoot><tr><td colSpan={5}>Razem</td><td className="num">{pln(wyn.sumy.razem)}</td></tr></tfoot></table></div>
+                <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Rodzaj</th><th>Kto</th><th>Od – do</th><th className="num">Dni</th><th className="num">%</th><th className="num">Kwota</th></tr></thead>
+                  <tbody>{zasilki.map((o: any, i: number) => <tr key={i}><td data-label="Rodzaj">{RODZAJE[o.rodzaj] ?? "Okres zasiłku"}{o.podwyzszoneDoSwiadczeniaRodzicielskiego && <span className="badge warn"> do {pln(parametry.kwoty.swiadczenie_rodzicielskie_miesieczne)}</span>}{o.uwagi && <div className="small muted">{o.uwagi}</div>}</td><td data-label="Kto">{rola(o.kto)}</td>
+                    <td data-label="Od – do">{dataPL(o.od)} do {dataPL(o.do)}</td><td className="num" data-label="Dni">{o.dni}</td><td className="num" data-label="%">{liczba(o.procent)}{o.wspolczynnikZasilku !== 1 ? ` × ${liczba(o.wspolczynnikZasilku)}` : ""}</td><td className="num" data-label="Kwota">{pln(o.kwota)}</td></tr>)}</tbody>
+                  <tfoot><tr><td colSpan={5}>Razem</td><td className="num" data-label="Razem">{pln(wyn.sumy.razem)}</td></tr></tfoot></table></div>
                 <Kroki kroki={wyn.kroki.map(opisObliczenia)} />
               </div>
               {por && <div className="card navy"><h3>Porównanie wariantów</h3>
