@@ -99,17 +99,17 @@ export default function Home() {
         <p>Wybierz sytuację, która dotyczy Ciebie lub bliskiej osoby. Możesz przejść przez sprawę bez logowania.</p>
       </section>
 
-      {sesja && (
-        // Miejsce na kartę rezerwujemy od razu po zalogowaniu, żeby jej dojście z serwera nie spychało kafelków w dół.
-        <div className={pilnaSprawa?.token === sesja.token && !pilne ? undefined : "slot-pilne"}>
-          {pilne ? (
+      {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
+      {(
+        <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
+          {sesja && (pilne ? (
             <section className="card urgent mb" style={{ overflowWrap: "anywhere" }}>
               <h2>Najbliższy termin z profilu</h2>
               <p>{opisTerminu(pilne.co)}</p>
               <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
               <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
             </section>
-          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>}
+          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
         </div>
       )}
 

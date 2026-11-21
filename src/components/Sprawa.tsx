@@ -251,7 +251,9 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
   function skocz(e: React.MouseEvent, id: string) {
     e.preventDefault();
     const cel = document.getElementById(id);
-    przejdzDoKroku(cel, cel?.querySelector<HTMLElement>("h2, h3, summary") ?? null);
+    const naglowek = cel?.querySelector<HTMLElement>("h2, h3, summary") ?? null;
+    if (naglowek && !naglowek.hasAttribute("tabindex") && naglowek.tagName !== "SUMMARY") naglowek.tabIndex = -1;
+    przejdzDoKroku(cel, naglowek);
   }
   return (
     <>

@@ -67,9 +67,9 @@ select { text-overflow: ellipsis; }
 }
 @keyframes szkielet { 50% { opacity: .45; } }
 html.hc .szkielet i { background: #555; }
-.slot-pilne { min-height: 268px; }
+html[data-sesja] .slot-pilne { min-height: 213px; }
 .slot-profil { min-height: 380px; }
-@media (max-width: 600px) { .slot-pilne { min-height: 300px; } .slot-profil { min-height: 520px; } }
+@media (max-width: 600px) { html[data-sesja] .slot-pilne { min-height: 237px; } .slot-profil { min-height: 520px; } }
 
 /* --- Spis „Na tej stronie" w długim wyniku --------------------------------------------------- */
 .na-stronie { margin: 16px 0 0; padding: 12px 16px; background: #f5f5f5; border: 1px solid var(--line); }
@@ -112,3 +112,7 @@ html.hc .zus-subnav a { color: #ffe14d !important; }
   .tbl-karty td.num { text-align: left; white-space: normal; }
 }
 @media (max-width: 600px) { .tbl-karty td[colspan] { display: none; } .tbl-karty tfoot tr { border-top-color: var(--zus-green); } }
+
+/* Przycisk logowania ma stałą szerokość w obu stanach („Zaloguj" i „Wyloguj (imię)"), bo po wczytaniu sesji
+   zmiana napisu przestawiała zawijanie narzędzi w nagłówku i cała strona skakała o ok. 60 px. */
+.zus-header__tools .pue-login { min-width: 11.5rem; }
