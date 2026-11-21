@@ -36,7 +36,7 @@ export default function Kalkulator() {
 
   useEffect(() => { api("/api/scenariusze").then((j) => setScen((j.przypadki || []).filter((c: any) => c.wejscie?.tytul))).catch(() => {}); }, []);
   useEffect(() => {
-    try { const pre = JSON.parse(localStorage.getItem("rodzice.prefill") || "null"); if (pre?.podstawaM) { setF((x) => ({ ...x, podstawaM: String(pre.podstawaM), tryb: "wlasne" })); localStorage.removeItem("rodzice.prefill"); } } catch {}
+    try { const pre = JSON.parse(localStorage.getItem("rodzice.prefill") || "null"); if (pre?.podstawaM) { setF((x) => ({ ...x, podstawaM: String(pre.podstawaM), bruttoM: "", tryb: "wlasne", ...(pre.data ? { data: pre.data } : {}), ...(pre.dzieci ? { dzieci: Math.min(pre.dzieci, 5) } : {}) })); localStorage.removeItem("rodzice.prefill"); } } catch {}
     const q = new URLSearchParams(location.search).get("tryb"); if (q) setF((x) => ({ ...x, tryb: q as Tryb, ...(q === "matka" ? { rodzO: 0, ojcowski: false } : {}), ...(q === "laczenie" ? { rodzM: 14, laczTyg: 20 } : {}), ...(q === "adopcja" ? { tytul: "przysposobienie" } : {}) }));
   }, []);
 

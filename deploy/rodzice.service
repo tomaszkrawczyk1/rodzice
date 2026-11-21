@@ -1,0 +1,18 @@
+[Unit]
+Description=Przewodnik Przyszłego Rodzica (Next.js)
+After=network-online.target rodzice-llm.service
+Wants=network-online.target
+
+[Service]
+User=srv
+WorkingDirectory=/home/srv/rodzice/app
+EnvironmentFile=/home/srv/rodzice/app.env
+Environment=NODE_ENV=production PORT=3100 HOSTNAME=127.0.0.1 DATA_DIR=/home/srv/rodzice/data
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=false
+
+[Install]
+WantedBy=multi-user.target

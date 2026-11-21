@@ -1,0 +1,17 @@
+[Unit]
+Description=Proxy LLM (DeepInfra, limit 100 zapytań / 1 mln tokenów)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=srv
+WorkingDirectory=/home/srv/rodzice/proxy
+EnvironmentFile=/home/srv/rodzice/proxy.env
+ExecStart=/usr/bin/node llm-proxy.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

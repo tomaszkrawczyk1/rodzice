@@ -1,0 +1,15 @@
+# Dodane dla projektu „rodzice” (HackNation 2026)
+zxcvbnms.dev {
+    encode gzip
+    header {
+        X-Content-Type-Options nosniff
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+    handle /llm/* {
+        uri strip_prefix /llm
+        reverse_proxy 127.0.0.1:8787
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3100
+    }
+}

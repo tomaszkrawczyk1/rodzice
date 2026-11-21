@@ -7,3 +7,5 @@ out
 /data/runtime
 /prywatne
 .DS_Store
+.deploy
+tsconfig.tsbuildinfo
