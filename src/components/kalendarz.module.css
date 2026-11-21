@@ -76,6 +76,20 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
 .daty span { display: block; color: var(--muted); }
 .skutek { padding: .6em .75em; border-left: 3px solid var(--line); background: var(--gray); }
 .skutek strong { display: block; }
+.skutek .odznaka { display: table; margin-top: .45rem; white-space: normal; }
+.zrodla { margin-top: .75rem; }
+.zrodla p { margin: 0; overflow-wrap: anywhere; }
+.ostrzezenie {
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  border-left: 4px solid #b36b00;
+  background: var(--gray);
+  font-weight: 700;
+}
+.ostrzezenie p { margin: 0; }
+.ostrzezenie p + p { margin-top: .5rem; }
+.ograniczenia { margin-top: 2.5rem; border-top: 6px solid var(--zus-navy); padding-top: .75rem; }
+.ograniczenia ul { max-width: 65ch; }
 .trwa { border-left: 4px solid var(--zus-green); }
 .informacja { background: var(--gray); }
 .informacja ul { margin-bottom: 0; }

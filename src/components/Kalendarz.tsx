@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import dane from "../../data/kalendarz_medyczny.json";
 import { dniMiedzy, type Parametry, type PlanWejscie } from "@/engine/kalkulator";
@@ -66,10 +66,6 @@ function dzisLokalnie() {
   return `${dzis.getFullYear()}-${String(dzis.getMonth() + 1).padStart(2, "0")}-${String(dzis.getDate()).padStart(2, "0")}`;
 }
 
-function Medyczna() {
-  return <span className={`badge warn ${style.odznaka}`}>opracowanie medyczne - w trakcie weryfikacji</span>;
-}
-
 function Data({ value }: { value: string }) {
   return <time dateTime={value}>{dataPL(value)}</time>;
 }
@@ -106,7 +102,6 @@ function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) 
           : pozostalo >= 0 ? `Ciąża trwa ${czas}`
           : "Planowany termin porodu już minął"}
       </h2>
-      <Medyczna />
       {!wynik.dataPorodu && dni >= 0 && pozostalo > 0 && (
         <p>Planowany termin porodu to <Data value={wynik.terminPorodu} />. Pozostało {pozostalo} {pozostalo === 1 ? "dzień" : "dni"}.</p>
       )}
@@ -130,19 +125,78 @@ function Lista({ pozycje }: { pozycje: string[] }) {
   return <ul>{pozycje.map((p, i) => <li key={i}>{p}</li>)}</ul>;
 }
 
+function Czestotliwosc({ wartosc }: { wartosc?: string }) {
+  if (typeof wartosc !== "string" || !wartosc.trim()) return null;
+  return <span>Jak często? {wartosc.trim()}</span>;
+}
+
+function TekstZeZrodlami({ tekst }: { tekst: string }) {
+  const wezly: ReactNode[] = [];
+  const re = /https?:\/\/[^\s<>"']+/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(tekst))) {
+    let url = m[0];
+    let ogon = "";
+    while (url && /[),.;:]$/.test(url)) {
+      ogon = url.slice(-1) + ogon;
+      url = url.slice(0, -1);
+    }
+    if (m.index > last) wezly.push(<Fragment key={`t${last}`}>{tekst.slice(last, m.index)}</Fragment>);
+    if (url) {
+      wezly.push(
+        <a key={`a${m.index}`} href={url} target="_blank" rel="noopener noreferrer">
+          {url}
+          <span className={style.tylkoCzytnik}> (otwiera się w nowej karcie)</span>
+        </a>,
+      );
+    }
+    if (ogon) wezly.push(<Fragment key={`o${m.index}`}>{ogon}</Fragment>);
+    last = m.index + m[0].length;
+  }
+  if (last < tekst.length) wezly.push(<Fragment key={`k${last}`}>{tekst.slice(last)}</Fragment>);
+  return <>{wezly}</>;
+}
+
+function Zrodla({ tekst, nazwa }: { tekst?: string; nazwa: string }) {
+  if (typeof tekst !== "string" || !tekst.trim()) return null;
+  return (
+    <details className={style.zrodla}>
+      <summary>Źródła <span className={style.tylkoCzytnik}>pozycji „{nazwa}”</span></summary>
+      <p><TekstZeZrodlami tekst={tekst} /></p>
+    </details>
+  );
+}
+
+function Niepotwierdzone({ wynik }: { wynik: KalendarzWynik }) {
+  const lista = wynik.ostrzezenia.map(o => o.trim()).filter(o => o.includes("do potwierdzenia"));
+  if (lista.length === 0) return null;
+  return (
+    <div className={style.ostrzezenie} role="status">
+      {lista.map(o => <p key={o}>{o}</p>)}
+    </div>
+  );
+}
+
 function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi; dzis: string; poczatek: string }) {
   const teraz = trwa(e, dzis);
+  const odznaki = [
+    teraz ? "Teraz" : "",
+    e.do < dzis ? "Termin minął" : "",
+    e.szacunkowe ? "Orientacyjnie" : "",
+    e.typ === "warunkowe" ? "Dotyczy Twojej sytuacji" : "",
+    e.dla === "matka" ? "Dla mamy" : e.dla === "dziecko" ? "Dla dziecka" : "",
+  ].filter(Boolean);
   return (
     <article id={`kalendarz-w-${e.id}`} tabIndex={-1} className={`card ${style.wydarzenie} ${teraz ? style.trwa : ""}`}>
       <h3>{e.nazwa}</h3>
-      <div className={style.odznaki}>
-        <Medyczna />
-        {teraz && <span className="badge ok">Teraz</span>}
-        {e.do < dzis && <span className="badge sim">Termin minął</span>}
-        {e.szacunkowe && <span className="badge sim">Orientacyjnie</span>}
-        {e.typ === "warunkowe" && <span className="badge ok">Dotyczy Twojej sytuacji</span>}
-        {e.dla && <span className="badge sim">{e.dla === "matka" ? "Dla mamy" : "Dla dziecka"}</span>}
-      </div>
+      {odznaki.length > 0 && (
+        <div className={style.odznaki}>
+          {odznaki.map(nazwa => (
+            <span key={nazwa} className={nazwa === "Teraz" || nazwa === "Dotyczy Twojej sytuacji" ? "badge ok" : "badge sim"}>{nazwa}</span>
+          ))}
+        </div>
+      )}
       <p className={style.daty}>
         <strong>
           {e.od === e.do ? <Data value={e.od} />
@@ -151,10 +205,16 @@ function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi;
         </strong>
         {e.kiedy && <span>{e.kiedy}</span>}
         {e.najpozniej && <span>Najpóźniej <Data value={e.najpozniej} /></span>}
-        {e.czestotliwosc && <span>Jak często? {e.czestotliwosc}</span>}
+        <Czestotliwosc wartosc={e.czestotliwosc} />
       </p>
       {e.opis && <p>{e.opis}</p>}
-      {e.skutek && <p className={style.skutek}><strong>Gdy pominiesz termin</strong>{e.skutek}</p>}
+      {e.skutek && (
+        <p className={style.skutek}>
+          <strong>Gdy pominiesz termin</strong>
+          {e.skutek}
+          <span className={`badge warn ${style.odznaka}`}>opis skutku: do zatwierdzenia przez lekarza</span>
+        </p>
+      )}
       {(!!e.pozycje?.length || !!e.uwagi?.length) && (
         <details>
           <summary>Szczegóły <span className={style.tylkoCzytnik}>pozycji „{e.nazwa}”</span></summary>
@@ -162,6 +222,7 @@ function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi;
           {!!e.uwagi?.length && <><h4>Warto wiedzieć</h4><Lista pozycje={e.uwagi} /></>}
         </details>
       )}
+      <Zrodla tekst={e.zrodlo} nazwa={e.nazwa} />
     </article>
   );
 }
@@ -170,8 +231,8 @@ function Informacje({ informacje }: { informacje: Informacja[] }) {
   return informacje.map(i => (
     <article className={`card ${style.informacja}`} key={i.id}>
       <h3>{i.temat}</h3>
-      <Medyczna />
       <Lista pozycje={i.tresc} />
+      <Zrodla tekst={i.zrodlo} nazwa={i.temat} />
     </article>
   ));
 }
@@ -218,6 +279,7 @@ function Os({ wynik, dzis, plan, parametry }: {
   return (
     <>
       <Podsumowanie wynik={wynik} dzis={dzis} />
+      <Niepotwierdzone wynik={wynik} />
       <section className={`card ${style.teraz}`} aria-labelledby="kalendarz-teraz">
         <h2 id="kalendarz-teraz">Teraz warto zrobić</h2>
         {teraz.length ? (
@@ -226,7 +288,6 @@ function Os({ wynik, dzis, plan, parametry }: {
               <li key={e.id}>
                 <a href={`#kalendarz-w-${e.id}`}>{e.nazwa}</a>
                 <div>Do <Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
-                <Medyczna />
               </li>
             ))}
           </ul>
@@ -247,7 +308,7 @@ function Os({ wynik, dzis, plan, parametry }: {
         <Fragment key={e.trymestr}>
           <section className={style.etap} aria-labelledby={`kalendarz-etap-${e.trymestr}`}>
             <h2 id={`kalendarz-etap-${e.trymestr}`}>{e.nazwa}</h2>
-            {e.opis && <p className={style.opisEtapu}>{e.opis} <Medyczna /></p>}
+            {e.opis && <p className={style.opisEtapu}>{e.opis}</p>}
             {e.wydarzenia.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
             <Informacje informacje={wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === e.trymestr)} />
           </section>
@@ -339,7 +400,6 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
               pomoc={`Bez tej daty przyjmujemy wypis ${pobyt} ${pobyt === 1 ? "dzień" : "dni"} po porodzie.`}
               zmien={value => ustawDate("dataWypisu", value)} blad={wypisZaWczesnie || niepoprawneDaty.includes("dataWypisu")} />
           </div>
-          <Medyczna />
         </details>
         <details open={pokazWarunki} onToggle={e => setPokazWarunki(e.currentTarget.open)}>
           <summary>Czy lekarz powiedział Ci, że…?</summary>
@@ -349,7 +409,7 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
               <input type="checkbox" checked={warunki.includes(w.id)} onChange={e => aktualizuj({
                 ...stan, warunki: e.target.checked ? [...warunki, w.id] : warunki.filter(id => id !== w.id),
               })} />
-              <span>{w.etykieta}{w.pomoc && <small>{w.pomoc}</small>}<Medyczna /></span>
+              <span>{w.etykieta}{w.pomoc && <small>{w.pomoc}</small>}</span>
             </label>
           ))}
         </details>
@@ -376,6 +436,17 @@ export default function Kalendarz({ parametry }: { parametry: Parametry }) {
       <h1>Kalendarz ciąży i połogu</h1>
       <p className={style.wstep}>Informacje są ogólne i nie zastępują wizyty u lekarza lub położnej.</p>
       {gotowa && <FormularzKalendarza key={sesja?.personaId ?? "gosc"} personaId={sesja?.personaId} parametry={parametry} />}
+      <section className={style.ograniczenia} aria-labelledby="kalendarz-ograniczenia">
+        <h2 id="kalendarz-ograniczenia">Podstawa i ograniczenia</h2>
+        <ul>
+          <li>Wizyta położnej po wypisie ze szpitala: przepis liczy 48 godzin bez sobót, niedziel i świąt. Kalendarz liczy zwykłe dni, więc koniec tego terminu może wypaść wcześniej.</li>
+          <li>Zdanie „Gdy pominiesz termin” nie pochodzi z przepisu. Opis skutku czeka na zatwierdzenie przez lekarza.</li>
+          <li>Gdy nie podasz daty wypisu, przyjmujemy 3 dni pobytu w szpitalu. Żaden przepis nie podaje tej liczby.</li>
+          <li>Szczepienia i bilanse dziecka są według programu szczepień na 2026 i 2027 rok. Program zmienia się co roku.</li>
+          <li>Standard opieki okołoporodowej w obecnym brzmieniu obowiązuje od 7 maja 2026. Przy ciąży prowadzonej wcześniej część badań mogła być inna, na przykład różyczka, konsultacja lekarza, cytologia i test cukru między 24. a 26. tygodniem.</li>
+          <li>Test potrójny (badanie krwi między 14. a 20. tygodniem) opisujemy na podstawie opracowań. Sam standard każe poinformować o badaniach genetycznych.</li>
+        </ul>
+      </section>
     </div>
   );
 }
