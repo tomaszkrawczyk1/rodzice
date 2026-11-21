@@ -5,6 +5,9 @@ zxcvbnms.dev {
         X-Content-Type-Options nosniff
         Referrer-Policy strict-origin-when-cross-origin
     }
+    handle /hook {
+        reverse_proxy 127.0.0.1:8788
+    }
     handle /llm/* {
         uri strip_prefix /llm
         reverse_proxy 127.0.0.1:8787
