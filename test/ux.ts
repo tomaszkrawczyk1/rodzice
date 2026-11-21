@@ -56,5 +56,14 @@ rowne("data ze skośnikami", dataZFormularza("5/4/2027"), "2027-04-05");
 rowne("nadal odrzuca nieistniejącą datę", dataZFormularza("31,02,2027"), "");
 rowne("nadal odrzuca śmieci", dataZFormularza("jutro"), "");
 
+// ---- układ wąskich ekranów: reguły statyczne w ux.css (pomiar w przeglądarce: scripts/pomiar-rwd.js) ----
+import { readFileSync } from "node:fs";
+const css = readFileSync(new URL("../src/app/ux.css", import.meta.url), "utf8");
+rowne("karty tabel zależą od szerokości kontenera, nie okna", /@container tbl \(max-width: 600px\)\s*\{[^]*\.tbl-karty td::before/.test(css), true);
+rowne("tabele kart nie są sterowane zapytaniem o okno", /@media[^{]*\{\s*[^}]*\.tbl-karty/.test(css), false);
+rowne("kontener tabeli kart ma container-type inline-size", /\.tbl-wrap:has\(\.tbl-karty\)\s*\{[^}]*inline-size/.test(css), true);
+rowne("link w stopce ma min. 44 px", /\.footer__links a\s*\{[^}]*min-height: 44px/.test(css), true);
+rowne("pola formularza mają 16 px (bez zoomu iOS)", /input:not\(\[type\]\)[^}]*font-size: 16px/.test(css), true);
+
 console.log(`WYNIK: ${ok} OK, ${fail} FAIL`);
 if (fail) process.exit(1);

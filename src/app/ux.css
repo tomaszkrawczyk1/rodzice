@@ -97,9 +97,11 @@ html.hc .na-stronie { background: #000; border-color: #fff; }
 html.hc .zus-subnav { background: #000; border-color: #fff; }
 html.hc .zus-subnav a { color: #ffe14d !important; }
 
-/* --- Tabele na wąskich ekranach: wiersz = karta „etykieta: wartość" ------------------------------ */
-@media (max-width: 600px) {
-  .tbl-wrap:has(.tbl-karty) { overflow: visible; }
+/* --- Tabele: wiersz = karta „etykieta: wartość", gdy brakuje miejsca ------------------------------
+   Decyduje szerokość kontenera tabeli, nie okna: w kalkulatorze na tablecie (768-1100 px) wynik leży w wąskiej
+   kolumnie obok formularza, więc zapytanie o okno zostawiało tam tabelę 6-kolumnową przewijaną w 165 px. */
+.tbl-wrap:has(.tbl-karty) { container: tbl / inline-size; }
+@container tbl (max-width: 600px) {
   table.tbl-karty { border: 0; display: block; }
   .tbl-karty thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
   .tbl-karty tbody, .tbl-karty tfoot { display: block; }
@@ -110,9 +112,14 @@ html.hc .zus-subnav a { color: #ffe14d !important; }
   .tbl-karty td:not([data-label]) { display: block; }
   .tbl-karty td:not([data-label])::before { content: none; }
   .tbl-karty td.num { text-align: left; white-space: normal; }
+  .tbl-karty td[colspan] { display: none; }
+  .tbl-karty tfoot tr { border-top-color: var(--zus-green); }
 }
-@media (max-width: 600px) { .tbl-karty td[colspan] { display: none; } .tbl-karty tfoot tr { border-top-color: var(--zus-green); } }
 
 /* Przycisk logowania ma stałą szerokość w obu stanach („Zaloguj" i „Wyloguj (imię)"), bo po wczytaniu sesji
    zmiana napisu przestawiała zawijanie narzędzi w nagłówku i cała strona skakała o ok. 60 px. */
 .zus-header__tools .pue-login { min-width: 11.5rem; }
+
+/* --- Cele dotykowe ≥ 44 px: stopka, szukaj, logowanie ------------------------------------------- */
+.footer__links a { min-height: 44px; display: flex; align-items: center; }
+.zus-search, .zus-header__tools .pue-login { min-height: 44px; }
