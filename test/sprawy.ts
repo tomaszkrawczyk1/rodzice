@@ -25,7 +25,7 @@ export async function testySpraw(rowne: Rowne) {
       return nextLoad(url, context);
     },
   });
-  const { sprawa, szukaj, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, aktywneOdpowiedzi, zbudujCtx } = await import("../src/lib/sprawy.ts").finally(() => hook.deregister());
+  const { sprawa, szukaj, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, aktywneOdpowiedzi, zbudujCtx, etykietaOdp } = await import("../src/lib/sprawy.ts").finally(() => hook.deregister());
   const pytania = (id: string) => sprawa(id)!.pytania;
   const pyt = (id: string, pole: string) => pytania(id).find((q) => q.id === pole)!;
   const { pln } = await import("../src/lib/format.ts");
@@ -36,6 +36,8 @@ export async function testySpraw(rowne: Rowne) {
   rowne("Zwolnienie przyjmuje dokładnie 270 dni", bladOdpowiedzi(pyt(chor, "dniNiezd"), "270", {}), undefined);
   rowne("Kwota z separatorem tysięcy i polskim przecinkiem", bladOdpowiedzi(pyt(chor, "brutto"), "3 450,25", {}), undefined);
   rowne("Kwota brutto musi być dodatnia", !!bladOdpowiedzi(pyt(chor, "brutto"), "0", {}), true);
+  rowne("Kwota z profilu w polskim formacie", etykietaOdp(pyt(chor, "podstawaM"), "7334.65"), pln(7334.65));
+  rowne("Jeden dzień z profilu ma poprawną odmianę", etykietaOdp(pyt(chor, "dniNiezd"), "1"), "1 dzień");
   for (const v of ["", "2027-02-29", "0000-01-01", "2027-13-01", "01000-01-01", "2027-04-31"]) {
     rowne(`Odrzuca datę "${v}"`, !!bladOdpowiedzi(pyt(urlop, "od"), v, {}), true);
   }

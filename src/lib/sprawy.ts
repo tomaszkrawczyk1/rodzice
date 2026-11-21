@@ -632,8 +632,19 @@ export const TOP: Record<Moment, { tytul: string; ids: string[] }> = {
   dziecko: { tytul: "Dziecko już jest", ids: ["wniosek-zasilek", "urlop-pracodawca", "podzial-urlopu"] },
 };
 
-/** Pytanie → odpowiedź o tytule sprawy, gdy opcja odpowiedzi to etykieta z pytania. */
-export const etykietaOdp = (q: Pyt, v: any): string => (q.typ === "wybor" ? (q.opcje?.find((x) => x.v === String(v))?.label ?? String(v)) : q.typ === "tak_nie" ? (v === "tak" ? "Tak" : "Nie") : q.typ === "data" ? dataPL(v) : q.typ === "liczba" ? `${v}${q.jednostka ? " " + q.jednostka : ""}` : String(v));
+export function etykietaOdp(q: Pyt, v: string): string {
+  if (q.typ === "wybor") return q.opcje?.find((x) => x.v === v)?.label ?? v;
+  if (q.typ === "tak_nie") return v === "tak" ? "Tak" : "Nie";
+  if (q.typ === "data") return dataPL(v);
+  if (q.typ === "liczba") {
+    const n = num(v);
+    if (q.jednostka === "zł") return pln(n);
+    if (q.jednostka === "dni") return wDniach(n);
+    if (q.jednostka === "tygodni") return tygodnie(n);
+    return liczba(n);
+  }
+  return v;
+}
 
 /* ============ wyszukiwanie lokalne („opisz własnymi słowami”) ============ */
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/ł/g, "l");
