@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./ux.css";
 import { Lato } from "next/font/google";
 import { SesjaProvider } from "@/lib/sesja";
 import Header from "@/components/Header";

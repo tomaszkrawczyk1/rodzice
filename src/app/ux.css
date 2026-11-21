@@ -1,0 +1,114 @@
+/* ux.css: zachowanie i układ (przewijanie, fokus, stabilność, wąskie ekrany, dotyk).
+   Kolory, kroje i wygląd komponentów zostają w globals.css. Ten plik ładuje się po nim i tylko go uzupełnia. */
+
+:root { --header-h: 0px; --ux-gap: 12px; }
+
+/* --- Przewijanie i fokus ---------------------------------------------------------------
+   Nagłówek przewija się razem ze stroną (na telefonie zajmował 300-400 px, czyli prawie połowę ekranu,
+   i zasłaniał tytuł pytania po każdym przewinięciu do pola). Gdyby ktoś znów go przykleił, wystarczy,
+   że Header ustawi --header-h: kotwice, fokus i scrollIntoView same uwzględnią jego wysokość. */
+.site-top { position: static; }
+html { scroll-padding-top: calc(var(--header-h) + var(--ux-gap)); -webkit-tap-highlight-color: transparent; }
+:target, [id], [data-fokus] { scroll-margin-top: calc(var(--header-h) + var(--ux-gap)); }
+[tabindex="-1"]:focus { outline: none; }   /* fokus ustawiany programowo na nagłówku kroku, bez ramki */
+
+/* --- Dotyk -------------------------------------------------------------------------------- */
+a, button, summary, input, select, textarea, label, [role="button"] { touch-action: manipulation; }
+button, .btn, .opt, .tile, .chip, .persona, .tab, summary { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.btn { transition: background .15s, border-color .15s, color .15s, transform .12s cubic-bezier(.23, 1, .32, 1); }
+.opt, .tile, .chip, .persona { transition: border-color .15s, background .15s, transform .12s cubic-bezier(.23, 1, .32, 1); }
+@media (prefers-reduced-motion: no-preference) {
+  .btn:active, .chip:active { transform: scale(.97); }
+  .opt:active, .tile:active, .persona:active { transform: scale(.985); }
+}
+/* Na ekranie dotykowym :hover zostaje po tapnięciu. Cofamy stan „najechania", żeby nic nie wyglądało na wybrane. */
+@media (hover: none) {
+  .opt:hover:not(.sel), .tile:hover, .persona:hover { border-top-color: #ececec; }
+  .zus-nav li:hover:not(.selected) { border-top-color: #ececec; }
+  .btn-primary:hover { background: var(--zus-green); color: #fff; border-color: var(--zus-green); box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .2); }
+  .btn-secondary:hover { background: #f3f3f3; color: var(--zus-green-dark); border-color: #f3f3f3; }
+  .btn-ghost:hover, .chip:hover { background: #fff; }
+}
+
+/* Obrys fokusu: ciemny na jasnym tle (pomarańcz miał 1,7:1, wymagane jest 3:1), biała przerwa na ciemnym. */
+:focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 2px; box-shadow: 0 0 0 2px #fff; }
+.btn-primary:focus-visible, .zus-nav a:focus-visible { outline-color: var(--zus-navy); }
+html.hc :focus-visible { box-shadow: 0 0 0 2px #000; }
+
+/* --- Pola formularzy: jeden wygląd, 44 px, 16 px (iOS nie powiększa strony przy fokusie) ---- */
+input:not([type]), input[type=tel], input[type=url] {
+  font: inherit; font-size: 16px; padding: 8px 10px; border: 1px solid #767676; border-radius: 3px;
+  background: #fff; width: 100%; min-height: 44px; color: var(--ink); max-width: 100%;
+}
+input[type=date] { display: block; line-height: 1.2; min-width: 0; }
+input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.4em; }
+.check { min-height: 44px; padding-block: 10px; margin-block: 0; }
+.check input { margin-top: 0; }
+select { text-overflow: ellipsis; }
+.field { min-width: 0; }
+
+/* --- Cele dotykowe w nagłówku i nawigacji pomocniczej ------------------------------------- */
+.zus-logo { display: flex; align-items: center; min-height: 44px; }
+.crumbs__list li { font-size: 16px; }
+.crumbs__list a { display: inline-flex; align-items: center; min-height: 44px; }
+.crumbs__list li.last > span { display: inline-flex; align-items: center; min-height: 44px; }
+.powrot { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 1099px) {
+  .pue-login__label { white-space: normal; overflow: visible; text-overflow: clip; }
+}
+
+/* --- Stany ładowania: rezerwują miejsce, więc nic nie skacze po załadowaniu ---------------- */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.szkielet { min-height: 320px; }
+.szkielet i { display: block; background: #ececec; height: 16px; margin: 14px 0; border-radius: 2px; }
+.szkielet .szkielet__tytul { height: 28px; width: 70%; }
+@media (prefers-reduced-motion: no-preference) {
+  .szkielet i { animation: szkielet 1.4s ease-in-out infinite; }
+}
+@keyframes szkielet { 50% { opacity: .45; } }
+html.hc .szkielet i { background: #555; }
+.slot-pilne { min-height: 268px; }
+.slot-profil { min-height: 380px; }
+@media (max-width: 600px) { .slot-pilne { min-height: 300px; } .slot-profil { min-height: 520px; } }
+
+/* --- Spis „Na tej stronie" w długim wyniku --------------------------------------------------- */
+.na-stronie { margin: 16px 0 0; padding: 12px 16px; background: #f5f5f5; border: 1px solid var(--line); }
+.na-stronie ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 16px; }
+.na-stronie a { display: inline-flex; align-items: center; min-height: 44px; }
+html.hc .na-stronie { background: #000; border-color: #fff; }
+
+/* --- Menu: podmenu „Formularze" ---------------------------------------------------------------
+   Na telefonie lista zagnieżdżona w panelu menu, na komputerze osobny pasek pod menu (tylko w tej części serwisu). */
+.zus-nav__sub { list-style: none; margin: 0; padding: 0; }
+.zus-subnav { display: none; }
+@media (max-width: 1099px) {
+  .zus-nav__sub li { border-top: 1px solid #e7e7e7; }
+  .zus-nav .zus-nav__sub a { padding-left: 32px; font-weight: 400; min-height: 48px; }
+  .zus-nav .zus-nav__sub a[aria-current="page"] { font-weight: 700; }
+}
+@media (min-width: 1100px) {
+  .zus-nav__sub { display: none; }
+  .zus-subnav { display: block; background: #f5f5f5; border-top: 1px solid var(--line); }
+  .zus-subnav ul { display: flex; flex-wrap: wrap; list-style: none; margin: 0 auto; padding: 0 16px; gap: 0 8px; }
+  .zus-subnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 6px 12px; color: #000; text-decoration: none; }
+  .zus-subnav a:hover { text-decoration: underline; }
+  .zus-subnav a[aria-current="page"] { font-weight: 700; box-shadow: inset 0 -4px 0 var(--zus-green); }
+}
+html.hc .zus-subnav { background: #000; border-color: #fff; }
+html.hc .zus-subnav a { color: #ffe14d !important; }
+
+/* --- Tabele na wąskich ekranach: wiersz = karta „etykieta: wartość" ------------------------------ */
+@media (max-width: 600px) {
+  .tbl-wrap:has(.tbl-karty) { overflow: visible; }
+  table.tbl-karty { border: 0; display: block; }
+  .tbl-karty thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .tbl-karty tbody, .tbl-karty tfoot { display: block; }
+  .tbl-karty tr { display: block; border: 1px solid var(--line); border-top: 4px solid #ececec; margin: 0 0 12px; padding: 4px 0; }
+  .tbl-karty td { display: grid; grid-template-columns: minmax(6.5rem, 38%) minmax(0, 1fr); gap: 4px 12px; border: 0; border-bottom: 1px solid var(--line); padding: 8px 12px; text-align: left; overflow-wrap: anywhere; }
+  .tbl-karty tr > td:last-child { border-bottom: 0; }
+  .tbl-karty td::before { content: attr(data-label); font-weight: 700; color: var(--muted); }
+  .tbl-karty td:not([data-label]) { display: block; }
+  .tbl-karty td:not([data-label])::before { content: none; }
+  .tbl-karty td.num { text-align: left; white-space: normal; }
+}
+@media (max-width: 600px) { .tbl-karty td[colspan] { display: none; } .tbl-karty tfoot tr { border-top-color: var(--zus-green); } }
