@@ -9,7 +9,8 @@ import { Alert, Kroki, Lista } from "@/components/ui";
 import { Pole as Field } from "@/components/Pole";
 import { Kreator, useKreator, type KrokDef } from "./Kreator";
 import { WyborSytuacji } from "./WyborSytuacji";
-import { P, L, W, T, niezbywalne, standard, usredniony, num, type Tryb, type Sytuacja } from "./stale";
+import { P, L, W, T, niezbywalne, standard, usredniony, num, czySytuacja, type Tryb, type Sytuacja } from "./stale";
+import { parametrZywy, zastap } from "./adres";
 import css from "./kalkulator.module.css";
 
 // Oś czasu, tabela i porównanie wariantów ładują się dopiero przy ostatnim kroku.
@@ -47,6 +48,7 @@ function stanPoczatkowy(tryb: Tryb): F {
   return { ...START, tryb, ...dod };
 }
 
+/** `poczatkowy` to tryb z adresu (?tryb=…): ustala stan startowy, a potem to wybór użytkownika jest źródłem prawdy, a adres za nim podąża. */
 export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb; onOjciec: () => void }) {
   const [f, setF] = useState<F>(() => stanPoczatkowy(poczatkowy));
   const [podM, setPodM] = useState<any>(null);
@@ -64,7 +66,6 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
   const set = (p: Partial<F>) => setF((x) => ({ ...x, ...p }));
   const dwoje = f.tryb !== "matka";
 
-  const { krok, maks, idz } = useKreator(KROKI.length);
   const [pokazBledy, setPokazBledy] = useState(false);
   const [fokusBledu, setFokusBledu] = useState(0);
   const tresc = useRef<HTMLDivElement>(null);
@@ -92,6 +93,20 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
 
   const podstawaM = !Number.isNaN(num(f.podstawaM)) ? num(f.podstawaM) : podM?.podstawaMiesieczna;
   const podstawaO = !Number.isNaN(num(f.podstawaO)) ? num(f.podstawaO) : podO?.podstawaMiesieczna;
+
+  // --- krok z adresu (?krok=…) ---
+  // Najdalszy krok, do którego wystarczą wpisane dane. Adres z dalszym krokiem (odświeżenie, link) prowadzi do pierwszego braku.
+  const brakData = !f.data;
+  const brakPodstawy = !(podstawaM > 0);
+  const { krok, maks, idz, wstecz, adres } = useKreator(KROKI, brakData ? K.dziecko : brakPodstawy ? K.zarobki : K.wynik);
+  useEffect(() => { setPokazBledy(false); }, [krok]);   // zmiana kroku (także „Wstecz" przeglądarki) czyści komunikaty o błędach
+
+  // Wybrany tryb zapisujemy w adresie (?tryb=…) bez nowego wpisu w historii. Dotyczy też trybu ustawionego przez
+  // wczytany scenariusz albo dane z wgranego dokumentu, a po „Wstecz"/„Dalej" przeglądarki przywraca adres do bieżącego wyboru.
+  useEffect(() => {
+    const zAdresu = parametrZywy("tryb");
+    if (f.tryb !== (czySytuacja(zAdresu) ? zAdresu : "oboje")) zastap({ tryb: f.tryb });
+  }, [f.tryb, poczatkowy]);
 
   const wiekGranicy = useMemo(() => {
     if (f.tytul === "porod" || !f.dataUrDziecka) return undefined;
@@ -179,13 +194,11 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
   const rodzicDrugi = przyjecie ? "Rodzic 2" : "Ojciec";
 
   // --- kroki: walidacja i nawigacja ---
-  const brakData = !f.data;
-  const brakPodstawy = !(podstawaM > 0);
   const komunikatData = przyjecie ? "Podaj datę przyjęcia dziecka na wychowanie." : "Podaj datę urodzenia dziecka lub przewidywaną datę porodu.";
   const komunikatPodstawy = "Podaj średnie wynagrodzenie brutto albo gotową podstawę zasiłku.";
   useEffect(() => { if (fokusBledu) tresc.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(); }, [fokusBledu]);
 
-  function idzDo(k: number) { setPokazBledy(false); idz(k); }
+  function idzDo(k: number) { setPokazBledy(false); idz(k); }   // nowy krok = nowy wpis historii (adres ?krok=…)
   function dalej() {
     if ((krok === K.dziecko && brakData) || (krok === K.zarobki && brakPodstawy)) { setPokazBledy(true); setFokusBledu((n) => n + 1); return; }
     idzDo(krok + 1);
@@ -201,7 +214,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
   ) : null;
 
   return (
-    <Kreator kroki={KROKI} krok={krok} maks={maks} onKrok={idzDo} onDalej={dalej} dalejEtykieta={krok === K.wariant ? "Pokaż wynik" : "Dalej"} podglad={podglad}>
+    <Kreator kroki={KROKI} krok={krok} maks={maks} onKrok={idzDo} onWstecz={wstecz} adres={adres} onDalej={dalej} dalejEtykieta={krok === K.wariant ? "Pokaż wynik" : "Dalej"} podglad={podglad}>
       <div ref={tresc}>
         {krok === K.sytuacja && (
           <WyborSytuacji wartosc={f.tryb} onZmiana={sytuacja}>

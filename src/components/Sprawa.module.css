@@ -1,0 +1,6 @@
+/* Treść sprawy jest renderowana na serwerze dla gościa (bez danych z profilu). Gdy przeglądarka ma zapisaną sesję,
+   skrypt w <head> ustawia html[data-sesja] jeszcze przed malowaniem: wtedy zamiast treści gościa pokazujemy szkielet
+   (na czas pobierania danych z profilu), żeby nikt nie zobaczył pytań, które zaraz się zmienią. */
+:global(html[data-sesja]) .gosc { display: none; }
+.sesja { display: none; }
+:global(html[data-sesja]) .sesja { display: block; }

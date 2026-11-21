@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import PlanRodziny from "./PlanRodziny";
+import { zastap } from "./adres";
+import { przekazFokusWyboru } from "./WyborSytuacji";
 import { czySytuacja, type Sytuacja, type Tryb } from "./stale";
 
 // Druga ścieżka (tata / drugi rodzic) ma własny kod i ładuje się osobno. Dalej renderuje się po stronie serwera,
@@ -10,12 +12,16 @@ const Ojcowski = dynamic(() => import("./Ojcowski"), {
   loading: () => <p role="status">Wczytuję kalkulator…</p>,
 });
 
-/** Wybór ścieżki: plan rodziny (kilka trybów) albo „tata / drugi rodzic". Stan startowy pochodzi z adresu (?tryb=…). */
-export default function Kalkulator({ tryb }: { tryb?: string }) {
-  const start: Sytuacja = czySytuacja(tryb) ? tryb : "oboje";
-  const [ojciec, setOjciec] = useState(start === "ojciec");
-  const [plan, setPlan] = useState<Tryb>(start === "ojciec" ? "oboje" : start);
+/**
+ * Wybór ścieżki: plan rodziny (kilka trybów) albo „tata / drugi rodzic". Ścieżka siedzi w adresie (?tryb=…),
+ * więc można ją podlinkować; zmiana wyboru poprawia adres bez dokładania wpisu w historii (krok to osobna sprawa).
+ */
+export default function Kalkulator() {
+  const surowy = useSearchParams().get("tryb");
+  const tryb: Sytuacja = czySytuacja(surowy) ? surowy : "oboje";
+  // Przełączenie ścieżki podmienia cały kreator, więc fokus (na wybranej opcji) przekazujemy nowemu widokowi.
+  const wybierz = (s: Sytuacja) => { przekazFokusWyboru(); zastap({ tryb: s, krok: null }); };
 
-  if (ojciec) return <Ojcowski onSytuacja={(s) => { if (s !== "ojciec") { setPlan(s); setOjciec(false); } }} />;
-  return <PlanRodziny poczatkowy={plan} onOjciec={() => setOjciec(true)} />;
+  if (tryb === "ojciec") return <Ojcowski onSytuacja={(s) => { if (s !== "ojciec") wybierz(s); }} />;
+  return <PlanRodziny poczatkowy={tryb as Tryb} onOjciec={() => wybierz("ojciec")} />;
 }

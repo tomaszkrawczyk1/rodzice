@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="footer zus-footer" role="contentinfo">
@@ -19,6 +21,12 @@ export default function Footer() {
           </ul>
         </nav>
         <div className="footer__side">
+          {/* Strona „O projekcie" nie miała żadnego linku w serwisie. */}
+          <nav aria-label="O serwisie">
+            <ul className="footer__links">
+              <li><Link href="/o-projekcie">O projekcie i użyciu AI</Link></li>
+            </ul>
+          </nav>
           <a className="to-top" href="#header">Do góry<span className="to-top__circle" aria-hidden="true" /></a>
           {/* Informacja „to nie ZUS" jest tylko w pasku u góry strony. Tu zostaje uwaga o charakterze wyliczeń. */}
           <p className="footer__note">Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>

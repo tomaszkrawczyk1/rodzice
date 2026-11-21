@@ -695,6 +695,23 @@ function podobienstwo(a: string, b: string): number {
   return krotsze >= 5 && jednaLiterowka(a, b) ? 0.7 : 0;
 }
 
+/** Słowa o przełożonym; w odpowiedziach poradnika występuje „pracodawca". */
+const PRACODAWCA = ["szef", "szefa", "szefowa", "szefowej", "szefem", "szefie", "kadry", "kadr", "kierownik", "przelozony", "przelozonego", "pracodawca", "pracodawcy", "pracodawce"];
+/** Formy „odmowy" występujące w tekstach poradnika (po normalizacji, bez polskich znaków). */
+const ODMOWA = ["odmawia", "odmowa", "odmowil", "odmowila", "odmowic", "odmowie", "odmowy"];
+
+/** „odmawia", „nie chce dać", „nie zgadza się": zapytanie o odmowę. Tylko dokładne formy, żeby nie łapać przypadkowych zdań. */
+function czyOdmowa(slowa: string[]): boolean {
+  const ma = (...r: string[]) => r.some((x) => slowa.includes(x));
+  return slowa.some((w) => w.startsWith("odmow") || w.startsWith("odmaw")) || (ma("nie") && (ma("zgadza", "zgodzi", "zgodzil", "pozwala", "pozwolil", "wyraza") ||
+    (ma("chce", "chca", "chcial", "chciala") && ma("dac", "dal", "dawac", "udzielic", "zgodzic", "pozwolic", "puscic"))));
+}
+
+/** Czy z wpisanego tekstu da się coś wyszukać (co najmniej jedno słowo z 3+ znaków, bez słów pomijanych). Np. „<b>x</b>" nie. */
+export function zapytanieMaSens(q: string): boolean {
+  return istotne(tok(q)).length > 0;
+}
+
 function intencjaZapytania(slowa: string[]): string | undefined {
   const ma = (...rdzenie: string[]) => rdzenie.some((r) => slowa.some((w) => podobienstwo(w, r) > 0));
   const urlop = ma("urlop", "urlopu", "urlopie", "rodziciel", "rodzicielski", "rodzicielskim");
@@ -708,14 +725,15 @@ function intencjaZapytania(slowa: string[]): string | undefined {
   if (ma("l4", "zwolnienie", "ciazowe", "chorobowy", "chorobowym") || (ma("zla") && ma("kod"))) return "zwolnienie-ciaza";
   if (urlop && ma("pracowac", "praca", "prace", "etatu", "dorabiac", "laczenie", "lacznie")) return "praca-na-urlopie";
   if ((urlop || ma("macierzynski", "ojcowski")) && ma("szef", "szefa", "kadr", "kadry", "pracodawca", "pracodawcy", "pismo", "papier") ||
-      ma("ojcowski") && ma("wniosek", "wniosku")) return "urlop-pracodawca";
+      ma("ojcowski") && ma("wniosek", "wniosku") ||
+      (czyOdmowa(slowa) && slowa.some((w) => PRACODAWCA.includes(w)))) return "urlop-pracodawca";
   if (ma("podzielic", "podzial") || (urlop && ma("maz", "partner", "partnerem", "tata", "taty")) ||
       (ma("tygodni") && ma("tata", "taty", "ojciec", "ojca"))) return "podzial-urlopu";
   if (ma("zam", "macierzynski", "81,5", "81.5") || (ma("porodzie") && ma("dostane", "pieniadze", "wyplata"))) return "wniosek-zasilek";
   if (ma("ojcowski")) return "urlop-pracodawca";
 }
 
-export function szukaj<T extends { id: string; pytanie: string; odpowiedz: string }>(q: string, faq: T[]) {
+export function szukaj<T extends { id: string; pytanie: string; odpowiedz: string; kroki?: string[] }>(q: string, faq: T[]) {
   const slowa = tok(q);
   const t = istotne(slowa);
   if (!t.length) return { sprawy: [] as Sprawa[], faq: [] as T[] };
@@ -728,11 +746,34 @@ export function szukaj<T extends { id: string; pytanie: string; odpowiedz: strin
   const sp = wybrana ? [wybrana] : SPRAWY.map((s) => ({ s, p: wynik(`${s.tytul} ${s.slowa} ${s.krotko}`) }))
     .filter((x) => x.p >= 0.7).sort((a, b) => b.p - a.p).slice(0, 3).map((x) => x.s);
   const powiazane = sp[0]?.faq ?? [];
+  const odmowa = czyOdmowa(slowa);
+  const przelozony = slowa.some((w) => PRACODAWCA.includes(w));
+  if (wybrana && (odmowa || przelozony)) return { sprawy: sp, faq: faqOdmowy(faq, powiazane, t, odmowa) };
   const fq = faq.filter((f) => !wybrana || powiazane.includes(f.id))
     .map((f) => ({ f, p: wynik(f.pytanie), kolejnosc: powiazane.indexOf(f.id) }))
     .filter((x) => x.p >= 0.7 || (wybrana && x.kolejnosc >= 0 && x.kolejnosc < 2))
     .sort((a, b) => b.p - a.p || a.kolejnosc - b.kolejnosc).slice(0, 3).map((x) => x.f);
   return { sprawy: sp, faq: fq };
+}
+
+/**
+ * Pytania powiązane ze sprawą, gdy ktoś pisze o szefie/pracodawcy lub jego odmowie. Same tytuły pytań tu nie wystarczą
+ * („Czy mama i tata mogą wziąć urlop…" nie odpowiada na „szef nie chce dać urlopu"), więc patrzymy też w treść
+ * odpowiedzi i kroków (z mniejszą wagą), a „szef" liczymy jak „pracodawca". Przy odmowie zostają tylko pytania, w których
+ * o odmowie faktycznie mowa; jeśli żadne nie mówi, wracamy do rankingu po wszystkich powiązanych.
+ */
+function faqOdmowy<T extends { id: string; pytanie: string; odpowiedz: string; kroki?: string[] }>(faq: T[], powiazane: string[], t: string[], odmowa: boolean): T[] {
+  const najlepsze = (grupa: string[], indeks: string[]) => Math.max(0, ...grupa.flatMap((w) => indeks.map((k) => podobienstwo(w, k))));
+  const grupy = t.map((w) => PRACODAWCA.includes(w) ? [w, "pracodawca"] : [w]);
+  const ocenione = faq.filter((f) => powiazane.includes(f.id)).map((f) => {
+    const wPytaniu = istotne(tok(f.pytanie));
+    const wTresci = istotne(tok(`${f.odpowiedz} ${(f.kroki ?? []).join(" ")}`));
+    const ocena = grupy.reduce((s, g) => s + Math.max(najlepsze(g, wPytaniu), 0.7 * najlepsze(g, wTresci)), 0) / grupy.length;
+    return { f, ocena, omawiaOdmowe: najlepsze(ODMOWA, wPytaniu) >= 0.7 || najlepsze(ODMOWA, wTresci) >= 0.7, kolejnosc: powiazane.indexOf(f.id) };
+  });
+  const trafne = odmowa ? ocenione.filter((x) => x.omawiaOdmowe) : [];
+  const lista = trafne.length ? trafne : ocenione;
+  return lista.sort((a, b) => b.ocena - a.ocena || a.kolejnosc - b.kolejnosc).slice(0, trafne.length ? 3 : 2).map((x) => x.f);
 }
 
 /* ============ dane o rodzicu (po zalogowaniu) ============ */

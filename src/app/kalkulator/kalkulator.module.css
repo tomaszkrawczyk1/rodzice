@@ -18,8 +18,9 @@
   padding: 4px 2px; font: inherit; font-size: 14px; line-height: 1.2; text-align: center; color: var(--ink);
   background: none; border: 0; border-radius: 3px;
 }
-button.krokEl { cursor: pointer; }
-button.krokEl:hover .nazwa { text-decoration: underline; }
+a.krokEl { cursor: pointer; text-decoration: none; color: var(--ink); }
+a.krokEl:hover { color: var(--ink); }
+a.krokEl:hover .nazwa { text-decoration: underline; }
 .numer {
   flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%;
   border: 2px solid var(--zus-green); font-weight: 700; font-size: 16px; background: var(--card); color: var(--ink);

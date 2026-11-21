@@ -2,6 +2,7 @@
 // Mechanika przewijania, fokusu i stanu kroku w sprawach. Bez przeglądarki: tylko czysta logika.
 import { celPrzewijania, czyZasloniety, MARGINES } from "../src/lib/ekran.ts";
 import { dataZFormularza } from "../src/lib/data-formularza.ts";
+import { etapZAdresu, ETAP_W_ADRESIE, MAKS_ZAPYTANIA, normalizujZapytanie } from "../src/lib/adres-glowna.ts";
 import { odczytajWpis, polaczPrzyPowrocie, stanHistorii, type Migawka } from "../src/lib/stan-sprawy.ts";
 
 let ok = 0, fail = 0;
@@ -55,6 +56,21 @@ rowne("data ze spacjami", dataZFormularza("5 4 2027"), "2027-04-05");
 rowne("data ze skośnikami", dataZFormularza("5/4/2027"), "2027-04-05");
 rowne("nadal odrzuca nieistniejącą datę", dataZFormularza("31,02,2027"), "");
 rowne("nadal odrzuca śmieci", dataZFormularza("jutro"), "");
+
+// ---- strona główna: etap i zapytanie w adresie ----
+rowne("etap z adresu: czekamy", etapZAdresu("czekamy"), "ciaza");
+rowne("etap z adresu: planuje", etapZAdresu("planuje"), "plan");
+rowne("etap z adresu: dziecko", etapZAdresu("dziecko"), "dziecko");
+rowne("etap z adresu: nieznany, pusty i brak to ekran wyboru", [etapZAdresu("xyz"), etapZAdresu(""), etapZAdresu(null), etapZAdresu(undefined), etapZAdresu("ciaza")], [null, null, null, null, null]);
+rowne("każdy etap ma własną wartość w adresie i wraca do siebie", Object.entries(ETAP_W_ADRESIE).map(([e, v]) => etapZAdresu(v) === e), [true, true, true]);
+rowne("zapytanie: spacje na brzegach i w środku", normalizujZapytanie("  szef   nie chce 	 dać urlopu "), "szef nie chce dać urlopu");
+rowne("zapytanie: puste i brak", [normalizujZapytanie("   "), normalizujZapytanie(null), normalizujZapytanie(undefined)], ["", "", ""]);
+rowne("zapytanie: ucięte do limitu", normalizujZapytanie("a".repeat(MAKS_ZAPYTANIA + 50)).length, MAKS_ZAPYTANIA);
+rowne("zapytanie z polskimi znakami i HTML przechodzi przez URLSearchParams bez zmian", (() => {
+  const fraza = "ile dostanę po porodzie? <b>x</b> & 81,5%";
+  return new URLSearchParams(new URLSearchParams({ q: fraza }).toString()).get("q");
+})(), "ile dostanę po porodzie? <b>x</b> & 81,5%");
+rowne("kodowanie zapytania w adresie", new URLSearchParams({ q: "szef nie chce dać urlopu" }).toString(), "q=szef+nie+chce+da%C4%87+urlopu");
 
 console.log(`WYNIK: ${ok} OK, ${fail} FAIL`);
 if (fail) process.exit(1);

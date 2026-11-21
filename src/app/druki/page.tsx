@@ -1,12 +1,19 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { DRUKI, LINK_WZORY, pytanie } from "@/content/poradnik";
+import { kanoniczny } from "@/lib/adres-serwisu";
 
-export const metadata = { title: "Formularze i druki – Przewodnik Przyszłego Rodzica" };
+// Tytuł i nagłówek odróżnione od /formularze (strony wyboru): tu są same instrukcje do druków ZUS.
+export const metadata: Metadata = {
+  title: "Druki ZUS: kto składa i jak wypełnić – Przewodnik Przyszłego Rodzica",
+  description: "Do czego służy każdy druk ZUS, kto go składa, gdzie i w jakim terminie, z instrukcją wypełnienia krok po kroku.",
+  alternates: { canonical: kanoniczny("/druki") },
+};
 
 export default function Druki() {
   return (
     <>
-      <h1>Formularze i druki do wniosków</h1>
+      <h1>Druki ZUS: kto składa i jak wypełnić</h1>
       <p className="lead">Sprawdź, kto składa dany formularz i jak go wypełnić. Wzory znajdziesz na stronie <a href={LINK_WZORY} target="_blank" rel="noopener noreferrer">zus.pl (wzory formularzy)</a>.</p>
       <nav className="tabs" aria-label="Wybierz formularz">{DRUKI.map((d) => <a key={d.id} className="tab" href={`#${d.id}`}>{d.id}</a>)}</nav>
       {DRUKI.map((d) => (

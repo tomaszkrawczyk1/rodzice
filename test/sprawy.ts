@@ -25,7 +25,7 @@ export async function testySpraw(rowne: Rowne) {
       return nextLoad(url, context);
     },
   });
-  const { sprawa, szukaj, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, aktywneOdpowiedzi, zbudujCtx, etykietaOdp } = await import("../src/lib/sprawy.ts").finally(() => hook.deregister());
+  const { sprawa, szukaj, zapytanieMaSens, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, aktywneOdpowiedzi, zbudujCtx, etykietaOdp } = await import("../src/lib/sprawy.ts").finally(() => hook.deregister());
   const pytania = (id: string) => sprawa(id)!.pytania;
   const pyt = (id: string, pole: string) => pytania(id).find((q) => q.id === pole)!;
   const { pln } = await import("../src/lib/format.ts");
@@ -163,4 +163,18 @@ export async function testySpraw(rowne: Rowne) {
   for (const [fraza, id] of frazy) {
     rowne(`Wyszukiwarka: ${fraza}`, szukaj(fraza, []).sprawy[0]?.id ?? null, id);
   }
+
+  // Pytania i odpowiedzi: przy odmowie pracodawcy ma wyjść pytanie, w którym o odmowie mowa, a nie pierwsze z listy sprawy.
+  const faq = JSON.parse(readFileSync(new URL("../src/content/poradnik/faq.json", import.meta.url), "utf8")).pytania;
+  const idFaq = (fraza: string) => szukaj(fraza, faq).faq.map((f: { id: string }) => f.id);
+  for (const fraza of ["szef nie chce dać urlopu", "pracodawca odmawia urlopu", "szefowa nie zgadza się na urlop", "kadry odmówiły urlopu rodzicielskiego"]) {
+    rowne(`Wyszukiwarka, odmowa pracodawcy: ${fraza}`, [szukaj(fraza, faq).sprawy[0]?.id, idFaq(fraza)], ["urlop-pracodawca", ["F13"]]);
+  }
+  rowne("Szef bez odmowy: nadal pytania powiązane ze sprawą", idFaq("szef urlop wniosek"), ["F12", "F14"]);
+  rowne("Odmowa bez wzmianki o pracodawcy nie zmienia trafień", szukaj("odmowa", faq).sprawy.length, 0);
+  rowne("Zwykłe zapytanie bez zmian (mąż chce wziąć urlop)", idFaq("mąż chce wziąć urlop"), ["F12", "F11"]);
+  rowne("HTML w zapytaniu: brak wyników", [szukaj("<b>x</b>", faq).sprawy.length, szukaj("<b>x</b>", faq).faq.length], [0, 0]);
+  rowne("zapytanieMaSens: <b>x</b>", zapytanieMaSens("<b>x</b>"), false);
+  rowne("zapytanieMaSens: puste i same spacje", [zapytanieMaSens(""), zapytanieMaSens("   ")], [false, false]);
+  rowne("zapytanieMaSens: zwykła fraza", zapytanieMaSens("urlop ojcowski"), true);
 }

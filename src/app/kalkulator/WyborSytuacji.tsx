@@ -1,5 +1,5 @@
 "use client";
-import { useId, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import type { Sytuacja } from "./stale";
 import css from "./kalkulator.module.css";
 
@@ -12,12 +12,24 @@ const OPCJE: { id: Sytuacja; tytul: string; opis: string }[] = [
   { id: "wlasne", tytul: "Moje dane / przykładowa sprawa", opis: "Gotowy scenariusz albo dane z wgranego wniosku." },
 ];
 
-/** Krok 1 obu ścieżek kalkulatora: jedna grupa przycisków radiowych zamiast dwóch rzędów zakładek. */
+// Przejście między „planem rodziny" a „tatą" podmienia cały kreator (inny komponent), więc zaznaczone radio znika z DOM.
+// Zanim to zrobimy, zapamiętujemy, że fokus ma wrócić na wybraną opcję w nowym widoku. Dotyczy tylko takiego przejścia:
+// przy zwykłym wejściu na stronę fokusu nie ruszamy.
+let fokusNaWyborze = false;
+export function przekazFokusWyboru() { fokusNaWyborze = true; }
+
+/** Krok 1 obu ścieżek kalkulatora: jedna grupa przycisków radiowych (ten sam wzorzec ARIA co wariant w kroku 5). */
 export function WyborSytuacji({ wartosc, onZmiana, children }: { wartosc: Sytuacja; onZmiana: (s: Sytuacja) => void; children?: ReactNode }) {
   const nazwa = useId();
+  const zestaw = useRef<HTMLFieldSetElement>(null);
+  useEffect(() => {
+    if (!fokusNaWyborze) return;
+    fokusNaWyborze = false;
+    zestaw.current?.querySelector<HTMLInputElement>("input:checked")?.focus({ preventScroll: true });
+  }, []);
   return (
     <>
-      <fieldset className={css.zestaw}>
+      <fieldset className={css.zestaw} ref={zestaw}>
         <legend>Wybierz, co chcesz policzyć</legend>
         <div className={css.opcje}>
           {OPCJE.map((o) => (

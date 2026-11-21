@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { api, useSesja, type Sesja } from "@/lib/sesja";
 import { SPRAWY, sprawa, zbudujCtx, etykietaOdp, zaIle, aktywneOdpowiedzi, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, type Ctx, type Odp, type Pyt, type Sprawa, type Wynik } from "@/lib/sprawy";
@@ -9,19 +9,31 @@ import { ekranDotykowy, przejdzDoKroku } from "@/lib/ekran";
 import { odczytajWpis, polaczPrzyPowrocie, stanHistorii, type Migawka } from "@/lib/stan-sprawy";
 import { Alert, Kroki } from "./ui";
 import Szkielet from "./Szkielet";
+import st from "./Sprawa.module.css";
 
 const tekstPytania = (q: Pyt, o: Odp) => (typeof q.tekst === "function" ? q.tekst(o) : q.tekst);
 const kolumnyDanych = { gridTemplateColumns: "fit-content(42%) minmax(0, 1fr)", overflowWrap: "anywhere" } as const;
 
-export default function SprawaWidok({ id }: { id: string }) {
+/**
+ * Pierwszy render (na serwerze i przy hydracji) pokazuje sprawę dla gościa: tytuł, wprowadzenie i pierwsze pytanie,
+ * bo sesja siedzi w localStorage i serwer jej nie zna. Dopiero po hydracji (gotowa) dociągamy dane z profilu i stan
+ * zapisany we wpisie historii. `wstepny` to wynik sprawy bez pytań, policzony na serwerze.
+ */
+export default function SprawaWidok({ id, wstepny }: { id: string; wstepny?: Wynik }) {
   const { sesja, gotowa } = useSesja();
   const s = sprawa(id)!;
+  const zPytaniami = s.pytania.length > 0;
+  const przedSesja = !gotowa && zPytaniami;
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <p className="small no-print"><Link href="/sprawy" className="powrot">← Wróć do listy spraw</Link></p>
       <WyborSprawy id={id} tytul={s.tytul} />
       <h1>{s.tytul}</h1>
-      {gotowa ? <WczytajSprawe key={JSON.stringify([id, sesja?.token])} s={s} sesja={sesja} /> : <Szkielet etykieta="Wczytuję sprawę…" />}
+      <p className="lead">{s.krotko}</p>
+      {przedSesja && <div className={st.sesja}><Szkielet etykieta="Pobieram dane z Twojego profilu…" /></div>}
+      <div className={przedSesja ? st.gosc : undefined}>
+        <WczytajSprawe key={JSON.stringify([id, zPytaniami ? sesja?.token : null])} s={s} sesja={sesja} podglad={!gotowa} wstepny={wstepny} />
+      </div>
     </div>
   );
 }
@@ -45,7 +57,7 @@ function WyborSprawy({ id, tytul }: { id: string; tytul: string }) {
   );
 }
 
-function WczytajSprawe({ s, sesja }: { s: Sprawa; sesja: Sesja | null }) {
+function WczytajSprawe({ s, sesja, podglad, wstepny }: { s: Sprawa; sesja: Sesja | null; podglad: boolean; wstepny?: Wynik }) {
   const [ctx, setCtx] = useState<Ctx | null>(sesja && s.pytania.length ? null : {});
   const [blad, setBlad] = useState(false);
   const [proba, setProba] = useState(0);
@@ -67,25 +79,28 @@ function WczytajSprawe({ s, sesja }: { s: Sprawa; sesja: Sesja | null }) {
     </>
   );
   if (!ctx) return <Szkielet etykieta="Pobieram dane z Twojego profilu…" />;
-  return <KrokiSprawy s={s} c={ctx} token={sesja?.token ?? ""} />;
+  return <KrokiSprawy s={s} c={ctx} token={sesja?.token ?? ""} podglad={podglad} wstepny={wstepny} />;
 }
 
-function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
+// podglad: render z serwera i hydracja, zanim wiadomo, kto jest zalogowany. Historii przeglądarki nie ruszamy wtedy wcale.
+function KrokiSprawy({ s, c, token, podglad, wstepny }: { s: Sprawa; c: Ctx; token: string; podglad: boolean; wstepny?: Wynik }) {
   const idPytan = s.pytania.map((x) => x.id);
   const [domyslne] = useState(() => domyslneOdpowiedzi(s.pytania, c));
-  // Wpis historii z tej samej sprawy i profilu: po odświeżeniu albo powrocie wracamy dokładnie do tego kroku.
-  const [zapis] = useState(() => odczytajWpis(history.state, s.id, token, idPytan));
-  const [m, setM] = useState<Migawka>(() => zapis?.m ?? {
+  // Pierwszy render jest zawsze „od początku" (tak samo na serwerze i w przeglądarce, więc hydracja się nie rozjeżdża).
+  // Wpis historii z tej samej sprawy i profilu przywraca useLayoutEffect niżej, jeszcze przed pierwszym malowaniem:
+  // po odświeżeniu albo powrocie wracamy dokładnie do tego kroku.
+  const [m, setM] = useState<Migawka>(() => ({
     faza: !s.pytania.length ? "wynik" : Object.keys(domyslne).length ? "dane" : "pytania",
     historia: [], odp: domyslne, potwierdzone: {},
-  });
+  }));
   const { faza, historia, odp, potwierdzone } = m;
-  const [n, setN] = useState(zapis?.n ?? 0);
-  const numer = useRef(zapis?.n ?? 0);
+  const [n, setN] = useState(0);
+  const numer = useRef(0);
   const ruch = useRef(false);
+  const czeka = useRef<Migawka | null>(null); // przywrócona migawka, po której trzeba ustawić fokus
   const blok = useRef<HTMLDivElement>(null);
   const [szkice, setSzkice] = useState<Record<string, string>>({});
-  const [wynik, setWynik] = useState<Wynik | null>(null);
+  const [wynik, setWynik] = useState<Wynik | null>(!s.pytania.length ? wstepny ?? null : null);
   const [blad, setBlad] = useState("");
   const [bladPola, setBladPola] = useState("");
   const [proba, setProba] = useState(0);
@@ -109,11 +124,17 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
     history.pushState(stanHistorii(history.state, { s: s.id, t: token, n: numer.current, m: nastepna }), "");
     setM(nastepna);
   }
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (podglad) return;
     const poprzednie = history.scrollRestoration;
     history.scrollRestoration = "manual";
-    if (zapis) ruch.current = zapis.n > 0;
-    else history.replaceState(stanHistorii(history.state, { s: s.id, t: token, n: 0, m }), "");
+    const zapis = odczytajWpis(history.state, s.id, token, idPytan);
+    if (zapis) {
+      numer.current = zapis.n;
+      setN(zapis.n);
+      setM(zapis.m);
+      czeka.current = zapis.n > 0 ? zapis.m : null;
+    } else history.replaceState(stanHistorii(history.state, { s: s.id, t: token, n: 0, m }), "");
     const poCofnieciu = (e: PopStateEvent) => {
       const w = odczytajWpis(e.state, s.id, token, idPytan);
       if (!w) return;
@@ -129,10 +150,11 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
       window.removeEventListener("popstate", poCofnieciu);
       history.scrollRestoration = poprzednie;
     };
-  }, []);
+  }, [podglad]);
 
   // Wynik liczymy z odpowiedzi, więc działa tak samo po kliknięciu, cofnięciu i odświeżeniu.
   useEffect(() => {
+    if (!s.pytania.length && wstepny) return; // wynik sprawy bez pytań przyszedł już z serwera
     setWynik(null);
     setBlad("");
     if (faza !== "wynik") return;
@@ -147,6 +169,11 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
   // Po zmianie kroku: tytuł pytania na górę widoku (pod nagłówkiem, jeśli jest przyklejony) i fokus na nim.
   // Na telefonie pole nie dostaje fokusu, bo klawiatura zasłoniłaby pytanie.
   useEffect(() => {
+    if (czeka.current) {
+      if (czeka.current !== m) return; // jeszcze nie ten render, w którym widać przywrócony krok
+      czeka.current = null;
+      ruch.current = true;
+    }
     if (!ruch.current || busy) return;
     ruch.current = false;
     const el = blok.current;

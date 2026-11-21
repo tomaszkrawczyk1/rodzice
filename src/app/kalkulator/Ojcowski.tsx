@@ -10,6 +10,7 @@ import { Pole } from "@/components/Pole";
 import { Kreator, useKreator, type KrokDef } from "./Kreator";
 import { WyborSytuacji } from "./WyborSytuacji";
 import { L, W, P, niezbywalne, type Sytuacja } from "./stale";
+import { parametrZywy } from "./adres";
 import css from "./kalkulator.module.css";
 
 const KROKI: KrokDef[] = [
@@ -36,7 +37,6 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
   const [pokazBledy, setPokazBledy] = useState(false);
   const [fokusBledu, setFokusBledu] = useState(0);
   const tresc = useRef<HTMLDivElement>(null);
-  const { krok, maks, idz } = useKreator(KROKI.length);
   const limit = (dzieci === 1 ? W.urlop_rodzicielski["1"] : W.urlop_rodzicielski["2_i_wiecej"]) - niezbywalne;
 
   // Błędy pól liczone na bieżąco; pokazujemy je dopiero po kliknięciu „Dalej".
@@ -53,6 +53,12 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
   const pokaz = (k: keyof typeof bl) => (pokazBledy && bl[k]) || undefined;
   const klucz = JSON.stringify([data, dzieci, kwota, rodzicielski, ojcowski, od, odRodz]);
   const wynik = zapisany?.klucz === klucz ? zapisany : null;   // po zmianie danych stary wynik nie jest pokazywany
+
+  // Najdalszy krok dostępny przy tych danych. Adres z dalszym krokiem (odświeżenie, link) prowadzi do pierwszego braku,
+  // a wynik jest dostępny dopiero po wyliczeniu (przy zmienionych danych krok wyniku proponuje ponowne wyliczenie).
+  const dostepny = bl.data || bl.podstawa ? K.dziecko : bl.rodz || bl.okres || bl.odRodz || bl.od ? K.urlopy : zapisany ? K.wynik : K.urlopy;
+  const { krok, maks, idz, wstecz, adres } = useKreator(KROKI, dostepny);
+  useEffect(() => { setPokazBledy(false); }, [krok]);   // zmiana kroku (także „Wstecz" przeglądarki) czyści komunikaty o błędach
 
   useEffect(() => { if (fokusBledu) tresc.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(); }, [fokusBledu]);
 
@@ -73,7 +79,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
       }
       setZapisany({ klucz, okresy: plan.okresy.filter((o) => o.kto === "ojciec"), sprawdz: plan.okresy.some((o) => o.kto === "ojciec" && o.podwyzszoneDoSwiadczeniaRodzicielskiego) });
       setPokazBledy(false);
-      idz(K.wynik);
+      if (parametrZywy("krok") === KROKI[K.urlopy].id) idz(K.wynik);   // nie przerzucamy do wyniku, jeśli w trakcie liczenia ktoś cofnął się lub wyszedł
     } catch {
       setBlad("Nie udało się policzyć zasiłku. Spróbuj ponownie.");
     } finally {
@@ -81,7 +87,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
     }
   }
 
-  function idzDo(k: number) { setPokazBledy(false); idz(k); }
+  function idzDo(k: number) { setPokazBledy(false); idz(k); }   // nowy krok = nowy wpis historii (adres ?krok=…)
   function dalej() {
     const bledy = krok === K.dziecko ? [bl.data, bl.podstawa] : krok === K.urlopy ? [bl.rodz, bl.okres, bl.odRodz, bl.od] : [];
     if (bledy.some(Boolean)) { setPokazBledy(true); setFokusBledu((n) => n + 1); return; }
@@ -89,7 +95,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
   }
 
   return (
-    <Kreator kroki={KROKI} krok={krok} maks={maks} onKrok={idzDo} onDalej={dalej} dalejEtykieta={krok === K.urlopy ? (busy ? "Liczymy zasiłek…" : "Policz zasiłek") : "Dalej"} dalejZablokowany={busy}>
+    <Kreator kroki={KROKI} krok={krok} maks={maks} onKrok={idzDo} onWstecz={wstecz} adres={adres} onDalej={dalej} dalejEtykieta={krok === K.urlopy ? (busy ? "Liczymy zasiłek…" : "Policz zasiłek") : "Dalej"} dalejZablokowany={busy}>
       <div ref={tresc}>
         {krok === K.sytuacja && <WyborSytuacji wartosc="ojciec" onZmiana={onSytuacja} />}
 
