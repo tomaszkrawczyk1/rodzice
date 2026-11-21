@@ -156,9 +156,9 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
           )}
         </div>
       )}
-      <p className="small muted ask__nota">
+      {wyniki && <p className="small muted ask__nota">
         Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.
-      </p>
+      </p>}
     </section>
   );
 }
