@@ -9,6 +9,8 @@ cd "$SRC"
 git fetch --depth 50 origin main && git reset --hard origin/main
 echo "commit: $(git log --oneline -1)"
 npm ci --no-audit --no-fund
+# npm na tym serwerze dobiera wariant musl; Next potrzebuje natywnego SWC dla glibc
+npm i --no-save --no-audit --no-fund "@next/swc-linux-x64-gnu@$(node -p "require('next/package.json').version")"
 npm test | tail -1
 npm run weryfikuj | tail -1
 npm run build
