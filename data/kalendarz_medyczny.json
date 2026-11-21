@@ -20,152 +20,324 @@
     "zrodlo": "wymagane",
     "status": "ok | do_potwierdzenia"
   },
-  "_konwencje_okien": "Zapis 'N+D' = N pełnych tygodni i D dni ciąży. Zakres 'N–M tydzień' = N+0 do M+6. Termin 'do N. tygodnia' liczony ostrożnie jako N+0. Po porodzie: 'N.–M. tydzień/miesiąc życia' = od N do końca M-tego tygodnia/miesiąca. 'Ok. 6 tygodni po porodzie' = dokładnie 6 tygodni po porodzie.",
-  "wersja": "2026-11-21-v5-strona",
-
+  "_konwencje_okien": "Zapis 'N+D' = N pełnych tygodni i D dni ciąży. Zakres 'N–M tydzień' = N+0 do M+6. Termin 'do N. tygodnia' liczony ostrożnie jako N+0. Po porodzie: 'N.–M. tydzień/miesiąc życia' = od N do końca M-tego tygodnia/miesiąca. 'Ok. 6 tygodni po porodzie' = dokładnie 6 tygodni po porodzie. Weryfikacja 3: w tekstach dla rodzica terminy po porodzie podajemy jako wiek dziecka (np. „dziecko ma 3–4 miesiące” = okno od 3 do 5 miesięcy bez ostatniego dnia). Uwaga: Program Szczepień Ochronnych liczy „N. miesiąc życia” od ukończenia N−1 miesięcy (część IV pkt 6: dziecko, które ukończyło 5 lat, jest w 6. roku życia), więc terminy szczepień w PSO bywają o miesiąc wcześniejsze niż te okna.",
+  "wersja": "2026-11-21-v9-uwagi-redaktora",
   "zalozenia": {
     "pobyt_w_szpitalu_dni": 3,
-    "_uwaga": "ZAŁOŻENIE AUTORA SILNIKA, nie z danych zespołu — do potwierdzenia. Używane tylko do wyliczenia dnia wypisu (wizyta położnej, badania w szpitalu), gdy użytkownik nie poda daty wypisu."
+    "_uwaga": "ZAŁOŻENIE AUTORA SILNIKA, nie z danych zespołu — do potwierdzenia. Używane tylko do wyliczenia dnia wypisu (wizyta położnej, badania w szpitalu), gdy użytkownik nie poda daty wypisu. Weryfikacja 2026-11-21: w standardzie opieki okołoporodowej (Dz.U. 2026 poz. 1140) nie znaleziono przepisu określającego długość pobytu po porodzie — wartość pozostaje założeniem."
   },
-
   "trymestry": [
-    { "id": 1, "nazwa": "I trymestr", "opis": "tygodnie 1–13 (miesiące 1–3)" },
-    { "id": 2, "nazwa": "II trymestr", "opis": "tygodnie 14–27 (miesiące 4–6)" },
-    { "id": 3, "nazwa": "III trymestr", "opis": "od 28. tygodnia do porodu (miesiące 7–9)" },
-    { "id": "polog", "nazwa": "Po porodzie: mama i noworodek", "opis": "pierwsze tygodnie po porodzie" },
-    { "id": "niemowle", "nazwa": "Pierwszy rok życia dziecka", "opis": "badania kontrolne i szczepienia" }
+    {
+      "id": 1,
+      "nazwa": "I trymestr",
+      "opis": "tygodnie 1–13 (miesiące 1–3)"
+    },
+    {
+      "id": 2,
+      "nazwa": "II trymestr",
+      "opis": "tygodnie 14–27 (miesiące 4–6)"
+    },
+    {
+      "id": 3,
+      "nazwa": "III trymestr",
+      "opis": "od 28. tygodnia do porodu (miesiące 7–9)"
+    },
+    {
+      "id": "polog",
+      "nazwa": "Po porodzie: mama i noworodek",
+      "opis": "pierwsze tygodnie po porodzie"
+    },
+    {
+      "id": "niemowle",
+      "nazwa": "Pierwszy rok życia dziecka",
+      "opis": "badania kontrolne i szczepienia"
+    }
   ],
-
   "warunki": [
-    { "id": "cukrzyca_przed", "etykieta": "Mam cukrzycę rozpoznaną jeszcze przed ciążą" },
-    { "id": "ryzyko_cukrzycy", "etykieta": "Jestem w grupie ryzyka cukrzycy ciążowej", "pomoc": "Np. masz ponad 35 lat, dużą nadwagę (BMI powyżej 30), była u Ciebie cukrzyca ciążowa w poprzedniej ciąży albo cukrzycę ma ktoś z rodziców lub rodzeństwa." },
-    { "id": "cukier_podwyzszony", "etykieta": "Cukier na czczo wyszedł mi podwyższony (92–125 mg/dl)" },
-    { "id": "cukrzyca_ciazowa", "etykieta": "Lekarz rozpoznał u mnie cukrzycę ciążową" },
-    { "id": "nadcisnienie", "etykieta": "Mam nadciśnienie (przed ciążą albo wywołane ciążą)" },
-    { "id": "autoimmun", "etykieta": "Mam chorobę autoimmunologiczną", "pomoc": "Np. toczeń albo zespół antyfosfolipidowy." },
-    { "id": "zum", "etykieta": "Mam nawracające zakażenia dróg moczowych" },
-    { "id": "swiad", "etykieta": "Mam silny, uporczywy świąd skóry", "pomoc": "Zgłoś się do lekarza od razu — to wymaga szybkich badań krwi." },
-    { "id": "ciaza_mnoga", "etykieta": "Spodziewam się więcej niż jednego dziecka", "pomoc": "Np. bliźniąt." },
-    { "id": "toxo_ujemna", "etykieta": "Wynik na toksoplazmozę w I trymestrze był ujemny", "pomoc": "Czyli nie masz przeciwciał i możesz się zarazić po raz pierwszy w ciąży." },
-    { "id": "rh_ujemne", "etykieta": "Mam grupę krwi Rh ujemną (Rh−) i nie mam jeszcze przeciwciał" },
-    { "id": "polozna", "etykieta": "Ciążę prowadzi położna, a nie lekarz" },
-    { "id": "wczesne_usg", "etykieta": "Lekarz zlecił mi wczesne USG (przed 10. tygodniem)" }
+    {
+      "id": "cukrzyca_przed",
+      "etykieta": "Mam cukrzycę rozpoznaną jeszcze przed ciążą"
+    },
+    {
+      "id": "ryzyko_cukrzycy",
+      "etykieta": "Jestem w grupie ryzyka cukrzycy ciążowej",
+      "pomoc": "Np. masz BMI 30 lub więcej (sprzed ciąży), miałaś cukrzycę ciążową w poprzedniej ciąży, urodziłaś dziecko ważące 4,5 kg lub więcej albo cukrzycę typu 2 ma Twoja mama lub siostra. Lekarz może uwzględnić też inne rzeczy (np. wiek) — zapytaj, czy Cię to dotyczy."
+    },
+    {
+      "id": "cukier_podwyzszony",
+      "etykieta": "Cukier na czczo wyszedł mi podwyższony (92–125 mg/dl)"
+    },
+    {
+      "id": "cukrzyca_ciazowa",
+      "etykieta": "Lekarz rozpoznał u mnie cukrzycę ciążową"
+    },
+    {
+      "id": "nadcisnienie",
+      "etykieta": "Mam nadciśnienie (przed ciążą albo wywołane ciążą)"
+    },
+    {
+      "id": "autoimmun",
+      "etykieta": "Mam chorobę autoimmunologiczną",
+      "pomoc": "Np. toczeń albo zespół antyfosfolipidowy."
+    },
+    {
+      "id": "zum",
+      "etykieta": "Mam nawracające zakażenia dróg moczowych"
+    },
+    {
+      "id": "swiad",
+      "etykieta": "Mam silny, uporczywy świąd skóry",
+      "pomoc": "Zgłoś się do lekarza od razu — to wymaga szybkich badań krwi."
+    },
+    {
+      "id": "ciaza_mnoga",
+      "etykieta": "Spodziewam się więcej niż jednego dziecka",
+      "pomoc": "Np. bliźniąt."
+    },
+    {
+      "id": "toxo_ujemna",
+      "etykieta": "Wynik na toksoplazmozę w I trymestrze był ujemny",
+      "pomoc": "Czyli nie masz przeciwciał i możesz się zarazić po raz pierwszy w ciąży."
+    },
+    {
+      "id": "rh_ujemne",
+      "etykieta": "Mam grupę krwi Rh ujemną (Rh−) i nie mam jeszcze przeciwciał"
+    },
+    {
+      "id": "polozna",
+      "etykieta": "Ciążę prowadzi położna, a nie lekarz"
+    },
+    {
+      "id": "wczesne_usg",
+      "etykieta": "Lekarz zlecił mi wczesne USG (przed 10. tygodniem)"
+    },
+    {
+      "id": "znieczulenie",
+      "etykieta": "Chcę mieć znieczulenie regionalne (np. zewnątrzoponowe) podczas porodu",
+      "pomoc": "Przed takim znieczuleniem standard przewiduje rozmowę z anestezjologiem — najlepiej w III trymestrze."
+    }
   ],
-
   "wydarzenia": [
     {
       "id": "WIZ-01",
       "nazwa": "Pierwsza wizyta u ginekologa — badania na start",
-      "kiedy": "najlepiej do 10. tygodnia (najpóźniej do 12.)",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 1,
-      "okno": { "typ": "tc", "od": "0+0", "do": "10+0", "najpozniej": "12+0" },
+      "kiedy": "najlepiej do 10. tygodnia ciąży (albo jak najszybciej, jeśli zgłaszasz się później)",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 1,
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "10+0"
+      },
       "opis": "Lekarz sprawdza Twój stan zdrowia i szuka czynników ryzyka. Dostajesz skierowania na zestaw badań.",
-      "skutek": "Wizyta pomaga wcześnie wykryć choroby i zakażenia. Jeśli termin minął, ustal z lekarzem, od których badań zacząć.",
+      "skutek": "Możesz nie wykryć na czas chorób i zakażeń, które szkodzą Tobie i dziecku.",
       "pozycje": [
-        "Badania krwi: grupa krwi i czynnik Rh, morfologia, poziom cukru na czczo",
-        "Badania na zakażenia: HIV, WZW C, kiła, różyczka, toksoplazmoza",
+        "Badania krwi: grupa krwi i czynnik Rh, przeciwciała przeciw krwinkom, morfologia z ferrytyną (zapasy żelaza), cukier na czczo (przy ryzyku cukrzycy ciążowej także test z glukozą)",
+        "Badania na zakażenia: HIV, WZW B, WZW C, kiła, toksoplazmoza",
         "Badanie moczu",
         "Badanie tarczycy (TSH)",
-        "Cytologia — jeśli nie była robiona w ostatnich 6 miesiącach",
-        "Pomiar ciśnienia i wagi"
+        "Cytologia — jeśli nie robiłaś jej w ciągu ostatniego roku przed ciążą",
+        "Ciśnienie, wzrost i waga, badanie piersi",
+        "Kontrola u dentysty",
+        "Rozmowa o zdrowym stylu życia, szczepieniach w ciąży i badaniach genetycznych"
       ],
-      "uwagi": ["Jeśli cukier na czczo wyjdzie powyżej 125 mg/dl, trzeba szybko powtórzyć badanie."],
-      "zrodlo": "Materiały zespołu: standardowa diagnostyka I trymestru (do uzupełnienia o akt prawny / standard opieki okołoporodowej)",
+      "uwagi": [
+        "Jeśli cukier na czczo wyjdzie powyżej 125 mg/dl, trzeba szybko powtórzyć badanie.",
+        "Jeśli zgłaszasz się później niż w 10. tygodniu, umów wizytę jak najszybciej.",
+        "Od 7 maja 2026 standard nie wymienia już badania na różyczkę (wcześniej było w wykazie). Jeśli nie wiesz, czy chorowałaś albo byłaś szczepiona, zapytaj lekarza o badanie przeciwciał.",
+        "Ministerstwo Zdrowia radzi zgłosić się do lekarza możliwie wcześnie — najlepiej w 7.–8. tygodniu ciąży."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (do 10. tygodnia lub w chwili pierwszego zgłoszenia się; wykaz bez różyczki, różyczka tylko jako czynnik ryzyka w części III ust. 2 pkt 6): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; zmiana wprowadzona rozporządzeniem MZ z 23.10.2025 (Dz.U. 2025 poz. 1525, w mocy od 7.05.2026): https://api.sejm.gov.pl/eli/acts/DU/2025/1525/text.pdf; wcześniejsza tabela standardu (z różyczką IgG/IgM, z konsultacją lekarza przy opiece położnej): https://www.gov.pl/attachment/517feeed-0c09-4bf0-879e-1bb06983679a. Weryfikacja 3: usunięto wcześniejszą granicę „najpóźniej do 12. tygodnia” (okno.najpozniej) — żadne przeczytane źródło jej nie podaje (standard: do 10. tygodnia lub w chwili pierwszego zgłoszenia się, bez górnej granicy; 12. tydzień pada w standardzie tylko przy zaleceniu USG piersi). Wskazówka o 7.–8. tygodniu: pacjent.gov.pl, Czym jest opieka okołoporodowa (aktualizacja 2026-02-17): https://pacjent.gov.pl/print/pdf/node/6818.",
       "status": "ok"
     },
     {
       "id": "BAD-HBS-01",
       "nazwa": "Badanie na WZW B (żółtaczkę typu B) — obowiązkowe",
-      "kiedy": "do 12. tygodnia",
-      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 1,
-      "okno": { "typ": "tc", "od": "0+0", "do": "12+0" },
-      "opis": "Robi się je każdej kobiecie w ciąży, zwykle razem z innymi badaniami przy pierwszej wizycie.",
-      "skutek": "Wynik pomaga zespołowi medycznemu ocenić, czy dziecko potrzebuje dodatkowej ochrony po urodzeniu.",
-      "zrodlo": "Materiały zespołu: WZW B (HBsAg)",
+      "kiedy": "do 10. tygodnia albo od razu po pierwszym zgłoszeniu się do lekarza",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 1,
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "10+0"
+      },
+      "opis": "Robi się je każdej kobiecie w ciąży, zwykle razem z innymi badaniami na pierwszej wizycie. Powtarza się je jeszcze raz przed porodem.",
+      "skutek": "Nie będzie wiadomo, czy noworodek potrzebuje ochrony zaraz po urodzeniu.",
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (do 10. tygodnia: badanie antygenu HBs; 33.–37. tydzień: powtórzenie): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "USG-01",
       "nazwa": "Wczesne USG (tylko gdy lekarz je zleci)",
       "kiedy": "przed 10. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 1,
-      "typ": "warunkowe", "warunki": ["wczesne_usg"],
-      "okno": { "typ": "tc", "od": "0+0", "do": "9+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "usg",
+      "trymestr": 1,
+      "typ": "warunkowe",
+      "warunki": [
+        "wczesne_usg"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "9+6"
+      },
       "opis": "Potwierdza ciążę i pokazuje, że rozwija się tam, gdzie powinna.",
-      "skutek": "Bez tego badania potwierdzenie, gdzie rozwija się ciąża, może nastąpić później.",
-      "pozycje": ["Sprawdzenie, gdzie jest ciąża i ile ma tygodni", "Sprawdzenie, czy bije serce dziecka"],
-      "zrodlo": "Materiały zespołu: badania ultrasonograficzne w I trymestrze",
-      "status": "ok"
+      "skutek": "Lekarz może nie potwierdzić ciąży ani nie sprawdzić, czy rozwija się prawidłowo.",
+      "pozycje": [
+        "Sprawdzenie, gdzie jest ciąża i ile ma tygodni",
+        "Sprawdzenie, czy bije serce dziecka"
+      ],
+      "zrodlo": "Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (badanie przed 10. tygodniem nie jest obowiązkowe, wykonuje się ze wskazań lekarskich). Zakres 4 obowiązkowych USG przesiewowych i wczesne USG tylko w uzasadnionych sytuacjach: Standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część II: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf (USG zgodnie z rekomendacjami PTGiP). Uwaga redaktora merytorycznego (materiały kursowe, ginekologia/pediatria) potwierdza ten zapis.",
+      "status": "ok",
+      "uwagi": [
+        "To badanie jest tylko ze wskazań lekarskich, nie jest rutynowe. Na wizycie w 11.–14. tygodniu lekarz i tak sprawdza, ile jest dzieci i czy bije serce."
+      ]
     },
     {
       "id": "WIZ-02",
       "nazwa": "Regularne wizyty kontrolne w I trymestrze",
       "kiedy": "mniej więcej co 4 tygodnie",
       "czestotliwosc": "co ok. 4 tygodnie",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 1,
-      "okno": { "typ": "tc", "od": "0+0", "do": "13+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 1,
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "13+6"
+      },
       "opis": "Lekarz pyta o samopoczucie, mierzy ciśnienie i wagę i ocenia, czy ciąża przebiega dobrze.",
-      "skutek": "Regularne wizyty pomagają wcześnie zauważyć zmiany w przebiegu ciąży.",
+      "skutek": "Problemy w ciąży mogą wyjść na jaw za późno.",
       "pozycje": [
         "Rozmowa o Twoim zdrowiu i poprzednich ciążach",
         "Ciśnienie i waga",
-        "Pytania o nastrój (czy nie ma objawów depresji)",
+        "Pytania o nastrój (czy nie masz objawów depresji) — standard przewiduje je w 11.–14. tygodniu",
         "Rady o zdrowym trybie życia"
       ],
-      "zrodlo": "Materiały zespołu: opieka w I trymestrze",
-      "status": "ok"
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (wizyty do 10. i w 11.–14. tygodniu, w tym ocena ryzyka i nasilenia objawów depresji w 11.–14. tygodniu; konsultacje nie rzadziej niż co 4 tygodnie): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok",
+      "uwagi": [
+        "Wizyta w 11.–14. tygodniu jest szczególnie ważna: wtedy robi się USG genetyczne i ocenia ryzyko depresji."
+      ]
     },
     {
       "id": "USG-02",
       "nazwa": "Pierwsze ważne USG (tzw. USG genetyczne) — obowiązkowe",
-      "kiedy": "między 11. a 14. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 1,
-      "okno": { "typ": "tc", "od": "11+0", "do": "14+6" },
-      "opis": "Lekarz sprawdza, jak rozwija się dziecko, i szuka oznak możliwych wad wrodzonych.",
-      "skutek": "W tym okresie najlepiej można ocenić ryzyko wad wrodzonych. Jeśli termin minął, omów z lekarzem dalsze badania.",
+      "kiedy": "między 11. a 14. tygodniem (najpóźniej do końca 13. tygodnia i 6. dnia)",
+      "grupa": "przed_porodem",
+      "kategoria": "usg",
+      "trymestr": 1,
+      "okno": {
+        "typ": "tc",
+        "od": "11+0",
+        "do": "13+6"
+      },
+      "opis": "To pierwsze z 4 obowiązkowych badań USG w ciąży o przebiegu prawidłowym. Lekarz sprawdza, jak rozwija się dziecko, i szuka oznak możliwych wad wrodzonych.",
+      "skutek": "Możesz nie dowiedzieć się o ryzyku wad wrodzonych w terminie, w którym to badanie jest najdokładniejsze.",
       "pozycje": [
         "Ile jest dzieci i czy bije serce",
         "Pomiary dziecka",
         "Ocena budowy dziecka",
         "Pomiar tzw. przezierności karku — pokazuje ryzyko wad genetycznych"
       ],
-      "zrodlo": "Materiały zespołu: badania ultrasonograficzne w I trymestrze",
+      "zrodlo": "Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (USG między 11+0 a 13+6 tygodniem, CRL 45–84 mm); Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (11.–14. tydzień: USG wg rekomendacji PTGiP): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "BP-01",
-      "nazwa": "Badanie krwi do USG genetycznego (test PAPP-A)",
-      "kiedy": "razem z USG, między 11. a 14. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "badanie_prenatalne", "trymestr": 1,
-      "okno": { "typ": "tc", "od": "11+0", "do": "14+6" },
-      "opis": "Zalecane, ale nieobowiązkowe. Razem z USG dokładniej pokazuje ryzyko wad genetycznych. Lekarz powinien Ci je zaproponować.",
-      "skutek": "Bez wyniku badania krwi ocena ryzyka wad genetycznych jest mniej dokładna.",
-      "zrodlo": "Materiały zespołu: badania w kierunku wad genetycznych",
+      "nazwa": "Badanie krwi do USG genetycznego — test podwójny (PAPP-A + β-hCG)",
+      "kiedy": "najlepiej w 10.–11. tygodniu — wynik jest potrzebny do oceny na USG (najpóźniej do 13+6)",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_prenatalne",
+      "trymestr": 1,
+      "okno": {
+        "typ": "tc",
+        "od": "10+0",
+        "do": "13+6"
+      },
+      "opis": "Zalecane, ale nieobowiązkowe — lekarz powinien zaproponować je każdej kobiecie w ciąży. Razem z pomiarem przezierności karku na USG dokładniej pokazuje ryzyko wad genetycznych.",
+      "skutek": "Ocena ryzyka wad genetycznych będzie mniej dokładna.",
+      "uwagi": [
+        "Badanie DNA dziecka z krwi mamy (tzw. NIPT) nie zastępuje tego testu. Test z krwi razem z USG sprawdza więcej niż samo ryzyko trisomii."
+      ],
+      "zrodlo": "Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (krew do testu biochemicznego optymalnie w 10.–11. tygodniu, ocena możliwa najpóźniej w 13+6; niewłaściwe jest zastępowanie badania biochemicznego badaniem cffDNA/NIPT); Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (informacja o możliwości badań genetycznych): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
+    },
+    {
+      "id": "BP-02",
+      "nazwa": "Badanie krwi na wady genetyczne — test potrójny (β-hCG, estriol, AFP)",
+      "kiedy": "między 14. a 20. tygodniem",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_prenatalne",
+      "trymestr": 2,
+      "okno": {
+        "typ": "tc",
+        "od": "14+0",
+        "do": "20+6"
+      },
+      "opis": "Zalecane, ale nieobowiązkowe — lekarz powinien zaproponować je każdej kobiecie w ciąży. To badanie krwi pokazuje ryzyko m.in. zespołu Downa i wad cewy nerwowej u dziecka.",
+      "skutek": "Ocena ryzyka wad genetycznych będzie mniej dokładna.",
+      "pozycje": [
+        "Pobranie krwi i oznaczenie trzech substancji: β-hCG, wolnego estriolu i AFP"
+      ],
+      "uwagi": [
+        "To wynik oceny ryzyka, a nie rozpoznanie choroby. O dalszych badaniach decyduje lekarz.",
+        "Lekarz decyduje, który test zaproponować: podwójny w I trymestrze (11.–14. tydzień) czy potrójny w II trymestrze (14.–20. tydzień)."
+      ],
+      "zrodlo": "Test potrójny (β-hCG, wolny estriol, AFP) w 14.–20. tygodniu, test podwójny w 11.–13+6: artykuł w Ginekologii Polskiej (źródło wtórne): https://journals.viamedica.pl/ginekologia_polska/article/download/46499/33286; Medycyna Praktyczna, Badania prenatalne: https://www.mp.pl/pacjent/badania_zabiegi/63104,badania-prenatalne. Standard (Dz.U. 2026 poz. 1140, część II) nakazuje tylko przekazać informację o możliwości badań genetycznych: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf. Nie ma rekomendacji PTGiP zawierającej ten test — pozycja pochodzi z uwagi redaktora merytorycznego (materiały kursowe) i źródeł wtórnych. Uwaga redaktora merytorycznego (materiały kursowe, ginekologia/pediatria) potwierdza ten zapis.",
       "status": "ok"
     },
     {
       "id": "GLU-01",
       "nazwa": "Wcześniejszy test na cukrzycę ciążową",
       "kiedy": "jak najszybciej — nie czekaj do 24. tygodnia",
-      "grupa": "przed_porodem", "kategoria": "test_glukozy", "trymestr": 1,
-      "typ": "warunkowe", "warunki": ["ryzyko_cukrzycy", "cukier_podwyzszony"],
-      "okno": { "typ": "tc", "od": "0+0", "do": "23+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "test_glukozy",
+      "trymestr": 1,
+      "typ": "warunkowe",
+      "warunki": [
+        "ryzyko_cukrzycy",
+        "cukier_podwyzszony"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "23+6"
+      },
       "opis": "Wypijasz roztwór z cukrem i pobierają Ci krew. Badanie sprawdza, czy organizm radzi sobie z cukrem.",
-      "skutek": "Wcześniejszy test pozwala wcześniej rozpoznać cukrzycę ciążową.",
-      "uwagi": ["Jeśli cukier na czczo wyszedł 92–125 mg/dl, zrób ten test pilnie."],
-      "zrodlo": "Materiały zespołu: diagnostyka zaburzeń gospodarki węglowodanowej",
+      "skutek": "Cukrzyca ciążowa może zostać wykryta za późno.",
+      "pozycje": [
+        "Test z 75 g glukozy: krew pobiera się 3 razy — na czczo oraz po 1 i po 2 godzinach od wypicia roztworu"
+      ],
+      "uwagi": [
+        "Jeśli cukier na czczo wyszedł 92–125 mg/dl, zrób ten test pilnie.",
+        "Jeśli wynik jest dobry, i tak powtarza się test między 24. a 28. tygodniem."
+      ],
+      "zrodlo": "Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (algorytm: glikemia na czczo przy pierwszej wizycie; czynniki ryzyka lub 92–125 mg/dl → niezwłoczny test 75 g OGTT); Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (do 10. tygodnia: OGTT u kobiet z czynnikami ryzyka GDM): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; Zalecenia kliniczne PTD 2026, rozdz. 24, rycina 24.1 (grupa ryzyka: OGTT 75 g przy pierwszej wizycie, a przy prawidłowym wyniku powtórka w 24.–28. tygodniu; glikemia na czczo 92–125 mg/dl: pilnie OGTT; >125: pilnie powtórzyć oznaczenie): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb",
       "status": "ok"
     },
     {
       "id": "OKU-01",
       "nazwa": "Wizyta u okulisty (cukrzyca) — I trymestr",
       "kiedy": "w I trymestrze (najlepiej też przed ciążą)",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 1,
-      "typ": "warunkowe", "warunki": ["cukrzyca_przed"],
-      "okno": { "typ": "tc", "od": "0+0", "do": "13+6" },
-      "opis": "Cukrzyca może uszkadzać oczy, dlatego okulista sprawdza je w każdym trymestrze.",
-      "skutek": "Przy przerwie w kontrolach okulista może zauważyć zmiany w oczach później.",
-      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 1,
+      "typ": "warunkowe",
+      "warunki": [
+        "cukrzyca_przed"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "13+6"
+      },
+      "opis": "Cukrzyca może uszkadzać oczy. Okulista bada dno oka (po rozszerzeniu źrenic) przed ciążą albo jak najwcześniej w ciąży — najpóźniej w I trymestrze. Jeśli badanie było robione w ostatnich 3 miesiącach, możesz go nie powtarzać.",
+      "skutek": "Uszkodzenie oka przez cukrzycę może się pogłębić, zanim ktoś je zauważy.",
+      "zrodlo": "Zalecenia kliniczne PTD 2026, rozdz. 24 (kontrola okulistyczna u kobiet z cukrzycą przedciążową przed ciążą, najpóźniej w I trymestrze, następnie w każdym trymestrze): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb; Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (ocena dna oka jak najszybciej, jeśli nie była wykonana w ostatnich 3 miesiącach, i ponownie w 28. tygodniu)",
       "status": "ok"
     },
     {
@@ -173,40 +345,88 @@
       "nazwa": "Regularne wizyty kontrolne w II trymestrze",
       "kiedy": "mniej więcej co 4 tygodnie",
       "czestotliwosc": "co ok. 4 tygodnie",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 2,
-      "okno": { "typ": "tc", "od": "14+0", "do": "27+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 2,
+      "okno": {
+        "typ": "tc",
+        "od": "14+0",
+        "do": "27+6"
+      },
       "opis": "Lekarz sprawdza, jak rozwija się ciąża i jak się czujesz.",
-      "skutek": "Wizyty pomagają kontrolować ciśnienie i rozwój dziecka.",
+      "skutek": "Możesz przeoczyć np. nadciśnienie albo kłopoty z rozwojem dziecka.",
       "pozycje": [
         "Rozmowa i badanie",
         "Sprawdzenie, jak rośnie brzuch i jak bije serce dziecka",
         "Ciśnienie i waga",
         "Ocena, czy nie ma ryzyka powikłań"
       ],
-      "uwagi": ["Jeśli w I trymestrze coś wyszło nie tak, lekarz może zlecić dodatkowe badania (np. moczu, krwi)."],
-      "zrodlo": "Materiały zespołu: opieka w II trymestrze",
+      "uwagi": [
+        "Jeśli w I trymestrze coś wyszło nie tak, lekarz może zlecić dodatkowe badania (np. moczu, krwi).",
+        "W 21.–26. tygodniu lekarz zleca też badanie moczu."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (wizyty w 15.–20. i 21.–26. tygodniu; konsultacje nie rzadziej niż co 4 tygodnie): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
+    },
+    {
+      "id": "LAB-01",
+      "nazwa": "Badania krwi i moczu w II trymestrze",
+      "kiedy": "między 15. a 20. tygodniem",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 2,
+      "okno": {
+        "typ": "tc",
+        "od": "15+0",
+        "do": "20+6"
+      },
+      "opis": "Kontrola, czy nie masz anemii i czy w moczu nie ma niepokojących zmian.",
+      "skutek": "Anemia albo zakażenie dróg moczowych mogą zostać wykryte za późno.",
+      "pozycje": [
+        "Morfologia krwi",
+        "Badanie ogólne moczu"
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (15.–20. tydzień: morfologia krwi, badanie ogólne moczu): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf Dalsze badania przy anemii: uwaga redaktora merytorycznego (materiały kursowe); ferrytyna w standardzie na pierwszej wizycie: Standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część II: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf.",
+      "status": "ok",
+      "uwagi": [
+        "Jeśli morfologia pokaże anemię (niedokrwistość), lekarz zleci dalsze badania, m.in. poziom żelaza (ferrytyny)."
+      ]
     },
     {
       "id": "OKU-02",
       "nazwa": "Wizyta u okulisty (cukrzyca) — II trymestr",
       "kiedy": "w II trymestrze",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 2,
-      "typ": "warunkowe", "warunki": ["cukrzyca_przed"],
-      "okno": { "typ": "tc", "od": "14+0", "do": "27+6" },
-      "opis": "Cukrzyca może uszkadzać oczy, dlatego okulista sprawdza je w każdym trymestrze.",
-      "skutek": "Przy przerwie w kontrolach okulista może zauważyć zmiany w oczach później.",
-      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 2,
+      "typ": "warunkowe",
+      "warunki": [
+        "cukrzyca_przed"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "14+0",
+        "do": "27+6"
+      },
+      "opis": "Cukrzyca może uszkadzać oczy. Według polskich zaleceń kontrolę powtarza się w każdym trymestrze, a termin ustala okulista. Jeśli przy pierwszym badaniu były zmiany w oku, dodatkowa kontrola bywa zalecana między 16. a 20. tygodniem.",
+      "skutek": "Uszkodzenie oka przez cukrzycę może się pogłębić, zanim ktoś je zauważy.",
+      "zrodlo": "Zalecenia kliniczne PTD 2026 (Current Topics in Diabetes 2026;6(1)), rozdz. 24 „Cukrzyca a ciąża” (kontrola okulistyczna przed ciążą, najpóźniej w I trymestrze, następnie powtarzana w każdym trymestrze i przez rok po porodzie wg stopnia retinopatii i zaleceń okulisty; rutynowo nie zaleca się u kobiet z GDM): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb; Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (starsze: dodatkowa ocena dna oka w 16.–20. tygodniu przy wykrytej retinopatii)",
       "status": "ok"
     },
     {
       "id": "USG-03",
       "nazwa": "USG połówkowe — najważniejsze USG w ciąży",
       "kiedy": "między 18. a 22. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 2,
-      "okno": { "typ": "tc", "od": "18+0", "do": "22+6" },
-      "opis": "Obowiązkowe. Lekarz dokładnie ogląda dziecko od głowy do stóp.",
-      "skutek": "W tym okresie można dokładnie obejrzeć budowę dziecka. Jeśli termin minął, zapytaj lekarza o dalsze badania.",
+      "grupa": "przed_porodem",
+      "kategoria": "usg",
+      "trymestr": 2,
+      "okno": {
+        "typ": "tc",
+        "od": "18+0",
+        "do": "22+6"
+      },
+      "opis": "To drugie z 4 obowiązkowych badań USG (badanie przesiewowe). Lekarz dokładnie ogląda dziecko od głowy do stóp.",
+      "skutek": "Możesz nie wykryć wad budowy dziecka, gdy da się je jeszcze dobrze zobaczyć.",
       "pozycje": [
         "Wielkość i szacowana waga dziecka",
         "Budowa i narządy dziecka",
@@ -214,79 +434,146 @@
         "Ilość wód płodowych",
         "Szyjka macicy"
       ],
-      "zrodlo": "Materiały zespołu: badania ultrasonograficzne w II trymestrze",
-      "status": "ok"
+      "zrodlo": "Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (USG w 18.–22. tygodniu — ocena anatomii płodu); Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (18.–22. tydzień): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf Dokładniejsze badanie serca przy wątpliwościach: uwaga redaktora merytorycznego (materiały kursowe); PTGiP 2020 opisuje przesiewową ocenę serca płodu w USG połówkowym.",
+      "status": "ok",
+      "uwagi": [
+        "Jeśli coś budzi wątpliwości, lekarz może skierować na dokładniejsze badania, np. USG serca dziecka (echo płodu), często w tym samym okresie albo tuż po."
+      ]
     },
     {
       "id": "TOX-01",
       "nazwa": "Powtórne badanie na toksoplazmozę",
       "kiedy": "między 21. a 26. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 2,
-      "typ": "warunkowe", "warunki": ["toxo_ujemna"],
-      "okno": { "typ": "tc", "od": "21+0", "do": "26+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 2,
+      "typ": "warunkowe",
+      "warunki": [
+        "toxo_ujemna"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "21+0",
+        "do": "26+6"
+      },
       "opis": "Obowiązkowe, jeśli w I trymestrze wynik był ujemny. Sprawdza, czy w ciąży nie doszło do zakażenia.",
-      "skutek": "Bez wyniku badania rozpoznanie zakażenia toksoplazmozą może się opóźnić.",
-      "uwagi": ["W III trymestrze badanie powtarza się według zaleceń lekarza."],
-      "zrodlo": "Materiały zespołu: toksoplazmoza",
+      "skutek": "Zakażenie może zostać wykryte za późno, a jest groźne dla dziecka.",
+      "uwagi": [
+        "W III trymestrze lekarz może zlecić badanie jeszcze raz. Standard tego nie wymaga, ale niektóre źródła zalecają powtarzać je raz w każdym trymestrze."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (21.–26. tydzień: toksoplazmoza IgG, IgM u kobiet z ujemnym wynikiem w I trymestrze; w 27.–32. i 33.–37. tygodniu brak badania w kierunku toksoplazmozy): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; źródło wtórne dla powtórek w III trymestrze: A. Bacz, Toksoplazmoza w ciąży, Medycyna Praktyczna 2017 (przy wyniku ujemnym badanie powtarzać co najmniej raz w każdym trymestrze): https://www.mp.pl/pacjent/ciaza/przebiegciazy/63126,toksoplazmoza-w-ciazy",
       "status": "ok"
     },
     {
       "id": "SZK-01",
       "nazwa": "Szkoła rodzenia",
       "kiedy": "warto zacząć od 21. tygodnia",
-      "grupa": "przed_porodem", "kategoria": "szkola_rodzenia", "trymestr": 2,
-      "okno": { "typ": "tc", "od": "21+0", "do": "porod" },
+      "grupa": "przed_porodem",
+      "kategoria": "szkola_rodzenia",
+      "trymestr": 2,
+      "okno": {
+        "typ": "tc",
+        "od": "21+0",
+        "do": "porod"
+      },
       "opis": "Zajęcia, na których uczysz się, jak wygląda poród i opieka nad noworodkiem.",
-      "skutek": "Zajęcia są dobrowolne. Jeśli je pominiesz, możesz omówić przygotowania do porodu z położną.",
-      "zrodlo": "Materiały zespołu: opieka w II trymestrze (edukacja przedporodowa)",
+      "skutek": "Nie jest obowiązkowa, ale będzie Ci trudniej przygotować się do porodu i pierwszych dni z dzieckiem.",
+      "uwagi": [
+        "Bezpłatne zajęcia u położnej POZ: od 21. do 31. tygodnia raz w tygodniu (maks. 10 spotkań), od 32. tygodnia dwa razy w tygodniu (maks. 16 spotkań)."
+      ],
+      "zrodlo": "pacjent.gov.pl, Czym jest opieka okołoporodowa (aktualizacja 2026-02-17): https://pacjent.gov.pl/print/pdf/node/6818 (edukacja przedporodowa u położnej POZ od 21. tygodnia); Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część IV (edukacja przedporodowa): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "GLU-02",
       "nazwa": "Test na cukrzycę ciążową",
-      "kiedy": "między 24. a 26. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "test_glukozy", "trymestr": 2,
-      "okno": { "typ": "tc", "od": "24+0", "do": "26+6" },
+      "kiedy": "między 24. a 28. tygodniem",
+      "grupa": "przed_porodem",
+      "kategoria": "test_glukozy",
+      "trymestr": 2,
+      "okno": {
+        "typ": "tc",
+        "od": "24+0",
+        "do": "28+6"
+      },
       "opis": "Robi się go wszystkim, u których wcześniej nie wykryto cukrzycy. Wypijasz roztwór z cukrem i pobierają Ci krew.",
-      "skutek": "Badanie pomaga rozpoznać cukrzycę ciążową. Jeśli termin minął, zapytaj lekarza o dalsze kroki.",
-      "uwagi": ["Jeśli jesteś w grupie ryzyka, test robi się wcześniej."],
-      "zrodlo": "Materiały zespołu: badania w II trymestrze; diagnostyka zaburzeń gospodarki węglowodanowej",
+      "skutek": "Cukrzyca ciążowa może zostać niezauważona, a nieleczona zwiększa ryzyko powikłań u mamy i dziecka.",
+      "pozycje": [
+        "Test z 75 g glukozy: krew pobiera się 3 razy — na czczo oraz po 1 i po 2 godzinach od wypicia roztworu"
+      ],
+      "uwagi": [
+        "Jeśli jesteś w grupie ryzyka, test robi się wcześniej, a potem i tak powtarza w tym okienku.",
+        "Jak się przygotować: przyjdź na czczo (8–10 godzin po ostatnim posiłku, nie dłużej). Przez 3 dni przed testem jedz normalnie, nie ograniczaj węglowodanów. W trakcie testu siedź, nie jedz i nie pal. Roztwór wypijasz w ciągu 5 minut.",
+        "Jeśli niedawno dostawałaś zastrzyki na dojrzewanie płuc dziecka (sterydy), test trzeba odłożyć o co najmniej 72 godziny.",
+        "Część źródeł i starsze zapisy podają termin 24.–26. tygodnia. Obecne rozporządzenie mówi o 24.–28. tygodniu, więc test zrobiony w 24.–26. tygodniu też jest w porządku."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (24.–28. tydzień: test z 75 g glukozy, pomiar na czczo, po 1 i po 2 godzinach): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (warunki wykonania testu: 8–10 h od ostatniego posiłku, 3 dni diety z co najmniej 150 g węglowodanów, 75 g glukozy w 250–300 ml wody w 5 minut, pozycja siedząca; odroczenie o 72 h po sterydoterapii); Zalecenia kliniczne PTD 2026, rozdz. 24 (badania przesiewowe przy pierwszej wizycie i w 24.–28. tygodniu; kryteria: na czczo 92–125, 60 min ≥180, 120 min 153–199 mg/dl): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb",
       "status": "ok"
     },
     {
       "id": "ANTD-01",
       "nazwa": "Badanie krwi na przeciwciała anty-D",
-      "kiedy": "między 24. a 26. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 2,
-      "typ": "warunkowe", "warunki": ["rh_ujemne"],
-      "okno": { "typ": "tc", "od": "24+0", "do": "26+6" },
+      "kiedy": "między 24. a 28. tygodniem",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 2,
+      "typ": "warunkowe",
+      "warunki": [
+        "rh_ujemne"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "24+0",
+        "do": "28+6"
+      },
       "opis": "Dla osób z grupą krwi Rh ujemną. Sprawdza, czy organizm nie zaczął reagować na krew dziecka.",
-      "skutek": "Bez wyniku lekarz będzie miał mniej informacji o tym, czy pojawiły się te przeciwciała.",
-      "zrodlo": "Materiały zespołu: badania w II trymestrze",
+      "skutek": "Możesz nie dowiedzieć się o niezgodności krwi mamy i dziecka.",
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (24.–28. tydzień: przeciwciała anty-D u kobiet Rh ujemnych): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "KON-01",
-      "nazwa": "Wizyta u lekarza (gdy ciążę prowadzi położna)",
-      "kiedy": "między 24. a 26. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 2,
-      "typ": "warunkowe", "warunki": ["polozna"],
-      "okno": { "typ": "tc", "od": "24+0", "do": "26+6" },
-      "opis": "Lekarz ocenia, czy ciąża przebiega prawidłowo.",
-      "skutek": "Jeśli ten termin minął, możesz ustalić z położną nową datę konsultacji.",
-      "zrodlo": "Materiały zespołu: opieka w II trymestrze",
-      "status": "ok"
+      "nazwa": "Konsultacja z lekarzem, gdy ciążę prowadzi położna (w razie czynników ryzyka)",
+      "kiedy": "w razie potrzeby — gdy pojawią się czynniki ryzyka",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 2,
+      "typ": "warunkowe",
+      "warunki": [
+        "polozna"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "0+0",
+        "do": "porod"
+      },
+      "opis": "Położna może prowadzić ciążę bez powikłań samodzielnie. Jeśli pojawią się czynniki ryzyka (np. nadciśnienie, cukrzyca, nieprawidłowy wynik badania), położna skieruje Cię do lekarza położnika. W starej wersji standardu (do 6 maja 2026) taka konsultacja była obowiązkowa w 24.–26. tygodniu — obecnie już nie.",
+      "skutek": "Czynniki ryzyka mogą nie zostać na czas ocenione przez lekarza.",
+      "zrodlo": "Od 7.05.2026 standard nie przewiduje obowiązkowej wizyty lekarskiej w 24.–26. tygodniu przy opiece położnej; prowadzenie ciąży fizjologicznej przez położną jest samodzielnym modelem opieki. Standard (Dz.U. 2026 poz. 1140): https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf; zmiana: rozporządzenie MZ z 23.10.2025 (Dz.U. 2025 poz. 1525): https://api.sejm.gov.pl/eli/acts/DU/2025/1525/text.pdf; wcześniejsza tabela standardu (z obowiązkową konsultacją): https://www.gov.pl/attachment/517feeed-0c09-4bf0-879e-1bb06983679a. Zapis „konsultacja w razie czynników ryzyka” — zalecenie redaktora merytorycznego (materiały kursowe, Ginekologia 3).",
+      "status": "ok",
+      "uwagi": [
+        "Jeśli czujesz niepokój albo coś Cię niepokoi w ciąży, nie czekaj na wizytę — zapytaj położną, czy potrzebna jest konsultacja z lekarzem."
+      ]
     },
     {
       "id": "OKU-03",
       "nazwa": "Wizyta u okulisty (cukrzyca) — III trymestr",
-      "kiedy": "w III trymestrze",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
-      "typ": "warunkowe", "warunki": ["cukrzyca_przed"],
-      "okno": { "typ": "tc", "od": "28+0", "do": "porod" },
-      "opis": "Cukrzyca może uszkadzać oczy, dlatego okulista sprawdza je w każdym trymestrze.",
-      "skutek": "Przy przerwie w kontrolach okulista może zauważyć zmiany w oczach później.",
-      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa",
+      "kiedy": "w III trymestrze (zalecane około 28. tygodnia)",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 3,
+      "typ": "warunkowe",
+      "warunki": [
+        "cukrzyca_przed"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "28+0",
+        "do": "porod"
+      },
+      "opis": "Cukrzyca może uszkadzać oczy. Okulista bada dno oka w III trymestrze — najlepiej około 28. tygodnia. Po porodzie kontrole oczu trwają zwykle jeszcze do roku, zależnie od zaleceń okulisty.",
+      "skutek": "Uszkodzenie oka przez cukrzycę może się pogłębić, zanim ktoś je zauważy.",
+      "zrodlo": "Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (ocena dna oka w 28. tygodniu ciąży); Zalecenia kliniczne PTD 2026, rozdz. 24 (kontrola w każdym trymestrze oraz przez rok po porodzie): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb",
       "status": "ok"
     },
     {
@@ -294,27 +581,60 @@
       "nazwa": "Wizyty kontrolne — do 32. tygodnia",
       "kiedy": "od 28. do 32. tygodnia, co 4 tygodnie",
       "czestotliwosc": "co 4 tygodnie",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "28+0", "do": "32+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "28+0",
+        "do": "32+6"
+      },
       "opis": "Kontrola przed porodem: lekarz sprawdza ciśnienie, mocz i samopoczucie dziecka.",
-      "skutek": "Przy przerwie w kontrolach lekarz może zauważyć zmiany ciśnienia później.",
+      "skutek": "Możesz przeoczyć nadciśnienie lub inne zagrożenia tuż przed porodem.",
       "pozycje": [
         "Badanie moczu na każdej wizycie (m.in. czy nie ma białka — ostrzega przed groźnym powikłaniem ciążowym)",
         "Ciśnienie",
         "Rozmowa o tym, jak się czuje dziecko, i o porodzie"
       ],
-      "zrodlo": "Materiały zespołu: opieka w III trymestrze",
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (wizyta w 27.–32. tygodniu: badanie, ciśnienie, morfologia, mocz, USG; konsultacje nie rzadziej niż co 4 tygodnie): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
+    },
+    {
+      "id": "LAB-02",
+      "nazwa": "Badania krwi i moczu w III trymestrze (pierwsze)",
+      "kiedy": "między 27. a 32. tygodniem",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "27+0",
+        "do": "32+6"
+      },
+      "opis": "Kontrola, czy nie masz anemii i czy w moczu nie ma niepokojących zmian.",
+      "skutek": "Anemia albo zakażenie dróg moczowych mogą zostać wykryte za późno.",
+      "pozycje": [
+        "Morfologia krwi",
+        "Badanie ogólne moczu"
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (27.–32. tydzień: morfologia krwi, badanie ogólne moczu): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "USG-04",
       "nazwa": "USG w III trymestrze",
-      "kiedy": "około 30. tygodnia (między 28. a 32.)",
-      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "28+0", "do": "32+6" },
-      "opis": "Kolejne USG kontrolne — lekarz sprawdza, jak rośnie dziecko.",
-      "skutek": "Jeśli termin minął, ustal z lekarzem, kiedy sprawdzić wzrastanie dziecka.",
-      "zrodlo": "Materiały zespołu: badania w III trymestrze",
+      "kiedy": "około 30. tygodnia (między 28. a 32., czyli 30. tydzień ± 2 tygodnie)",
+      "grupa": "przed_porodem",
+      "kategoria": "usg",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "28+0",
+        "do": "32+6"
+      },
+      "opis": "To trzecie z 4 obowiązkowych badań USG (badanie przesiewowe). Lekarz sprawdza, jak rośnie dziecko.",
+      "skutek": "Kłopoty z rozwojem dziecka mogą zostać zauważone za późno.",
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (27.–32. tydzień: USG wg rekomendacji PTGiP); Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (USG w 28.–32. tygodniu — ocena wzrastania płodu): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
@@ -322,384 +642,880 @@
       "nazwa": "Wizyty kontrolne — od 33. do 36. tygodnia",
       "kiedy": "od 33. do 36. tygodnia, co 2–3 tygodnie",
       "czestotliwosc": "co 2–3 tygodnie",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "33+0", "do": "36+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "33+0",
+        "do": "36+6"
+      },
       "opis": "Kontrola przed porodem: lekarz sprawdza ciśnienie, mocz i samopoczucie dziecka.",
-      "skutek": "Przy przerwie w kontrolach lekarz może zauważyć zmiany ciśnienia później.",
+      "skutek": "Możesz przeoczyć nadciśnienie lub inne zagrożenia tuż przed porodem.",
       "pozycje": [
         "Badanie moczu na każdej wizycie (m.in. czy nie ma białka — ostrzega przed groźnym powikłaniem ciążowym)",
         "Ciśnienie",
         "Rozmowa o tym, jak się czuje dziecko, i o porodzie"
       ],
-      "zrodlo": "Materiały zespołu: opieka w III trymestrze",
+      "uwagi": [
+        "Standard wymaga wizyt nie rzadziej niż co 4 tygodnie. W ostatnich tygodniach bywają częstsze — jak często, ustala lekarz lub położna. W Wielkiej Brytanii zaleca się wizyty ok. 31., 34. i 36. tygodnia.",
+        "W 33.–37. tygodniu lekarz lub położna zapyta też o Twój nastrój (ocena ryzyka depresji)."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (wizyta w 33.–37. tygodniu, w tym ocena ryzyka i nasilenia objawów depresji; konsultacje nie rzadziej niż co 4 tygodnie — to dolna granica, nie zalecana częstość): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf. Typowa częstość „co 2–3 tygodnie”: NICE NG201 Antenatal care (2021), Schedule of antenatal appointments (wizyty wszystkich ciężarnych w 28., 34., 36., 38. tygodniu, pierwiastki dodatkowo w 25., 31., 40.; 41. tydzień jeśli bez porodu): https://www.nice.org.uk/guidance/ng201/resources/schedule-of-antenatal-appointments-pdf-9204300829. Polskiego przepisu ani rekomendacji PTGiP z taką częstością nie znaleziono.",
       "status": "ok"
     },
     {
       "id": "LAB-03",
       "nazwa": "Badania krwi i moczu przed porodem",
       "kiedy": "między 33. a 37. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "33+0", "do": "37+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "33+0",
+        "do": "37+6"
+      },
       "opis": "Ostatnia większa kontrola przed porodem. Na HIV badasz się w ciąży dwa razy: na początku i teraz.",
-      "skutek": "Badania pomagają rozpoznać między innymi anemię lub zakażenie przed porodem.",
-      "pozycje": ["Morfologia krwi", "Badanie moczu", "Badanie na WZW B", "Powtórne badanie na HIV"],
-      "uwagi": ["Jeśli wykryto zakażenie (HIV, WZW B, WZW C), lekarz ustala indywidualny plan prowadzenia ciąży — może to wpłynąć na sposób porodu."],
-      "zrodlo": "Materiały zespołu: badania w III trymestrze; HIV w ciąży",
+      "skutek": "Możesz nie wiedzieć o anemii lub zakażeniu, a to ważne dla porodu i dziecka.",
+      "pozycje": [
+        "Morfologia krwi",
+        "Badanie moczu",
+        "Badanie na WZW B",
+        "Powtórne badanie na HIV"
+      ],
+      "uwagi": [
+        "Jeśli wykryto zakażenie (HIV, WZW B, WZW C), lekarz ustala indywidualny plan ciąży — może to wpłynąć na sposób porodu.",
+        "Badanie na kiłę i WZW C powtarza się w tym czasie tylko przy zwiększonym ryzyku zakażenia."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (33.–37. tydzień: morfologia, mocz, HBs, HIV; kiła i HCV tylko przy zwiększonym ryzyku): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
+    },
+    {
+      "id": "ANE-01",
+      "nazwa": "Konsultacja z anestezjologiem (znieczulenie podczas porodu)",
+      "kiedy": "między 33. a 37. tygodniem (jeśli się nie odbyła — w 38.–39. tygodniu albo po 40. tygodniu)",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 3,
+      "typ": "warunkowe",
+      "warunki": [
+        "znieczulenie"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "33+0",
+        "do": "37+6"
+      },
+      "opis": "Dla kobiet, które chcą znieczulenia zewnątrzoponowego lub podobnego podczas porodu. Anestezjolog tłumaczy, jak ono działa, i ustala z Tobą, czy możesz je dostać.",
+      "skutek": "Znieczulenie zostanie omówione dopiero w trakcie porodu.",
+      "pozycje": [
+        "Rozmowa o tym, jak działa znieczulenie, jak wpływa na poród i dziecko oraz jakie mogą być skutki uboczne",
+        "Ustalenie, czy możesz je dostać"
+      ],
+      "uwagi": [
+        "Jeśli konsultacja nie odbyła się w 33.–37. tygodniu, standard przewiduje ją w 38.–39. tygodniu, a potem zaraz po 40. tygodniu.",
+        "Możesz zdecydować o znieczuleniu dopiero w trakcie porodu — anestezjolog przychodzi wtedy na zlecenie lekarza, najpóźniej w 30 minut.",
+        "Do znieczulenia potrzebna jest Twoja pisemna zgoda."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (konsultacja anestezjologiczna dla kobiet decydujących się na łagodzenie bólu porodowego analgezją regionalną: w 33.–37. tygodniu, a jeśli się nie odbyła — w 38.–39. tygodniu lub po 40. tygodniu), część V ust. 6 oraz część VII ust. 22–23 (konsultacja w czasie porodu nie później niż 30 minut od zgłoszenia zlecenia; pisemna zgoda): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf (kopia tekstu: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf). Nowy wpis dodany w weryfikacji 3.",
       "status": "ok"
     },
     {
       "id": "GBS-01",
       "nazwa": "Wymaz na bakterie GBS",
       "kiedy": "między 35. a 37. tygodniem",
-      "grupa": "przed_porodem", "kategoria": "wymaz", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "35+0", "do": "37+6" },
+      "grupa": "przed_porodem",
+      "kategoria": "wymaz",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "35+0",
+        "do": "37+6"
+      },
       "opis": "Wymaz z pochwy i odbytu. Sprawdza, czy masz bakterie, którymi dziecko mogłoby się zakazić podczas porodu.",
-      "skutek": "Wynik pomaga zespołowi medycznemu zaplanować opiekę podczas porodu.",
-      "uwagi": ["Dodatni wynik lekarz uwzględnia w planie opieki podczas porodu."],
-      "zrodlo": "Materiały zespołu: badania w III trymestrze",
+      "skutek": "Nie będzie wiadomo, czy dziecko jest narażone na zakażenie podczas porodu.",
+      "uwagi": [
+        "Dodatni wynik lekarz uwzględnia w planie opieki podczas porodu."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (posiew z pochwy i odbytu w kierunku paciorkowców B-hemolizujących, od 35. do 37. tygodnia): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "KTG-01",
       "nazwa": "Badanie KTG (zapis tętna dziecka)",
-      "kiedy": "od 32.–34. tygodnia, regularnie",
-      "grupa": "przed_porodem", "kategoria": "badanie_prenatalne", "trymestr": 3,
-      "typ": "warunkowe", "warunki": ["cukrzyca_przed", "cukrzyca_ciazowa", "nadcisnienie", "autoimmun"],
-      "okno": { "typ": "tc", "od": "32+0", "do": "porod" },
-      "opis": "Na brzuchu masz czujniki, które zapisują tętno dziecka i skurcze. Badanie sprawdza, czy dziecku nic nie dolega.",
-      "skutek": "Zapis tętna pomaga zespołowi medycznemu ocenić, jak czuje się dziecko.",
-      "zrodlo": "Materiały zespołu: monitorowanie dobrostanu płodu w III trymestrze",
+      "kiedy": "od ok. 32.–36. tygodnia (zależnie od choroby i decyzji lekarza), zwykle raz w tygodniu lub częściej",
+      "czestotliwosc": "zwykle raz w tygodniu lub częściej",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_prenatalne",
+      "trymestr": 3,
+      "typ": "warunkowe",
+      "warunki": [
+        "cukrzyca_przed",
+        "cukrzyca_ciazowa",
+        "nadcisnienie",
+        "autoimmun"
+      ],
+      "okno": {
+        "typ": "tc",
+        "od": "32+0",
+        "do": "porod"
+      },
+      "opis": "Na brzuchu masz czujniki, które zapisują tętno dziecka i skurcze. Badanie sprawdza, czy dziecku nic nie dolega. Przy chorobach z tej listy robi się je wcześniej i częściej niż u innych kobiet (u wszystkich — dopiero po 40. tygodniu).",
+      "skutek": "Problem z samopoczuciem dziecka może zostać zauważony za późno.",
+      "uwagi": [
+        "Nadciśnienie: polskie zalecenia — KTG raz w tygodniu od 36. tygodnia (od 34., jeśli dziecko rośnie za wolno).",
+        "Cukrzyca przed ciążą: KTG po 36. tygodniu przy każdej wizycie. Cukrzyca ciążowa: KTG od 38. tygodnia.",
+        "Zalecenia amerykańskie (ACOG) podpowiadają start już od ok. 32. tygodnia przy nadciśnieniu, cukrzycy, toczniu i zespole antyfosfolipidowym. Dokładny termin i częstość ustala lekarz."
+      ],
+      "zrodlo": "Standard (Dz.U. 2026 poz. 1140, część II) przewiduje KTG u wszystkich dopiero niezwłocznie po 40. tygodniu (patrz KTG-02): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf. Nadciśnienie: Zespół ekspertów PTNT/PTK/PTGiP, Postępowanie w nadciśnieniu tętniczym u kobiet w ciąży, Ginekol Perinatol Prakt 2019;4(2):43-111, ryc. 5.3–5.4 i rozdz. 6.3.1 (ambulatoryjne KTG raz w tygodniu od 36. tygodnia; od 34. tygodnia przy biometrii <10. centyla): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/64987/48759. Cukrzyca: Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (po 36. tygodniu KTG przy każdej wizycie w poradni; od 38. tygodnia nadzór KTG). Start od 32 tygodnia: ACOG Committee Opinion No. 828 (2021), Indications for Outpatient Antenatal Fetal Surveillance, Obstet Gynecol 2021;137(6):e177-e197, Table 1 (nadciśnienie przewlekłe, cukrzyca, SLE, APS: od 32 0/7 tyg.; zalecenia sugerujące, nie obowiązkowe): https://starlegacyfoundation.org/wp-content/uploads/ACOG-2021-Indications-for-outpatient-antenatal-fetal-surveillance.pdf. Źródła polskie i amerykańskie różnią się terminem startu (36 vs 32 tc), stąd okno od 32 tc i wzmianka o decyzji lekarza.",
       "status": "ok"
     },
     {
       "id": "WIZ-06",
       "nazwa": "Wizyty kontrolne — po 36. tygodniu",
-      "kiedy": "co tydzień aż do porodu",
-      "czestotliwosc": "co tydzień",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "37+0", "do": "porod" },
+      "kiedy": "od 37. tygodnia do porodu — zwykle co 1–2 tygodnie, a po terminie porodu co 7 dni",
+      "czestotliwosc": "zwykle co 1–2 tygodnie (po 40. tygodniu co 7 dni)",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "37+0",
+        "do": "porod"
+      },
       "opis": "Kontrola przed porodem: lekarz sprawdza ciśnienie, mocz i samopoczucie dziecka.",
-      "skutek": "Regularne wizyty pomagają kontrolować ciśnienie i samopoczucie przed porodem.",
+      "skutek": "Możesz przeoczyć nadciśnienie lub inne zagrożenia tuż przed porodem.",
       "pozycje": [
         "Badanie moczu na każdej wizycie (m.in. czy nie ma białka — ostrzega przed groźnym powikłaniem ciążowym)",
         "Ciśnienie",
         "Rozmowa o tym, jak się czuje dziecko, i o porodzie"
       ],
-      "zrodlo": "Materiały zespołu: opieka w III trymestrze",
+      "uwagi": [
+        "Standard wymaga wizyt nie rzadziej niż co 4 tygodnie. Wprost wymienia wizytę w 38.–39. tygodniu, a po 40. tygodniu kontrole co 7 dni. Jak często dokładnie, ustala lekarz lub położna.",
+        "W 38.–39. tygodniu standard przewiduje: badanie lekarskie i położnicze, ocenę ruchów i czynności serca dziecka, ciśnienie, wagę oraz badanie moczu i morfologię."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (wizyta w 38.–39. tygodniu; po 40. tygodniu wizyta niezwłocznie, potem co 7 dni; konsultacje nie rzadziej niż co 4 tygodnie): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; NICE NG201 Antenatal care (2021), Schedule of antenatal appointments (wizyty w 36., 38. i 41. tygodniu; pierwiastki także w 40.): https://www.nice.org.uk/guidance/ng201/resources/schedule-of-antenatal-appointments-pdf-9204300829. Wcześniejsza częstość „co tydzień” od 37. tygodnia nie ma potwierdzenia w przepisach ani w NICE — zastąpiona „co 1–2 tygodnie”. Zakres wizyty w 38.–39. tygodniu: Standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część II: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf.",
+      "status": "ok"
+    },
+    {
+      "id": "LAB-04",
+      "nazwa": "Badania krwi i moczu tuż przed terminem",
+      "kiedy": "między 38. a 39. tygodniem",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_krwi",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "38+0",
+        "do": "39+6"
+      },
+      "opis": "Ostatnia kontrola przed terminem porodu: czy nie masz anemii i czy w moczu nie ma niepokojących zmian.",
+      "skutek": "Anemia albo zakażenie dróg moczowych mogą zostać wykryte za późno.",
+      "pozycje": [
+        "Badanie ogólne moczu",
+        "Morfologia krwi"
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (38.–39. tydzień: badanie ogólne moczu, morfologia krwi): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "USG-05",
       "nazwa": "USG po terminie porodu",
       "kiedy": "zaraz po 40. tygodniu, jeśli poród się nie zaczął",
-      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "40+0", "do": "porod" },
-      "opis": "Lekarz sprawdza, czy dziecku nic nie grozi, gdy poród się opóźnia.",
-      "skutek": "Jeśli termin minął, ustal z lekarzem dalsze kontrole po planowanym terminie porodu.",
-      "pozycje": ["Ilość wód płodowych", "Przepływ krwi", "Ogólny stan dziecka"],
-      "zrodlo": "Materiały zespołu: okres po 40. tygodniu",
+      "grupa": "przed_porodem",
+      "kategoria": "usg",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "40+0",
+        "do": "porod"
+      },
+      "opis": "To czwarte z 4 obowiązkowych badań USG. Lekarz sprawdza, czy dziecku nic nie grozi, gdy poród się opóźnia.",
+      "skutek": "Nie będzie wiadomo, czy dziecku nic nie grozi, gdy poród się opóźnia.",
+      "pozycje": [
+        "Położenie i tętno dziecka",
+        "Szacowana waga dziecka",
+        "Ilość płynu owodniowego (wód płodowych)",
+        "Położenie łożyska"
+      ],
+      "uwagi": [
+        "Badanie przepływu krwi (Doppler) lekarz robi tylko wtedy, gdy są po temu powody."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (niezwłocznie po 40. tygodniu: KTG i USG wg rekomendacji PTGiP): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (USG po terminie porodu)",
+      "status": "ok"
+    },
+    {
+      "id": "KTG-02",
+      "nazwa": "KTG po terminie porodu (zapis tętna dziecka)",
+      "kiedy": "zaraz po 40. tygodniu, potem co 7 dni, jeśli poród się nie zaczął",
+      "grupa": "przed_porodem",
+      "kategoria": "badanie_prenatalne",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "40+0",
+        "do": "porod"
+      },
+      "opis": "Na brzuchu masz czujniki, które zapisują tętno dziecka i skurcze. Po 40. tygodniu badanie robi się każdej kobiecie, której poród się nie zaczął.",
+      "skutek": "Problem z samopoczuciem dziecka może zostać zauważony za późno.",
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (niezwłocznie po 40. tygodniu: badanie KTG; przy prawidłowym wyniku kolejne KTG i USG za 7 dni): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "WIZ-07",
-      "nazwa": "Częste kontrole po terminie porodu",
-      "kiedy": "po 40. tygodniu, co 2–3 dni",
-      "czestotliwosc": "co 2–3 dni",
-      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
-      "okno": { "typ": "tc", "od": "40+0", "do": "porod" },
-      "opis": "Gdy poród się nie zaczyna, dziecko jest obserwowane częściej.",
-      "skutek": "Jeśli termin minął, skontaktuj się z zespołem prowadzącym, aby ustalić kolejny termin kontroli.",
+      "nazwa": "Kontrole po terminie porodu",
+      "kiedy": "od 40. tygodnia: pierwsza wizyta od razu, potem co 7 dni (przy nieprawidłowościach częściej)",
+      "czestotliwosc": "co 7 dni (przy nieprawidłowościach częściej)",
+      "grupa": "przed_porodem",
+      "kategoria": "wizyta",
+      "trymestr": 3,
+      "okno": {
+        "typ": "tc",
+        "od": "40+0",
+        "do": "porod"
+      },
+      "opis": "Gdy poród się nie zaczyna, dziecko jest kontrolowane regularnie, a lekarz planuje, kiedy poród ma się odbyć.",
+      "skutek": "Nie będzie wiadomo, czy dziecku nic nie grozi, gdy poród się opóźnia.",
       "pozycje": [
-        "Wizyty co 2–3 dni",
-        "KTG (tętno dziecka) — często codziennie lub co 2–3 dni",
-        "USG: ilość wód płodowych i przepływ krwi"
+        "Pierwsza wizyta zaraz po 40. tygodniu: badanie lekarskie i położnicze (lekarz lub położna może przy nim ocenić m.in. szyjkę macicy), pytania o ruchy dziecka, ciśnienie i waga, KTG (tętno dziecka) oraz USG (m.in. ilość płynu owodniowego)",
+        "Jeśli KTG, USG i ruchy dziecka są dobre — następna kontrola za 7 dni (znów KTG i USG)",
+        "Na wizycie ustala się termin pobytu w szpitalu, tak aby poród odbył się przed końcem 42. tygodnia",
+        "Jeśli coś jest nie tak, lekarz ustala częstsze kontrole"
       ],
-      "uwagi": ["Często zalecany jest pobyt w szpitalu (oddział patologii ciąży), gdzie dziecko jest obserwowane, a lekarz decyduje, czy wywołać poród."],
-      "zrodlo": "Materiały zespołu: okres po 40. tygodniu",
+      "uwagi": [
+        "Często zaleca się pobyt w szpitalu (oddział patologii ciąży). Dziecko jest tam obserwowane, a lekarz decyduje, czy wywołać poród."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (niezwłocznie po 40. tygodniu: badanie, ruchy płodu, KTG, USG; przy prawidłowych wynikach kolejne badanie za 7 dni; termin hospitalizacji tak, by poród odbył się przed końcem 42. tygodnia): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf Zakres wizyty po 40. tygodniu (badanie położnicze, ocena ruchów płodu, KTG, USG): Standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część II: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf. Ocena szyjki macicy podczas badania położniczego: uwaga redaktora merytorycznego (materiały kursowe).",
       "status": "ok"
     },
     {
       "id": "PAT-01",
       "nazwa": "Wizyta położnej w domu",
-      "kiedy": "do 2 dni po wyjściu ze szpitala",
-      "grupa": "po_porodzie", "kategoria": "wizyta_patronazowa", "trymestr": "polog",
-      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": 2, "kotwica": "wypis" },
-      "opis": "Położna środowiskowa odwiedza mamę i dziecko w domu. Kolejne wizyty odbywają się w pierwszych tygodniach po porodzie.",
-      "skutek": "Wizyta daje okazję do sprawdzenia, jak czujecie się po powrocie do domu, i do zadania pytań położnej.",
-      "zrodlo": "Materiały zespołu: połóg, wizyty patronażowe",
+      "kiedy": "w ciągu 48 godzin po wyjściu ze szpitala (nie liczą się soboty, niedziele i święta)",
+      "grupa": "po_porodzie",
+      "kategoria": "wizyta_patronazowa",
+      "trymestr": "polog",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "dni",
+        "od": 0,
+        "do": 2,
+        "kotwica": "wypis"
+      },
+      "opis": "Położna środowiskowa (POZ) odwiedza mamę i dziecko w domu co najmniej 4 razy w pierwszych tygodniach po porodzie. Pierwsza wizyta jest w ciągu 48 godzin od wypisu ze szpitala albo od zgłoszenia porodu, kolejne w następnych tygodniach.",
+      "skutek": "W pierwszych dniach nikt nie sprawdzi w domu, jak radzicie sobie z dzieckiem i jak czuje się mama.",
+      "pozycje": [
+        "Sprawdzenie zdrowia mamy i dziecka (m.in. jak goi się rana po porodzie, żółtaczka, skóra i pępek)",
+        "Pomoc w karmieniu piersią",
+        "Pokaz pielęgnacji noworodka (kąpiel, skóra, pępek)",
+        "Rozmowa o tym, jak się czujesz i czy masz wsparcie rodziny",
+        "Informacje o szczepieniach, badaniach dziecka i wizycie u lekarza po połogu"
+      ],
+      "uwagi": [
+        "Szpital przekazuje położnej zgłoszenie o porodzie najpóźniej w dniu wypisu. Jeśli nie wybrałaś jeszcze położnej, szpital powie Ci, jak to zrobić.",
+        "Jeśli dziecko wyjdzie ze szpitala później niż mama, położna przychodzi co najmniej 2 razy po jego powrocie do domu."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część XV „Połóg” ust. 7 (co najmniej 4 wizyty; pierwsza nie później niż w ciągu 48 godzin, z wyjątkiem sobót, niedziel i świąt, od otrzymania zgłoszenia urodzenia dziecka lub wypisu; gdy dziecko wyjdzie później niż mama — co najmniej 2 wizyty po jego powrocie), ust. 10 (zakres wizyty) oraz część XIII ust. 2 pkt 10 i 13 (zgłoszenie o porodzie): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; rozporządzenie o świadczeniach POZ (Dz.U. 2023 poz. 1427), załącznik nr 3 część II lp. 2 (co najmniej 4 wizyty położnej w 1.–6. tygodniu życia): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html; pacjent.gov.pl, Czym jest opieka okołoporodowa (aktualizacja 2026-02-17): https://pacjent.gov.pl/print/pdf/node/6818",
       "status": "ok"
     },
     {
       "id": "DEP-01",
-      "nazwa": "Krótkie badanie: jak się czujesz po porodzie",
-      "kiedy": "raz, zwykle przy wizycie położnej lub u ginekologa",
-      "grupa": "po_porodzie", "kategoria": "badanie_poporodowe", "trymestr": "polog", "dla": "matka",
-      "okno": { "typ": "po_porodzie", "jednostka": "tygodnie", "od": 0, "do": 6 },
-      "opis": "Obowiązkowe badanie przesiewowe w kierunku depresji poporodowej. Lekarz lub położna pyta o nastrój.",
-      "skutek": "Rozmowa pomaga zauważyć, kiedy po porodzie potrzebujesz wsparcia.",
-      "zrodlo": "Materiały zespołu: połóg, depresja poporodowa",
+      "nazwa": "Krótkie badanie: jak się czujesz po porodzie (obowiązkowe badanie przesiewowe w kierunku depresji)",
+      "kiedy": "w 4. tygodniu po porodzie, zwykle przy wizycie położnej (wcześniej, jeśli pojawią się kłopoty z nastrojem)",
+      "grupa": "po_porodzie",
+      "kategoria": "badanie_poporodowe",
+      "trymestr": "polog",
+      "dla": "matka",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "tygodnie",
+        "od": 3,
+        "do": 5,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "To obowiązkowe badanie przesiewowe. Standard wymaga sprawdzenia, czy nie grozi Ci depresja po porodzie — w 4. tygodniu po porodzie, a wcześniej, gdy pojawią się kłopoty z nastrojem. Położna lub lekarz pyta, jak się czujesz.",
+      "skutek": "Depresja poporodowa może zostać niezauważona, a wymaga pomocy.",
+      "pozycje": [
+        "Położna lub lekarz pyta o nastrój, sen, lęk i to, jak sobie radzisz — zwykle w krótkiej ankiecie (np. skala EPDS)",
+        "Rozmowa o tym, gdzie szukać pomocy, jeśli wynik budzi niepokój"
+      ],
+      "uwagi": [
+        "To tylko badanie przesiewowe, nie rozpoznanie choroby. Standard nie narzuca konkretnej ankiety — najczęściej używa się EPDS.",
+        "Nie czekaj na ten termin, jeśli czujesz się ciągle przygnębiona albo bardzo zmęczona — powiedz o tym położnej lub lekarzowi od razu. Gdy jest taka potrzeba, przysługuje Ci pomoc psychologa.",
+        "W ciąży podobne pytania o nastrój są w 11.–14. i w 33.–37. tygodniu."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część XV „Połóg” ust. 2 pkt 6 i ust. 3 (ocena ryzyka depresji poporodowej w czwartym tygodniu od urodzenia dziecka lub wcześniej przy zaburzeniach psychicznych; ust. 3 — pomoc psychologiczna): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf. Okno 21.–34. dnia po porodzie obejmuje oba sposoby liczenia „czwartego tygodnia”. Standard nie wskazuje narzędzia — EPDS (źródło wtórne): S. Suchowiak i wsp., Badania przesiewowe w kierunku depresji okresu okołoporodowego — przegląd narzędzi i barier w skriningu, Neuropsychiatria i Neuropsychologia 2020;15(1–2):60–69, doi:10.5114/nan.2020.97402: https://termedia.pl/Badania-przesiewowe-w-kierunku-depresji-okresu-okoloporodowego-przeglad-narzedzi-i-barier-w-skriningu,46,41362,0,0.html (artykuł cytuje starszy zapis standardu „w ciągu miesiąca od porodu”, obecny mówi o czwartym tygodniu).",
       "status": "ok"
     },
     {
       "id": "POP-01",
       "nazwa": "Wizyta u ginekologa po porodzie",
       "kiedy": "około 6 tygodni po porodzie",
-      "grupa": "po_porodzie", "kategoria": "badanie_poporodowe", "trymestr": "polog", "dla": "matka",
-      "okno": { "typ": "po_porodzie", "jednostka": "tygodnie", "od": 6, "do": 6 },
+      "grupa": "po_porodzie",
+      "kategoria": "badanie_poporodowe",
+      "trymestr": "polog",
+      "dla": "matka",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "tygodnie",
+        "od": 6,
+        "do": 6
+      },
       "opis": "Kontrola, jak mama wraca do formy po porodzie.",
-      "skutek": "Jeśli wizyta się opóźni, ocena gojenia po porodzie odbędzie się później.",
+      "skutek": "Nie będzie wiadomo, czy wszystko po porodzie goi się prawidłowo.",
       "pozycje": [
         "Czy goją się rany (krocze lub blizna po cięciu cesarskim)",
         "Czy macica wraca do normy",
         "Pytania o samopoczucie psychiczne"
       ],
-      "uwagi": ["Dokładny dzień ustal z lekarzem — termin jest orientacyjny."],
-      "zrodlo": "Materiały zespołu: połóg, badanie poporodowe",
+      "uwagi": [
+        "Dokładny dzień ustal z lekarzem — termin jest orientacyjny.",
+        "Standard mówi o wizycie „po zakończeniu połogu” (połóg trwa 6 tygodni) i nie podaje, do kiedy. Jeśli nie uda się dokładnie po 6 tygodniach, nie rezygnuj — umów wizytę jak najszybciej.",
+        "Położna, która odwiedza Cię w domu, przypomni Ci o tej wizycie."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), definicje (połóg trwa sześć tygodni) i część XV „Połóg” ust. 10 pkt 10 (wizyta u lekarza położnika po zakończeniu połogu): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
+    },
+    {
+      "id": "GLU-03",
+      "nazwa": "Test na cukier po cukrzycy ciążowej",
+      "kiedy": "między 6. a 12. tygodniem po porodzie",
+      "grupa": "po_porodzie",
+      "kategoria": "test_glukozy",
+      "trymestr": "polog",
+      "dla": "matka",
+      "typ": "warunkowe",
+      "warunki": [
+        "cukrzyca_ciazowa"
+      ],
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "tygodnie",
+        "od": 6,
+        "do": 12
+      },
+      "opis": "Po porodzie cukier zwykle wraca do normy. Po cukrzycy ciążowej trzeba jednak sprawdzić, czy nie została cukrzyca albo stan przedcukrzycowy. Robi się znów test z 75 g glukozy.",
+      "skutek": "Cukrzyca lub stan przedcukrzycowy po ciąży mogą zostać niezauważone.",
+      "pozycje": [
+        "Test z 75 g glukozy: krew pobiera się na czczo oraz po 1 i po 2 godzinach (tak jak w ciąży) — poproś lekarza o skierowanie"
+      ],
+      "uwagi": [
+        "Potem zaleca się badanie cukru raz w roku i test przed kolejną planowaną ciążą."
+      ],
+      "zrodlo": "Zalecenia kliniczne dotyczące postępowania u osób z cukrzycą 2026, Stanowisko PTD (Current Topics in Diabetes 2026;6(1)), rozdz. 24 (OGTT w okresie 6–12 tygodni po porodzie, potem badanie przesiewowe raz w roku; OGTT przed kolejną ciążą): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb; Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (test z 75 g glukozy w ciągu 6 tygodni po porodzie, potem raz w roku)",
       "status": "ok"
     },
     {
       "id": "NOW-01",
       "nazwa": "Szczepienie noworodka przeciw WZW B (żółtaczce typu B)",
       "kiedy": "w ciągu doby po urodzeniu, w szpitalu",
-      "grupa": "po_porodzie", "kategoria": "szczepienie", "trymestr": "polog", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": 1 },
+      "grupa": "po_porodzie",
+      "kategoria": "szczepienie",
+      "trymestr": "polog",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "dni",
+        "od": 0,
+        "do": 1
+      },
       "opis": "Pierwsza dawka. Robi się ją jeszcze w szpitalu.",
-      "skutek": "Pominięcie szczepienia opóźnia ochronę przed WZW B. Omów termin z zespołem medycznym.",
-      "zrodlo": "Materiały zespołu: noworodek w szpitalu",
+      "skutek": "Dziecko nie będzie chronione przed tą chorobą.",
+      "uwagi": [
+        "Przed szczepieniem lekarz sprawdza, czy dziecko może je dostać. Szczepienia wpisuje się do karty uodpornienia dziecka.",
+        "W wyjątkowych sytuacjach lekarz może przesunąć pierwszą dawkę na pierwszą wizytę szczepienną w przychodni (2. miesiąc życia). Dotyczy to dzieci urodzonych o czasie, których mama jest w pełni zaszczepiona i ma w tej ciąży potwierdzony wysoki poziom przeciwciał anty-HBs. Decyduje lekarz."
+      ],
+      "zrodlo": "Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132 (część I.A: BCG i WZW B od 1. doby życia do wypisu ze szpitala; część III.C pkt 1: pierwsza dawka WZW B w ciągu 24 godzin po urodzeniu, najlepiej w ciągu 12 godzin; pkt 10: przesunięcie rozpoczęcia szczepień na 2. miesiąc życia tylko indywidualnie — dziecko urodzone o czasie, > 2000 g, mama w pełni zaszczepiona, HBsAg ujemny i anty-HBs > 100 U/l w aktualnej ciąży, decyzja lekarza); wcześniej: Program Szczepień Ochronnych na rok 2026 (komunikat GIS z 31.10.2025, Dz. Urz. MZ 2025 poz. 85): https://dziennikmz.mz.gov.pl/DUM_MZ/2025/85/oryginal/akt.pdf (WZW B: w ciągu 24 godzin po urodzeniu; przesunięcie na I wizytę szczepienną, ok. 7–8. tygodnia, przy anty-HBs matki > 100 U/l); Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część XIII ust. 2 pkt 6 lit. f: https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
       "status": "ok"
     },
     {
       "id": "NOW-02",
       "nazwa": "Szczepienie noworodka przeciw gruźlicy (BCG)",
-      "kiedy": "zwykle pierwszego dnia, przed wypisem ze szpitala",
-      "grupa": "po_porodzie", "kategoria": "szczepienie", "trymestr": "polog", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": "wypis" },
+      "kiedy": "od pierwszej doby życia, najpóźniej do dnia wypisu ze szpitala",
+      "grupa": "po_porodzie",
+      "kategoria": "szczepienie",
+      "trymestr": "polog",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "dni",
+        "od": 0,
+        "do": "wypis"
+      },
       "opis": "Robi się je jeszcze w szpitalu.",
-      "skutek": "Pominięcie szczepienia opóźnia ochronę przed gruźlicą. Omów termin z zespołem medycznym.",
-      "zrodlo": "Materiały zespołu: noworodek w szpitalu",
+      "skutek": "Dziecko nie będzie chronione przed tą chorobą.",
+      "zrodlo": "Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132 (część I.A: gruźlica — szczepienie noworodków od 1. doby życia, nie później niż do dnia wypisu ze szpitala); bez zmiany względem Program Szczepień Ochronnych na rok 2026 (komunikat GIS z 31.10.2025, Dz. Urz. MZ 2025 poz. 85): https://dziennikmz.mz.gov.pl/DUM_MZ/2025/85/oryginal/akt.pdf",
       "status": "ok"
     },
     {
       "id": "NOW-03",
       "nazwa": "Badania noworodka w szpitalu",
-      "kiedy": "w pierwszych dobach życia",
-      "grupa": "po_porodzie", "kategoria": "badanie_poporodowe", "trymestr": "polog", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": "wypis" },
-      "opis": "Wychwytują wrodzone choroby, kłopoty ze słuchem i żółtaczkę noworodkową.",
-      "skutek": "Bez wyników rozpoznanie między innymi problemów ze słuchem lub żółtaczki może się opóźnić.",
-      "pozycje": ["Badania na wrodzone choroby (metaboliczne)", "Badanie słuchu", "Badanie żółtaczki (poziom bilirubiny)"],
-      "zrodlo": "Materiały zespołu: noworodek w szpitalu",
+      "kiedy": "w pierwszych dobach życia, jeszcze przed wypisem ze szpitala",
+      "grupa": "po_porodzie",
+      "kategoria": "badanie_poporodowe",
+      "trymestr": "polog",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "dni",
+        "od": 0,
+        "do": "wypis"
+      },
+      "opis": "Badania wychwytują wrodzone choroby, wady serca i kłopoty ze słuchem. Personel sprawdza też, czy nie pojawia się żółtaczka noworodkowa.",
+      "skutek": "Wrodzone choroby, wady serca, kłopoty ze słuchem lub żółtaczka mogą zostać wykryte za późno.",
+      "pozycje": [
+        "Badanie lekarskie noworodka (w ciągu 12 godzin od urodzenia)",
+        "Badanie z kropli krwi na wrodzone choroby (m.in. fenyloketonurię, niedoczynność tarczycy, mukowiscydozę i SMA — rdzeniowy zanik mięśni)",
+        "Badanie słuchu",
+        "Pomiar tlenu we krwi (pulsoksymetria) — pomaga wykryć wady serca",
+        "Sprawdzenie ssania i wędzidełka języka",
+        "Obserwacja, czy skóra nie żółknie (żółtaczka noworodkowa)"
+      ],
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część XIII ust. 2 pkt 2 i 6 (badanie lekarskie w ciągu 12 godzin; test pulsoksymetryczny, przesiewowe badanie słuchu, ocena ssania, badanie suchej kropli krwi — wykonywane podczas pobytu na oddziale położniczym): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; obserwacja zażółcenia skóry: część XV ust. 4 pkt 2 i ust. 10 pkt 2 (część XIII nie wymienia osobnego pomiaru bilirubiny); lista badań przesiewowych (fenyloketonuria, niedoczynność tarczycy, mukowiscydoza, SMA, pulsoksymetria, słuch): pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866",
       "status": "ok"
     },
     {
       "id": "PED-01",
       "nazwa": "Pierwsza wizyta dziecka u lekarza rodzinnego",
       "kiedy": "w ciągu 4 tygodni od urodzenia",
-      "grupa": "po_porodzie", "kategoria": "wizyta_patronazowa", "trymestr": "polog", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": 28 },
-      "opis": "W przychodni albo w domu. Lekarz sprawdza rozwój i wagę dziecka i ustala plan szczepień.",
-      "skutek": "Gdy wizyta się opóźni, lekarz później oceni rozwój dziecka i omówi plan szczepień.",
-      "zrodlo": "Materiały zespołu: noworodek, wizyta patronażowa lekarska",
+      "grupa": "po_porodzie",
+      "kategoria": "wizyta_patronazowa",
+      "trymestr": "polog",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "dni",
+        "od": 0,
+        "do": 28
+      },
+      "opis": "W przychodni albo w domu. Lekarz bada dziecko: sprawdza rozwój, obwód główki, żółtaczkę, układ nerwowy i stawy biodrowe.",
+      "skutek": "Nikt na czas nie oceni rozwoju dziecka, żółtaczki ani stawów biodrowych.",
+      "uwagi": [
+        "To pierwszy z 4 bilansów zdrowia (bezpłatnych badań kontrolnych) w 1. roku życia dziecka. Kolejne są: w 2.–6. miesiącu (przy szczepieniach), w 9. i w 12. miesiącu.",
+        "Gdy położna skończy wizyty, opiekę nad dzieckiem przejmuje pielęgniarka POZ."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427, zm. Dz.U. 2025 poz. 584: https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html (załącznik nr 1 część III lp. 1: porada patronażowa lekarza POZ w 1.–4. tygodniu życia); liczba bilansów w 1. roku życia: pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc); przekazanie opieki pielęgniarce POZ: standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część XV ust. 12: https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
+    },
+    {
+      "id": "PAT-02",
+      "nazwa": "Wizyta patronażowa pielęgniarki POZ (instruktaż opieki nad niemowlęciem)",
+      "kiedy": "gdy dziecko ma 3–4 miesiące",
+      "grupa": "po_porodzie",
+      "kategoria": "wizyta_patronazowa",
+      "trymestr": "niemowle",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "miesiace",
+        "od": 3,
+        "do": 5,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "Gdy położna skończy wizyty, dzieckiem opiekuje się pielęgniarka podstawowej opieki zdrowotnej. Gdy dziecko ma 3–4 miesiące, przychodzi na wizytę: pokazuje, jak pielęgnować niemowlę, i pomaga w karmieniu piersią.",
+      "skutek": "Możesz nie dostać praktycznych wskazówek o pielęgnacji i karmieniu niemowlęcia, a ewentualne problemy rodziny zostaną zauważone później.",
+      "pozycje": [
+        "Pokaz pielęgnacji niemowlęcia: karmienie piersią, pielęgnacja jamy ustnej",
+        "Jeśli pielęgniarka zauważy kłopoty zdrowotne lub w rodzinie — wskazuje, gdzie szukać pomocy"
+      ],
+      "uwagi": [
+        "Przy wizytach w terminach szczepień (do 6. miesiąca) pielęgniarka robi też proste testy: mierzy dziecko, ogólnie ocenia rozwój i orientacyjnie sprawdza wzrok.",
+        "Dodatkowa wizyta w 9. miesiącu jest tylko wtedy, gdy przy poprzedniej wizycie coś niepokoiło."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 2 część II lp. 1–3 (wizyta patronażowa pielęgniarki POZ w 3.–4. miesiącu życia: instruktaż pielęgnacji niemowlęcia, w tym karmienia piersią i pielęgnacji jamy ustnej; testy przesiewowe w terminach szczepień; wizyta w 9. miesiącu przy stwierdzonych zaburzeniach). Nowy wpis dodany w weryfikacji 3.",
       "status": "ok"
     },
     {
       "id": "BIL-01",
-      "nazwa": "Badanie kontrolne dziecka nr 1 z 5 (ze szczepieniem)",
-      "kiedy": "między 6. a 9. tygodniem życia",
-      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "tygodnie", "od": 6, "do": 10, "bezOstatniegoDnia": true },
-      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka i szczepi.",
-      "skutek": "Przełożenie wizyty może przesunąć ocenę rozwoju dziecka i zaplanowane szczepienia.",
-      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia", "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, pneumokoki)"],
-      "uwagi": ["Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw rotawirusom i meningokokom)."],
-      "zrodlo": "Materiały zespołu: bilanse zdrowia i szczepienia w 1. roku życia",
+      "nazwa": "Wizyta kontrolna dziecka ze szczepieniami nr 1 (dziecko ma ok. 2 miesięcy)",
+      "kiedy": "gdy dziecko ma 6–9 tygodni (pierwsza wizyta szczepienna zwykle ok. 7.–8. tygodnia życia)",
+      "grupa": "po_porodzie",
+      "kategoria": "bilans",
+      "trymestr": "niemowle",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "tygodnie",
+        "od": 6,
+        "do": 10,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "Lekarz bada dziecko, sprawdza rozwój i szczepi. Bilans zdrowia na 2.–6. miesiąc życia robi się właśnie przy takich wizytach szczepiennych.",
+      "skutek": "Można przeoczyć zaburzenia rozwoju dziecka, a szczepienia mogą się opóźnić.",
+      "pozycje": [
+        "Badanie dziecka i ocena rozwoju (waga, długość, obwód główki)",
+        "Wpis wyników do książeczki zdrowia",
+        "Szczepienie: pierwsze dawki (m.in. rotawirusy, błonica, tężec, krztusiec, Hib, pneumokoki, kolejna dawka WZW B; polio — zależnie od szczepionki)"
+      ],
+      "uwagi": [
+        "Ile szczepień dziecko dostaje na jednej wizycie i kiedy, zależy od rodzaju szczepionki i decyzji lekarza (za zgodą rodziców) — według Programu Szczepień Ochronnych.",
+        "Szczepienie przeciw rotawirusom (doustne) trzeba zacząć wcześnie: pierwsza dawka po ukończeniu 6. tygodnia życia, zwykle przed ukończeniem 12. tygodnia.",
+        "Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw meningokokom)."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 1 część III (bilanse lekarza: 1.–4. tydzień; 2.–6. miesiąc życia „w terminach odpowiadających szczepieniom ochronnym”; 9. miesiąc; 12. miesiąc); pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc); szczepienia: Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132 (część I.A: 2. miesiąc życia, od ukończenia 6. tygodnia — pierwsze dawki; część III.D: rotawirusy; część IV pkt 1: decyzję o liczbie szczepień na jednej wizycie podejmuje lekarz), terminy bez zmian względem Program Szczepień Ochronnych na rok 2026 (komunikat GIS z 31.10.2025, Dz. Urz. MZ 2025 poz. 85): https://dziennikmz.mz.gov.pl/DUM_MZ/2025/85/oryginal/akt.pdf. Weryfikacja 3: zastąpiono wcześniejszy podział na „5 badań kontrolnych” (6.–9. tydzień, 3.–4. miesiąc, 6.–7. miesiąc, 9. i 12. miesiąc), który nie wynikał z żadnego obowiązującego przepisu (wygląda na pochodzący z projektu rozporządzenia o profilaktycznej opiece pediatrycznej z 2015 r., który nie trafił do rozporządzenia o świadczeniach POZ). Okno: od ukończenia 6. tygodnia (PSO) do końca 9. tygodnia.",
       "status": "ok"
     },
     {
       "id": "BIL-02",
-      "nazwa": "Badanie kontrolne dziecka nr 2 z 5 (ze szczepieniem)",
-      "kiedy": "między 3. a 4. miesiącem życia",
-      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 3, "do": 5, "bezOstatniegoDnia": true },
-      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka i szczepi.",
-      "skutek": "Przełożenie wizyty może przesunąć ocenę rozwoju dziecka i zaplanowane szczepienia.",
-      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia", "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, pneumokoki)"],
-      "uwagi": ["Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw rotawirusom i meningokokom)."],
-      "zrodlo": "Materiały zespołu: bilanse zdrowia i szczepienia w 1. roku życia",
+      "nazwa": "Wizyta kontrolna dziecka ze szczepieniami nr 2 (dziecko ma 3–4 miesiące)",
+      "kiedy": "gdy dziecko ma 3–4 miesiące",
+      "grupa": "po_porodzie",
+      "kategoria": "bilans",
+      "trymestr": "niemowle",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "miesiace",
+        "od": 3,
+        "do": 5,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "Lekarz bada dziecko, sprawdza rozwój i szczepi. Bilans zdrowia na 2.–6. miesiąc życia robi się właśnie przy takich wizytach szczepiennych.",
+      "skutek": "Można przeoczyć zaburzenia rozwoju dziecka, a szczepienia mogą się opóźnić.",
+      "pozycje": [
+        "Badanie dziecka i ocena rozwoju (waga, długość, obwód główki)",
+        "Wpis wyników do książeczki zdrowia",
+        "Szczepienie: kolejne dawki (m.in. rotawirusy, błonica, tężec, krztusiec, polio, Hib, pneumokoki; zależnie od szczepionki także WZW B)"
+      ],
+      "uwagi": [
+        "Ile szczepień dziecko dostaje na jednej wizycie i kiedy, zależy od rodzaju szczepionki i decyzji lekarza (za zgodą rodziców) — według Programu Szczepień Ochronnych.",
+        "Druga dawka przeciw rotawirusom jest najwcześniej 4 tygodnie po pierwszej. W niektórych schematach wypada już w 3. miesiącu, czyli trochę przed tym oknem.",
+        "Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw meningokokom)."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 1 część III (bilanse lekarza: 1.–4. tydzień; 2.–6. miesiąc życia „w terminach odpowiadających szczepieniom ochronnym”; 9. miesiąc; 12. miesiąc); pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc); szczepienia: Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132 (część I.A i A.1–A.2: druga dawka DTP, Hib, pneumokoków i polio od ukończenia 12. tygodnia życia, 8 tygodni po pierwszej; rotawirusy 4 tygodnie po pierwszej dawce), terminy zbliżone do Program Szczepień Ochronnych na rok 2026 (komunikat GIS z 31.10.2025, Dz. Urz. MZ 2025 poz. 85): https://dziennikmz.mz.gov.pl/DUM_MZ/2025/85/oryginal/akt.pdf (tam od ukończenia 14. tygodnia). Weryfikacja 3: zastąpiono wcześniejszy podział na „5 badań kontrolnych” (6.–9. tydzień, 3.–4. miesiąc, 6.–7. miesiąc, 9. i 12. miesiąc), który nie wynikał z żadnego obowiązującego przepisu (wygląda na pochodzący z projektu rozporządzenia o profilaktycznej opiece pediatrycznej z 2015 r., który nie trafił do rozporządzenia o świadczeniach POZ).",
       "status": "ok"
     },
     {
       "id": "BIL-03",
-      "nazwa": "Badanie kontrolne dziecka nr 3 z 5 (ze szczepieniem)",
-      "kiedy": "między 6. a 7. miesiącem życia",
-      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 6, "do": 8, "bezOstatniegoDnia": true },
-      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka i szczepi.",
-      "skutek": "Przełożenie wizyty może przesunąć ocenę rozwoju dziecka i zaplanowane szczepienia.",
-      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia", "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, pneumokoki)"],
-      "uwagi": ["Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw rotawirusom i meningokokom)."],
-      "zrodlo": "Materiały zespołu: bilanse zdrowia i szczepienia w 1. roku życia",
+      "nazwa": "Wizyta kontrolna dziecka ze szczepieniami nr 3 (dziecko ma 5–6 miesięcy)",
+      "kiedy": "gdy dziecko ma 5–6 miesięcy",
+      "grupa": "po_porodzie",
+      "kategoria": "bilans",
+      "trymestr": "niemowle",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "miesiace",
+        "od": 5,
+        "do": 7,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "Lekarz bada dziecko, sprawdza rozwój i szczepi. Bilans zdrowia na 2.–6. miesiąc życia robi się właśnie przy takich wizytach szczepiennych.",
+      "skutek": "Można przeoczyć zaburzenia rozwoju dziecka, a szczepienia mogą się opóźnić.",
+      "pozycje": [
+        "Badanie dziecka i ocena rozwoju (waga, długość, obwód główki)",
+        "Wpis wyników do książeczki zdrowia",
+        "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, Hib, WZW B; trzecia dawka przeciw rotawirusom — tylko w schemacie 3-dawkowym)"
+      ],
+      "uwagi": [
+        "Ile szczepień dziecko dostaje na jednej wizycie i kiedy, zależy od rodzaju szczepionki i decyzji lekarza (za zgodą rodziców) — według Programu Szczepień Ochronnych.",
+        "Przy osobnych szczepionkach trzecia dawka przeciw WZW B wypada w 7. miesiącu życia (5 miesięcy po drugiej), czyli pod koniec tego okna. Przy szczepionce sześcioskładnikowej trzecia dawka jest w 5.–6. miesiącu.",
+        "Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw meningokokom)."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 1 część III (bilanse lekarza: 1.–4. tydzień; 2.–6. miesiąc życia „w terminach odpowiadających szczepieniom ochronnym”; 9. miesiąc; 12. miesiąc); pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc); szczepienia: Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132 (część I.A i A.2: 5.–6. miesiąc życia — trzecia dawka rotawirusów w schemacie 3-dawkowym; 6. miesiąc — trzecia dawka DTP i Hib, druga dawka polio; 7. miesiąc — trzecia dawka WZW B; w wariancie 6w1 3+1 trzecia dawka w 5.–6. miesiącu od ukończenia 4. miesiąca), terminy zbliżone do Program Szczepień Ochronnych na rok 2026 (komunikat GIS z 31.10.2025, Dz. Urz. MZ 2025 poz. 85): https://dziennikmz.mz.gov.pl/DUM_MZ/2025/85/oryginal/akt.pdf. Weryfikacja 3: zastąpiono wcześniejszy podział na „5 badań kontrolnych” (6.–9. tydzień, 3.–4. miesiąc, 6.–7. miesiąc, 9. i 12. miesiąc), który nie wynikał z żadnego obowiązującego przepisu (wygląda na pochodzący z projektu rozporządzenia o profilaktycznej opiece pediatrycznej z 2015 r., który nie trafił do rozporządzenia o świadczeniach POZ). Okno 5–7 miesięcy wieku dziecka obejmuje PSO-owe „6. i 7. miesiąc życia”.",
       "status": "ok"
     },
     {
       "id": "BIL-04",
-      "nazwa": "Badanie kontrolne dziecka nr 4 z 5",
-      "kiedy": "w 9. miesiącu życia",
-      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 9, "do": 10, "bezOstatniegoDnia": true },
-      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka.",
-      "skutek": "Jeśli przełożysz wizytę, ocena rozwoju dziecka odbędzie się później.",
-      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia"],
-      "uwagi": ["Szczepienia — zgodnie z aktualnym Programem Szczepień Ochronnych."],
-      "zrodlo": "Materiały zespołu: bilanse zdrowia w 1. roku życia",
+      "nazwa": "Bilans zdrowia dziecka — 9. miesiąc życia",
+      "kiedy": "gdy dziecko ma 9 miesięcy",
+      "grupa": "po_porodzie",
+      "kategoria": "bilans",
+      "trymestr": "niemowle",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "miesiace",
+        "od": 9,
+        "do": 10,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza, jak rozwija się dziecko.",
+      "skutek": "Można przeoczyć zaburzenia rozwoju dziecka.",
+      "pozycje": [
+        "Pomiary dziecka (waga, długość, obwód główki i klatki piersiowej) i ocena rozwoju: fizycznego, ruchowego i psychicznego",
+        "Sprawdzenie, czy dziecko ma wszystkie szczepienia zgodnie z kalendarzem",
+        "Prosty test reakcji na dźwięki (słuch)",
+        "Wpis wyników do książeczki zdrowia"
+      ],
+      "uwagi": [
+        "W tym wieku nie ma szczepień obowiązkowych (następne są po ukończeniu 12. miesiąca). Lekarz może zaproponować szczepienia zalecane.",
+        "Pielęgniarka POZ ma w 9. miesiącu dodatkową wizytę tylko wtedy, gdy przy poprzedniej wizycie coś niepokoiło."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 1 część III lp. 3 (9. miesiąc życia: badanie lekarskie z oceną rozwoju fizycznego i psychomotorycznego, ocena wykonania szczepień, test rozwoju reakcji słuchowych) oraz załącznik nr 2 część II lp. 3; pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc)",
       "status": "ok"
     },
     {
       "id": "BIL-05",
-      "nazwa": "Badanie kontrolne dziecka nr 5 z 5",
-      "kiedy": "w 12. miesiącu życia",
-      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
-      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 12, "do": 13, "bezOstatniegoDnia": true },
-      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka.",
-      "skutek": "Jeśli przełożysz wizytę, ocena rozwoju dziecka odbędzie się później.",
-      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia"],
-      "uwagi": ["Szczepienia — zgodnie z aktualnym Programem Szczepień Ochronnych."],
-      "zrodlo": "Materiały zespołu: bilanse zdrowia w 1. roku życia",
+      "nazwa": "Bilans zdrowia dziecka — 12. miesiąc życia",
+      "kiedy": "gdy dziecko ma 12 miesięcy",
+      "grupa": "po_porodzie",
+      "kategoria": "bilans",
+      "trymestr": "niemowle",
+      "dla": "dziecko",
+      "okno": {
+        "typ": "po_porodzie",
+        "jednostka": "miesiace",
+        "od": 12,
+        "do": 13,
+        "bezOstatniegoDnia": true
+      },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza, jak rozwija się dziecko.",
+      "skutek": "Można przeoczyć zaburzenia rozwoju dziecka.",
+      "pozycje": [
+        "Pomiary dziecka (waga, długość, obwód główki i klatki piersiowej) i ocena rozwoju: fizycznego, ruchowego i psychicznego",
+        "Sprawdzenie, czy dziecko ma wszystkie szczepienia zgodnie z kalendarzem",
+        "Prosty test reakcji na dźwięki (słuch) i pytania o nowe czynniki ryzyka uszkodzenia słuchu",
+        "Pomiar ciśnienia",
+        "Wpis wyników do książeczki zdrowia"
+      ],
+      "uwagi": [
+        "Po ukończeniu 12. miesiąca dziecko dostaje szczepienie przeciw odrze, śwince i różyczce oraz kolejną dawkę przeciw pneumokokom (w 13.–15. miesiącu wg Programu Szczepień Ochronnych). O terminie decyduje lekarz.",
+        "Następny bilans zdrowia jest, gdy dziecko ma 2 lata."
+      ],
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 1 część III lp. 4–5 (12. miesiąc życia: badanie lekarskie z oceną rozwoju, ocena wykonania szczepień, test rozwoju reakcji słuchowych, ocena nowych czynników ryzyka uszkodzenia słuchu, pomiar ciśnienia; kolejny bilans w wieku 2 lat) oraz załącznik nr 2 część II lp. 4; pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc); szczepienia w 2. roku życia: Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132, część I.A",
       "status": "ok"
     }
   ],
-
   "informacje": [
     {
-      "id": "INF-00", "temat": "Jak czytać ten kalendarz", "rodzaj": "ogolna",
+      "id": "INF-00",
+      "temat": "Jak czytać ten kalendarz",
+      "rodzaj": "ogolna",
       "tresc": [
         "To standardowy zestaw badań w ciąży bez powikłań.",
         "Ostateczny plan zawsze ustala lekarz prowadzący, który zna Twój stan zdrowia.",
-        "Terminy to okna czasowe — badanie możesz zrobić w dowolnym dniu takiego okna."
+        "Terminy to okna czasowe — badanie możesz zrobić w dowolnym dniu takiego okna.",
+        "Badanie przesiewowe to badanie, które standard zaleca każdej kobiecie w ciąży bez powikłań. Badanie ze wskazań zleca lekarz tylko wtedy, gdy ma po temu powód.",
+        "Na każdą wizytę zabieraj kartę przebiegu ciąży, a po porodzie książeczkę zdrowia dziecka."
       ],
-      "zrodlo": "Materiały zespołu", "status": "ok"
+      "zrodlo": "Standard opieki okołoporodowej dotyczy ciąży fizjologicznej (bez powikłań) — Rozporządzenie MZ z 16.08.2018, tekst jednolity Dz.U. 2026 poz. 1140: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf. Pozostałe zdania to zasady czytania tego kalendarza (terminy podane jako okna czasowe, zob. _konwencje_okien). Podział na badania przesiewowe i ze wskazań oraz przypomnienie o dokumentach: zalecenie redaktora merytorycznego.",
+      "status": "ok"
     },
     {
-      "id": "INF-TOX", "temat": "Jak uniknąć toksoplazmozy", "rodzaj": "ogolna", "trymestr": 2, "warunki": ["toxo_ujemna"],
+      "id": "INF-USG",
+      "temat": "Cztery obowiązkowe USG w ciąży",
+      "rodzaj": "ogolna",
+      "tresc": [
+        "W ciąży bez powikłań są 4 obowiązkowe badania USG (przesiewowe): w 11.–14. tygodniu, około 20. tygodnia (± 2 tygodnie), około 30. tygodnia (± 2 tygodnie) i zaraz po 40. tygodniu, jeśli poród się nie zaczął.",
+        "USG przed 10. tygodniem robi się tylko wtedy, gdy lekarz uzna, że jest potrzebne."
+      ],
+      "zrodlo": "Standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część II — USG zgodnie z rekomendacjami PTGiP: https://api.sejm.gov.pl/eli/acts/DU/2026/1140/text.pdf; Rekomendacje Sekcji USG PTGiP 2020: https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881. Układ czterech badań potwierdza redaktor merytoryczny (materiały kursowe).",
+      "status": "ok"
+    },
+    {
+      "id": "INF-TOX",
+      "temat": "Jak uniknąć toksoplazmozy",
+      "rodzaj": "ogolna",
+      "trymestr": 2,
+      "warunki": [
+        "toxo_ujemna"
+      ],
       "tresc": [
         "Dokładnie myj i obieraj warzywa oraz owoce.",
         "Nie jedz surowego ani niedogotowanego mięsa (tatar, krwisty stek).",
-        "Ogranicz kontakt z kotami, zwłaszcza z kuwetą. W ogrodzie noś rękawice, a po pracy umyj ręce."
+        "Nie musisz oddawać kota. Kuwetę sprzątaj w rękawiczkach (najlepiej codziennie) albo poproś o to kogoś innego, a potem umyj ręce. W ogrodzie noś rękawice i po pracy umyj ręce."
       ],
-      "zrodlo": "Materiały zespołu: toksoplazmoza", "status": "ok"
+      "zrodlo": "A. Bacz, Toksoplazmoza w ciąży, Medycyna Praktyczna 2017 (profilaktyka: mycie i obieranie owoców i warzyw, brak surowego i niedogotowanego mięsa, higiena przy kotach i w ogrodzie; źródło wtórne): https://www.mp.pl/pacjent/ciaza/przebiegciazy/63126,toksoplazmoza-w-ciazy",
+      "status": "ok"
     },
     {
-      "id": "INF-CMV", "temat": "Cytomegalia (CMV)", "rodzaj": "ogolna",
+      "id": "INF-CMV",
+      "temat": "Cytomegalia (CMV)",
+      "rodzaj": "ogolna",
       "tresc": [
         "To badanie nie jest dla wszystkich — lekarz zleca je, gdy są czynniki ryzyka albo niepokojące objawy.",
         "Jak się chronić: nie dziel się sztućcami ani napojami z małymi dziećmi i nie całuj ich w usta."
       ],
-      "zrodlo": "Materiały zespołu: CMV", "status": "ok"
+      "zrodlo": "Rutynowe badania przesiewowe w kierunku CMV w ciąży nie są zalecane przez ACOG i SOGC (cytowane przez E. Kuchara, Medycyna Praktyczna 2021; źródło wtórne): https://www.mp.pl/pytania/pediatria/chapter/B25.QA.19.4.6.; standard opieki okołoporodowej (Dz.U. 2026 poz. 1140, część II) nie przewiduje badania na CMV: https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf. Zasady higieny (unikanie całowania małych dzieci w usta, wspólnych sztućców, mycie rąk po kontakcie ze śliną/moczem dziecka): CDC, MMWR 2008;57(3), Knowledge and practices of obstetricians and gynecologists regarding cytomegalovirus infection during pregnancy: https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5703a2.htm (skuteczność higieny w zapobieganiu zakażeniu wrodzonemu nie jest dobrze udowodniona)",
+      "status": "ok"
     },
     {
-      "id": "INF-RUCHY", "temat": "Obserwuj ruchy dziecka", "rodzaj": "ogolna", "trymestr": 3,
+      "id": "INF-RUCHY",
+      "temat": "Obserwuj ruchy dziecka",
+      "rodzaj": "ogolna",
+      "trymestr": 3,
       "tresc": [
         "Pod koniec ciąży warto zwracać uwagę, jak często dziecko się rusza.",
         "Lekarz lub położna powinni pokazać Ci, jak to robić."
       ],
-      "zrodlo": "Materiały zespołu: opieka w III trymestrze", "status": "ok"
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II (ocena ruchów płodu w 33.–37. tygodniu, 38.–39. tygodniu i po 40. tygodniu): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
     },
     {
-      "id": "INF-DEP", "temat": "Smutek po porodzie — kiedy iść do lekarza", "rodzaj": "ogolna", "trymestr": "polog",
+      "id": "INF-DEP",
+      "temat": "Smutek po porodzie — kiedy iść do lekarza",
+      "rodzaj": "ogolna",
+      "trymestr": "polog",
       "tresc": [
         "Obniżony nastrój po porodzie (tzw. baby blues) bywa przemijający.",
-        "Jeśli trwa dłużej niż 2 tygodnie, zgłoś się do lekarza od razu — to może być depresja poporodowa i potrzebna jest pomoc."
+        "Jeśli trwa dłużej niż 2 tygodnie albo się nasila, zgłoś się do lekarza lub położnej od razu — to może być depresja poporodowa i potrzebna jest pomoc."
       ],
-      "zrodlo": "Materiały zespołu: połóg, depresja poporodowa", "status": "ok"
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część XV „Połóg” ust. 2 pkt 6 i ust. 3; pacjent.gov.pl: https://pacjent.gov.pl/print/pdf/node/6818. „2 tygodnie” baby blues: NHS, Postnatal depression — overview (baby blues zwykle mija w ciągu 2 tygodni od porodu; przy dłuższym trwaniu lub nasileniu zgłosić się do lekarza/położnej): https://www.nhs.uk/mental-health/conditions/post-natal-depression/overview/",
+      "status": "ok"
     },
     {
-      "id": "INF-BIL", "temat": "Badania kontrolne dziecka (bilanse)", "rodzaj": "ogolna", "trymestr": "niemowle",
+      "id": "INF-BIL",
+      "temat": "Badania kontrolne dziecka (bilanse)",
+      "rodzaj": "ogolna",
+      "trymestr": "niemowle",
       "tresc": [
-        "W pierwszym roku życia dziecko ma 5 takich badań: w 6.–9. tygodniu, 3.–4. miesiącu, 6.–7. miesiącu, 9. miesiącu i 12. miesiącu.",
-        "W całym okresie rozwoju dziecka badania kontrolne powinny odbyć się co najmniej 13 razy.",
-        "Wyniki lekarz wpisuje do książeczki zdrowia dziecka i informuje Cię o terminie kolejnej wizyty i szczepieniach."
+        "W pierwszym roku życia dziecko ma 4 bilanse zdrowia (bezpłatne badania kontrolne u lekarza): w 1.–4. tygodniu życia (wizyta patronażowa lekarza), w 2.–6. miesiącu (przy szczepieniach), w 9. miesiącu i w 12. miesiącu.",
+        "Oprócz tego położna odwiedza Was w domu co najmniej 4 razy w pierwszych tygodniach, a pielęgniarka POZ przychodzi, gdy dziecko ma 3–4 miesiące. Przy szczepieniach lekarz też bada dziecko.",
+        "Później bilanse są jeszcze m.in. w wieku 2, 4 i 5 lat oraz w kolejnych etapach nauki — łącznie kilkanaście razy do pełnoletności.",
+        "Wyniki lekarz wpisuje do książeczki zdrowia dziecka i mówi Ci, kiedy kolejna wizyta i szczepienie."
       ],
-      "zrodlo": "Materiały zespołu: bilanse i wizyty patronażowe dziecka", "status": "ok"
+      "zrodlo": "Rozporządzenie MZ z 24.09.2013 w sprawie świadczeń gwarantowanych z zakresu POZ, tekst jednolity Dz.U. 2023 poz. 1427 (ostatnia zmiana, Dz.U. 2025 poz. 584, dotyczy tylko bilansu dorosłych — część dla dzieci bez zmian): https://api.sejm.gov.pl/eli/acts/DU/2023/1427/text.html, załącznik nr 1 część III (bilanse lekarza: 1.–4. tydzień życia; 2.–6. miesiąc życia w terminach odpowiadających szczepieniom; 9. miesiąc; 12. miesiąc; 2 lata; 4 lata; 5 lat; roczne przygotowanie przedszkolne i dalsze etapy nauki), załącznik nr 2 część II (pielęgniarka POZ: 3.–4. miesiąc) i załącznik nr 3 część II (położna: co najmniej 4 wizyty w 1.–6. tygodniu); pacjent.gov.pl, Noworodek i wcześniak – profilaktyka zdrowia (aktualizacja 2024-10-10): https://pacjent.gov.pl/print/pdf/node/4866 oraz NFZ, ulotka „Profilaktyka zdrowia noworodka i wcześniaka”: https://akademia.nfz.gov.pl/uplodas/2023/11/ulotka_sroda_z_profilaktyka_zdrowie_wczesniaka_i_noworodka_cyfrowa.pdf (w 1. roku życia 4 bilanse: 1.–4. tydzień, 2.–6. miesiąc, 9. miesiąc, 12. miesiąc); „kilkanaście razy” do pełnoletności: pacjent.gov.pl (jw.). Weryfikacja 3: zastąpiono wcześniejszy zapis o 5 badaniach (6.–9. tydzień, 3.–4. miesiąc, 6.–7. miesiąc, 9. i 12. miesiąc) i o „co najmniej 13 razy” — nie wynikały z obowiązujących przepisów.",
+      "status": "ok"
     },
     {
-      "id": "INF-SZCZ", "temat": "Szczepienia dziecka", "rodzaj": "ogolna", "trymestr": "niemowle",
+      "id": "INF-SZCZ",
+      "temat": "Szczepienia dziecka",
+      "rodzaj": "ogolna",
+      "trymestr": "niemowle",
       "tresc": [
-        "W szpitalu: szczepienie przeciw WZW B (w ciągu doby) i przeciw gruźlicy (zwykle pierwszego dnia).",
-        "Podczas trzech pierwszych badań kontrolnych dziecko dostaje kolejne dawki szczepień obowiązkowych.",
-        "Szczepienia odbywają się zgodnie z aktualnym Programem Szczepień Ochronnych."
+        "W szpitalu (od pierwszej doby życia): szczepienie przeciw WZW B (w ciągu 24 godzin po urodzeniu; w wyjątkowych sytuacjach lekarz może je przesunąć na 2. miesiąc życia) i przeciw gruźlicy (BCG — najpóźniej do dnia wypisu).",
+        "Pierwsza wizyta szczepienna jest zwykle ok. 7.–8. tygodnia życia (po ukończeniu 6. tygodnia). Szczepienie przeciw rotawirusom (doustne) trzeba zacząć wcześnie: pierwsza dawka po ukończeniu 6. tygodnia, zwykle przed ukończeniem 12. tygodnia życia.",
+        "W pierwszym roku dziecko dostaje kolejne dawki szczepień obowiązkowych (przeciw rotawirusom, błonicy, tężcowi, krztuścowi, polio, Hib, pneumokokom i WZW B) — mniej więcej w wieku ok. 2, 3–4 i 5–7 miesięcy. Liczba wizyt i terminy zależą od rodzaju szczepionki (np. sześcioskładnikowej) i decyzji lekarza.",
+        "Po pierwszych urodzinach: szczepienie przeciw odrze, śwince i różyczce oraz kolejna dawka przeciw pneumokokom (w 13.–15. miesiącu). Kolejne dawki przeciw błonicy, tężcowi, krztuścowi, polio i Hib są w 16.–18. miesiącu.",
+        "Szczepienia zalecane, nieobowiązkowe (np. przeciw meningokokom, grypie i COVID-19): decydujesz po rozmowie z lekarzem.",
+        "Szczepienia odbywają się według Programu Szczepień Ochronnych — co roku ogłaszany jest nowy."
       ],
-      "zrodlo": "Materiały zespołu: szczepienia noworodka i niemowlęcia", "status": "ok"
+      "zrodlo": "Program Szczepień Ochronnych na rok 2027 (komunikat GIS z 28.10.2026, Dz. Urz. MZ 2026 poz. 77, obowiązuje od 1.01.2027): https://www.gov.pl/attachment/90ca02b3-dcf8-400a-bb9e-3cf2b7ff9132: część I.A i A.1–A.2 (terminy dawek obowiązkowych w 1. i 2. roku życia), część II.A (szczepienia zalecane dzieci: meningokoki od 6./8. tygodnia, grypa i COVID-19 od 6. miesiąca), część III.C pkt 1 i 10 (WZW B), część III.D pkt 2 (rotawirusy: pierwsza dawka od 6. do 12. tygodnia życia, wyjątkowo do 14 tygodni + 6 dni), część IV pkt 1 i 6 (liczbę szczepień na wizycie ustala lekarz; „N. miesiąc życia” = po ukończeniu N−1 miesięcy); do końca 2026 r. obowiązuje Program Szczepień Ochronnych na rok 2026 (komunikat GIS z 31.10.2025, Dz. Urz. MZ 2025 poz. 85): https://dziennikmz.mz.gov.pl/DUM_MZ/2025/85/oryginal/akt.pdf (terminy w 1. roku życia takie same, różnice dotyczą m.in. przesunięcia pierwszej dawki WZW B)",
+      "status": "ok"
     },
     {
-      "id": "SYT-CUK-PRZED", "temat": "Cukrzyca rozpoznana przed ciążą", "rodzaj": "sytuacja_szczegolna", "warunki": ["cukrzyca_przed"],
+      "id": "SYT-CUK-PRZED",
+      "temat": "Cukrzyca rozpoznana przed ciążą",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "cukrzyca_przed"
+      ],
       "tresc": [
-        "Wizyta u okulisty: przed ciążą, w I trymestrze i potem w każdym trymestrze.",
-        "Wizyty u lekarza są częstsze niż standardowo.",
-        "Lekarz regularnie sprawdza, jak dobrze wyrównana jest cukrzyca (badanie HbA1c).",
-        "Opiekę najlepiej prowadzić w specjalistycznym ośrodku — zapytaj lekarza."
+        "Dno oka u okulisty: przed ciążą, najpóźniej w I trymestrze, potem w każdym trymestrze (np. ok. 28. tygodnia) i jeszcze przez rok po porodzie — częstość ustala okulista. Jeśli są zmiany w oku, dodatkowa kontrola bywa zalecana między 16. a 20. tygodniem.",
+        "Do diabetologa chodzisz nie rzadziej niż raz w miesiącu, a w razie potrzeby co 2–3 tygodnie. W ośrodku położniczym kontrole bywają jeszcze częstsze (zalecenie PTGiP: co najmniej co 2 tygodnie).",
+        "Lekarz sprawdza, jak dobrze ustawiona jest cukrzyca (badanie HbA1c mniej więcej co 6 tygodni i pomiary cukru w domu).",
+        "Opiekę najlepiej prowadzić w specjalistycznym ośrodku — zapytaj lekarza.",
+        "W 18.–22. tygodniu robi się USG serca dziecka. Od 28. tygodnia USG wzrostu dziecka robi się co najwyżej co 4 tygodnie, a po 36. tygodniu KTG przy każdej wizycie (lekarz może zacząć KTG wcześniej)."
       ],
-      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa", "status": "ok"
+      "zrodlo": "Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (wizyty w ośrodku referencyjnym nie rzadziej niż co 2 tygodnie; USG wzrastania od 28. tc co ≤4 tygodnie; KTG po 36. tc przy każdej wizycie; USG serca płodu w 18.–22. tc); Zalecenia kliniczne PTD 2026 (Current Topics in Diabetes 2026;6(1)), rozdz. 24 (wizyty u diabetologa nie rzadziej niż co miesiąc, w uzasadnionych przypadkach co 2–3 tygodnie; HbA1c co 6 tygodni; kontrola okulistyczna przed ciążą, w I trymestrze i w każdym trymestrze, przez rok po porodzie): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb",
+      "status": "ok"
     },
     {
-      "id": "SYT-GDM", "temat": "Cukrzyca ciążowa", "rodzaj": "sytuacja_szczegolna", "warunki": ["cukrzyca_ciazowa"],
+      "id": "SYT-GDM",
+      "temat": "Cukrzyca ciążowa",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "cukrzyca_ciazowa"
+      ],
       "tresc": [
-        "Codziennie mierzysz cukier glukometrem — lekarz powie, jak często.",
-        "Wizyty kontrolne są zwykle częstsze niż co 4 tygodnie.",
-        "Lekarz zleci też badanie HbA1c."
+        "Mierzysz cukier glukometrem — na czczo i po głównych posiłkach. Lekarz powie, jak często.",
+        "Lekarz zwykle zleca dodatkowe USG między 28. a 36. tygodniem, żeby sprawdzić wzrost dziecka i ilość wód płodowych. Jak często masz przychodzić na wizyty, ustala lekarz.",
+        "Przy rozpoznaniu lekarz zwykle zleca też badanie HbA1c. Później nie jest ono potrzebne do rutynowej kontroli.",
+        "Po porodzie (między 6. a 12. tygodniem) zaleca się powtórzyć test z glukozą, a potem sprawdzać cukier raz w roku — poproś lekarza o skierowanie."
       ],
-      "zrodlo": "Materiały zespołu: cukrzyca ciążowa", "status": "ok"
+      "zrodlo": "Standardy PTGiP postępowania u kobiet z cukrzycą, 2017 (Ginekol Perinatol Prakt 2017;2(5):215-229): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/56571/43037 (samokontrola na czczo i po posiłkach; dodatkowe USG w 28.–36. tc; HbA1c nie rutynowo; test z glukozą po porodzie); Zalecenia kliniczne PTD 2026 (Current Topics in Diabetes 2026;6(1)), rozdz. 24 (HbA1c przy rozpoznaniu, bez rutynowej kontroli; OGTT 6–12 tygodni po porodzie, potem przesiew raz w roku): https://metabol.wl.uj.edu.pl/documents/20028879/149025325/Zalecenia+PTD+2026/fe88ae76-1e56-40e7-8a75-ce80f0fabfbb. Dawne zdanie „wizyty częstsze niż co 4 tygodnie” usunięto — brak źródła liczbowego dla GDM.",
+      "status": "ok"
     },
     {
-      "id": "SYT-NADCISN", "temat": "Nadciśnienie", "rodzaj": "sytuacja_szczegolna", "warunki": ["nadcisnienie"],
+      "id": "SYT-NADCISN",
+      "temat": "Nadciśnienie",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "nadcisnienie"
+      ],
       "tresc": [
-        "Ciśnienie jest mierzone częściej niż standardowo.",
-        "Częściej robi się badania krwi sprawdzające nerki i wątrobę — pozwalają wcześnie wykryć groźne powikłanie (stan przedrzucawkowy).",
-        "USG jest częstsze, bo przy nadciśnieniu dziecko może rosnąć wolniej.",
-        "W III trymestrze często dochodzi badanie KTG od 32.–34. tygodnia."
+        "Ciśnienie mierzysz nie tylko na wizycie, ale też w domu (zwykle rano i wieczorem, po 2 pomiary) i zapisujesz w dzienniczku.",
+        "Wizyty u lekarza są co najmniej raz w miesiącu (przy nadciśnieniu wywołanym ciążą co 2–4 tygodnie), a gdy stan się zmienia — częściej.",
+        "Na wizytach bada się mocz i morfologię. Badania krwi sprawdzające nerki i wątrobę (m.in. w 28. i 34. tygodniu) pomagają wcześnie wykryć groźne powikłanie, czyli stan przedrzucawkowy.",
+        "USG jest częstsze, bo przy nadciśnieniu dziecko może rosnąć wolniej: wzrost ocenia się w 28.–32. tygodniu, a potem co najwyżej co 4 tygodnie.",
+        "W III trymestrze dochodzi KTG: zwykle raz w tygodniu od 36. tygodnia (od 34., jeśli dziecko rośnie za wolno)."
       ],
-      "zrodlo": "Materiały zespołu: nadciśnienie w ciąży", "status": "ok"
+      "zrodlo": "Zespół ekspertów PTNT/PTK/PTGiP, Postępowanie w nadciśnieniu tętniczym u kobiet w ciąży. Zapobieganie, diagnostyka, leczenie i odległe rokowanie, Ginekol Perinatol Prakt 2019;4(2):43-111, tab. 5.2, ryc. 5.3–5.4, rozdz. 6.3.1 (wizyty położnicze ≥1×/mies. przy nadciśnieniu przewlekłym, co 2–4 tygodnie przy nadciśnieniu wywołanym ciążą; pomiary domowe 2×2; USG wzrastania 28.–32. tc i ≥ co 4 tygodnie; KTG ambulatoryjne 1×/tydz. od 36. tc, od 34. tc przy biometrii <10. centyla): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/64987/48759. Termin startu KTG wg ACOG (od 32. tc): ACOG Committee Opinion No. 828 (2021): https://starlegacyfoundation.org/wp-content/uploads/ACOG-2021-Indications-for-outpatient-antenatal-fetal-surveillance.pdf",
+      "status": "ok"
     },
     {
-      "id": "SYT-AUTOIMM", "temat": "Choroba autoimmunologiczna", "rodzaj": "sytuacja_szczegolna", "warunki": ["autoimmun"],
+      "id": "SYT-AUTOIMM",
+      "temat": "Choroba autoimmunologiczna",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "autoimmun"
+      ],
       "tresc": [
         "Wizyty ustala lekarz — często w ośrodku specjalistycznym.",
-        "Regularne badania krwi pokazują, jak przebiega choroba.",
-        "USG jest częstsze, bo łożysko może gorzej pracować.",
-        "W III trymestrze często dochodzi badanie KTG od 32.–34. tygodnia."
+        "Regularne badania krwi i moczu (m.in. białko w moczu) pokazują, jak przebiega choroba.",
+        "USG jest częstsze, bo łożysko może gorzej pracować. Oprócz USG w I trymestrze robi się badanie przepływu krwi (Doppler), najlepiej w 20.–24. tygodniu, a w III trymestrze USG wzrostu i przepływów mniej więcej co miesiąc.",
+        "W III trymestrze lekarz często zleca KTG, zwykle od ok. 32. tygodnia (raz lub dwa razy w tygodniu). O terminie decyduje lekarz."
       ],
-      "zrodlo": "Materiały zespołu: choroby autoimmunologiczne w ciąży", "status": "ok"
+      "zrodlo": "Andreoli L. i wsp., EULAR recommendations for women's health and the management of family planning, assisted reproduction, pregnancy and menopause in patients with SLE and/or APS, Ann Rheum Dis 2017;76(3):476-485, doi:10.1136/annrheumdis-2016-209770 (dodatkowy nadzór płodu: biometria i Doppler, szczególnie w III trymestrze; Doppler 20.–24. tc; w III trymestrze co miesiąc; kontrola aktywności choroby i białkomoczu): https://pmc.ncbi.nlm.nih.gov/articles/PMC5446003; ACOG Committee Opinion No. 828 (2021), Table 1 (SLE, APS: nadzór płodu od ok. 32 0/7 tc, raz–dwa razy w tygodniu; zalecenia sugerujące): https://starlegacyfoundation.org/wp-content/uploads/ACOG-2021-Indications-for-outpatient-antenatal-fetal-surveillance.pdf. Polskiego dokumentu z częstością wizyt przy chorobach autoimmunologicznych nie znaleziono — wizyty ustala lekarz.",
+      "status": "ok"
     },
     {
-      "id": "SYT-ZUM", "temat": "Zakażenia dróg moczowych", "rodzaj": "sytuacja_szczegolna", "warunki": ["zum"],
+      "id": "SYT-ZUM",
+      "temat": "Zakażenia dróg moczowych",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "zum"
+      ],
       "tresc": [
         "Mocz bada się częściej (posiew).",
-        "Nawet bakterie w moczu bez żadnych dolegliwości wymagają w ciąży reakcji lekarza.",
+        "W ciąży nawet bakterie w moczu bez żadnych dolegliwości wymagają reakcji lekarza.",
         "Ostre zapalenie nerek wymaga pilnego pobytu w szpitalu."
       ],
-      "zrodlo": "Materiały zespołu: zakażenia dróg moczowych w ciąży", "status": "ok"
+      "zrodlo": "Standard opieki okołoporodowej (Dz.U. 2026 poz. 1140), część II (badanie ogólne moczu w 15.–20., 21.–26., 27.–32., 33.–37., 38.–39. tygodniu; zlecanie dodatkowych badań przy czynnikach ryzyka) i część III ust. 2 pkt 3 (odmiedniczkowe zapalenie nerek jako czynnik ryzyka): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf; leczenie także bezobjawowego bakteriomoczu: https://www.mp.pl/pacjent/ciaza/przebiegciazy/118965,zakazenie-ukladu-moczowego-w-ciazy (źródło wtórne); hospitalizacja każdej ciężarnej z ostrym odmiedniczkowym zapaleniem nerek: Medycyna po Dyplomie 2025;02, Ostre odmiedniczkowe zapalenie nerek (powołuje m.in. ACOG, Urinary Tract Infections in Pregnant Individuals, Obstet Gynecol 2023) — źródło wtórne: https://podyplomie.pl/czasopisma/medycyna-po-dyplomie/2025/02/ostre-odmiedniczkowe-zapalenie-nerek-bledy-w-diagnostyce-i-leczeniu. Częstość posiewów („częściej”) — nie znaleziono polskiej rekomendacji z liczbą, ustala lekarz",
+      "status": "ok"
     },
     {
-      "id": "SYT-SWIAD", "temat": "Silny świąd skóry (cholestaza ciążowa)", "rodzaj": "sytuacja_szczegolna", "warunki": ["swiad"],
-      "tresc": [
-        "Silny świąd skóry (zwykle w II lub III trymestrze) wymaga szybkich badań krwi — zgłoś się do lekarza od razu.",
-        "Jeśli to cholestaza, kontrole wątroby i stanu dziecka odbywają się zwykle co 1–2 tygodnie lub częściej."
+      "id": "SYT-SWIAD",
+      "temat": "Silny świąd skóry (cholestaza ciążowa)",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "swiad"
       ],
-      "zrodlo": "Materiały zespołu: cholestaza ciężarnych", "status": "ok"
+      "tresc": [
+        "Silny świąd skóry (zwykle w II lub III trymestrze) wymaga szybkich badań krwi — zgłoś się do lekarza od razu. Jeśli pierwsze wyniki są dobre, a świąd trwa, badania powtarza się co tydzień.",
+        "Jeśli to cholestaza, kwasy żółciowe i próby wątrobowe kontroluje się zwykle co 1–2 tygodnie: co najmniej co 2 tygodnie przy łagodnej postaci, co najmniej co tydzień przy umiarkowanej, a przy ciężkiej 2 razy w tygodniu (zwykle w szpitalu).",
+        "O dodatkowych badaniach dziecka (KTG, USG) decyduje lekarz — sama cholestaza nie zawsze ich wymaga. Termin porodu lekarz ustala zależnie od poziomu kwasów żółciowych."
+      ],
+      "zrodlo": "Rekomendacje Polskiego Towarzystwa Ginekologów i Położników dotyczące postępowania u kobiet z wewnątrzwątrobową cholestazą ciężarnych (Kędzia M. i wsp.), Ginekol Perinatol Prakt 2025 (rozdz. Monitorowanie: kwasy żółciowe co ≥2 tyg. przy 19–39 µmol/l, co ≥1 tydz. przy 40–99, 2×/tydz. przy ≥100 + szpital; przy świądzie z prawidłowymi wynikami powtarzać badania co tydzień; sama cholestaza nie jest wskazaniem do intensyfikacji KTG i USG; indukcja porodu rozważana w 38.–39. tc przy 40–99 µmol/l): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/view/105348/85056. Uwaga: ACOG Committee Opinion No. 828 (2021) sugeruje KTG 1–2×/tydz. od rozpoznania cholestazy — rozbieżność z PTGiP 2025 (https://starlegacyfoundation.org/wp-content/uploads/ACOG-2021-Indications-for-outpatient-antenatal-fetal-surveillance.pdf); zostawiono decyzję lekarza",
+      "status": "ok"
     },
     {
-      "id": "SYT-MNOGA", "temat": "Ciąża mnoga (np. bliźnięta)", "rodzaj": "sytuacja_szczegolna", "warunki": ["ciaza_mnoga"],
-      "tresc": ["USG robi się znacznie częściej niż przy jednym dziecku — od II trymestru."],
-      "zrodlo": "Materiały zespołu: ciąża wielopłodowa", "status": "ok"
+      "id": "SYT-MNOGA",
+      "temat": "Ciąża mnoga (np. bliźnięta)",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "ciaza_mnoga"
+      ],
+      "tresc": [
+        "USG robi się częściej niż przy jednym dziecku. Przy bliźniętach z jednym łożyskiem — co 2 tygodnie od 16. tygodnia. Przy bliźniętach z dwoma łożyskami zwykle w 11.–14., 18.–22., 28., 32. i 36. tygodniu.",
+        "Ciąża mnoga nie jest uznawana za zwykłą, więc opiekę nad nią zwykle prowadzi się w ośrodku referencyjnym.",
+        "Lekarz może zlecić też KTG. Zalecenia amerykańskie (ACOG) sugerują raz w tygodniu od ok. 36. tygodnia przy bliźniętach z dwoma łożyskami i od ok. 32. tygodnia przy bliźniętach z jednym łożyskiem. O terminie decyduje lekarz."
+      ],
+      "zrodlo": "Rekomendacje Sekcji Ultrasonografii PTGiP — przesiewowa diagnostyka USG w ciąży o przebiegu prawidłowym, 2020 (Ginekol Perinatol Prakt 2020;5(2):63-75): https://journals.viamedica.pl/ginekologia_perinatologia_prakt/article/download/69742/51881 (ciąża bliźniacza: dwukosmówkowa 11–13+6, 18–22, 28, 32, 36 tc; jednokosmówkowa dwuowodniowa od 16 tc co 2 tygodnie; ciąża bliźniacza nie jest ciążą fizjologiczną, opieka zwykle w ośrodkach referencyjnych); ACOG Committee Opinion No. 828 (2021), Table 1 (bliźnięta dwukosmówkowe niepowikłane: KTG od 36 0/7 tc raz w tygodniu; jednokosmówkowo-dwuowodniowe niepowikłane: od 32 0/7 tc raz w tygodniu; zalecenia sugerujące): https://starlegacyfoundation.org/wp-content/uploads/ACOG-2021-Indications-for-outpatient-antenatal-fetal-surveillance.pdf",
+      "status": "ok"
     },
     {
-      "id": "SYT-OGOLNE", "temat": "Gdy ciąża nie jest standardowa", "rodzaj": "sytuacja_szczegolna",
-      "warunki": ["cukrzyca_przed", "cukrzyca_ciazowa", "nadcisnienie", "autoimmun", "zum", "swiad", "ciaza_mnoga"],
+      "id": "SYT-OGOLNE",
+      "temat": "Gdy ciąża nie jest standardowa",
+      "rodzaj": "sytuacja_szczegolna",
+      "warunki": [
+        "cukrzyca_przed",
+        "cukrzyca_ciazowa",
+        "nadcisnienie",
+        "autoimmun",
+        "zum",
+        "swiad",
+        "ciaza_mnoga"
+      ],
       "tresc": [
         "Ten kalendarz dotyczy ciąży bez powikłań. Przy chorobach lekarz układa własny, częstszy plan wizyt i badań.",
         "Wizyty co 4 tygodnie to wtedy zwykle za mało.",
         "Przy wielu chorobach potrzebna jest opieka kilku specjalistów (np. diabetologa)."
       ],
-      "zrodlo": "Materiały zespołu: sytuacje wymagające zmiany standardowej diagnostyki", "status": "ok"
+      "zrodlo": "Rozporządzenie MZ z 16.08.2018 w sprawie standardu organizacyjnego opieki okołoporodowej, tekst jednolity: Obwieszczenie MZ z 18.08.2026 (Dz.U. 2026 poz. 1140), część II ust. 1 pkt 3 i ust. 2 (dodatkowe badania przy wskazaniach; konsultacje w uzasadnionych przypadkach częściej): https://eli.gov.pl/eli/DU/2026/1140/ogl/pol/pdf",
+      "status": "ok"
     }
   ]
 }
