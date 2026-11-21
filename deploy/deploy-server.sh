@@ -17,7 +17,7 @@ npm run build
 rm -rf .deploy && mkdir -p .deploy/.next
 cp -r .next/standalone/. .deploy/
 cp -r .next/static .deploy/.next/static
-cp -r public .deploy/public
+mkdir -p .deploy/public && cp -r public/. .deploy/public/
 mkdir -p $BASE/app $BASE/data $BASE/proxy
 rsync -a --delete .deploy/ $BASE/app/
 rsync -a data/personas data/scenariusze.json $BASE/data/

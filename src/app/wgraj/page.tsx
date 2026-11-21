@@ -76,6 +76,7 @@ export default function Wgraj() {
   async function przelicz() {
     setBusy(true); setErr("");
     try {
+      if (wiersze.some((w) => [w.dP, w.dO, w.stale, w.zm, w.pr, w.proc].some((x) => (num(x) ?? 0) < 0))) { setErr("Kwoty i liczby dni nie mogą być ujemne. Popraw wpisane wartości."); setBusy(false); return; }
       const sk = wiersze.map((w) => ({ rok: w.rok, miesiac: w.miesiac, dniPrzepracowal: num(w.dP), dniObowiazany: num(w.dO), stale: num(w.stale), zmiennePomniejszone: num(w.zm), premieFaktyczne: num(w.pr), procentSkladki: num(w.proc) }));
       const j = await api<any>("/api/parser/podstawa", { typ_dokumentu: wyn.dane.typ_dokumentu, zatrudnienie: wyn.dane.zatrudnienie, skladniki_miesieczne: sk });
       setPod(j.podstawa);
@@ -140,7 +141,7 @@ export default function Wgraj() {
                 <Field label="Liczba dzieci"><input inputMode="numeric" autoComplete="off" value={dzieci} onChange={(e) => setDzieci(e.target.value.replace(/\D/g, "").slice(0, 1))} /></Field>
                 <Field label="Data porodu lub przyjęcia dziecka"><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
               </div>
-              {(slabo(p.pesel) || slabo(p.data_zdarzenia)) && <p className="small muted">Pola PESEL i data zostały odczytane z niską pewnością. Porównaj je z dokumentem.</p>}
+              {(slabo(p.pesel) || (slabo(p.data_zdarzenia) && !wyn.ostrzezenia?.some((o: string) => /daty porodu/.test(o)))) && <p className="small muted">Pola PESEL i data zostały odczytane z niską pewnością. Porównaj je z dokumentem.</p>}
               <div className="row mt"><button className="btn btn-secondary" onClick={sprawdzUb}>Sprawdź ubezpieczenie (symulacja ZUS)</button></div>
             </div>
 
@@ -166,7 +167,7 @@ export default function Wgraj() {
               <Kroki kroki={pod.wynik.kroki?.map(opisObliczenia)} />
               {pod.wynik.ostrzezenia?.length > 0 && <Alert t="warn">Sprawdź dane odczytane z zaświadczenia i skonsultuj wynik z ZUS.</Alert>}
               <button className="btn btn-primary mt" onClick={policz}>Policz zasiłek z tą podstawą →</button></div>}
-            {!pod?.wynik && <Alert t="info">Z tego dokumentu nie wyliczono podstawy. Uzupełnij wynagrodzenia w tabeli powyżej albo wprowadź je ręcznie w <a href="/kalkulator">kalkulatorze</a>.</Alert>}
+            {!pod?.wynik && <Alert t="info">Z tego dokumentu nie wyliczono podstawy. {wiersze.length > 0 ? "Uzupełnij wynagrodzenia w tabeli powyżej albo wprowadź je ręcznie w" : "Wpisz wynagrodzenia przyciskiem powyżej albo wprowadź je w"} <a href="/kalkulator">kalkulatorze</a>.</Alert>}
           </>}
         </div>
       </div>

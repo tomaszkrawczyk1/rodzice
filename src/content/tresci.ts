@@ -55,7 +55,7 @@ export const LINKI = [
 ] as const;
 
 export const PERSONA_OPIS: Record<string, string> = {
-  P01: "Pracownica, firma 80 osób, planuje urlop z partnerem", P02: "Ojciec prowadzący działalność, zadłużenie składkowe 1 200 zł", P03: "Zleceniobiorczyni bez dobrowolnego chorobowego",
+  P01: "Pracownica, firma 80 osób, planuje urlop z partnerem", P02: "Ojciec prowadzący działalność, zadłużenie składkowe zależne od dnia (np. 1 200 zł na 2.04.2027)", P03: "Zleceniobiorczyni bez dobrowolnego chorobowego",
   P04: "Pracownica, bliźnięta, łączy pracę z urlopem rodzicielskim", P05: "Pracownica, wcześniak, pobyt w szpitalu", P06: "Pracownica, dziecko urodzone martwe", P07a: "Adopcja – Agnieszka (rodzic 1)",
   P07b: "Adopcja – Piotr (rodzic 2)", P08: "Pracownica, zmiana pracy w ciąży", P09: "Ciąża zagrożona, zmienne wynagrodzenie, zwolnienia e-ZLA", P10: "Ojciec po śmierci matki dziecka",
 };
