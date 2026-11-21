@@ -17,7 +17,9 @@ export default function Szukaj() {
       <h3 id="zq">Nie widzisz swojej sprawy? Opisz ją własnymi słowami</h3>
       <form className="row" onSubmit={(e) => { e.preventDefault(); setWyslane(q.trim()); }}>
         <input
-          type="text"
+          type="search"
+          enterKeyHint="search"
+          autoComplete="off"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="np. zasiłek po porodzie, urlop u pracodawcy"

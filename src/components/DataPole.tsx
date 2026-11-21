@@ -26,7 +26,7 @@ export function DataPole({ label, hint, value, onChange }: {
   const blad = sprawdz && tekst.trim() && !dataZFormularza(tekst);
   return (
     <Pole label={label} hint={blad ? "Wpisz prawidłową datę, np. 5.04.2027." : [hint, "Dzień.miesiąc.rok, np. 5.04.2027."].filter(Boolean).join(" ")}>
-      <input ref={pole} value={tekst} autoComplete="off" aria-invalid={blad ? true : undefined}
+      <input ref={pole} type="text" inputMode="decimal" enterKeyHint="next" autoComplete="off" autoCapitalize="off" placeholder="np. 5.04.2027" value={tekst} aria-invalid={blad ? true : undefined}
         onBlur={() => setSprawdz(true)}
         onChange={(e) => {
           const wartosc = e.target.value;

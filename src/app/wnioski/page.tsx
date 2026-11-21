@@ -171,7 +171,7 @@ export default function Wnioski() {
                 <p className="right">…………………………<br />(podpis)</p></>}
               {tab === "zam" && <><h3 style={{ textAlign: "center" }}>Podgląd danych do formularza ZAM</h3>
                 <p>Wnoszę o ustalenie prawa do zasiłku macierzyńskiego w związku z urodzeniem dziecka / przyjęciem dziecka na wychowanie w dniu <b>{dataPL(f.dziecko)}</b>.</p>
-                {okresy.length > 0 && <div className="tbl-wrap"><table className="tbl"><thead><tr><th>Rodzaj</th><th>Od</th><th>Do</th></tr></thead><tbody>{okresy.map((o, i) => <tr key={i}><td>{RODZAJE[o.rodzaj] ?? "Okres zasiłku"} ({o.kto === "matka" ? "rodzic 1" : "rodzic 2"})</td><td>{dataPL(o.od)}</td><td>{dataPL(o.do)}</td></tr>)}</tbody></table></div>}
+                {okresy.length > 0 && <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Rodzaj</th><th>Od</th><th>Do</th></tr></thead><tbody>{okresy.map((o, i) => <tr key={i}><td data-label="Rodzaj">{RODZAJE[o.rodzaj] ?? "Okres zasiłku"} ({o.kto === "matka" ? "rodzic 1" : "rodzic 2"})</td><td data-label="Od">{dataPL(o.od)}</td><td data-label="Do">{dataPL(o.do)}</td></tr>)}</tbody></table></div>}
                 {f.w815 && <p>Wnoszę o uśrednioną stawkę zasiłku ({liczba(P.wariant_pelny_wymiar_81_5)}% podstawy).</p>}
                 {f.przedsiebiorca && <p>Informacja o ubezpieczeniu: prowadzę pozarolniczą działalność gospodarczą, ubezpieczenie chorobowe: <b>{f.chorobowe ? "tak" : "nie"}</b>.</p>}
                 <p className="right">…………………………<br />(podpis)</p></>}

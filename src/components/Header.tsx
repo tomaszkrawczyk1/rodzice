@@ -3,21 +3,29 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSesja } from "@/lib/sesja";
+import { sprawa } from "@/lib/sprawy";
 import Dostepnosc from "./Dostepnosc";
 
+// Sześć pozycji zamiast dziewięciu: cztery podstrony o papierach (druki, kreator wniosków, wgrywanie, konto w ZUS)
+// są pod jedną pozycją „Formularze", a po wejściu w którąkolwiek z nich widać ich wspólne podmenu.
 const NAV = [
-  ["/", "Start"], ["/sprawy", "Sprawy"], ["/kalendarz", "Kalendarz"], ["/poradnik", "Poradnik"], ["/kalkulator", "Kalkulator"], ["/druki", "Druki"], ["/wnioski", "Wnioski"], ["/wgraj", "Wgraj wniosek"], ["/pue", "PUE"],
+  ["/", "Start"], ["/sprawy", "Sprawy"], ["/kalendarz", "Kalendarz"], ["/kalkulator", "Kalkulator"], ["/poradnik", "Poradnik"], ["/formularze", "Formularze"],
 ] as const;
+const FORMULARZE = [
+  ["/druki", "Druki"], ["/wnioski", "Kreator wniosków"], ["/wgraj", "Wgraj wniosek"], ["/pue", "Konto w ZUS"],
+] as const;
+const wFormularzach = (path: string) => path === "/formularze" || FORMULARZE.some(([h]) => path === h || path.startsWith(h + "/"));
 
 const NAZWY: Record<string, string> = {
   "/sprawy": "Sprawy",
   "/kalendarz": "Kalendarz ciąży i połogu",
   "/poradnik": "Poradnik",
   "/kalkulator": "Kalkulator",
+  "/formularze": "Formularze",
   "/druki": "Druki",
-  "/wnioski": "Wnioski",
+  "/wnioski": "Kreator wniosków",
   "/wgraj": "Wgraj wniosek",
-  "/pue": "PUE",
+  "/pue": "Konto w ZUS (PUE)",
   "/logowanie": "Zaloguj",
   "/kreator": "Kreator",
   "/ryzyka": "Ryzyka",
@@ -32,6 +40,7 @@ const NAZWY: Record<string, string> = {
 function aktywny(path: string, href: string) {
   if (href === "/") return path === "/";
   if (href === "/sprawy") return path === "/sprawy" || path.startsWith("/sprawa/");
+  if (href === "/formularze") return wFormularzach(path);
   return path === href || path.startsWith(href + "/");
 }
 
@@ -40,13 +49,14 @@ function okruszki(path: string): { href: string; label: string; biezacy?: boolea
   if (path.startsWith("/sprawa/")) {
     return [
       { href: "/sprawy", label: "Sprawy" },
-      { href: path, label: "Sprawa", biezacy: true },
+      { href: path, label: sprawa(path.split("/")[2])?.tytul ?? "Sprawa", biezacy: true },
     ];
   }
   const bazowy = "/" + path.split("/").filter(Boolean)[0];
   const label = NAZWY[path] || NAZWY[bazowy];
   if (!label) return [];
-  return [{ href: path, label, biezacy: true }];
+  const nadrzedny = path !== "/formularze" && wFormularzach(path) ? [{ href: "/formularze", label: NAZWY["/formularze"] }] : [];
+  return [...nadrzedny, { href: path, label, biezacy: true }];
 }
 
 export default function Header() {
@@ -62,6 +72,9 @@ export default function Header() {
       const pasek = document.querySelector(".site-top");
       const dol = pasek ? pasek.getBoundingClientRect().bottom : 0;
       document.documentElement.style.setProperty("--menu-top", `${Math.max(0, Math.round(dol))}px`);
+      // Wysokość przyklejonego nagłówka dla przewijania do kotwic i kroków (0, gdy nagłówek jedzie ze stroną).
+      const przyklejony = pasek && ["sticky", "fixed"].includes(getComputedStyle(pasek).position);
+      document.documentElement.style.setProperty("--header-h", przyklejony ? `${Math.round(pasek.getBoundingClientRect().height)}px` : "0px");
     };
     ustaw();
     window.addEventListener("resize", ustaw);
@@ -111,11 +124,27 @@ export default function Header() {
               return (
                 <li key={h} className={on ? "selected" : undefined}>
                   <Link href={h} aria-current={on ? "page" : undefined} className={on ? "active" : ""} onClick={zamknij}>{t}</Link>
+                  {h === "/formularze" && (
+                    <ul className="zus-nav__sub" aria-label="Formularze i konto w ZUS">
+                      {FORMULARZE.map(([sh, st]) => (
+                        <li key={sh}><Link href={sh} aria-current={path === sh ? "page" : undefined} onClick={zamknij}>{st}</Link></li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               );
             })}
           </ul>
         </nav>
+        {wFormularzach(path) && (
+          <nav className="zus-subnav" aria-label="Formularze i konto w ZUS">
+            <ul className="container">
+              {FORMULARZE.map(([sh, st]) => (
+                <li key={sh}><Link href={sh} aria-current={path === sh ? "page" : undefined}>{st}</Link></li>
+              ))}
+            </ul>
+          </nav>
+        )}
         {crumbs.length > 0 && (
           <nav className="crumbs" aria-label="Okruszki">
             <div className="container crumbs__row">
