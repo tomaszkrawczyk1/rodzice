@@ -39,7 +39,7 @@ export default function Wgraj() {
         <div>
           <div className="card" onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files[0]; if (f) wyslij(f); }}
             style={{ borderStyle: "dashed", borderWidth: 2, borderColor: drag ? "var(--zus-green)" : "var(--line)", textAlign: "center", padding: 34 }}>
-            <p style={{ fontSize: "2rem", margin: 0 }} aria-hidden>📄</p>
+            <p className="drop-ic" style={{ margin: 0 }} aria-hidden>📄</p>
             <p><b>Przeciągnij plik tutaj</b> lub</p>
             <input ref={ref} type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/*" hidden onChange={(e) => e.target.files?.[0] && wyslij(e.target.files[0])} />
             <button className="btn btn-primary" onClick={() => ref.current?.click()} disabled={busy}>Wybierz plik</button>

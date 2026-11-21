@@ -22,7 +22,7 @@ export default function Szukaj() {
       <p className="small muted" style={{ margin: "8px 0 0" }}>Przykłady: {PRZYKLADY.map((p) => <button key={p} type="button" className="chip" onClick={() => { setQ(p); setWyslane(p); }}>{p}</button>)}</p>
       {w && (
         <div className="mt" aria-live="polite">
-          {w.sprawy.length > 0 && <><b>Sprawy, które mogą pasować:</b><div className="grid g3 mt">{w.sprawy.map((s) => <Link key={s.id} href={`/sprawa/${s.id}`} className="tile"><span className="ic">{s.ikona}</span><b>{s.tytul}</b><span>{s.krotko}</span></Link>)}</div></>}
+          {w.sprawy.length > 0 && <><b>Sprawy, które mogą pasować:</b><div className="grid g3 mt">{w.sprawy.map((s) => <Link key={s.id} href={`/sprawa/${s.id}`} className="tile"><span className={`ic ic-${s.id}`} aria-hidden="true">{s.ikona}</span><b>{s.tytul}</b><span>{s.krotko}</span></Link>)}</div></>}
           {w.faq.length > 0 && <><p className="mt"><b>Odpowiedzi z poradnika:</b></p><ul className="clean">{w.faq.map((f) => <li key={f.id}><Link href={`/poradnik#${f.id}`}>{f.pytanie}</Link> <StatusBadge s={f.status} /></li>)}</ul></>}
           {pusto && <p>Nie znaleźliśmy tego w naszych źródłach, więc nie zgadujemy. <Link href="/pue">Zadaj pytanie w ZUS (symulacja PUE)</Link> albo <Link href="/sprawy">zobacz wszystkie sprawy</Link>.</p>}
         </div>

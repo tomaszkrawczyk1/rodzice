@@ -225,7 +225,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
 
       {w.jakLiczono && <Kroki kroki={w.jakLiczono} tytul="Jak to policzyliśmy?" />}
 
-      {powiazane.length > 0 && <div className="card mt no-print"><h3>Co dalej?</h3><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className="ic">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
+      {powiazane.length > 0 && <div className="card mt no-print"><h3>Co dalej?</h3><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className={`ic ic-${s!.id}`} aria-hidden="true">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
 
       {bezPytan && <div className="row mt no-print"><Link href="/sprawy" className="btn btn-ghost">← Wróć do spraw</Link></div>}
       <p className="small muted mt">Wyliczenia są orientacyjne i nie stanowią decyzji ZUS. Dane w prototypie są fikcyjne.</p>

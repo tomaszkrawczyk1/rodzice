@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSesja } from "@/lib/sesja";
 import Dostepnosc from "./Dostepnosc";
 
@@ -55,18 +55,38 @@ export default function Header() {
   const crumbs = okruszki(path);
   const zamknij = () => setOpen(false);
 
+  useEffect(() => {
+    document.body.classList.toggle("nav-open", open);
+    const ustaw = () => {
+      const pasek = document.querySelector(".site-top");
+      const dol = pasek ? pasek.getBoundingClientRect().bottom : 0;
+      document.documentElement.style.setProperty("--menu-top", `${Math.max(0, Math.round(dol))}px`);
+    };
+    ustaw();
+    window.addEventListener("resize", ustaw);
+    return () => {
+      document.body.classList.remove("nav-open");
+      window.removeEventListener("resize", ustaw);
+    };
+  }, [open, path]);
+
+  useEffect(() => { setOpen(false); }, [path]);
+
+  const imie = sesja ? sesja.osoba.split(" ")[0] : "";
   const logowanie = sesja ? (
-    <button type="button" className="pue-login" onClick={() => { wyloguj(); zamknij(); }}>Wyloguj ({sesja.osoba.split(" ")[0]})</button>
+    <button type="button" className="pue-login" title={sesja.osoba} onClick={() => { wyloguj(); zamknij(); }}>
+      <span className="pue-login__label">Wyloguj ({imie})</span>
+    </button>
   ) : (
     <Link href="/logowanie" className="pue-login login" onClick={zamknij}>Zaloguj</Link>
   );
 
   return (
-    <>
-      <div className="sim-banner">Prototyp HackNation 2026 · wszystkie integracje (mObywatel, ZUS, PUE, USC) są <b>symulowane</b>, dane są fikcyjne</div>
+    <div className="site-top">
+      <div className="sim-banner">Wersja testowa. Dane i logowanie są przykładowe. To nie jest oficjalna usługa ZUS.</div>
       <header id="header" className="header zus-header">
         <div className="zus-header__bar">
-          <Link href="/" className="zus-logo brand" title="Zakład Ubezpieczeń Społecznych" onClick={zamknij}>
+          <Link href="/" className="zus-logo brand" title="Przewodnik Przyszłego Rodzica" onClick={zamknij}>
             <img className="zus-logo__img" src="/logo_zus_darker_with_text.svg" alt="Strona główna" width={250} height={56} />
           </Link>
           <div className="zus-product brand-text">
@@ -112,6 +132,6 @@ export default function Header() {
           </nav>
         )}
       </header>
-    </>
+    </div>
   );
 }
