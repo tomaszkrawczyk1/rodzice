@@ -1,5 +1,5 @@
 import { dodajDni, dniMiedzy } from "@/engine/kalkulator";
-import { pln, dataPL, dataKrotka, tygodnie, dzis, RODZAJE } from "./format";
+import { pln, dataPL, dataKrotka, liczba, tygodnie, dzis, RODZAJE } from "./format";
 import { pytanie, type Status } from "@/content/poradnik";
 import { WSPARCIE, WSPARCIE_UWAGA } from "@/content/tresci";
 
@@ -25,7 +25,9 @@ export interface Pyt {
   poCo: string;                     // „Po co pytamy?”
   skad?: string;                    // „Skąd to wziąć?”
   warunek?: (o: Odp, c: Ctx) => boolean;
-  jednostka?: string; min?: number; max?: number; przyklad?: string;
+  sprawdz?: (v: string, o: Odp) => string | undefined;
+  zalezyOd?: string[];
+  jednostka?: string; min?: number; max?: number | ((o: Odp) => number); calkowita?: boolean; przyklad?: string;
 }
 
 export interface Wynik {
@@ -50,7 +52,61 @@ export interface Sprawa {
 }
 
 /* ============ pomocnicze ============ */
-const num = (x: any) => Number(String(x ?? "").replace(",", ".").replace(/\s/g, ""));
+const num = (x: unknown) => {
+  const s = String(x ?? "").trim();
+  if (!/^-?(?:\d+|\d{1,3}(?:[ \u00a0\u202f]\d{3})+)(?:[,.]\d+)?$/.test(s)) return NaN;
+  return Number(s.replace(/\s/g, "").replace(",", "."));
+};
+export function bladOdpowiedzi(q: Pyt, v: string, o: Odp): string | undefined {
+  const s = v.trim();
+  if (!s) return "Podaj odpowiedź.";
+  if (q.typ === "wybor" && !q.opcje?.some((op) => op.v === s)) return "Wybierz jedną z dostępnych odpowiedzi.";
+  if (q.typ === "tak_nie" && s !== "tak" && s !== "nie") return "Wybierz „Tak” lub „Nie”.";
+  if (q.typ === "data") {
+    const data = new Date(`${s}T00:00:00Z`);
+    if (!/^[1-9]\d{3}-\d{2}-\d{2}$/.test(s) || !Number.isFinite(data.getTime()) || data.toISOString().slice(0, 10) !== s) {
+      return "Podaj prawidłową datę.";
+    }
+  }
+  if (q.typ === "liczba") {
+    const n = num(s);
+    if (!Number.isFinite(n) || Math.abs(n) > Number.MAX_SAFE_INTEGER / 100) return "Podaj prawidłową liczbę.";
+    if (q.calkowita && !Number.isInteger(n)) return "Podaj pełną liczbę.";
+    const min = q.min ?? 0;
+    const max = typeof q.max === "function" ? q.max(o) : q.max;
+    if (n < min || (max !== undefined && n > max)) {
+      return max === undefined ? `Wpisz co najmniej ${liczba(min)}.` : `Wpisz liczbę od ${liczba(min)} do ${liczba(max)}.`;
+    }
+  }
+  return q.sprawdz?.(s, o);
+}
+
+export function domyslneOdpowiedzi(pytania: Pyt[], c: Ctx): Odp {
+  const odp: Odp = {};
+  for (const q of pytania) {
+    const v = q.domyslne?.(c);
+    if (v != null && (q.warunek?.(odp, c) ?? true) && !bladOdpowiedzi(q, String(v), odp)) odp[q.id] = String(v);
+  }
+  return odp;
+}
+
+export function zapiszOdpowiedz(pytania: Pyt[], odp: Odp, q: Pyt, v: string): Odp {
+  const nowe = { ...odp, [q.id]: v };
+  if (odp[q.id] !== undefined && odp[q.id] !== v) {
+    const zmienione = new Set([q.id]);
+    for (const pole of pytania) {
+      if (pole.zalezyOd?.some((id) => zmienione.has(id))) {
+        delete nowe[pole.id];
+        zmienione.add(pole.id);
+      }
+    }
+  }
+  return nowe;
+}
+
+export function aktywneOdpowiedzi(pytania: Pyt[], odp: Odp, c: Ctx): Odp {
+  return Object.fromEntries(pytania.filter((q) => odp[q.id] !== undefined && (q.warunek?.(odp, c) ?? true)).map((q) => [q.id, odp[q.id]]));
+}
 const DZIECI = [{ v: "1", label: "Jedno" }, { v: "2", label: "Dwoje (bliźnięta)" }, { v: "3", label: "Troje" }, { v: "4", label: "Czworo" }, { v: "5", label: "Pięcioro lub więcej" }];
 const ZATRUDNIENIE = [
   { v: "umowa", label: "Umowa o pracę", opis: "Etat u pracodawcy" },
