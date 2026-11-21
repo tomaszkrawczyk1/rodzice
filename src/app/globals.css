@@ -243,12 +243,17 @@ img { max-width: 100%; height: auto; }
   .menu-btn { display: inline-flex; align-items: center; }
   .zus-header__bar { flex-wrap: wrap; padding-bottom: 12px; }
   .zus-logo { order: 1; }
-  .menu-btn { order: 2; margin-left: auto; }
   .zus-product { order: 3; flex: 1 0 100%; margin-left: 0; border-left: 0; padding-left: 0; }
-  .zus-header__tools { order: 4; width: 100%; margin-left: 0; justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
+  .zus-header__tools { display: contents; }
+  .zus-header__bar { column-gap: 8px; }
+  .zus-header__tools .pue-login { order: 2; margin-left: auto; }
+  .menu-btn { order: 3; margin-left: 0; }
+  .zus-product { order: 4; }
+  .zus-search { order: 5; }
+  .a11y { order: 6; }
   .zus-search span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .zus-search { min-width: 44px; justify-content: center; padding: 4px; }
-  .a11y { gap: 6px; flex-wrap: nowrap; }
+  .a11y { gap: 6px; flex-wrap: wrap; }
   .a11y button { padding: 8px 8px; font-size: 14px; }
   .pue-login { padding: 8px 10px; }
   .zus-nav__list { padding: 0; }
@@ -778,5 +783,5 @@ html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 #ffe14d; }
 html.hc .footer__links a { text-decoration: underline; }
 html.hc .zus-nav li.selected { border-top-color: #ffe14d; box-shadow: inset 7px 0 0 #ffe14d; }
 html.hc .crumbs__home svg path { fill: #ffe14d; }
-html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) contrast(2) brightness(2); }
+html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) invert(1) brightness(2); }
 html.hc :focus-visible { outline: 3px solid #ffe14d; outline-offset: 2px; }

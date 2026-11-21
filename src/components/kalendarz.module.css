@@ -1,6 +1,6 @@
 .kalendarz {
   max-width: 55rem;
-  margin-inline: auto;
+  margin-inline: 0;
   overflow-wrap: anywhere;
 }
 
