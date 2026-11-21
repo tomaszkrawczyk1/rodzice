@@ -119,20 +119,20 @@ export function zapiszOdpowiedz(pytania: Pyt[], odp: Odp, q: Pyt, v: string): Od
 export function aktywneOdpowiedzi(pytania: Pyt[], odp: Odp, c: Ctx): Odp {
   return Object.fromEntries(pytania.filter((q) => odp[q.id] !== undefined && (q.warunek?.(odp, c) ?? true)).map((q) => [q.id, odp[q.id]]));
 }
-const DZIECI = [{ v: "1", label: "Jedno" }, { v: "2", label: "Dwoje (bliźnięta)" }, { v: "3", label: "Troje" }, { v: "4", label: "Czworo" }, { v: "5", label: "Pięcioro lub więcej" }];
+const DZIECI = [{ v: "1", label: "Jedno dziecko" }, { v: "2", label: "Dwoje dzieci (bliźnięta)" }, { v: "3", label: "Troje dzieci" }, { v: "4", label: "Czworo dzieci" }, { v: "5", label: "Pięcioro lub więcej dzieci" }];
 const ZATRUDNIENIE = [
-  { v: "umowa", label: "Umowa o pracę", opis: "Etat u pracodawcy" },
-  { v: "dzialalnosc", label: "Własna firma (działalność)", opis: "Opłacam składki sama" },
-  { v: "zlecenie", label: "Umowa zlecenia" },
+  { v: "umowa", label: "Umowa o pracę", opis: "Zatrudnienie na etacie u pracodawcy" },
+  { v: "dzialalnosc", label: "Własna firma (działalność gospodarcza)", opis: "Opłacam składki samodzielnie" },
+  { v: "zlecenie", label: "Umowa zlecenia", opis: "Praca na podstawie umowy zlecenia" },
 ];
 const czyPracownik = (o: Odp) => o.zatrudnienie === "umowa" || !o.zatrudnienie;
 const maChorobowe = (o: Odp) => o.tytul === "umowa_o_prace" || ((o.tytul === "zlecenie" || o.tytul === "dzialalnosc") && o.dobrowolne === "tak");
 const pPlatnik: Pyt = {
-  id: "platnik", typ: "wybor", tekst: "Ile osób Twój płatnik zgłasza do ubezpieczenia chorobowego?",
-  opcje: [{ v: "duzy", label: `Więcej niż ${progPlatnika} osób` }, { v: "maly", label: `${progPlatnika} osób lub mniej` }, { v: "nie_wiem", label: "Nie wiem" }],
+  id: "platnik", typ: "wybor", tekst: "Ile osób Twój pracodawca lub zleceniodawca zgłasza do ubezpieczenia chorobowego?",
+  opcje: [{ v: "duzy", label: `Więcej niż ${progPlatnika} osób (zasiłek wypłaca pracodawca)` }, { v: "maly", label: `${progPlatnika} osób lub mniej (zasiłek wypłaca ZUS)` }, { v: "nie_wiem", label: "Nie wiem – sprawdzimy to" }],
   domyslne: (c) => c.liczbaUbezpieczonychPlatnika === undefined ? undefined : c.liczbaUbezpieczonychPlatnika > progPlatnika ? "duzy" : "maly",
-  etykietaDanych: "Liczba ubezpieczonych u płatnika",
-  poCo: "Od tego zależy, czy zasiłek wypłaci płatnik składek, czy ZUS.", skad: "Zapytaj w kadrach o stan na 30 listopada poprzedniego roku.",
+  etykietaDanych: "Liczba ubezpieczonych u pracodawcy",
+  poCo: "W firmach zgłaszających powyżej 20 osób zasiłek wypłaca pracodawca razem z pensją. W mniejszych firmach wypłatą zajmuje się bezpośrednio ZUS.", skad: "Możesz zapytać w kadrach lub księgowości (liczy się stan na 30 listopada poprzedniego roku). Jeśli nie masz pewności, wybierz «Nie wiem».",
 };
 const pyt = (id: string) => pytanie(id);
 const kroki = (...ids: string[]) => ids.flatMap((i) => pyt(i)?.kroki ?? []);
@@ -140,19 +140,19 @@ const dniDo = (iso: string) => dniMiedzy(dzis(), iso);
 const zaIle = (iso: string) => { const d = dniDo(iso); return d < 0 ? "termin minął" : d === 0 ? "dziś" : d === 1 ? "jutro" : `za ${d} dni`; };
 
 const pDataPorodu: Pyt = {
-  id: "dataPorodu", typ: "data", tekst: "Kiedy dziecko się urodziło albo kiedy jest planowany termin porodu?",
+  id: "dataPorodu", typ: "data", tekst: "Kiedy dziecko się urodziło lub jaki jest planowany termin porodu?",
   domyslne: (c) => c.dataPorodu, etykietaDanych: "Data porodu",
-  poCo: "Od tej daty liczymy wszystkie okresy urlopów i terminy wniosków.", skad: "Karta ciąży albo akt urodzenia. Jeśli nie znasz dokładnie – wpisz termin z karty ciąży, poprawisz później.",
+  poCo: "Od tej daty liczymy wszystkie okresy urlopów i terminy wniosków.", skad: "Karta przebiegu ciąży albo odpis aktu urodzenia dziecka.",
 };
 const pDzieci: Pyt = {
   id: "liczbaDzieci", typ: "wybor", tekst: "Ile dzieci urodziło się (lub urodzi) przy jednym porodzie?", opcje: DZIECI,
   domyslne: (c) => (c.liczbaDzieci ? String(Math.min(c.liczbaDzieci, 5)) : undefined), etykietaDanych: "Liczba dzieci",
-  poCo: "Od liczby dzieci przy jednym porodzie zależy, ile tygodni urlopu Ci przysługuje.",
+  poCo: "Od liczby dzieci przy jednym porodzie zależy wymiar urlopu i zasiłku macierzyńskiego.",
 };
 const pZatrudnienie: Pyt = {
   id: "zatrudnienie", typ: "wybor", tekst: "Na jakiej podstawie pracujesz?", opcje: ZATRUDNIENIE,
-  domyslne: (c) => (c.tytul ? (c.tytul === "umowa_o_prace" ? "umowa" : c.tytul === "dzialalnosc" ? "dzialalnosc" : c.tytul === "zlecenie" ? "zlecenie" : undefined) : undefined), etykietaDanych: "Rodzaj zatrudnienia",
-  poCo: "Od tego zależy, jak liczymy podstawę zasiłku i kto go wypłaca.", skad: "Z umowy. Jeśli nie masz żadnej z tych form zatrudnienia albo nie wiesz, czy masz ubezpieczenie, sprawdź sprawę „Co mi przysługuje”.",
+  domyslne: (c) => (c.tytul ? (c.tytul === "umowa_o_prace" ? "umowa" : c.tytul === "dzialalnosc" ? "dzialalnosc" : c.tytul === "zlecenie" ? "zlecenie" : undefined) : undefined), etykietaDanych: "Forma zatrudnienia",
+  poCo: "Od formy zatrudnienia zależy, jak obliczamy podstawę zasiłku i kto go wypłaca.", skad: "Z umowy o pracę, umowy zlecenia lub wpisu w CEIDG. Sprawdzisz to także na koncie PUE / eZUS.",
 };
 const pChorobowe: Pyt = {
   id: "chorobowe", typ: "tak_nie", tekst: "Czy masz dobrowolne ubezpieczenie chorobowe?",
@@ -160,14 +160,14 @@ const pChorobowe: Pyt = {
   domyslne: (c) => c.dobrowolne === undefined ? undefined : c.dobrowolne ? "tak" : "nie",
   etykietaDanych: "Dobrowolne ubezpieczenie chorobowe",
   zalezyOd: ["zatrudnienie"],
-  poCo: "Od tego zależy prawo do zasiłku przy umowie zlecenia lub własnej firmie.",
+  poCo: "Przy umowie zlecenia i własnej działalności gospodarczej prawo do zasiłku przysługuje tylko wtedy, gdy opłacasz dobrowolną składkę chorobową.", skad: "Z potwierdzenia zgłoszenia ZUS ZUA lub pytając w księgowości.",
 };
 const poPotwierdzeniuChorobowego = (pytania: Pyt[]) => pytania.map((q) => ({
   ...q, warunek: (o: Odp, c: Ctx) => o.chorobowe !== "nie" && (q.warunek?.(o, c) ?? true),
 }));
 const brakChorobowego = (): Wynik => ({
-  glowne: "Bez ubezpieczenia chorobowego z tej umowy lub działalności nie wyliczymy zasiłku.",
-  zrob: [{ tekst: "Sprawdź, co przysługuje Ci w Twojej sytuacji, także jeśli masz inny tytuł do ubezpieczenia." }],
+  glowne: "Bez ubezpieczenia chorobowego z tej umowy lub działalności ZUS nie wypłaca zasiłku.",
+  zrob: [{ tekst: "Sprawdź, co przysługuje Ci w Twojej sytuacji, także jeśli masz inny tytuł do ubezpieczenia (np. świadczenie rodzicielskie «kosiniakowe»)." }],
   status: "ok", nastepne: ["co-przysluguje"],
 });
 const pPelnyEtat = (kto: "M" | "O"): Pyt => ({
@@ -175,12 +175,12 @@ const pPelnyEtat = (kto: "M" | "O"): Pyt => ({
   tekst: kto === "M" ? "Czy pracujesz na pełnym etacie?" : "Czy drugi rodzic pracuje na pełnym etacie?",
   warunek: (o, c) => kto === "M" ? pBrutto("M").warunek!(o, c) && czyPracownik(o) : pBrutto("O").warunek!(o, c) && o.zatrudnienieO === "umowa",
   zalezyOd: [kto === "M" ? "zatrudnienie" : "zatrudnienieO"],
-  poCo: "Minimalną podstawę zasiłku stosujemy przy pełnym etacie.",
+  poCo: "Minimalną gwarantowaną podstawę wymiaru zasiłku stosujemy przy pełnym etacie.",
 });
 const pZatrudnienieO: Pyt = { ...pZatrudnienie, id: "zatrudnienieO", tekst: "Na jakiej podstawie pracuje drugi rodzic?", domyslne: undefined, warunek: (o, c) => pBrutto("O").warunek!(o, c) };
 const pPodstawaZUS = (kto: "M" | "O"): Pyt => ({
-  id: kto === "M" ? "podstawaM" : "podstawaO", typ: "liczba", min: 0.01, tekst: kto === "M" ? "Podstawa Twojego zasiłku (zł miesięcznie)" : "Podstawa zasiłku drugiego rodzica (zł miesięcznie)",
-  domyslne: (c) => (kto === "M" ? c.podstawaM : c.podstawaO), etykietaDanych: kto === "M" ? "Podstawa zasiłku" : "Podstawa zasiłku drugiego rodzica", jednostka: "zł",
+  id: kto === "M" ? "podstawaM" : "podstawaO", typ: "liczba", min: 0.01, tekst: kto === "M" ? "Miesięczna podstawa wymiaru Twojego zasiłku (zł)" : "Miesięczna podstawa wymiaru zasiłku drugiego rodzica (zł)",
+  domyslne: (c) => (kto === "M" ? c.podstawaM : c.podstawaO), etykietaDanych: kto === "M" ? "Podstawa wymiaru zasiłku" : "Podstawa wymiaru zasiłku drugiego rodzica", jednostka: "zł",
   zalezyOd: kto === "M" ? ["zatrudnienie"] : undefined,
   warunek: (o, c) => {
     const zatrudnienieZProfilu = pZatrudnienie.domyslne?.(c);
@@ -188,15 +188,21 @@ const pPodstawaZUS = (kto: "M" | "O"): Pyt => ({
     const podstawa = kto === "M" ? c.podstawaM : c.podstawaO;
     return Number.isFinite(podstawa) && (podstawa ?? 0) > 0;
   },
-  poCo: "To kwota, od której liczymy zasiłek (średnia z 12 miesięcy po odliczeniu składek).",
+  poCo: "To kwota, od której liczymy zasiłek (średnie miesięczne wynagrodzenie z ostatnich 12 miesięcy po odliczeniu 13,71% składek).",
 });
 const pBrutto = (kto: "M" | "O"): Pyt => ({
   id: kto === "M" ? "brutto" : "bruttoO", typ: "liczba", jednostka: "zł", min: 0.01, przyklad: "np. 6500",
   zalezyOd: [kto === "M" ? "zatrudnienie" : "zatrudnienieO"],
-  tekst: (o) => kto === "O" ? o.zatrudnienieO === "umowa" ? "Ile zarabia drugi rodzic miesięcznie „na papierze” (brutto)?" : "Od jakiej kwoty drugi rodzic opłaca miesięcznie składki na ubezpieczenia?" : czyPracownik(o) ? "Ile zarabiasz miesięcznie „na papierze” (brutto)?" : "Od jakiej kwoty opłacasz miesięcznie składki na ubezpieczenia?",
+  tekst: (o) => kto === "O"
+    ? o.zatrudnienieO === "umowa"
+      ? "Ile wynosi miesięczne wynagrodzenie brutto drugiego rodzica (kwota z umowy)?"
+      : "Od jakiej kwoty drugi rodzic opłaca miesięcznie składki na ubezpieczenia społeczne?"
+    : czyPracownik(o)
+      ? "Ile wynosi Twoje miesięczne wynagrodzenie brutto (kwota z umowy przed odliczeniem podatku i składek)?"
+      : "Od jakiej kwoty opłacasz miesięcznie składki na ubezpieczenia społeczne (podstawa składek)?",
   warunek: (o, c) => !pPodstawaZUS(kto).warunek!(o, c),
-  poCo: `Z tego liczymy podstawę zasiłku (średnia z ostatnich 12 miesięcy, pomniejszona o ${liczba(parametry.procenty.skladki_odliczane_od_podstawy)}% składek).`,
-  skad: "Pasek wypłaty albo umowa – kwota „brutto”, czyli przed odliczeniem podatku. Jeśli wynagrodzenie bywa różne, wpisz średnią z roku. Przy własnej firmie: kwota, od której płacisz składki (deklaracja ZUS DRA).",
+  poCo: `Z tego liczymy podstawę zasiłku (średnia z ostatnich 12 miesięcy pomniejszona o ${liczba(parametry.procenty.skladki_odliczane_od_podstawy)}% składek na ubezpieczenia społeczne).`,
+  skad: "Sprawdź kwotę brutto na umowie o pracę lub pasku płacowym (przed odliczeniem podatku i składek). Jeśli pensja się zmieniała, wpisz średnią z ostatnich 12 miesięcy. Przy własnej firmie: kwota zadeklarowana w deklaracji ZUS DRA.",
 });
 
 async function podstawaDla(api: Api, o: Odp, kto: "M" | "O"): Promise<number> {
@@ -235,26 +241,26 @@ const LINK_KALK = { href: "/kalkulator", etykieta: "Dopracuj szczegóły w pełn
 export const SPRAWY: Sprawa[] = [
   /* ---- 1. Co mi przysługuje ---- */
   {
-    id: "co-przysluguje", tytul: "Sprawdzić, co mi przysługuje", krotko: "Zasiłek chorobowy w ciąży i macierzyński: tak czy nie, i dlaczego", ikona: "🛡️", czas: "3–5 pytań · 2 min",
+    id: "co-przysluguje", tytul: "Sprawdzić, co mi przysługuje", krotko: "Zasiłek chorobowy w ciąży i zasiłek macierzyński: czy masz prawo i na jakich zasadach", ikona: "🛡️", czas: "3–5 pytań · 2 min",
     slowa: "przysługuje prawo uprawnienia czy dostanę zasiłek ubezpieczenie chorobowe karencja okres wyczekiwania umowa zlecenie działalność brak ubezpieczenia", faq: ["F01", "F02", "F20", "F21", "F22"],
     pytania: [
-      { id: "tytul", typ: "wybor", tekst: "Jak jesteś teraz ubezpieczona?", domyslne: (c) => c.tytul, etykietaDanych: "Rodzaj ubezpieczenia",
-        opcje: [{ v: "umowa_o_prace", label: "Umowa o pracę" }, { v: "zlecenie", label: "Umowa zlecenia" }, { v: "dzialalnosc", label: "Własna firma (działalność)" }, { v: "dzielo_lub_brak", label: "Umowa o dzieło albo nie mam ubezpieczenia" }],
-        poCo: "Od rodzaju ubezpieczenia zależy, czy w ogóle masz prawo do zasiłku.", skad: "Z umowy lub z wyciągu z konta PUE." },
+      { id: "tytul", typ: "wybor", tekst: "Jaka jest Twoja obecna forma zatrudnienia lub ubezpieczenia?", domyslne: (c) => c.tytul, etykietaDanych: "Forma ubezpieczenia",
+        opcje: [{ v: "umowa_o_prace", label: "Umowa o pracę (etat)" }, { v: "zlecenie", label: "Umowa zlecenia" }, { v: "dzialalnosc", label: "Własna działalność gospodarcza (firma)" }, { v: "dzielo_lub_brak", label: "Umowa o dzieło lub brak ubezpieczenia" }],
+        poCo: "Od formy zatrudnienia zależy, czy podlegasz ubezpieczeniu chorobowemu i jakie świadczenia Ci przysługują.", skad: "Z umowy lub z informacji o ubezpieczeniu na koncie PUE / eZUS." },
       { id: "dobrowolne", typ: "tak_nie", tekst: "Czy opłacasz dobrowolną składkę na ubezpieczenie chorobowe?", warunek: (o) => o.tytul === "zlecenie" || o.tytul === "dzialalnosc",
-        domyslne: (c) => c.dobrowolne === undefined ? undefined : c.dobrowolne ? "tak" : "nie", etykietaDanych: "Dobrowolne ubezpieczenie chorobowe", zalezyOd: ["tytul"],
-        poCo: "Przy zleceniu i własnej firmie zasiłek przysługuje tylko osobom, które same się na chorobowe zgłosiły.", skad: "Z potwierdzenia zgłoszenia do ubezpieczeń (ZUS ZUA) albo z rozliczeń składek." },
-      { id: "od", typ: "data", tekst: `Od kiedy masz to ubezpieczenie chorobowe bez przerwy dłuższej niż ${L.przerwa_wliczana_do_karencji_dni} dni?`, warunek: maChorobowe,
-        zalezyOd: ["tytul", "dobrowolne"], sprawdz: (v) => v > dzis() ? "Początek obecnego ubezpieczenia nie może być w przyszłości." : undefined,
-        domyslne: (c) => (c.dniUbezpieczenia !== undefined ? dodajDni(dzis(), -c.dniUbezpieczenia + 1) : undefined), etykietaDanych: "Ubezpieczona nieprzerwanie od",
-        poCo: "Na zasiłek chorobowy trzeba odczekać: 30 dni przy umowie o pracę, 90 dni przy dobrowolnym ubezpieczeniu.", skad: "Data początku umowy o pracę albo zgłoszenia do ubezpieczenia." },
+        domyslne: (c) => c.dobrowolne === undefined ? undefined : c.dobrowolne ? "tak" : "nie", etykietaDanych: "Dobrowolna składka chorobowa", zalezyOd: ["tytul"],
+        poCo: "Przy umowie zlecenia i działalności gospodarczej zasiłek przysługuje tylko wtedy, gdy dobrowolnie opłacasz składkę na ubezpieczenie chorobowe.", skad: "Z potwierdzenia zgłoszenia ZUS ZUA lub z comiesięcznych rozliczeń składek." },
+      { id: "od", typ: "data", tekst: `Od kiedy masz nieprzerwane ubezpieczenie chorobowe (bez przerw dłuższych niż ${L.przerwa_wliczana_do_karencji_dni} dni)?`, warunek: maChorobowe,
+        zalezyOd: ["tytul", "dobrowolne"], sprawdz: (v) => v > dzis() ? "Data rozpoczęcia ubezpieczenia nie może być w przyszłości." : undefined,
+        domyslne: (c) => (c.dniUbezpieczenia !== undefined ? dodajDni(dzis(), -c.dniUbezpieczenia + 1) : undefined), etykietaDanych: "Ubezpieczenie nieprzerwanie od",
+        poCo: "Prawo do zasiłku chorobowego wymaga wymaganego stażu ubezpieczenia: 30 dni przy umowie o pracę lub 90 dni przy ubezpieczeniu dobrowolnym. Zasiłek macierzyński po porodzie przysługuje bez tego okresu wyczekiwania.", skad: "Wpisz datę startu obecnej umowy. Jeśli wcześniej była inna umowa o pracę, a przerwa między umowami nie przekroczyła 30 dni, podaj datę ze starszej umowy." },
       { ...pDataPorodu, warunek: maChorobowe,
-        poCo: "Zasiłek macierzyński przysługuje, jeśli w dniu porodu jesteś ubezpieczona.", skad: "Karta ciąży." },
-      { id: "wDniu", typ: "tak_nie", tekst: (o) => `Czy ${dataPL(o.dataPorodu)} ${o.dataPorodu < dzis() ? "byłaś" : o.dataPorodu === dzis() ? "jesteś" : "będziesz"} ubezpieczona chorobowo?`, domyslne: (c) => (c.wDniuPorodu === undefined ? undefined : c.wDniuPorodu ? "tak" : "nie"), etykietaDanych: "Ubezpieczenie w dniu porodu",
+        poCo: "Prawo do zasiłku macierzyńskiego przysługuje, jeśli rodzic ma ważne ubezpieczenie chorobowe w dniu narodzin dziecka.", skad: "Karta przebiegu ciąży lub akt urodzenia dziecka." },
+      { id: "wDniu", typ: "tak_nie", tekst: (o) => `Czy ${dataPL(o.dataPorodu)} ${o.dataPorodu < dzis() ? "trwało Twoje" : o.dataPorodu === dzis() ? "trwa Twoje" : "będzie trwało Twoje"} ubezpieczenie chorobowe (umowa o pracę lub opłacone składki)?`, domyslne: (c) => (c.wDniuPorodu === undefined ? undefined : c.wDniuPorodu ? "tak" : "nie"), etykietaDanych: "Ubezpieczenie w dniu porodu",
         warunek: maChorobowe, zalezyOd: ["tytul", "dobrowolne", "dataPorodu"],
-        poCo: "To najważniejszy warunek zasiłku macierzyńskiego. Utrata pracy lub zakończenie umowy przed porodem może go odebrać.", skad: "Pomyśl, czy umowa lub składki potrwają do porodu." },
-      { id: "zadluzenie", typ: "liczba", tekst: "Ile wynosi Twoje zadłużenie składkowe w ZUS? (wpisz 0, jeśli nie masz)", jednostka: "zł", min: 0, warunek: (o) => o.tytul === "dzialalnosc" && maChorobowe(o), zalezyOd: ["tytul"],
-        domyslne: (c) => c.zadluzenie, etykietaDanych: "Zadłużenie składkowe", poCo: "Zadłużenie powyżej progu wstrzymuje wypłatę zasiłku do czasu spłaty.", skad: "Konto PUE ZUS, zakładka „Rozliczenia”." },
+        poCo: "To najważniejszy warunek prawa do zasiłku macierzyńskiego: ubezpieczenie musi trwać w dniu narodzin dziecka.", skad: "Sprawdź datę końcową na umowie o pracę. Jeśli masz umowę na czas nieokreślony lub regularnie opłacasz składki, wybierz «Tak»." },
+      { id: "zadluzenie", typ: "liczba", tekst: "Ile wynosi Twoje ewentualne zadłużenie składkowe w ZUS? (jeśli nie masz zaległości, wpisz 0)", jednostka: "zł", min: 0, warunek: (o) => o.tytul === "dzialalnosc" && maChorobowe(o), zalezyOd: ["tytul"],
+        domyslne: (c) => c.zadluzenie, etykietaDanych: "Zadłużenie składkowe w ZUS", poCo: "Zaległości w opłacaniu składek powyżej ustawowego limitu wstrzymują wypłatę zasiłku do czasu ich uregulowania.", skad: "Sprawdzisz to na koncie PUE / eZUS w zakładce «Rozliczenia» lub pytając księgowość." },
       { ...pPlatnik, warunek: (o) => o.tytul === "umowa_o_prace" || (o.tytul === "zlecenie" && maChorobowe(o)), zalezyOd: ["tytul"] },
     ],
     async licz(o, c, api) {
@@ -267,36 +273,37 @@ export const SPRAWY: Sprawa[] = [
       });
       const mac = r.zasilekMacierzynski, ch = r.zasilekChorobowyWCiazy;
       const zrob: Wynik["zrob"] = [];
-      if (mac.przysluguje) zrob.push({ tekst: "Policz, ile dostaniesz, i przygotuj wniosek o zasiłek macierzyński." });
-      else zrob.push({ tekst: "Jeśli Twoja sytuacja się zmieniła lub masz wątpliwości, zapytaj ZUS." });
-      if (ch.przysluguje) zrob.push({ tekst: "Gdy lekarz wystawi zwolnienie w ciąży – zobacz, ile zasiłku Ci się należy." });
+      if (mac.przysluguje) zrob.push({ tekst: "Sprawdź w kalkulatorze wysokość zasiłku i przygotuj wniosek o zasiłek macierzyński." });
+      else zrob.push({ tekst: "Jeśli Twoja sytuacja zawodowa się zmieniła lub masz pytania, skonsultuj się z doradcą w ZUS." });
+      if (ch.przysluguje) zrob.push({ tekst: "Dla mamy: jeśli lekarz wystawi zwolnienie w ciąży, zasiłek chorobowy wynosi 100% pensji – sprawdź szczegóły w sprawie o zwolnieniu." });
+      zrob.push({ tekst: "Dla taty: po narodzinach dziecka przysługuje Ci 2 tygodnie urlopu ojcowskiego (100% płatne) oraz część urlopu rodzicielskiego." });
       return {
-        glowne: mac.przysluguje ? (r.zasilekMacierzynski.zawieszonyDoSplatyZadluzenia ? "Masz prawo do zasiłku macierzyńskiego, ale wypłata czeka na spłatę zadłużenia." : "Masz prawo do zasiłku macierzyńskiego.") : "Z tego, co wpisałaś, zasiłek macierzyński może Ci nie przysługiwać.",
+        glowne: mac.przysluguje ? (r.zasilekMacierzynski.zawieszonyDoSplatyZadluzenia ? "Masz prawo do zasiłku macierzyńskiego, ale wypłata nastąpi po uregulowaniu zaległych składek." : "Masz prawo do zasiłku macierzyńskiego.") : "Z podanych informacji wynika, że zasiłek macierzyński może Ci nie przysługiwać.",
         szczegoly: [["Zasiłek chorobowy w ciąży", `${ch.przysluguje ? "przysługuje" : "nie przysługuje"} – ${ch.powod}`], ["Zasiłek macierzyński", `${mac.przysluguje ? "przysługuje" : "nie przysługuje"} – ${mac.powod}`],
-          ...(mac.przysluguje || ch.przysluguje ? [["Kto wypłaca zasiłek", o.platnik === "nie_wiem" ? "Sprawdź w kadrach" : o.platnik === "duzy" ? "Płatnik składek" : "ZUS"] as [string, string]] : [])],
+          ...(mac.przysluguje || ch.przysluguje ? [["Kto wypłaca zasiłek", o.platnik === "nie_wiem" ? "Do potwierdzenia w kadrach" : o.platnik === "duzy" ? "Pracodawca (płatnik składek)" : "ZUS"] as [string, string]] : [])],
         ostrzezenia: [...r.ostrzezenia.filter((x: string) => x !== mac.powod), ...(r.alternatywa ? [r.alternatywa] : [])],
         zrob, druki: mac.przysluguje ? ["ZAM"] : [], nastepne: [...(mac.przysluguje ? ["wniosek-zasilek"] : []), ...(ch.przysluguje ? ["zwolnienie-ciaza"] : [])],
-        status: o.platnik === "nie_wiem" ? "do_potwierdzenia" : "ok", uwagaStatus: "Ustal w kadrach, kto wypłaca zasiłek.",
-        linki: [{ href: "/pue", etykieta: "Zadaj pytanie w ZUS (symulacja PUE)" }],
+        status: o.platnik === "nie_wiem" ? "do_potwierdzenia" : "ok", uwagaStatus: "Ustal w dziale kadr, czy pracodawca zatrudnia powyżej 20 osób i wypłaca zasiłek samodzielnie.",
+        linki: [{ href: "/pue", etykieta: "Zadaj pytanie przez internet (symulacja PUE / eZUS)" }],
       };
     },
   },
 
   /* ---- 2. Zwolnienie w ciąży ---- */
   {
-    id: "zwolnienie-ciaza", tytul: "Zwolnienie w ciąży – ile dostanę", krotko: "Zasiłek chorobowy w ciąży (100%) i kto go wypłaca", ikona: "🩺", czas: "4 pytania · 2 min",
+    id: "zwolnienie-ciaza", tytul: "Zwolnienie w ciąży – ile dostanę", krotko: "Zasiłek chorobowy w ciąży (100% pensji) i informacja, kto go wypłaca", ikona: "🩺", czas: "4 pytania · 2 min",
     slowa: "zwolnienie l4 e-zla chorobowe ciąża ciążowe chorobowy zasiłek 100% lekarz pracodawca wynagrodzenie chorobowe", faq: ["F01", "F02", "F03"],
     pytania: [
       pZatrudnienie, pChorobowe, ...poPotwierdzeniuChorobowego([pPelnyEtat("M"),
       pPodstawaZUS("M"),
       pBrutto("M"),
-      { id: "dniNiezd", typ: "liczba", tekst: "Ile dni zwolnienia w ciąży masz lub planujesz? (zwolnienie z kodem B)", jednostka: "dni", min: 1, max: L.okres_zasilkowy_ciaza_dni, calkowita: true, przyklad: "np. 60",
-        domyslne: (c) => (c.ezlaDni ? c.ezlaDni : undefined), etykietaDanych: "Dni zwolnień e-ZLA",
-        poCo: "Tyle dni liczymy, żeby pokazać Twój zasiłek.", skad: "Z e-ZLA (konto PUE ZUS albo od lekarza). Nie wiesz? Wpisz 30, żeby zobaczyć kwotę za miesiąc." },
-      { id: "w50", typ: "tak_nie", tekst: "Czy 50. urodziny miałaś przed początkiem roku, którego dotyczy zwolnienie?", warunek: czyPracownik, poCo: "Od roku po 50. urodzinach pracodawca krócej wypłaca wynagrodzenie chorobowe." },
-      { id: "dniWykorzystane", typ: "liczba", tekst: "Za ile dni zwolnienia pracodawca zapłacił Ci wcześniej w tym samym roku?", jednostka: "dni", calkowita: true, warunek: czyPracownik,
+      { id: "dniNiezd", typ: "liczba", tekst: "Za ile dni zwolnienia w ciąży chcesz policzyć zasiłek? (e-ZLA z kodem B)", jednostka: "dni", min: 1, max: L.okres_zasilkowy_ciaza_dni, calkowita: true, przyklad: "np. 60",
+        domyslne: (c) => (c.ezlaDni ? c.ezlaDni : undefined), etykietaDanych: "Liczba dni zwolnienia e-ZLA",
+        poCo: "Zasiłek chorobowy w ciąży wynosi 100% podstawy wymiaru za każdy dzień kalendarzowy zwolnienia (także za weekendy).", skad: "Z elektronicznego zwolnienia e-ZLA na koncie PUE / eZUS lub od lekarza. Jeśli planujesz z góry, wpisz np. 30 dni za pełny miesiąc." },
+      { id: "w50", typ: "tak_nie", tekst: "Czy Twoje 50. urodziny przypadały przed rokiem, którego dotyczy zwolnienie?", warunek: czyPracownik, poCo: "Od roku kalendarzowego następującego po 50. urodzinach pracodawca wypłaca wynagrodzenie chorobowe tylko za pierwsze 14 dni w roku (zamiast 33). Od 15. dnia zasiłek przejmuje ZUS." },
+      { id: "dniWykorzystane", typ: "liczba", tekst: "Za ile dni zwolnienia lekarskiego pracodawca zapłacił Ci już w tym roku kalendarzowym?", jednostka: "dni", calkowita: true, warunek: czyPracownik,
         max: (o) => o.w50 === "tak" ? L.wynagrodzenie_chorobowe_dni_od_50_lat : L.wynagrodzenie_chorobowe_dni_do_50_lat,
-        poCo: "Wcześniejsze zwolnienia pomniejszają liczbę dni wynagrodzenia chorobowego w danym roku. Jeśli ich nie było, wpisz 0." },
+        poCo: "W danym roku pracodawca finansuje pierwsze 33 dni choroby (lub 14 dni po 50. roku życia). Dopiero po ich wykorzystaniu wypłatę rozpoczyna ZUS. Jeśli w tym roku nie było jeszcze płatnego zwolnienia, wpisz 0." },
       { ...pPlatnik, warunek: (o) => !czyPracownik(o) ? o.zatrudnienie === "zlecenie" :
         num(o.dniNiezd) > (o.w50 === "tak" ? L.wynagrodzenie_chorobowe_dni_od_50_lat : L.wynagrodzenie_chorobowe_dni_do_50_lat) - num(o.dniWykorzystane) },
       ]),
@@ -308,7 +315,7 @@ export const SPRAWY: Sprawa[] = [
       const dni = num(o.dniNiezd);
       const f = pyt("F01");
       const pct = parametry.procenty.zasilek_chorobowy_w_ciazy;
-      const platnik = o.platnik === "duzy" ? "płatnik składek" : o.platnik === "nie_wiem" ? "sprawdź w kadrach" : "ZUS";
+      const platnik = o.platnik === "duzy" ? "pracodawca (płatnik składek)" : o.platnik === "nie_wiem" ? "do potwierdzenia w kadrach" : "ZUS";
       return {
         glowne: `Za zwolnienie w ciąży (${wDniach(dni)}) stawka wynosi ${pct}% podstawy.`, duza: pln(r.kwotaRazem), podpis: `ok. ${pln(r.dzienna)} za każdy dzień zwolnienia`,
         szczegoly: [["Podstawa zasiłku", `${pln(podM)} miesięcznie`],
@@ -329,9 +336,13 @@ export const SPRAWY: Sprawa[] = [
     pytania: [
       pZatrudnienie, pChorobowe, ...poPotwierdzeniuChorobowego([pDataPorodu, pDzieci, pPelnyEtat("M"), pPodstawaZUS("M"), pBrutto("M"),
       { ...pPlatnik, warunek: (o) => o.zatrudnienie === "umowa" || o.zatrudnienie === "zlecenie", zalezyOd: ["zatrudnienie"] },
-      { id: "wariant", typ: "wybor", tekst: "Jak chcesz dostawać pieniądze?",
-        opcje: [{ v: "zmienny", label: "Standardowo", opis: "Wyższa kwota na początku (100%), niższa potem (70%)" }, { v: "usredniony", label: "Uśredniona stawka (81,5%)", opis: "Wniosek trzeba złożyć w ciągu 21 dni po porodzie" }, { v: "nie_wiem", label: "Nie wiem – pokażcie różnicę", opis: "Policzymy oba warianty" }],
-        poCo: "To jedno zaznaczone pole we wniosku. Pokażemy, ile różnią się obie opcje.", skad: "Nie musisz tego wiedzieć teraz – wybierz „Nie wiem” i porównaj." },
+      { id: "wariant", typ: "wybor", tekst: "W jaki sposób chcesz otrzymywać zasiłek macierzyński?",
+        opcje: [
+          { v: "zmienny", label: "Wariant standardowy: 100% i 70%", opis: "100% podstawy przez urlop macierzyński (pierwsze 20 tygodni), potem 70% w czasie rodzicielskiego" },
+          { v: "usredniony", label: "Wariant stały: 81,5% przez cały rok", opis: "Jednakowa wypłata co miesiąc – wniosek musisz złożyć w ciągu 21 dni po porodzie" },
+          { v: "nie_wiem", label: "Nie wiem – chcę porównać oba warianty", opis: "Przeliczymy i pokażemy różnicę między obiema opcjami" },
+        ],
+        poCo: "Wybór wariantu decyduje o wysokości comiesięcznych wypłat. Pokażemy różnicę i podpowiemy, co zaznaczyć we wniosku.", skad: "Możesz wybrać «Nie wiem», aby porównać obie opcje przed podjęciem decyzji." },
       ]),
     ],
     async licz(o, c, api) {
@@ -352,19 +363,19 @@ export const SPRAWY: Sprawa[] = [
       const okr = wyn.okresy;
       const mac = okr.find((x: any) => x.rodzaj === "macierzynski");
       const rod = okr.find((x: any) => x.rodzaj === "rodzicielski");
-      const adresat = o.platnik === "duzy" ? "Płatnik składek" : o.platnik === "nie_wiem" ? "Sprawdź w kadrach" : "Zakład Ubezpieczeń Społecznych";
-      const ost = [...wyn.bledy, ...wyn.ostrzezenia, `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi. Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli drugi rodzic też weźmie urlop, sprawdź „Podzielić urlop z partnerem”.`];
-      if (o.wariant !== "zmienny" && poTerminie) ost.push(`Termin złożenia wniosku o 81,5% minął ${dataPL(t815)}. Pokazujemy wariant standardowy przy założeniu, że wniosek o stawkę 81,5% nie został złożony w terminie.`);
+      const adresat = o.platnik === "duzy" ? "Pracodawca (płatnik składek)" : o.platnik === "nie_wiem" ? "Do ustalenia w kadrach (pracodawca lub ZUS)" : "Zakład Ubezpieczeń Społecznych (ZUS)";
+      const ost = [...wyn.bledy, ...wyn.ostrzezenia, `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi (część nieprzenoszalna dla drugiego rodzica). Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli oboje rodzice biorą urlop, sprawdź sprawę „Podzielić urlop z partnerem”.`];
+      if (o.wariant !== "zmienny" && poTerminie) ost.push(`Termin złożenia wniosku o stawkę 81,5% minął ${dataPL(t815)} (21 dni od porodu). Pokazujemy wariant standardowy (100% / 70%) przy założeniu, że wniosek o stawkę 81,5% nie został złożony w terminie.`);
       const zrob: Wynik["zrob"] = [
-        { kiedy: uzywa815 ? `do ${dataPL(t815)}` : "po porodzie", tekst: o.platnik === "nie_wiem" ? "Ustal w kadrach, gdzie złożyć wniosek ZAM." : o.platnik === "duzy" ? "Złóż wniosek ZAM u płatnika składek." : "Złóż wniosek ZAM w ZUS.",
+        { kiedy: uzywa815 ? `do ${dataPL(t815)}` : "po porodzie", tekst: o.platnik === "nie_wiem" ? "Ustal w kadrach, gdzie złożyć wniosek ZAM." : o.platnik === "duzy" ? "Złóż wniosek ZAM u pracodawcy." : "Złóż wniosek ZAM w ZUS (elektronicznie przez PUE / eZUS lub w placówce).",
           uwaga: porownaj ? `Jeśli wybierzesz stawkę 81,5%, złóż wniosek do ${dataPL(t815)}.` : undefined },
-        { tekst: "Dołącz dokumenty z listy w poradniku (m.in. akt urodzenia lub zaświadczenie lekarskie).", uwaga: "Pełna lista: pytanie „Jakie dokumenty muszę dołączyć?”." },
-        { kiedy: `do ${par.terminy_dni.zasilek_wyplata_po_wyjasnieniu_okolicznosci_max} dni`, tekst: "Tyle najwyżej czeka się na wypłatę po wyjaśnieniu wszystkich okoliczności." },
+        { tekst: "Dołącz dokumenty z listy w poradniku (m.in. odpis aktu urodzenia dziecka lub zaświadczenie lekarskie).", uwaga: "Pełną listę znajdziesz w pytaniu «Jakie dokumenty muszę dołączyć?»." },
+        { kiedy: `do ${par.terminy_dni.zasilek_wyplata_po_wyjasnieniu_okolicznosci_max} dni`, tekst: "Maksymalny czas oczekiwania na pierwszą wypłatę po wyjaśnieniu wszystkich okoliczności." },
       ];
       const sciagaWiersze: [string, string, string][] = [
         ["Dane wnioskodawcy", `${c.osoba ?? "Twoje imię i nazwisko"}, PESEL ${c.pesel ?? "…"}`, "Dowód osobisty"],
-        ["Data urodzenia dziecka", dataKrotka(o.dataPorodu), "Akt urodzenia (albo termin z karty ciąży przed porodem)"],
-        ["Za jaki okres wnioskujesz", [mac && `urlop macierzyński: ${dataKrotka(mac.od)} – ${dataKrotka(mac.do)}`, rod && `urlop rodzicielski: ${dataKrotka(rod.od)} – ${dataKrotka(rod.do)}`].filter(Boolean).join("; "), "Wynika z Twojego planu (tabela wyżej)"],
+        ["Data urodzenia dziecka", dataPL(o.dataPorodu), "Akt urodzenia (albo termin z karty ciąży przed porodem)"],
+        ["Za jaki okres wnioskujesz", [mac && `urlop macierzyński: od ${dataPL(mac.od)} do ${dataPL(mac.do)}`, rod && `urlop rodzicielski: od ${dataPL(rod.od)} do ${dataPL(rod.do)}`].filter(Boolean).join("; "), "Wynika z Twojego planu (tabela powyżej)"],
         ["Pełny wymiar (81,5%)", uzywa815 ? "Zaznacz pole" : porownaj ? "Zaznacz tylko, jeśli wybierzesz stawkę 81,5%" : "Nie zaznaczaj", "Dotyczy wyboru stawki 81,5%"],
         ["Do kogo składasz", adresat, `Sprawdź, czy płatnik zgłasza do ubezpieczenia chorobowego więcej niż ${progPlatnika} osób.`],
       ];
@@ -375,10 +386,10 @@ export const SPRAWY: Sprawa[] = [
         ostrzezenia: ost, terminy: terminyDlaRodzica(term), zrob, sciaga: { tytul: "Ściąga: co wpisać w druku ZAM", wiersze: sciagaWiersze, uwaga: "Nazwy pól mogą się nieznacznie różnić od aktualnego druku – sprawdź wzór na zus.pl." },
         druki: ["ZAM", ...(o.zatrudnienie === "umowa" ? ["Z-3"] : o.zatrudnienie === "zlecenie" ? ["Z-3a"] : [])],
         status: o.platnik === "nie_wiem" ? "do_potwierdzenia" : "ok", uwagaStatus: "Ustal w kadrach, gdzie złożyć wniosek ZAM.",
-        info: por ? [{ tytul: "Porównanie wariantów", tresc: `Standardowy (100% i 70%): ${pln(por.zmienny_100_70.sumy.razem)}\nUśredniony (81,5%): ${pln(por.usredniony_81_5.sumy.razem)}\n${por.roznicaRazem === 0 ? "Łącznie obie stawki dają tę samą kwotę." : `Różnica: ${pln(Math.abs(por.roznicaRazem))}.`}` }] : undefined,
+        info: por ? [{ tytul: "Porównanie wariantów", tresc: `Standardowy (100% i 70%): ${pln(por.zmienny_100_70.sumy.razem)}\nUśredniony (81,5%): ${pln(por.usredniony_81_5.sumy.razem)}\n${por.roznicaRazem === 0 ? "Łącznie obie stawki dają tę samą kwotę." : `Różnica: ${pln(Math.abs(por.roznicaRazem))}.`}\n\nWskazówka: wariant stały 81,5% gwarantuje równy budżet co miesiąc, a wariant standardowy daje wyższy zastrzyk gotówki w pierwszych miesiącach po narodzinach.` }] : undefined,
         linki: [LINK_KALK], nastepne: o.zatrudnienie === "umowa" ? ["urlop-pracodawca", "podzial-urlopu"] : ["podzial-urlopu"],
         jakLiczono: wyn.kroki,
-        tabela: { kolumny: ["Rodzaj", "Od – do", "Dni", "Kwota"], wiersze: okr.map((x: any) => [RODZAJE[x.rodzaj] ?? x.rodzaj, `${dataKrotka(x.od)} – ${dataKrotka(x.do)}`, String(x.dni), pln(x.kwota)]) },
+        tabela: { kolumny: ["Rodzaj urlopu", "Okres", "Dni", "Kwota brutto"], wiersze: okr.map((x: any) => [RODZAJE[x.rodzaj] ?? x.rodzaj, `${dataPL(x.od)} – ${dataPL(x.do)}`, String(x.dni), pln(x.kwota)]) },
       };
     },
   },
@@ -388,13 +399,15 @@ export const SPRAWY: Sprawa[] = [
     id: "urlop-pracodawca", tytul: "Poprosić pracodawcę o urlop", krotko: "Gotowy tekst wniosku i termin, do kiedy go złożyć", ikona: "🏢", czas: "5 pytań · 3 min",
     slowa: "urlop wniosek pracodawca macierzyński rodzicielski ojcowski uzupełniający szef kadry pismo", faq: ["F12", "F14", "F13"],
     pytania: [
-      { id: "rodzaj", typ: "wybor", tekst: "O jaki urlop prosisz?",
-        opcje: [{ v: "macierzynski", label: "Macierzyński", opis: "Pierwsze tygodnie po porodzie (dla mamy)" }, { v: "rodzicielski", label: "Rodzicielski", opis: "Po macierzyńskim, dla mamy lub taty" }, { v: "ojcowski", label: "Ojcowski", opis: "Dla taty, do 2 tygodni" }, { v: "uzupelniajacy", label: "Uzupełniający", opis: "Gdy dziecko długo leży w szpitalu" }],
+      { id: "rodzaj", typ: "wybor", tekst: "O jaki urlop wnioskujesz?",
+        opcje: [{ v: "macierzynski", label: "Urlop macierzyński", opis: "Pierwsze tygodnie po porodzie (dla mamy)" }, { v: "rodzicielski", label: "Urlop rodzicielski", opis: "Po macierzyńskim, dla mamy lub taty" }, { v: "ojcowski", label: "Urlop ojcowski", opis: "Dla taty, 2 tygodnie (do 1. urodzin dziecka)" }, { v: "uzupelniajacy", label: "Uzupełniający urlop macierzyński", opis: "Gdy dziecko długo przebywa w szpitalu" }],
         poCo: "Każdy urlop ma inny termin złożenia wniosku." },
-      { id: "od", typ: "data", tekst: "Od kiedy chcesz urlop?", poCo: "Od tej daty liczymy termin złożenia wniosku." },
-      { id: "do", typ: "data", tekst: "Do kiedy chcesz urlop?", poCo: "Dzięki temu wniosek ma pełny okres.",
-        sprawdz: (v, o) => v < o.od ? "Koniec urlopu nie może być przed jego początkiem." : o.rodzaj === "ojcowski" && dniMiedzy(o.od, v) + 1 > L.urlop_ojcowski_dni ? `Urlop ojcowski może trwać najwyżej ${L.urlop_ojcowski_dni} dni.` : undefined },
-      { id: "dziecko", typ: "data", tekst: "Kiedy urodziło się dziecko (albo jaki jest planowany termin porodu)?", domyslne: (c) => c.dataPorodu, etykietaDanych: "Data porodu", poCo: "Pracodawca potrzebuje daty, żeby powiązać urlop z dzieckiem.", skad: "Akt urodzenia lub karta ciąży.",
+      { id: "od", typ: "data", tekst: "Od kiedy chcesz rozpocząć urlop?", poCo: "Od tej daty liczymy termin złożenia wniosku." },
+      { id: "do", typ: "data", tekst: "Do kiedy ma trwać urlop?", poCo: "Dzięki temu wniosek zawiera pełny okres urlopu.",
+        sprawdz: (v, o) => v < o.od ? "Koniec urlopu nie może być przed jego początkiem." : o.rodzaj === "ojcowski" && dniMiedzy(o.od, v) + 1 > L.urlop_ojcowski_dni ? `Urlop ojcowski może trwać najwyżej ${L.urlop_ojcowski_dni} dni (2 tygodnie).` : undefined },
+      { id: "dziecko", typ: "data", tekst: (o) => o.rodzaj === "ojcowski" ? "Kiedy urodziło się dziecko?" : "Kiedy urodziło się dziecko (albo jaki jest planowany termin porodu)?", domyslne: (c) => c.dataPorodu, etykietaDanych: "Data porodu",
+        poCo: "Pracodawca potrzebuje daty, żeby powiązać urlop z dzieckiem. Do wniosku o urlop ojcowski dołącza się odpis aktu urodzenia dziecka.",
+        skad: "Akt urodzenia lub karta ciąży.",
         sprawdz: (v, o) => {
           if (!o.od) return;
           if (o.rodzaj === "macierzynski") {
@@ -419,15 +432,21 @@ export const SPRAWY: Sprawa[] = [
       const nazwa: Record<string, string> = { macierzynski: "urlopu macierzyńskiego", rodzicielski: "urlopu rodzicielskiego", ojcowski: "urlopu ojcowskiego", uzupelniajacy: "uzupełniającego urlopu macierzyńskiego" };
       const urlop: Record<string, string> = { macierzynski: "urlop macierzyński", rodzicielski: "urlop rodzicielski", ojcowski: "urlop ojcowski", uzupelniajacy: "uzupełniający urlop macierzyński" };
       const termin = dni ? dodajDni(o.od, -dni - (uzupelniajacy ? 1 : 0)) : "";
-      const tresc = `${dataPL(dzis())}\n\n${o.imie}\n\n${o.pracodawca}\n\nWniosek o udzielenie ${nazwa[o.rodzaj]}\n\nWnoszę o udzielenie mi ${nazwa[o.rodzaj]} w okresie od ${dataPL(o.od)} do ${dataPL(o.do)}${o.rodzaj === "rodzicielski" ? ` (część ${o.czesc} z maksymalnie 5)` : ""}. Dotyczy dziecka ${o.dziecko > dzis() ? "z planowaną datą porodu" : "urodzonego w dniu"} ${dataPL(o.dziecko)}.\n\n…………………………\n(podpis)`;
+      const dzieckoOpis = o.rodzaj === "ojcowski" || o.dziecko <= dzis() ? `urodzonego w dniu ${dataPL(o.dziecko)}` : `z planowaną datą porodu na ${dataPL(o.dziecko)}`;
+      const tresc = `${dataPL(dzis())}\n\n${o.imie}\n\n${o.pracodawca}\n\nWniosek o udzielenie ${nazwa[o.rodzaj]}\n\nWnoszę o udzielenie mi ${nazwa[o.rodzaj]} w okresie od ${dataPL(o.od)} do ${dataPL(o.do)}${o.rodzaj === "rodzicielski" ? ` (część ${o.czesc} z maksymalnie 5)` : ""}. Dotyczy dziecka ${dzieckoOpis}.\n\n…………………………\n(podpis)`;
       const ost: string[] = [];
       if (termin && termin < dzis()) ost.push(`Termin ${dataPL(termin)} już minął. Złóż wniosek jak najszybciej i zapytaj pracodawcę, czy uwzględni krótszy termin.`);
+      if (o.rodzaj === "ojcowski") ost.push("Ważne: Wniosek o urlop ojcowski składa się po narodzinach dziecka. Do wniosku należy dołączyć odpis skrócony aktu urodzenia dziecka (zgodnie z art. 182³ Kodeksu pracy i § 33 rozporządzenia o wnioskach zasiłkowych).");
       return {
         glowne: dni ? `Wniosek o ${urlop[o.rodzaj]} złóż najpóźniej ${dataPL(termin)} (${zaIle(termin)}).` : `Poniżej masz gotowy wniosek o ${urlop[o.rodzaj]}.`,
         tekstDoKopii: { tytul: "Gotowy tekst wniosku", tresc }, ostrzezenia: ost,
         szczegoly: [["Okres urlopu", `${dataPL(o.od)} – ${dataPL(o.do)}`], ["Do kogo", o.pracodawca], ...(dni ? [["Termin złożenia", `co najmniej ${dni} dni ${uzupelniajacy ? "przed końcem urlopu macierzyńskiego" : "przed startem"} (${dataPL(termin)})`] as [string, string]] : [])],
         terminy: termin ? [{ co: `Złożenie wniosku o ${urlop[o.rodzaj]}`, do: termin }] : undefined,
-        zrob: [{ kiedy: termin ? `do ${dataPL(termin)}` : undefined, tekst: "Skopiuj lub wydrukuj wniosek, podpisz i złóż pracodawcy." }, { tekst: "Zachowaj kopię z datą złożenia." }],
+        zrob: [
+          ...(o.rodzaj === "ojcowski" ? [{ tekst: "Pamiętaj o dołączeniu odpisu aktu urodzenia dziecka do wniosku o urlop ojcowski." }] : []),
+          { kiedy: termin ? `do ${dataPL(termin)}` : undefined, tekst: "Skopiuj lub wydrukuj wniosek, podpisz i złóż pracodawcy." },
+          { tekst: "Zachowaj kopię z potwierdzeniem daty złożenia." },
+        ],
         status: "ok", nastepne: ["wniosek-zasilek"],
       };
     },
@@ -439,9 +458,9 @@ export const SPRAWY: Sprawa[] = [
     slowa: "podział urlopu partner tata ojciec mąż mama oboje rodzice rodzicielski ile wyniesie porównanie dzielić", faq: ["F11", "F12", "F14"],
     pytania: [
       pDataPorodu, pDzieci, pZatrudnienie, pPelnyEtat("M"), pPodstawaZUS("M"), pBrutto("M"), pZatrudnienieO, pPelnyEtat("O"), pPodstawaZUS("O"), pBrutto("O"),
-      { id: "ojcowski", typ: "tak_nie", tekst: `Czy tata weźmie też urlop ojcowski (${tygodnie(L.urlop_ojcowski_dni / 7)})?`, poCo: "Urlop ojcowski jest dodatkowy – nie odbiera nic z urlopu rodzicielskiego.", skad: "Możecie zmienić to później." },
+      { id: "ojcowski", typ: "tak_nie", tekst: `Czy tata weźmie też urlop ojcowski (${tygodnie(L.urlop_ojcowski_dni / 7)})?`, poCo: "Urlop ojcowski (2 tygodnie, 100% płatne) jest dodatkowy dla taty – nie odbiera nic z urlopu rodzicielskiego.", skad: "Możecie zmienić to później." },
       { id: "odOjcowski", typ: "data", tekst: "Od kiedy tata chce wziąć urlop ojcowski?", warunek: (o) => o.ojcowski === "tak",
-        poCo: "Od tej daty liczymy termin wniosku.", sprawdz: (v, o) => v < o.dataPorodu ? "Urlop ojcowski nie może zacząć się przed porodem." :
+        poCo: "Od tej daty liczymy termin złożenia wniosku u pracodawcy.", sprawdz: (v, o) => v < o.dataPorodu ? "Urlop ojcowski nie może zacząć się przed porodem." :
           dodajDni(v, L.urlop_ojcowski_dni - 1) >= dodajMiesiace(o.dataPorodu, L.urlop_ojcowski_do_wieku_dziecka_miesiecy) ? "Urlop ojcowski skończyłby się po osiągnięciu przez dziecko limitu wieku." : undefined },
     ],
     async licz(o, c, api) {
@@ -466,7 +485,7 @@ export const SPRAWY: Sprawa[] = [
         glowne: `Najwięcej pieniędzy łącznie wyjdzie przy podziale: „${najlepszy.op.nazwa}”. Różnica między podziałami to ${pln(najlepszy.r.sumy.razem - najgorszy.r.sumy.razem)}.`,
         duza: pln(najlepszy.r.sumy.razem), podpis: "razem dla rodziny przy najkorzystniejszym podziale",
         tabela: { kolumny: ["Podział urlopu rodzicielskiego", "Mama", "Tata", "Razem"], wiersze: wyniki.map((x) => [x.op.nazwa, pln(x.r.sumy.matka), pln(x.r.sumy.ojciec), pln(x.r.sumy.razem)]),
-          uwaga: `Rodzicielski do podziału: ${tygodnie(limit)}. Każdemu z rodziców przysługuje ${tygodnie(niezbywalne)} tylko dla niego. ${o.ojcowski === "tak" ? "Każdy wariant uwzględnia też urlop ojcowski. " : ""}Pieniądze to nie jedyne kryterium – wybierzcie to, co pasuje Waszej rodzinie.` },
+          uwaga: `Rodzicielski do podziału: ${tygodnie(limit)}. Każdemu z rodziców przysługuje ${tygodnie(niezbywalne)} tylko dla niego. ${o.ojcowski === "tak" ? "Każdy wariant uwzględnia też urlop ojcowski. " : ""}Pieniądze to niejedyne kryterium – wybierzcie to, co najbardziej odpowiada Waszej rodzinie.` },
         ostrzezenia: [...new Set(wyniki.flatMap((x) => [...(x.r.bledy as string[]), ...(x.r.ostrzezenia as string[])]))],
         terminy: terminyDlaRodzica(t),
         zrob: [{ tekst: "Ustalcie podział razem – można go jeszcze zmieniać." }, { tekst: "Jeśli korzystacie z urlopu jako pracownicy, złóżcie osobne wnioski do swoich pracodawców.", uwaga: "Daty składania wniosków znajdziesz poniżej." }, { tekst: "Każdy z rodziców składa własny wniosek o zasiłek za swój okres." }],
@@ -482,8 +501,8 @@ export const SPRAWY: Sprawa[] = [
     slowa: "praca urlop rodzicielski łączyć połowa etatu wrócić do pracy pracować częściowo etat zarabiać", faq: ["F13"],
     pytania: [
       pDataPorodu, pDzieci, pPelnyEtat("M"), pPodstawaZUS("M"), pBrutto("M"),
-      { id: "tygPraca", typ: "liczba", tekst: "Ile tygodni urlopu rodzicielskiego chcesz połączyć z pracą?", jednostka: "tygodni", min: 1, max: (o) => wymiarRodzicielski(num(o.liczbaDzieci) || 1, false, parametry) - niezbywalne, calkowita: true, przyklad: "np. 20", poCo: "Podaj tygodnie z Twojej puli urlopu rodzicielskiego przed wydłużeniem go przez pracę.", skad: "Pomyśl, na jak długo chcesz wrócić do pracy." },
-      { id: "etat", typ: "wybor", tekst: "Na jaką część etatu wrócisz?", opcje: [{ v: "0.5", label: "Połowa etatu" }, { v: "0.4", label: "Dwie piąte etatu" }, { v: "0.25", label: "Jedna czwarta etatu" }], poCo: "Można pracować najwyżej na pół etatu. Im mniej pracujesz, tym większą część zasiłku zachowujesz.", skad: "Ustalasz z pracodawcą." },
+      { id: "tygPraca", typ: "liczba", tekst: "Ile tygodni urlopu rodzicielskiego chcesz połączyć z pracą?", jednostka: "tygodni", min: 1, max: (o) => wymiarRodzicielski(num(o.liczbaDzieci) || 1, false, parametry) - niezbywalne, calkowita: true, przyklad: "np. 20", poCo: "Podaj tygodnie z Twojej puli urlopu rodzicielskiego przed wydłużeniem go przez pracę.", skad: "Wpisz, na jak długo chcesz wrócić do pracy na część etatu." },
+      { id: "etat", typ: "wybor", tekst: "Na jaką część etatu wrócisz?", opcje: [{ v: "0.5", label: "Połowa etatu (1/2)" }, { v: "0.4", label: "Dwie piąte etatu (2/5)" }, { v: "0.25", label: "Jedna czwarta etatu (1/4)" }], poCo: "Zgodnie z prawem można pracować najwyżej na pół etatu. Im mniejsza część etatu, tym większą część zasiłku zachowujesz.", skad: "Wymiar czasu pracy ustalasz z pracodawcą." },
     ],
     async licz(o, c, api) {
       const podM = await podstawaDla(api, o, "M");
@@ -503,7 +522,7 @@ export const SPRAWY: Sprawa[] = [
       const mPraca = miesiecznie(okPraca);
       const etatTxt = o.etat === "0.5" ? "pół etatu" : o.etat === "0.4" ? "dwie piąte etatu" : "jedną czwartą etatu";
       return {
-        glowne: `Przy pracy na ${etatTxt} (${tygodnie(T)} z Twojej puli przed wydłużeniem) urlop potrwa do ${dataPL(kZ)} (zamiast do ${dataPL(kPo)}). ${Math.round(Math.abs(roz) * 100) === 0 ? "Łączna kwota zasiłku wychodzi tak samo, tylko rozłożona na dłuższy czas." : roz > 0 ? `Zasiłek łącznie będzie niższy o ${pln(roz)}.` : `Zasiłek łącznie będzie wyższy o ${pln(-roz)}.`}`,
+        glowne: `Przy pracy na ${etatTxt} (${tygodnie(T)} z Twojej puli przed wydłużeniem) urlop potrwa do ${dataPL(kZ)} (zamiast do ${dataPL(kPo)}). ${Math.round(Math.abs(roz) * 100) === 0 ? "Łączna kwota zasiłku wychodzi tak samo, tylko rozłożona na dłuższy czas." : roz > 0 ? `Zasiłek łącznie będzie niższy o ${pln(roz)} (w zamian otrzymujesz normalne wynagrodzenie za pracę).` : `Zasiłek łącznie będzie wyższy o ${pln(-roz)}.`}`,
         ...(mPraca > 0 ? { podpis: `W czasie pracy zasiłek miesięczny to ok. ${pln(mPraca)} (bez pracy: ok. ${pln(mBez)}).` } : {}),
         tabela: { kolumny: ["", "Bez pracy", "Z pracą"], wiersze: [["Zasiłek łącznie", pln(rBez.sumy.razem), pln(rZ.sumy.razem)], ["Urlop kończy się", dataPL(kPo), dataPL(kZ)]], uwaga: "Pensję za pracę dostajesz od pracodawcy – nie jest wliczona w powyższe kwoty." },
         ostrzezenia: [...new Set([...(rZ.ostrzezenia as string[]), ...(rZ.bledy as string[])])],
@@ -519,14 +538,14 @@ export const SPRAWY: Sprawa[] = [
     id: "adopcja", tytul: "Adopcja lub rodzina zastępcza", krotko: "Urlop na warunkach macierzyńskiego, zasiłek i terminy po przyjęciu dziecka", ikona: "🧸", czas: "5 pytań · 3 min",
     slowa: "adopcja przysposobienie rodzina zastępcza przyjęcie dziecka na wychowanie urlop zasiłek sąd opiekuńczy", faq: ["F23", "F18"],
     pytania: [
-      { id: "rodzajAdopcji", typ: "wybor", tekst: "Co się u Was dzieje?", opcje: [{ v: "przysposobienie", label: "Adoptujemy dziecko", opis: "Dziecko u nas jest, wniosek w sądzie złożony" }, { v: "rodzina_zastepcza", label: "Zostajemy rodziną zastępczą", opis: "Niezawodową" }], domyslne: (c) => c.rodzajPrzyjecia, etykietaDanych: "Rodzaj sprawy", poCo: "Od tego zależy limit wieku dziecka.", skad: "Z postanowienia sądu albo umowy ze starostą." },
-      { id: "dataPorodu", typ: "data", tekst: "Kiedy dziecko trafiło do Waszej rodziny?", domyslne: (c) => c.dataPrzyjecia, zalezyOd: ["rodzajAdopcji"], etykietaDanych: "Data przyjęcia dziecka", poCo: "Od tej daty liczymy urlop i terminy.", skad: "Z dokumentu o przyjęciu dziecka na wychowanie." },
-      { id: "dataUr", typ: "data", tekst: "Kiedy urodziło się najmłodsze przyjęte dziecko?", poCo: "Wiek dziecka może skrócić urlop.", skad: "Akt urodzenia dziecka.",
+      { id: "rodzajAdopcji", typ: "wybor", tekst: "Jaka jest forma przyjęcia dziecka do rodziny?", opcje: [{ v: "przysposobienie", label: "Przysposobienie (adopcja)", opis: "Dziecko zostało przyjęte, złożono wniosek o przysposobienie do sądu" }, { v: "rodzina_zastepcza", label: "Rodzina zastępcza", opis: "Przyjęcie dziecka w ramach niezawodowej rodziny zastępczej" }], domyslne: (c) => c.rodzajPrzyjecia, etykietaDanych: "Forma przyjęcia dziecka", poCo: "Od formy prawnej przyjęcia dziecka zależy maksymalny limit wieku dziecka uprawniający do urlopu.", skad: "Z postanowienia sądu opiekuńczego albo umowy ze starostą." },
+      { id: "dataPorodu", typ: "data", tekst: "Kiedy dziecko zostało przyjęte do Waszej rodziny?", domyslne: (c) => c.dataPrzyjecia, zalezyOd: ["rodzajAdopcji"], etykietaDanych: "Data przyjęcia dziecka", poCo: "Od tej daty liczymy wymiar urlopu i terminy wniosków.", skad: "Z dokumentu o przyjęciu dziecka na wychowanie." },
+      { id: "dataUr", typ: "data", tekst: "Kiedy urodziło się najmłodsze przyjęte dziecko?", poCo: "Wiek dziecka wpływa na uprawnienia do urlopu (zgodnie z przepisami Kodeksu pracy).", skad: "Akt urodzenia dziecka.",
         sprawdz: (v, o) => v > o.dataPorodu ? "Data urodzenia nie może być po przyjęciu dziecka." : undefined },
       { id: "odroczenie", typ: "tak_nie", tekst: "Czy dziecku odroczono obowiązek szkolny?", warunek: (o) => o.rodzajAdopcji === "rodzina_zastepcza",
-        poCo: "Decyzja o odroczeniu zmienia limit wieku dziecka." },
+        poCo: "W rodzinie zastępczej decyzja o odroczeniu obowiązku szkolnego wydłuża limit wieku dziecka z 7 do 10 lat." },
       { ...pDzieci, tekst: "Ile dzieci przyjęliście jednocześnie?", domyslne: (c) => c.liczbaPrzyjetychDzieci ? String(Math.min(c.liczbaPrzyjetychDzieci, 5)) : undefined,
-        opcje: DZIECI.map((x) => x.v === "2" ? { ...x, label: "Dwoje" } : x), poCo: "Od liczby dzieci zależy wymiar urlopu." },
+        opcje: DZIECI.map((x) => x.v === "2" ? { ...x, label: "Dwoje" } : x), poCo: "Od liczby dzieci przyjętych w tym samym czasie zależy wymiar urlopu." },
       ...[pZatrudnienie, pPelnyEtat("M"), pPodstawaZUS("M"), pBrutto("M")].map((q) => ({
         ...q, warunek: (o: Odp, c: Ctx) => (!o.dataUr || o.dataPorodu < dataLimituAdopcja(o)) && (q.warunek?.(o, c) ?? true),
       })),
@@ -535,10 +554,10 @@ export const SPRAWY: Sprawa[] = [
       const lat = limitWiekuAdopcja(o);
       const granica = dataLimituAdopcja(o);
       if (o.dataPorodu >= granica) return {
-        glowne: "W dniu przyjęcia dziecko osiągnęło już limit wieku dla tej ścieżki.",
-        status: "do_potwierdzenia", uwagaStatus: "Sprawdź z ZUS, co przysługuje w tej sytuacji.",
+        glowne: "W dniu przyjęcia dziecko osiągnęło już limit wieku uprawniający do tego urlopu.",
+        status: "do_potwierdzenia", uwagaStatus: "Skonsultuj się z doradcą ZUS, aby sprawdzić uprawnienia w tej sytuacji.",
         szczegoly: [["Data osiągnięcia limitu wieku", dataPL(granica)]],
-        zrob: [{ tekst: "Zapytaj o uprawnienia po przyjęciu dziecka." }], linki: [{ href: "/pue", etykieta: "Zadaj pytanie w ZUS" }],
+        zrob: [{ tekst: "Zapytaj w placówce ZUS o uprawnienia po przyjęciu dziecka." }], linki: [{ href: "/pue", etykieta: "Zadaj pytanie w ZUS (PUE / eZUS)" }],
       };
       const podM = await podstawaDla(api, o, "M");
       const { baza, matkaMax, mac: macTyg } = await bazaPlanu(api, o, podM, { tytul: o.rodzajAdopcji, wiekGranicyDzieckaData: granica });
@@ -554,7 +573,7 @@ export const SPRAWY: Sprawa[] = [
       const f = pyt("F23");
       const mac = wyn.okresy.find((x: any) => x.rodzaj === "na_warunkach_macierzynskiego" || x.rodzaj === "macierzynski");
       return {
-        glowne: `Szacowany zasiłek za urlop na warunkach macierzyńskiego${rodzicielskiTyg > 0 ? " i rodzicielski" : ""}: ${pln(wyn.sumy.razem)}.`, duza: pln(wyn.sumy.razem), podpis: mac ? `Pierwszy okres: ok. ${pln(miesiecznie(mac))} miesięcznie` : undefined,
+        glowne: `Szacowany zasiłek za urlop na warunkach urlopu macierzyńskiego${rodzicielskiTyg > 0 ? " i rodzicielski" : ""}: ${pln(wyn.sumy.razem)}.`, duza: pln(wyn.sumy.razem), podpis: mac ? `Pierwszy okres: ok. ${pln(miesiecznie(mac))} miesięcznie` : undefined,
         szczegoly: [["Limit wieku dziecka", `do ${dataPL(granica)} (${lat} lat)`], ["Podstawa zasiłku", `${pln(podM)} miesięcznie`]],
         ostrzezenia: [...wyn.bledy, ...wyn.ostrzezenia], terminy: terminyDlaRodzica(t),
         zrob: [...kroki("F23").map((x) => ({ tekst: x })), ...terminyDlaRodzica(t).slice(0, 2).map((x) => ({ kiedy: `do ${dataPL(x.do)}`, tekst: x.co }))],
@@ -568,14 +587,14 @@ export const SPRAWY: Sprawa[] = [
     id: "trudna-sytuacja", tytul: "Trudna sytuacja: strata, wcześniak, śmierć matki", krotko: "Co przysługuje i gdzie szukać pomocy. Bez pośpiechu", ikona: "🕊️", czas: "1 pytanie · 1 min",
     slowa: "strata martwe urodzenie poronienie zgon śmierć dziecka wcześniak szpital żałoba trudna sytuacja choroba matka zmarła wsparcie psycholog", faq: ["F24", "F15", "F25", "F26"],
     pytania: [
-      { id: "sytuacja", typ: "wybor", tekst: "Co się stało? Wybierz to, co najbliższe.", opcje: [{ v: "martwe", label: "Dziecko urodziło się martwe lub zmarło" }, { v: "wczesniak", label: "Dziecko urodziło się za wcześnie albo jest w szpitalu" }, { v: "zgon", label: "Mama dziecka zmarła lub nie może się nim zająć" }, { v: "wsparcie", label: "Potrzebuję z kimś porozmawiać" }], poCo: "Dobierzemy informacje do Twojej sytuacji. Nie musisz niczego załatwiać od razu." },
+      { id: "sytuacja", typ: "wybor", tekst: "Wybierz sytuację, w której potrzebujesz wsparcia i informacji:", opcje: [{ v: "martwe", label: "Dziecko urodziło się martwe lub doszło do poronienia" }, { v: "wczesniak", label: "Dziecko urodziło się przedwcześnie lub przebywa w szpitalu" }, { v: "zgon", label: "Mama dziecka zmarła lub nie może się nim zająć" }, { v: "wsparcie", label: "Potrzebuję rozmowy lub wsparcia psychologicznego" }], poCo: "Dobierzemy najważniejsze informacje prawne i kontakty. Nie musisz niczego załatwiać od razu – najważniejszy jest spokój." },
     ],
     async licz(o) {
       const mapa: Record<string, string> = { martwe: "F24", wczesniak: "F15", zgon: "F25", wsparcie: "F26" };
       const f = pyt(mapa[o.sytuacja]);
       const org = WSPARCIE.filter((w) => o.sytuacja === "wsparcie" || w.dla.includes(o.sytuacja === "zgon" ? "zgon" : o.sytuacja));
       return {
-        lagodny: true, glowne: "Bardzo nam przykro. Nie musisz niczego załatwiać dziś – poniżej zebraliśmy to, co ważne, i miejsca, gdzie można znaleźć wsparcie.",
+        lagodny: true, glowne: "Bardzo nam przykro z powodu Twojej straty i trudnej sytuacji. Nie musisz załatwiać formalności natychmiast – poniżej zebraliśmy najważniejsze informacje prawne oraz kontakty do bezpłatnego wsparcia.",
         info: [...(f ? [{ tytul: o.sytuacja === "wsparcie" ? "Gdzie szukać wsparcia" : "Co Ci przysługuje", tresc: f.odpowiedz }] : []), ...(org.length ? [{ tytul: "Organizacje, które mogą pomóc", tresc: org.map((x) => `• ${x.nazwa}: ${x.opis}`).join("\n") + `\n\n${WSPARCIE_UWAGA}` }] : [])],
         zrob: f ? kroki(f.id).map((t) => ({ tekst: t })) : [],
         druki: f?.druki, status: f?.status, linki: o.sytuacja === "wsparcie" ? undefined : [{ href: "/trudne", etykieta: "Sprawdź świadczenia w trudnej sytuacji" }],
@@ -588,14 +607,14 @@ export const SPRAWY: Sprawa[] = [
     id: "terminy", tytul: "Sprawdzić terminy, których nie mogę przegapić", krotko: "Lista dat: do kiedy złożyć które wnioski", ikona: "⏰", czas: "2 pytania · 1 min",
     slowa: "termin kiedy do kiedy nie przegapić 21 dni przedawnienie ryzyko stracić wniosek data", faq: ["F19", "F09"],
     pytania: [
-      { id: "rodzajZdarzenia", typ: "wybor", tekst: "Czego dotyczy Twoja sytuacja?", opcje: [{ v: "porod", label: "Poród (urodzenie dziecka)" }, { v: "przysposobienie", label: "Adopcja" }, { v: "rodzina_zastepcza", label: "Rodzina zastępcza" }], poCo: "Dla każdej sytuacji obowiązują inne terminy." },
+      { id: "rodzajZdarzenia", typ: "wybor", tekst: "Czego dotyczą terminy, które chcesz sprawdzić?", opcje: [{ v: "porod", label: "Narodziny dziecka (poród)" }, { v: "przysposobienie", label: "Adopcja (przysposobienie)" }, { v: "rodzina_zastepcza", label: "Rodzina zastępcza" }], poCo: "Dla każdej sytuacji obowiązują inne terminy składania wniosków." },
       { ...pDataPorodu, warunek: (o) => o.rodzajZdarzenia === "porod" },
-      { id: "dataPrzyjecia", typ: "data", tekst: "Kiedy przyjęliście dziecko do rodziny?",
+      { id: "dataPrzyjecia", typ: "data", tekst: "Kiedy dziecko zostało przyjęte do rodziny?",
         domyslne: (c) => c.dataPrzyjecia, warunek: (o) => o.rodzajZdarzenia === "przysposobienie" || o.rodzajZdarzenia === "rodzina_zastepcza",
-        etykietaDanych: "Data przyjęcia dziecka", poCo: "Od tej daty liczymy terminy.", skad: "Dokument o przyjęciu dziecka na wychowanie." },
-      { id: "znaKoniec", typ: "tak_nie", tekst: "Czy znasz ostatni dzień okresu, za który chcesz dostać zasiłek?", poCo: "Od tego dnia liczymy termin przedawnienia roszczenia." },
+        etykietaDanych: "Data przyjęcia dziecka", poCo: "Od tej daty liczymy ustawowe terminy.", skad: "Z dokumentu o przyjęciu dziecka na wychowanie." },
+      { id: "znaKoniec", typ: "tak_nie", tekst: "Czy znasz ostatni dzień okresu, za który chcesz dostać zasiłek?", poCo: "Od tego dnia liczymy 6-miesięczny termin na przedawnienie roszczenia o wypłatę zasiłku." },
       { id: "koniec", typ: "data", tekst: "Jaki jest ostatni dzień tego okresu?", warunek: (o) => o.znaKoniec === "tak",
-        poCo: "Podaj ostatni dzień okresu, którego dotyczy Twój wniosek." },
+        poCo: "Podaj ostatni dzień okresu zasiłkowego, którego dotyczy Twój wniosek." },
     ],
     async licz(o, c, api) {
       const t = await api("/api/oblicz/terminy", { tytul: o.rodzajZdarzenia, dataZdarzenia: o.dataPorodu ?? o.dataPrzyjecia,
@@ -606,8 +625,8 @@ export const SPRAWY: Sprawa[] = [
       const bliski = wszystkie.find((x) => x.do >= dzis());
       return {
         glowne: bliski ? `Najbliższy termin: ${bliski.co} – do ${dataPL(bliski.do)} (${zaIle(bliski.do)}).` : "Wszystkie główne terminy dla tej daty już minęły. Złóż wnioski jak najszybciej.",
-        terminy: wszystkie, zrob: [{ tekst: "Wpisz najważniejsze daty do kalendarza w telefonie." }, { tekst: "W razie wątpliwości zapytaj ZUS (symulacja PUE → Zadaj pytanie)." }],
-        linki: [{ href: "/pue", etykieta: "Zadaj pytanie w ZUS" }], status: "ok", nastepne: o.rodzajZdarzenia === "porod" ? ["wniosek-zasilek", "urlop-pracodawca"] : ["adopcja"],
+        terminy: wszystkie, zrob: [{ tekst: "Wpisz najważniejsze daty do kalendarza w telefonie." }, { tekst: "W razie wątpliwości zapytaj konsultanta ZUS przez konto PUE / eZUS." }],
+        linki: [{ href: "/pue", etykieta: "Zadaj pytanie w ZUS (PUE / eZUS)" }], status: "ok", nastepne: o.rodzajZdarzenia === "porod" ? ["wniosek-zasilek", "urlop-pracodawca"] : ["adopcja"],
         ostrzezenia: ["Terminy wniosków o urlop rodzicielski i ojcowski zależą od wybranej daty startu – poznasz je w sprawach „Podzielić urlop” i „Poprosić pracodawcę o urlop”."],
       };
     },
@@ -615,11 +634,17 @@ export const SPRAWY: Sprawa[] = [
 
   /* ---- 10. Odpis aktu urodzenia ---- */
   {
-    id: "odpis-aktu", tytul: "Zdobyć odpis aktu urodzenia", krotko: "Gdzie i jak, i czy w ogóle jest potrzebny", ikona: "🪪", czas: "bez pytań · 1 min",
+    id: "odpis-aktu", tytul: "Zdobyć odpis aktu urodzenia", krotko: "Gdzie i jak załatwić odpis, i kiedy ZUS pobiera dane sam", ikona: "🪪", czas: "bez pytań · 1 min",
     slowa: "odpis akt urodzenia usc urząd stanu cywilnego dokument dziecka", faq: ["F27"], pytania: [],
     async licz() {
       const f = pyt("F27");
-      return { glowne: "Odpis aktu urodzenia dostaniesz w urzędzie stanu cywilnego.", info: f ? [{ tytul: "Co warto wiedzieć", tresc: f.odpowiedz }] : [], zrob: kroki("F27").map((t) => ({ tekst: t })), linki: [{ href: "/odpis", etykieta: "Złóż wniosek o odpis (symulacja)" }], status: f?.status };
+      return {
+        glowne: "Odpis aktu urodzenia dziecka wydaje Urząd Stanu Cywilnego (USC). Do celów zasiłku w ZUS najczęściej nie musisz go pobierać – ZUS pozyskuje dane dziecka z państwowego rejestru PESEL.",
+        info: f ? [{ tytul: "Co warto wiedzieć", tresc: f.odpowiedz }] : [],
+        zrob: kroki("F27").map((t) => ({ tekst: t })),
+        linki: [{ href: "/odpis", etykieta: "Złóż wniosek o odpis aktu urodzenia przez internet (symulacja gov.pl / USC)" }],
+        status: f?.status,
+      };
     },
   },
 ];

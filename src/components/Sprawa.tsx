@@ -116,22 +116,22 @@ function KrokiSprawy({ s, c }: { s: Sprawa; c: Ctx }) {
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
-      <p className="small no-print"><Link href="/sprawy">← Wszystkie sprawy</Link></p>
+      <p className="small no-print"><Link href="/sprawy">← Wróć do listy spraw</Link></p>
       <h1>{s.tytul}</h1>
-      <div className="prog" role="progressbar" aria-valuenow={postep} aria-valuemin={0} aria-valuemax={100} aria-label="Postęp"><i style={{ width: `${postep}%` }} /></div>
+      <div className="prog" role="progressbar" aria-valuenow={postep} aria-valuemin={0} aria-valuemax={100} aria-label="Postęp wypełniania sprawy"><i style={{ width: `${postep}%` }} /></div>
 
       {faza === "dane" && (
         <div className="card">
-          <span className="lab">Krok 1 · sprawdź swoje dane</span>
-          <p className="muted small mt">Pobraliśmy je z ZUS (symulacja dla {c.osoba}). Jeśli coś się nie zgadza – popraw.</p>
+          <span className="lab">Krok 1 · Sprawdź swoje dane</span>
+          <p className="muted small mt">Dane pobrane z ZUS (profil testowy: {c.osoba}). Sprawdź, czy wszystko się zgadza. Jeśli zauważysz błąd, możesz go teraz poprawić.</p>
           <dl className="kv" style={kolumnyDanych}>{wstepne.map((x) => <div key={x.id} style={{ display: "contents" }}><dt>{x.etykietaDanych ?? tekstPytania(x, odp)}</dt><dd>{etykietaOdp(x, odp[x.id])}</dd></div>)}</dl>
-          <div className="row mt"><button className="btn btn-primary" onClick={() => rozpocznij(Object.fromEntries(wstepne.map((x) => [x.id, odp[x.id]])))}>Wszystko się zgadza</button><button className="btn btn-secondary" onClick={() => rozpocznij({})}>Coś trzeba poprawić</button></div>
+          <div className="row mt"><button className="btn btn-primary" onClick={() => rozpocznij(Object.fromEntries(wstepne.map((x) => [x.id, odp[x.id]])))}>Potwierdzam dane</button><button className="btn btn-secondary" onClick={() => rozpocznij({})}>Chcę poprawić dane</button></div>
         </div>
       )}
 
       {faza === "pytania" && q && (
         <div className="card" key={q.id}>
-          <span className="lab">Pytanie {i + 1} z {pytania.length}</span>
+          <span className="lab">Pytanie {i + 1}</span>
           <h2 className="mt" id="pyt">{tekstPytania(q, odp)}</h2>
           {q.typ === "wybor" && <div role="group" aria-labelledby="pyt">{q.opcje!.map((op) => <button key={op.v} className={"opt" + (odp[q.id] === op.v ? " sel" : "")} onClick={() => odpowiedz(op.v)}><b>{op.label}</b>{op.opis && <span className="muted small" style={{ display: "block" }}>{op.opis}</span>}</button>)}</div>}
           {q.typ === "tak_nie" && <div className="row" role="group" aria-labelledby="pyt"><button className={"opt" + (odp[q.id] === "tak" ? " sel" : "")} style={{ flex: 1 }} onClick={() => odpowiedz("tak")}><b>Tak</b></button><button className={"opt" + (odp[q.id] === "nie" ? " sel" : "")} style={{ flex: 1 }} onClick={() => odpowiedz("nie")}><b>Nie</b></button></div>}
@@ -145,20 +145,30 @@ function KrokiSprawy({ s, c }: { s: Sprawa; c: Ctx }) {
                 {q.jednostka && <span className="muted">{q.jednostka}</span>}
               </div>
               {bladPola && <p id="blad-pola" role="alert" className="alert err">{bladPola}</p>}
-              <div className="row mt"><button className="btn btn-primary">Zapisz odpowiedź</button></div>
+              <div className="row mt">
+                <button className="btn btn-primary">
+                  {i === pytania.length - 1
+                    ? "Policz i sprawdź wynik"
+                    : q.typ === "data"
+                    ? "Zatwierdź datę"
+                    : q.typ === "liczba"
+                    ? "Zapisz kwotę"
+                    : "Zapisz i przejdź dalej"}
+                </button>
+              </div>
             </form>
           )}
           <details className="dl mt"><summary>Po co o to pytamy?</summary><p className="small">{q.poCo}</p></details>
           {q.skad && <details className="dl"><summary>Skąd to wziąć?</summary><p className="small">{q.skad}</p></details>}
-          <div className="row mt no-print">{(historia.length > 1 || wstepne.length > 0) && <button className="btn btn-ghost btn-sm" onClick={wstecz}>← Wstecz</button>}</div>
+          <div className="row mt no-print">{(historia.length > 1 || wstepne.length > 0) && <button className="btn btn-ghost btn-sm" onClick={wstecz}>← Poprzednie pytanie</button>}</div>
         </div>
       )}
 
       {faza === "wynik" && (
         <div aria-live="polite">
-          {busy && <p><Spin /> Liczę…</p>}
+          {busy && <p><Spin /> Przeliczam Twoje dane…</p>}
           {blad && <><Alert t="err">{blad}</Alert><button className="btn btn-secondary" onClick={s.pytania.length ? wstecz : () => uruchom({})}>{s.pytania.length ? "Wróć i popraw odpowiedzi" : "Wczytaj sprawę ponownie"}</button></>}
-          {wynik && <><WynikWidok w={wynik} bezPytan={!s.pytania.length} />{s.pytania.length > 0 && <div className="row mt no-print"><button className="btn btn-ghost" onClick={wstecz}>← Wstecz</button><button className="btn btn-ghost" onClick={() => rozpocznij({})}>Zmień odpowiedzi</button><Link href="/" className="btn btn-ghost">Wróć na start</Link></div>}</>}
+          {wynik && <><WynikWidok w={wynik} bezPytan={!s.pytania.length} />{s.pytania.length > 0 && <div className="row mt no-print"><button className="btn btn-ghost" onClick={wstecz}>← Poprzednie pytanie</button><button className="btn btn-ghost" onClick={() => rozpocznij({})}>Zmień odpowiedzi</button><Link href="/" className="btn btn-ghost">Wróć na stronę główną</Link></div>}</>}
         </div>
       )}
     </div>
@@ -185,8 +195,21 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
   return (
     <>
       <div className={"card " + (w.lagodny ? "navy" : "accent")}>
-        {w.status === "do_potwierdzenia" && <Alert t="warn"><b>Sprawdź w ZUS.</b> {w.uwagaStatus ?? "Źródła są w tym miejscu niepewne lub niespójne."}</Alert>}
-        {w.status === "luka" && <Alert t="warn"><b>Brak rozstrzygnięcia.</b> {w.uwagaStatus} <Link href="/pue">Zadaj pytanie w ZUS</Link></Alert>}
+        {w.status === "do_potwierdzenia" && (
+          <Alert t="warn">
+            <b>Warto potwierdzić w ZUS.</b>{" "}
+            {w.uwagaStatus
+              ? w.uwagaStatus.replace(/^Sprawdź w ZUS[\.\s–-]*/i, "")
+              : "W tej sytuacji przepisy wymagają indywidualnej oceny przez pracownika ZUS."}
+          </Alert>
+        )}
+        {w.status === "luka" && (
+          <Alert t="warn">
+            <b>Nietypowa sytuacja.</b>{" "}
+            {w.uwagaStatus ?? "W oficjalnych wytycznych brakuje prostej reguły dla tego przypadku."}{" "}
+            <Link href="/pue">Napisz do konsultanta ZUS przez PUE / eZUS</Link>
+          </Alert>
+        )}
         <h2 style={{ marginTop: 0 }}>{w.glowne}</h2>
         {w.duza && <div className="big">{w.duza}</div>}
         {w.podpis && <p className="muted">{w.podpis}</p>}
@@ -199,36 +222,36 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
       {w.info?.map((x) => <div key={x.tytul} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{x.tresc}</p></div>)}
 
       {w.zrob.length > 0 && (
-        <div className="card mt"><h2>Co teraz zrobić</h2>
+        <div className="card mt"><h2>Co teraz zrobić krok po kroku</h2>
           <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{z.tekst}{z.uwaga && <div className="small muted">{z.uwaga}</div>}</li>)}</ol>
-          {w.terminy && w.terminy.length > 0 && <><h3 className="mt">Terminy</h3><ul className="clean warnlist">{w.terminy.map((t, i) => <li key={i}><b>{dataPL(t.do)}</b> ({zaIle(t.do)}): {t.co}</li>)}</ul></>}
+          {w.terminy && w.terminy.length > 0 && <><h3 className="mt">Ważne terminy</h3><ul className="clean warnlist">{w.terminy.map((t, i) => <li key={i}><b>{dataPL(t.do)}</b> ({zaIle(t.do)}): {t.co}</li>)}</ul></>}
         </div>
       )}
 
       {w.sciaga && (
-        <div className="card mt"><h2>{w.sciaga.tytul}</h2><p className="small muted" style={{ marginTop: 0 }}>Otwórz druk obok i przepisz z tej tabeli.</p>
+        <div className="card mt"><h2>{w.sciaga.tytul}</h2><p className="small muted" style={{ marginTop: 0 }}>Pobierz formularz ZUS lub otwórz go w PUE / eZUS i przepisz poniższe dane do odpowiednich rubryk:</p>
           <div className="tbl-wrap"><table className="tbl"><thead><tr><th>Pole na druku</th><th>Wpisz</th><th>Skąd to wziąć</th></tr></thead><tbody>{w.sciaga.wiersze.map(([a, b, c], i) => <tr key={i}><td>{a}</td><td><b>{b}</b></td><td className="muted">{c}</td></tr>)}</tbody></table></div>
           {w.sciaga.uwaga && <p className="small muted mt">{w.sciaga.uwaga}</p>}
-          <div className="row mt no-print"><button className="btn btn-secondary btn-sm" onClick={() => kopiuj("sciaga", w.sciaga!.wiersze.map((r) => r.slice(0, 2).join(": ")).join("\n"))}>{skop === "sciaga" ? "Skopiowano ✓" : "Kopiuj"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Drukuj</button></div></div>
+          <div className="row mt no-print"><button className="btn btn-secondary btn-sm" onClick={() => kopiuj("sciaga", w.sciaga!.wiersze.map((r) => r.slice(0, 2).join(": ")).join("\n"))}>{skop === "sciaga" ? "Skopiowano do schowka ✓" : "Skopiuj dane do wniosku"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Wydrukuj ściągę</button></div></div>
       )}
 
       {w.tekstDoKopii && (
         <div className="card mt"><h2>{w.tekstDoKopii.tytul}</h2><pre className="wniosek" style={{ overflowWrap: "anywhere" }}>{w.tekstDoKopii.tresc}</pre>
-          <div className="row no-print"><button className="btn btn-primary btn-sm" onClick={() => kopiuj("tekst", w.tekstDoKopii!.tresc)}>{skop === "tekst" ? "Skopiowano ✓" : "Kopiuj tekst"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Drukuj</button></div></div>
+          <div className="row no-print"><button className="btn btn-primary btn-sm" onClick={() => kopiuj("tekst", w.tekstDoKopii!.tresc)}>{skop === "tekst" ? "Skopiowano do schowka ✓" : "Skopiuj tekst wniosku"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Wydrukuj wniosek</button></div></div>
       )}
 
-      {bladKopii && <p role="alert">Kopiowanie się nie udało. Zaznacz tekst i skopiuj go ręcznie.</p>}
+      {bladKopii && <p role="alert" className="alert err">Kopiowanie do schowka się nie udało. Zaznacz tekst myszką i skopiuj go ręcznie.</p>}
 
       {(druki.length > 0 || (w.linki && w.linki.length > 0)) && (
-        <div className="row mt no-print">{druki.map((d) => DRUKI.find((x) => x.id === d) && <Link key={d} className="btn btn-secondary" href={`/druki#${d}`}>Druk {d}: jak wypełnić</Link>)}{w.linki?.map((l) => <Link key={l.href} className="btn btn-ghost" href={l.href}>{l.etykieta}</Link>)}</div>
+        <div className="row mt no-print">{druki.map((d) => DRUKI.find((x) => x.id === d) && <Link key={d} className="btn btn-secondary" href={`/druki#${d}`}>Formularz {d}: instrukcja wypełnienia</Link>)}{w.linki?.map((l) => <Link key={l.href} className="btn btn-ghost" href={l.href}>{l.etykieta}</Link>)}</div>
       )}
 
       {w.jakLiczono && <Kroki kroki={w.jakLiczono} tytul="Jak to policzyliśmy?" />}
 
-      {powiazane.length > 0 && <div className="card mt no-print"><h3>Co dalej?</h3><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className="ic">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
+      {powiazane.length > 0 && <div className="card mt no-print"><h3>Przydatne kolejne kroki</h3><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className="ic">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
 
-      {bezPytan && <div className="row mt no-print"><Link href="/sprawy" className="btn btn-ghost">← Wróć do spraw</Link></div>}
-      <p className="small muted mt">Wyliczenia są orientacyjne i nie stanowią decyzji ZUS. Dane w prototypie są fikcyjne.</p>
+      {bezPytan && <div className="row mt no-print"><Link href="/sprawy" className="btn btn-ghost">← Wróć do listy spraw</Link></div>}
+      <p className="small muted mt">Wyliczenia mają charakter pomocniczy i opierają się na aktualnych przepisach. W wersji testowej dane mają charakter przykładowy.</p>
     </>
   );
 }
