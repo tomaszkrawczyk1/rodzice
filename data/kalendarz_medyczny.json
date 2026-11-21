@@ -1,0 +1,705 @@
+{
+  "_opis": "Baza kalendarza ciąży i połogu (Moduł medyczny, etap 1) — to z niej strona wyświetla cały kalendarz na podstawie terminu porodu i zaznaczonych pól. Silnik silnik/kalendarz.ts nie ma żadnych wartości medycznych w kodzie. Teksty pisane prostym językiem (dla rodzica, nie dla lekarza). Pominięto informacje o lekach.",
+  "_uwaga_skutek": "Pole 'skutek' (co się stanie, jeśli tego nie zrobisz) napisał autor silnika na podstawie ogólnej wiedzy, a NIE z materiałów zespołu. Do weryfikacji przed publikacją.",
+  "_schemat": {
+    "id": "unikalny, np. WIZ-01",
+    "nazwa": "prosty język",
+    "kiedy": "termin prostym językiem",
+    "grupa": "przed_porodem | po_porodzie",
+    "kategoria": "wizyta | usg | badanie_krwi | test_glukozy | wymaz | szkola_rodzenia | wizyta_patronazowa | badanie_poporodowe | bilans | szczepienie | badanie_prenatalne",
+    "trymestr": "1 | 2 | 3 | polog | niemowle (polog i niemowle tylko dla po_porodzie)",
+    "dla": "matka | dziecko (opcjonalnie)",
+    "typ": "standard (domyślnie) | warunkowe — pokazuje się tylko, gdy zaznaczono któryś z 'warunki'",
+    "warunki": "lista id z sekcji 'warunki' (pola do zaznaczenia przez użytkownika)",
+    "okno": "{ typ:'tc', od:'11+0', do:'14+6'|'porod', najpozniej? } albo { typ:'po_porodzie', jednostka:'dni|tygodnie|miesiace', od, do:liczba|'wypis', kotwica?:'porod'|'wypis', bezOstatniegoDnia? }",
+    "czestotliwosc": "dla wizyt cyklicznych",
+    "opis": "po co to jest — 1–2 zdania",
+    "skutek": "co będzie, jeśli pominiesz — 1 zdanie",
+    "pozycje": "szczegóły (rozwijane na stronie)",
+    "uwagi": "dodatki (rozwijane na stronie)",
+    "zrodlo": "wymagane",
+    "status": "ok | do_potwierdzenia"
+  },
+  "_konwencje_okien": "Zapis 'N+D' = N pełnych tygodni i D dni ciąży. Zakres 'N–M tydzień' = N+0 do M+6. Termin 'do N. tygodnia' liczony ostrożnie jako N+0. Po porodzie: 'N.–M. tydzień/miesiąc życia' = od N do końca M-tego tygodnia/miesiąca. 'Ok. 6 tygodni po porodzie' = dokładnie 6 tygodni po porodzie.",
+  "wersja": "2026-11-21-v5-strona",
+
+  "zalozenia": {
+    "pobyt_w_szpitalu_dni": 3,
+    "_uwaga": "ZAŁOŻENIE AUTORA SILNIKA, nie z danych zespołu — do potwierdzenia. Używane tylko do wyliczenia dnia wypisu (wizyta położnej, badania w szpitalu), gdy użytkownik nie poda daty wypisu."
+  },
+
+  "trymestry": [
+    { "id": 1, "nazwa": "I trymestr", "opis": "tygodnie 1–13 (miesiące 1–3)" },
+    { "id": 2, "nazwa": "II trymestr", "opis": "tygodnie 14–27 (miesiące 4–6)" },
+    { "id": 3, "nazwa": "III trymestr", "opis": "od 28. tygodnia do porodu (miesiące 7–9)" },
+    { "id": "polog", "nazwa": "Po porodzie: mama i noworodek", "opis": "pierwsze tygodnie po porodzie" },
+    { "id": "niemowle", "nazwa": "Pierwszy rok życia dziecka", "opis": "badania kontrolne i szczepienia" }
+  ],
+
+  "warunki": [
+    { "id": "cukrzyca_przed", "etykieta": "Mam cukrzycę rozpoznaną jeszcze przed ciążą" },
+    { "id": "ryzyko_cukrzycy", "etykieta": "Jestem w grupie ryzyka cukrzycy ciążowej", "pomoc": "Np. masz ponad 35 lat, dużą nadwagę (BMI powyżej 30), była u Ciebie cukrzyca ciążowa w poprzedniej ciąży albo cukrzycę ma ktoś z rodziców lub rodzeństwa." },
+    { "id": "cukier_podwyzszony", "etykieta": "Cukier na czczo wyszedł mi podwyższony (92–125 mg/dl)" },
+    { "id": "cukrzyca_ciazowa", "etykieta": "Lekarz rozpoznał u mnie cukrzycę ciążową" },
+    { "id": "nadcisnienie", "etykieta": "Mam nadciśnienie (przed ciążą albo wywołane ciążą)" },
+    { "id": "autoimmun", "etykieta": "Mam chorobę autoimmunologiczną", "pomoc": "Np. toczeń albo zespół antyfosfolipidowy." },
+    { "id": "zum", "etykieta": "Mam nawracające zakażenia dróg moczowych" },
+    { "id": "swiad", "etykieta": "Mam silny, uporczywy świąd skóry", "pomoc": "Zgłoś się do lekarza od razu — to wymaga szybkich badań krwi." },
+    { "id": "ciaza_mnoga", "etykieta": "Spodziewam się więcej niż jednego dziecka", "pomoc": "Np. bliźniąt." },
+    { "id": "toxo_ujemna", "etykieta": "Wynik na toksoplazmozę w I trymestrze był ujemny", "pomoc": "Czyli nie masz przeciwciał i możesz się zarazić po raz pierwszy w ciąży." },
+    { "id": "rh_ujemne", "etykieta": "Mam grupę krwi Rh ujemną (Rh−) i nie mam jeszcze przeciwciał" },
+    { "id": "polozna", "etykieta": "Ciążę prowadzi położna, a nie lekarz" },
+    { "id": "wczesne_usg", "etykieta": "Lekarz zlecił mi wczesne USG (przed 10. tygodniem)" }
+  ],
+
+  "wydarzenia": [
+    {
+      "id": "WIZ-01",
+      "nazwa": "Pierwsza wizyta u ginekologa — badania na start",
+      "kiedy": "najlepiej do 10. tygodnia (najpóźniej do 12.)",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 1,
+      "okno": { "typ": "tc", "od": "0+0", "do": "10+0", "najpozniej": "12+0" },
+      "opis": "Lekarz sprawdza Twój stan zdrowia i szuka czynników ryzyka. Dostajesz skierowania na zestaw badań.",
+      "skutek": "Wizyta pomaga wcześnie wykryć choroby i zakażenia. Jeśli termin minął, ustal z lekarzem, od których badań zacząć.",
+      "pozycje": [
+        "Badania krwi: grupa krwi i czynnik Rh, morfologia, poziom cukru na czczo",
+        "Badania na zakażenia: HIV, WZW C, kiła, różyczka, toksoplazmoza",
+        "Badanie moczu",
+        "Badanie tarczycy (TSH)",
+        "Cytologia — jeśli nie była robiona w ostatnich 6 miesiącach",
+        "Pomiar ciśnienia i wagi"
+      ],
+      "uwagi": ["Jeśli cukier na czczo wyjdzie powyżej 125 mg/dl, trzeba szybko powtórzyć badanie."],
+      "zrodlo": "Materiały zespołu: standardowa diagnostyka I trymestru (do uzupełnienia o akt prawny / standard opieki okołoporodowej)",
+      "status": "ok"
+    },
+    {
+      "id": "BAD-HBS-01",
+      "nazwa": "Badanie na WZW B (żółtaczkę typu B) — obowiązkowe",
+      "kiedy": "do 12. tygodnia",
+      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 1,
+      "okno": { "typ": "tc", "od": "0+0", "do": "12+0" },
+      "opis": "Robi się je każdej kobiecie w ciąży, zwykle razem z innymi badaniami przy pierwszej wizycie.",
+      "skutek": "Wynik pomaga zespołowi medycznemu ocenić, czy dziecko potrzebuje dodatkowej ochrony po urodzeniu.",
+      "zrodlo": "Materiały zespołu: WZW B (HBsAg)",
+      "status": "ok"
+    },
+    {
+      "id": "USG-01",
+      "nazwa": "Wczesne USG (tylko gdy lekarz je zleci)",
+      "kiedy": "przed 10. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 1,
+      "typ": "warunkowe", "warunki": ["wczesne_usg"],
+      "okno": { "typ": "tc", "od": "0+0", "do": "9+6" },
+      "opis": "Potwierdza ciążę i pokazuje, że rozwija się tam, gdzie powinna.",
+      "skutek": "Bez tego badania potwierdzenie, gdzie rozwija się ciąża, może nastąpić później.",
+      "pozycje": ["Sprawdzenie, gdzie jest ciąża i ile ma tygodni", "Sprawdzenie, czy bije serce dziecka"],
+      "zrodlo": "Materiały zespołu: badania ultrasonograficzne w I trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "WIZ-02",
+      "nazwa": "Regularne wizyty kontrolne w I trymestrze",
+      "kiedy": "mniej więcej co 4 tygodnie",
+      "czestotliwosc": "co ok. 4 tygodnie",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 1,
+      "okno": { "typ": "tc", "od": "0+0", "do": "13+6" },
+      "opis": "Lekarz pyta o samopoczucie, mierzy ciśnienie i wagę i ocenia, czy ciąża przebiega dobrze.",
+      "skutek": "Regularne wizyty pomagają wcześnie zauważyć zmiany w przebiegu ciąży.",
+      "pozycje": [
+        "Rozmowa o Twoim zdrowiu i poprzednich ciążach",
+        "Ciśnienie i waga",
+        "Pytania o nastrój (czy nie ma objawów depresji)",
+        "Rady o zdrowym trybie życia"
+      ],
+      "zrodlo": "Materiały zespołu: opieka w I trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "USG-02",
+      "nazwa": "Pierwsze ważne USG (tzw. USG genetyczne) — obowiązkowe",
+      "kiedy": "między 11. a 14. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 1,
+      "okno": { "typ": "tc", "od": "11+0", "do": "14+6" },
+      "opis": "Lekarz sprawdza, jak rozwija się dziecko, i szuka oznak możliwych wad wrodzonych.",
+      "skutek": "W tym okresie najlepiej można ocenić ryzyko wad wrodzonych. Jeśli termin minął, omów z lekarzem dalsze badania.",
+      "pozycje": [
+        "Ile jest dzieci i czy bije serce",
+        "Pomiary dziecka",
+        "Ocena budowy dziecka",
+        "Pomiar tzw. przezierności karku — pokazuje ryzyko wad genetycznych"
+      ],
+      "zrodlo": "Materiały zespołu: badania ultrasonograficzne w I trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "BP-01",
+      "nazwa": "Badanie krwi do USG genetycznego (test PAPP-A)",
+      "kiedy": "razem z USG, między 11. a 14. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "badanie_prenatalne", "trymestr": 1,
+      "okno": { "typ": "tc", "od": "11+0", "do": "14+6" },
+      "opis": "Zalecane, ale nieobowiązkowe. Razem z USG dokładniej pokazuje ryzyko wad genetycznych. Lekarz powinien Ci je zaproponować.",
+      "skutek": "Bez wyniku badania krwi ocena ryzyka wad genetycznych jest mniej dokładna.",
+      "zrodlo": "Materiały zespołu: badania w kierunku wad genetycznych",
+      "status": "ok"
+    },
+    {
+      "id": "GLU-01",
+      "nazwa": "Wcześniejszy test na cukrzycę ciążową",
+      "kiedy": "jak najszybciej — nie czekaj do 24. tygodnia",
+      "grupa": "przed_porodem", "kategoria": "test_glukozy", "trymestr": 1,
+      "typ": "warunkowe", "warunki": ["ryzyko_cukrzycy", "cukier_podwyzszony"],
+      "okno": { "typ": "tc", "od": "0+0", "do": "23+6" },
+      "opis": "Wypijasz roztwór z cukrem i pobierają Ci krew. Badanie sprawdza, czy organizm radzi sobie z cukrem.",
+      "skutek": "Wcześniejszy test pozwala wcześniej rozpoznać cukrzycę ciążową.",
+      "uwagi": ["Jeśli cukier na czczo wyszedł 92–125 mg/dl, zrób ten test pilnie."],
+      "zrodlo": "Materiały zespołu: diagnostyka zaburzeń gospodarki węglowodanowej",
+      "status": "ok"
+    },
+    {
+      "id": "OKU-01",
+      "nazwa": "Wizyta u okulisty (cukrzyca) — I trymestr",
+      "kiedy": "w I trymestrze (najlepiej też przed ciążą)",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 1,
+      "typ": "warunkowe", "warunki": ["cukrzyca_przed"],
+      "okno": { "typ": "tc", "od": "0+0", "do": "13+6" },
+      "opis": "Cukrzyca może uszkadzać oczy, dlatego okulista sprawdza je w każdym trymestrze.",
+      "skutek": "Przy przerwie w kontrolach okulista może zauważyć zmiany w oczach później.",
+      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa",
+      "status": "ok"
+    },
+    {
+      "id": "WIZ-03",
+      "nazwa": "Regularne wizyty kontrolne w II trymestrze",
+      "kiedy": "mniej więcej co 4 tygodnie",
+      "czestotliwosc": "co ok. 4 tygodnie",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 2,
+      "okno": { "typ": "tc", "od": "14+0", "do": "27+6" },
+      "opis": "Lekarz sprawdza, jak rozwija się ciąża i jak się czujesz.",
+      "skutek": "Wizyty pomagają kontrolować ciśnienie i rozwój dziecka.",
+      "pozycje": [
+        "Rozmowa i badanie",
+        "Sprawdzenie, jak rośnie brzuch i jak bije serce dziecka",
+        "Ciśnienie i waga",
+        "Ocena, czy nie ma ryzyka powikłań"
+      ],
+      "uwagi": ["Jeśli w I trymestrze coś wyszło nie tak, lekarz może zlecić dodatkowe badania (np. moczu, krwi)."],
+      "zrodlo": "Materiały zespołu: opieka w II trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "OKU-02",
+      "nazwa": "Wizyta u okulisty (cukrzyca) — II trymestr",
+      "kiedy": "w II trymestrze",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 2,
+      "typ": "warunkowe", "warunki": ["cukrzyca_przed"],
+      "okno": { "typ": "tc", "od": "14+0", "do": "27+6" },
+      "opis": "Cukrzyca może uszkadzać oczy, dlatego okulista sprawdza je w każdym trymestrze.",
+      "skutek": "Przy przerwie w kontrolach okulista może zauważyć zmiany w oczach później.",
+      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa",
+      "status": "ok"
+    },
+    {
+      "id": "USG-03",
+      "nazwa": "USG połówkowe — najważniejsze USG w ciąży",
+      "kiedy": "między 18. a 22. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 2,
+      "okno": { "typ": "tc", "od": "18+0", "do": "22+6" },
+      "opis": "Obowiązkowe. Lekarz dokładnie ogląda dziecko od głowy do stóp.",
+      "skutek": "W tym okresie można dokładnie obejrzeć budowę dziecka. Jeśli termin minął, zapytaj lekarza o dalsze badania.",
+      "pozycje": [
+        "Wielkość i szacowana waga dziecka",
+        "Budowa i narządy dziecka",
+        "Łożysko i pępowina",
+        "Ilość wód płodowych",
+        "Szyjka macicy"
+      ],
+      "zrodlo": "Materiały zespołu: badania ultrasonograficzne w II trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "TOX-01",
+      "nazwa": "Powtórne badanie na toksoplazmozę",
+      "kiedy": "między 21. a 26. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 2,
+      "typ": "warunkowe", "warunki": ["toxo_ujemna"],
+      "okno": { "typ": "tc", "od": "21+0", "do": "26+6" },
+      "opis": "Obowiązkowe, jeśli w I trymestrze wynik był ujemny. Sprawdza, czy w ciąży nie doszło do zakażenia.",
+      "skutek": "Bez wyniku badania rozpoznanie zakażenia toksoplazmozą może się opóźnić.",
+      "uwagi": ["W III trymestrze badanie powtarza się według zaleceń lekarza."],
+      "zrodlo": "Materiały zespołu: toksoplazmoza",
+      "status": "ok"
+    },
+    {
+      "id": "SZK-01",
+      "nazwa": "Szkoła rodzenia",
+      "kiedy": "warto zacząć od 21. tygodnia",
+      "grupa": "przed_porodem", "kategoria": "szkola_rodzenia", "trymestr": 2,
+      "okno": { "typ": "tc", "od": "21+0", "do": "porod" },
+      "opis": "Zajęcia, na których uczysz się, jak wygląda poród i opieka nad noworodkiem.",
+      "skutek": "Zajęcia są dobrowolne. Jeśli je pominiesz, możesz omówić przygotowania do porodu z położną.",
+      "zrodlo": "Materiały zespołu: opieka w II trymestrze (edukacja przedporodowa)",
+      "status": "ok"
+    },
+    {
+      "id": "GLU-02",
+      "nazwa": "Test na cukrzycę ciążową",
+      "kiedy": "między 24. a 26. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "test_glukozy", "trymestr": 2,
+      "okno": { "typ": "tc", "od": "24+0", "do": "26+6" },
+      "opis": "Robi się go wszystkim, u których wcześniej nie wykryto cukrzycy. Wypijasz roztwór z cukrem i pobierają Ci krew.",
+      "skutek": "Badanie pomaga rozpoznać cukrzycę ciążową. Jeśli termin minął, zapytaj lekarza o dalsze kroki.",
+      "uwagi": ["Jeśli jesteś w grupie ryzyka, test robi się wcześniej."],
+      "zrodlo": "Materiały zespołu: badania w II trymestrze; diagnostyka zaburzeń gospodarki węglowodanowej",
+      "status": "ok"
+    },
+    {
+      "id": "ANTD-01",
+      "nazwa": "Badanie krwi na przeciwciała anty-D",
+      "kiedy": "między 24. a 26. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 2,
+      "typ": "warunkowe", "warunki": ["rh_ujemne"],
+      "okno": { "typ": "tc", "od": "24+0", "do": "26+6" },
+      "opis": "Dla osób z grupą krwi Rh ujemną. Sprawdza, czy organizm nie zaczął reagować na krew dziecka.",
+      "skutek": "Bez wyniku lekarz będzie miał mniej informacji o tym, czy pojawiły się te przeciwciała.",
+      "zrodlo": "Materiały zespołu: badania w II trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "KON-01",
+      "nazwa": "Wizyta u lekarza (gdy ciążę prowadzi położna)",
+      "kiedy": "między 24. a 26. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 2,
+      "typ": "warunkowe", "warunki": ["polozna"],
+      "okno": { "typ": "tc", "od": "24+0", "do": "26+6" },
+      "opis": "Lekarz ocenia, czy ciąża przebiega prawidłowo.",
+      "skutek": "Jeśli ten termin minął, możesz ustalić z położną nową datę konsultacji.",
+      "zrodlo": "Materiały zespołu: opieka w II trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "OKU-03",
+      "nazwa": "Wizyta u okulisty (cukrzyca) — III trymestr",
+      "kiedy": "w III trymestrze",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
+      "typ": "warunkowe", "warunki": ["cukrzyca_przed"],
+      "okno": { "typ": "tc", "od": "28+0", "do": "porod" },
+      "opis": "Cukrzyca może uszkadzać oczy, dlatego okulista sprawdza je w każdym trymestrze.",
+      "skutek": "Przy przerwie w kontrolach okulista może zauważyć zmiany w oczach później.",
+      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa",
+      "status": "ok"
+    },
+    {
+      "id": "WIZ-04",
+      "nazwa": "Wizyty kontrolne — do 32. tygodnia",
+      "kiedy": "od 28. do 32. tygodnia, co 4 tygodnie",
+      "czestotliwosc": "co 4 tygodnie",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "28+0", "do": "32+6" },
+      "opis": "Kontrola przed porodem: lekarz sprawdza ciśnienie, mocz i samopoczucie dziecka.",
+      "skutek": "Przy przerwie w kontrolach lekarz może zauważyć zmiany ciśnienia później.",
+      "pozycje": [
+        "Badanie moczu na każdej wizycie (m.in. czy nie ma białka — ostrzega przed groźnym powikłaniem ciążowym)",
+        "Ciśnienie",
+        "Rozmowa o tym, jak się czuje dziecko, i o porodzie"
+      ],
+      "zrodlo": "Materiały zespołu: opieka w III trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "USG-04",
+      "nazwa": "USG w III trymestrze",
+      "kiedy": "około 30. tygodnia (między 28. a 32.)",
+      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "28+0", "do": "32+6" },
+      "opis": "Kolejne USG kontrolne — lekarz sprawdza, jak rośnie dziecko.",
+      "skutek": "Jeśli termin minął, ustal z lekarzem, kiedy sprawdzić wzrastanie dziecka.",
+      "zrodlo": "Materiały zespołu: badania w III trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "WIZ-05",
+      "nazwa": "Wizyty kontrolne — od 33. do 36. tygodnia",
+      "kiedy": "od 33. do 36. tygodnia, co 2–3 tygodnie",
+      "czestotliwosc": "co 2–3 tygodnie",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "33+0", "do": "36+6" },
+      "opis": "Kontrola przed porodem: lekarz sprawdza ciśnienie, mocz i samopoczucie dziecka.",
+      "skutek": "Przy przerwie w kontrolach lekarz może zauważyć zmiany ciśnienia później.",
+      "pozycje": [
+        "Badanie moczu na każdej wizycie (m.in. czy nie ma białka — ostrzega przed groźnym powikłaniem ciążowym)",
+        "Ciśnienie",
+        "Rozmowa o tym, jak się czuje dziecko, i o porodzie"
+      ],
+      "zrodlo": "Materiały zespołu: opieka w III trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "LAB-03",
+      "nazwa": "Badania krwi i moczu przed porodem",
+      "kiedy": "między 33. a 37. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "badanie_krwi", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "33+0", "do": "37+6" },
+      "opis": "Ostatnia większa kontrola przed porodem. Na HIV badasz się w ciąży dwa razy: na początku i teraz.",
+      "skutek": "Badania pomagają rozpoznać między innymi anemię lub zakażenie przed porodem.",
+      "pozycje": ["Morfologia krwi", "Badanie moczu", "Badanie na WZW B", "Powtórne badanie na HIV"],
+      "uwagi": ["Jeśli wykryto zakażenie (HIV, WZW B, WZW C), lekarz ustala indywidualny plan prowadzenia ciąży — może to wpłynąć na sposób porodu."],
+      "zrodlo": "Materiały zespołu: badania w III trymestrze; HIV w ciąży",
+      "status": "ok"
+    },
+    {
+      "id": "GBS-01",
+      "nazwa": "Wymaz na bakterie GBS",
+      "kiedy": "między 35. a 37. tygodniem",
+      "grupa": "przed_porodem", "kategoria": "wymaz", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "35+0", "do": "37+6" },
+      "opis": "Wymaz z pochwy i odbytu. Sprawdza, czy masz bakterie, którymi dziecko mogłoby się zakazić podczas porodu.",
+      "skutek": "Wynik pomaga zespołowi medycznemu zaplanować opiekę podczas porodu.",
+      "uwagi": ["Dodatni wynik lekarz uwzględnia w planie opieki podczas porodu."],
+      "zrodlo": "Materiały zespołu: badania w III trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "KTG-01",
+      "nazwa": "Badanie KTG (zapis tętna dziecka)",
+      "kiedy": "od 32.–34. tygodnia, regularnie",
+      "grupa": "przed_porodem", "kategoria": "badanie_prenatalne", "trymestr": 3,
+      "typ": "warunkowe", "warunki": ["cukrzyca_przed", "cukrzyca_ciazowa", "nadcisnienie", "autoimmun"],
+      "okno": { "typ": "tc", "od": "32+0", "do": "porod" },
+      "opis": "Na brzuchu masz czujniki, które zapisują tętno dziecka i skurcze. Badanie sprawdza, czy dziecku nic nie dolega.",
+      "skutek": "Zapis tętna pomaga zespołowi medycznemu ocenić, jak czuje się dziecko.",
+      "zrodlo": "Materiały zespołu: monitorowanie dobrostanu płodu w III trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "WIZ-06",
+      "nazwa": "Wizyty kontrolne — po 36. tygodniu",
+      "kiedy": "co tydzień aż do porodu",
+      "czestotliwosc": "co tydzień",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "37+0", "do": "porod" },
+      "opis": "Kontrola przed porodem: lekarz sprawdza ciśnienie, mocz i samopoczucie dziecka.",
+      "skutek": "Regularne wizyty pomagają kontrolować ciśnienie i samopoczucie przed porodem.",
+      "pozycje": [
+        "Badanie moczu na każdej wizycie (m.in. czy nie ma białka — ostrzega przed groźnym powikłaniem ciążowym)",
+        "Ciśnienie",
+        "Rozmowa o tym, jak się czuje dziecko, i o porodzie"
+      ],
+      "zrodlo": "Materiały zespołu: opieka w III trymestrze",
+      "status": "ok"
+    },
+    {
+      "id": "USG-05",
+      "nazwa": "USG po terminie porodu",
+      "kiedy": "zaraz po 40. tygodniu, jeśli poród się nie zaczął",
+      "grupa": "przed_porodem", "kategoria": "usg", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "40+0", "do": "porod" },
+      "opis": "Lekarz sprawdza, czy dziecku nic nie grozi, gdy poród się opóźnia.",
+      "skutek": "Jeśli termin minął, ustal z lekarzem dalsze kontrole po planowanym terminie porodu.",
+      "pozycje": ["Ilość wód płodowych", "Przepływ krwi", "Ogólny stan dziecka"],
+      "zrodlo": "Materiały zespołu: okres po 40. tygodniu",
+      "status": "ok"
+    },
+    {
+      "id": "WIZ-07",
+      "nazwa": "Częste kontrole po terminie porodu",
+      "kiedy": "po 40. tygodniu, co 2–3 dni",
+      "czestotliwosc": "co 2–3 dni",
+      "grupa": "przed_porodem", "kategoria": "wizyta", "trymestr": 3,
+      "okno": { "typ": "tc", "od": "40+0", "do": "porod" },
+      "opis": "Gdy poród się nie zaczyna, dziecko jest obserwowane częściej.",
+      "skutek": "Jeśli termin minął, skontaktuj się z zespołem prowadzącym, aby ustalić kolejny termin kontroli.",
+      "pozycje": [
+        "Wizyty co 2–3 dni",
+        "KTG (tętno dziecka) — często codziennie lub co 2–3 dni",
+        "USG: ilość wód płodowych i przepływ krwi"
+      ],
+      "uwagi": ["Często zalecany jest pobyt w szpitalu (oddział patologii ciąży), gdzie dziecko jest obserwowane, a lekarz decyduje, czy wywołać poród."],
+      "zrodlo": "Materiały zespołu: okres po 40. tygodniu",
+      "status": "ok"
+    },
+    {
+      "id": "PAT-01",
+      "nazwa": "Wizyta położnej w domu",
+      "kiedy": "do 2 dni po wyjściu ze szpitala",
+      "grupa": "po_porodzie", "kategoria": "wizyta_patronazowa", "trymestr": "polog",
+      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": 2, "kotwica": "wypis" },
+      "opis": "Położna środowiskowa odwiedza mamę i dziecko w domu. Kolejne wizyty odbywają się w pierwszych tygodniach po porodzie.",
+      "skutek": "Wizyta daje okazję do sprawdzenia, jak czujecie się po powrocie do domu, i do zadania pytań położnej.",
+      "zrodlo": "Materiały zespołu: połóg, wizyty patronażowe",
+      "status": "ok"
+    },
+    {
+      "id": "DEP-01",
+      "nazwa": "Krótkie badanie: jak się czujesz po porodzie",
+      "kiedy": "raz, zwykle przy wizycie położnej lub u ginekologa",
+      "grupa": "po_porodzie", "kategoria": "badanie_poporodowe", "trymestr": "polog", "dla": "matka",
+      "okno": { "typ": "po_porodzie", "jednostka": "tygodnie", "od": 0, "do": 6 },
+      "opis": "Obowiązkowe badanie przesiewowe w kierunku depresji poporodowej. Lekarz lub położna pyta o nastrój.",
+      "skutek": "Rozmowa pomaga zauważyć, kiedy po porodzie potrzebujesz wsparcia.",
+      "zrodlo": "Materiały zespołu: połóg, depresja poporodowa",
+      "status": "ok"
+    },
+    {
+      "id": "POP-01",
+      "nazwa": "Wizyta u ginekologa po porodzie",
+      "kiedy": "około 6 tygodni po porodzie",
+      "grupa": "po_porodzie", "kategoria": "badanie_poporodowe", "trymestr": "polog", "dla": "matka",
+      "okno": { "typ": "po_porodzie", "jednostka": "tygodnie", "od": 6, "do": 6 },
+      "opis": "Kontrola, jak mama wraca do formy po porodzie.",
+      "skutek": "Jeśli wizyta się opóźni, ocena gojenia po porodzie odbędzie się później.",
+      "pozycje": [
+        "Czy goją się rany (krocze lub blizna po cięciu cesarskim)",
+        "Czy macica wraca do normy",
+        "Pytania o samopoczucie psychiczne"
+      ],
+      "uwagi": ["Dokładny dzień ustal z lekarzem — termin jest orientacyjny."],
+      "zrodlo": "Materiały zespołu: połóg, badanie poporodowe",
+      "status": "ok"
+    },
+    {
+      "id": "NOW-01",
+      "nazwa": "Szczepienie noworodka przeciw WZW B (żółtaczce typu B)",
+      "kiedy": "w ciągu doby po urodzeniu, w szpitalu",
+      "grupa": "po_porodzie", "kategoria": "szczepienie", "trymestr": "polog", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": 1 },
+      "opis": "Pierwsza dawka. Robi się ją jeszcze w szpitalu.",
+      "skutek": "Pominięcie szczepienia opóźnia ochronę przed WZW B. Omów termin z zespołem medycznym.",
+      "zrodlo": "Materiały zespołu: noworodek w szpitalu",
+      "status": "ok"
+    },
+    {
+      "id": "NOW-02",
+      "nazwa": "Szczepienie noworodka przeciw gruźlicy (BCG)",
+      "kiedy": "zwykle pierwszego dnia, przed wypisem ze szpitala",
+      "grupa": "po_porodzie", "kategoria": "szczepienie", "trymestr": "polog", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": "wypis" },
+      "opis": "Robi się je jeszcze w szpitalu.",
+      "skutek": "Pominięcie szczepienia opóźnia ochronę przed gruźlicą. Omów termin z zespołem medycznym.",
+      "zrodlo": "Materiały zespołu: noworodek w szpitalu",
+      "status": "ok"
+    },
+    {
+      "id": "NOW-03",
+      "nazwa": "Badania noworodka w szpitalu",
+      "kiedy": "w pierwszych dobach życia",
+      "grupa": "po_porodzie", "kategoria": "badanie_poporodowe", "trymestr": "polog", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": "wypis" },
+      "opis": "Wychwytują wrodzone choroby, kłopoty ze słuchem i żółtaczkę noworodkową.",
+      "skutek": "Bez wyników rozpoznanie między innymi problemów ze słuchem lub żółtaczki może się opóźnić.",
+      "pozycje": ["Badania na wrodzone choroby (metaboliczne)", "Badanie słuchu", "Badanie żółtaczki (poziom bilirubiny)"],
+      "zrodlo": "Materiały zespołu: noworodek w szpitalu",
+      "status": "ok"
+    },
+    {
+      "id": "PED-01",
+      "nazwa": "Pierwsza wizyta dziecka u lekarza rodzinnego",
+      "kiedy": "w ciągu 4 tygodni od urodzenia",
+      "grupa": "po_porodzie", "kategoria": "wizyta_patronazowa", "trymestr": "polog", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "dni", "od": 0, "do": 28 },
+      "opis": "W przychodni albo w domu. Lekarz sprawdza rozwój i wagę dziecka i ustala plan szczepień.",
+      "skutek": "Gdy wizyta się opóźni, lekarz później oceni rozwój dziecka i omówi plan szczepień.",
+      "zrodlo": "Materiały zespołu: noworodek, wizyta patronażowa lekarska",
+      "status": "ok"
+    },
+    {
+      "id": "BIL-01",
+      "nazwa": "Badanie kontrolne dziecka nr 1 z 5 (ze szczepieniem)",
+      "kiedy": "między 6. a 9. tygodniem życia",
+      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "tygodnie", "od": 6, "do": 10, "bezOstatniegoDnia": true },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka i szczepi.",
+      "skutek": "Przełożenie wizyty może przesunąć ocenę rozwoju dziecka i zaplanowane szczepienia.",
+      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia", "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, pneumokoki)"],
+      "uwagi": ["Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw rotawirusom i meningokokom)."],
+      "zrodlo": "Materiały zespołu: bilanse zdrowia i szczepienia w 1. roku życia",
+      "status": "ok"
+    },
+    {
+      "id": "BIL-02",
+      "nazwa": "Badanie kontrolne dziecka nr 2 z 5 (ze szczepieniem)",
+      "kiedy": "między 3. a 4. miesiącem życia",
+      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 3, "do": 5, "bezOstatniegoDnia": true },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka i szczepi.",
+      "skutek": "Przełożenie wizyty może przesunąć ocenę rozwoju dziecka i zaplanowane szczepienia.",
+      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia", "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, pneumokoki)"],
+      "uwagi": ["Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw rotawirusom i meningokokom)."],
+      "zrodlo": "Materiały zespołu: bilanse zdrowia i szczepienia w 1. roku życia",
+      "status": "ok"
+    },
+    {
+      "id": "BIL-03",
+      "nazwa": "Badanie kontrolne dziecka nr 3 z 5 (ze szczepieniem)",
+      "kiedy": "między 6. a 7. miesiącem życia",
+      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 6, "do": 8, "bezOstatniegoDnia": true },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka i szczepi.",
+      "skutek": "Przełożenie wizyty może przesunąć ocenę rozwoju dziecka i zaplanowane szczepienia.",
+      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia", "Szczepienie: kolejne dawki (m.in. błonica, tężec, krztusiec, polio, pneumokoki)"],
+      "uwagi": ["Lekarz może zaproponować też szczepienia dodatkowe, nieobowiązkowe (np. przeciw rotawirusom i meningokokom)."],
+      "zrodlo": "Materiały zespołu: bilanse zdrowia i szczepienia w 1. roku życia",
+      "status": "ok"
+    },
+    {
+      "id": "BIL-04",
+      "nazwa": "Badanie kontrolne dziecka nr 4 z 5",
+      "kiedy": "w 9. miesiącu życia",
+      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 9, "do": 10, "bezOstatniegoDnia": true },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka.",
+      "skutek": "Jeśli przełożysz wizytę, ocena rozwoju dziecka odbędzie się później.",
+      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia"],
+      "uwagi": ["Szczepienia — zgodnie z aktualnym Programem Szczepień Ochronnych."],
+      "zrodlo": "Materiały zespołu: bilanse zdrowia w 1. roku życia",
+      "status": "ok"
+    },
+    {
+      "id": "BIL-05",
+      "nazwa": "Badanie kontrolne dziecka nr 5 z 5",
+      "kiedy": "w 12. miesiącu życia",
+      "grupa": "po_porodzie", "kategoria": "bilans", "trymestr": "niemowle", "dla": "dziecko",
+      "okno": { "typ": "po_porodzie", "jednostka": "miesiace", "od": 12, "do": 13, "bezOstatniegoDnia": true },
+      "opis": "Tzw. bilans zdrowia: lekarz sprawdza rozwój dziecka.",
+      "skutek": "Jeśli przełożysz wizytę, ocena rozwoju dziecka odbędzie się później.",
+      "pozycje": ["Badanie dziecka i ocena rozwoju", "Wpis wyników do książeczki zdrowia"],
+      "uwagi": ["Szczepienia — zgodnie z aktualnym Programem Szczepień Ochronnych."],
+      "zrodlo": "Materiały zespołu: bilanse zdrowia w 1. roku życia",
+      "status": "ok"
+    }
+  ],
+
+  "informacje": [
+    {
+      "id": "INF-00", "temat": "Jak czytać ten kalendarz", "rodzaj": "ogolna",
+      "tresc": [
+        "To standardowy zestaw badań w ciąży bez powikłań.",
+        "Ostateczny plan zawsze ustala lekarz prowadzący, który zna Twój stan zdrowia.",
+        "Terminy to okna czasowe — badanie możesz zrobić w dowolnym dniu takiego okna."
+      ],
+      "zrodlo": "Materiały zespołu", "status": "ok"
+    },
+    {
+      "id": "INF-TOX", "temat": "Jak uniknąć toksoplazmozy", "rodzaj": "ogolna", "trymestr": 2, "warunki": ["toxo_ujemna"],
+      "tresc": [
+        "Dokładnie myj i obieraj warzywa oraz owoce.",
+        "Nie jedz surowego ani niedogotowanego mięsa (tatar, krwisty stek).",
+        "Ogranicz kontakt z kotami, zwłaszcza z kuwetą. W ogrodzie noś rękawice, a po pracy umyj ręce."
+      ],
+      "zrodlo": "Materiały zespołu: toksoplazmoza", "status": "ok"
+    },
+    {
+      "id": "INF-CMV", "temat": "Cytomegalia (CMV)", "rodzaj": "ogolna",
+      "tresc": [
+        "To badanie nie jest dla wszystkich — lekarz zleca je, gdy są czynniki ryzyka albo niepokojące objawy.",
+        "Jak się chronić: nie dziel się sztućcami ani napojami z małymi dziećmi i nie całuj ich w usta."
+      ],
+      "zrodlo": "Materiały zespołu: CMV", "status": "ok"
+    },
+    {
+      "id": "INF-RUCHY", "temat": "Obserwuj ruchy dziecka", "rodzaj": "ogolna", "trymestr": 3,
+      "tresc": [
+        "Pod koniec ciąży warto zwracać uwagę, jak często dziecko się rusza.",
+        "Lekarz lub położna powinni pokazać Ci, jak to robić."
+      ],
+      "zrodlo": "Materiały zespołu: opieka w III trymestrze", "status": "ok"
+    },
+    {
+      "id": "INF-DEP", "temat": "Smutek po porodzie — kiedy iść do lekarza", "rodzaj": "ogolna", "trymestr": "polog",
+      "tresc": [
+        "Obniżony nastrój po porodzie (tzw. baby blues) bywa przemijający.",
+        "Jeśli trwa dłużej niż 2 tygodnie, zgłoś się do lekarza od razu — to może być depresja poporodowa i potrzebna jest pomoc."
+      ],
+      "zrodlo": "Materiały zespołu: połóg, depresja poporodowa", "status": "ok"
+    },
+    {
+      "id": "INF-BIL", "temat": "Badania kontrolne dziecka (bilanse)", "rodzaj": "ogolna", "trymestr": "niemowle",
+      "tresc": [
+        "W pierwszym roku życia dziecko ma 5 takich badań: w 6.–9. tygodniu, 3.–4. miesiącu, 6.–7. miesiącu, 9. miesiącu i 12. miesiącu.",
+        "W całym okresie rozwoju dziecka badania kontrolne powinny odbyć się co najmniej 13 razy.",
+        "Wyniki lekarz wpisuje do książeczki zdrowia dziecka i informuje Cię o terminie kolejnej wizyty i szczepieniach."
+      ],
+      "zrodlo": "Materiały zespołu: bilanse i wizyty patronażowe dziecka", "status": "ok"
+    },
+    {
+      "id": "INF-SZCZ", "temat": "Szczepienia dziecka", "rodzaj": "ogolna", "trymestr": "niemowle",
+      "tresc": [
+        "W szpitalu: szczepienie przeciw WZW B (w ciągu doby) i przeciw gruźlicy (zwykle pierwszego dnia).",
+        "Podczas trzech pierwszych badań kontrolnych dziecko dostaje kolejne dawki szczepień obowiązkowych.",
+        "Szczepienia odbywają się zgodnie z aktualnym Programem Szczepień Ochronnych."
+      ],
+      "zrodlo": "Materiały zespołu: szczepienia noworodka i niemowlęcia", "status": "ok"
+    },
+    {
+      "id": "SYT-CUK-PRZED", "temat": "Cukrzyca rozpoznana przed ciążą", "rodzaj": "sytuacja_szczegolna", "warunki": ["cukrzyca_przed"],
+      "tresc": [
+        "Wizyta u okulisty: przed ciążą, w I trymestrze i potem w każdym trymestrze.",
+        "Wizyty u lekarza są częstsze niż standardowo.",
+        "Lekarz regularnie sprawdza, jak dobrze wyrównana jest cukrzyca (badanie HbA1c).",
+        "Opiekę najlepiej prowadzić w specjalistycznym ośrodku — zapytaj lekarza."
+      ],
+      "zrodlo": "Materiały zespołu: cukrzyca przedciążowa", "status": "ok"
+    },
+    {
+      "id": "SYT-GDM", "temat": "Cukrzyca ciążowa", "rodzaj": "sytuacja_szczegolna", "warunki": ["cukrzyca_ciazowa"],
+      "tresc": [
+        "Codziennie mierzysz cukier glukometrem — lekarz powie, jak często.",
+        "Wizyty kontrolne są zwykle częstsze niż co 4 tygodnie.",
+        "Lekarz zleci też badanie HbA1c."
+      ],
+      "zrodlo": "Materiały zespołu: cukrzyca ciążowa", "status": "ok"
+    },
+    {
+      "id": "SYT-NADCISN", "temat": "Nadciśnienie", "rodzaj": "sytuacja_szczegolna", "warunki": ["nadcisnienie"],
+      "tresc": [
+        "Ciśnienie jest mierzone częściej niż standardowo.",
+        "Częściej robi się badania krwi sprawdzające nerki i wątrobę — pozwalają wcześnie wykryć groźne powikłanie (stan przedrzucawkowy).",
+        "USG jest częstsze, bo przy nadciśnieniu dziecko może rosnąć wolniej.",
+        "W III trymestrze często dochodzi badanie KTG od 32.–34. tygodnia."
+      ],
+      "zrodlo": "Materiały zespołu: nadciśnienie w ciąży", "status": "ok"
+    },
+    {
+      "id": "SYT-AUTOIMM", "temat": "Choroba autoimmunologiczna", "rodzaj": "sytuacja_szczegolna", "warunki": ["autoimmun"],
+      "tresc": [
+        "Wizyty ustala lekarz — często w ośrodku specjalistycznym.",
+        "Regularne badania krwi pokazują, jak przebiega choroba.",
+        "USG jest częstsze, bo łożysko może gorzej pracować.",
+        "W III trymestrze często dochodzi badanie KTG od 32.–34. tygodnia."
+      ],
+      "zrodlo": "Materiały zespołu: choroby autoimmunologiczne w ciąży", "status": "ok"
+    },
+    {
+      "id": "SYT-ZUM", "temat": "Zakażenia dróg moczowych", "rodzaj": "sytuacja_szczegolna", "warunki": ["zum"],
+      "tresc": [
+        "Mocz bada się częściej (posiew).",
+        "Nawet bakterie w moczu bez żadnych dolegliwości wymagają w ciąży reakcji lekarza.",
+        "Ostre zapalenie nerek wymaga pilnego pobytu w szpitalu."
+      ],
+      "zrodlo": "Materiały zespołu: zakażenia dróg moczowych w ciąży", "status": "ok"
+    },
+    {
+      "id": "SYT-SWIAD", "temat": "Silny świąd skóry (cholestaza ciążowa)", "rodzaj": "sytuacja_szczegolna", "warunki": ["swiad"],
+      "tresc": [
+        "Silny świąd skóry (zwykle w II lub III trymestrze) wymaga szybkich badań krwi — zgłoś się do lekarza od razu.",
+        "Jeśli to cholestaza, kontrole wątroby i stanu dziecka odbywają się zwykle co 1–2 tygodnie lub częściej."
+      ],
+      "zrodlo": "Materiały zespołu: cholestaza ciężarnych", "status": "ok"
+    },
+    {
+      "id": "SYT-MNOGA", "temat": "Ciąża mnoga (np. bliźnięta)", "rodzaj": "sytuacja_szczegolna", "warunki": ["ciaza_mnoga"],
+      "tresc": ["USG robi się znacznie częściej niż przy jednym dziecku — od II trymestru."],
+      "zrodlo": "Materiały zespołu: ciąża wielopłodowa", "status": "ok"
+    },
+    {
+      "id": "SYT-OGOLNE", "temat": "Gdy ciąża nie jest standardowa", "rodzaj": "sytuacja_szczegolna",
+      "warunki": ["cukrzyca_przed", "cukrzyca_ciazowa", "nadcisnienie", "autoimmun", "zum", "swiad", "ciaza_mnoga"],
+      "tresc": [
+        "Ten kalendarz dotyczy ciąży bez powikłań. Przy chorobach lekarz układa własny, częstszy plan wizyt i badań.",
+        "Wizyty co 4 tygodnie to wtedy zwykle za mało.",
+        "Przy wielu chorobach potrzebna jest opieka kilku specjalistów (np. diabetologa)."
+      ],
+      "zrodlo": "Materiały zespołu: sytuacje wymagające zmiany standardowej diagnostyki", "status": "ok"
+    }
+  ]
+}
