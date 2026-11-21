@@ -19,8 +19,24 @@
   "skladniki": [
    {
     "rodzaj": "ubezpieczenie_spoleczne",
+    "okres": "2026-09",
+    "kwota": 480,
+    "terminPlatnosci": "2026-10-15",
+    "splacono": "2027-01-20"
+   },
+   {
+    "rodzaj": "ubezpieczenie_spoleczne",
+    "okres": "2027-01",
+    "kwota": 300,
+    "terminPlatnosci": "2027-02-15",
+    "splacono": null
+   },
+   {
+    "rodzaj": "ubezpieczenie_spoleczne",
     "okres": "2027-02",
-    "kwota": 1200
+    "kwota": 900,
+    "terminPlatnosci": "2027-03-15",
+    "splacono": null
    }
   ],
   "progBlokady": 48.06

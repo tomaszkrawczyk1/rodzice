@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, useSesja } from "@/lib/sesja";
-import { pln, dataKrotka, dzis, tygodnie } from "@/lib/format";
+import { pln, dataKrotka, dataPL, dzis, tygodnie } from "@/lib/format";
+import { wynikZadluzenia } from "@/lib/dane-profilu";
 import { Alert, Field, Kroki, Spin } from "@/components/ui";
 
 const plus = (n: number) => { const d = new Date(); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
@@ -12,6 +13,7 @@ export default function Ciaza() {
   const [f, setF] = useState<any>({ tytul: "umowa_o_prace", dobrowolne: false, dni: 400, wDniu: true, zadl: 0, platnik: 50, dziesiec: false, data: plus(150), brutto: "6500", niezd: 60, w50: false, rehabDni: 90, straciłaPrace: "nie", dzieci: 1 });
   const [w, setW] = useState<any>(null); const [ch, setCh] = useState<any>(null); const [reh, setReh] = useState<any>(null); const [rod, setRod] = useState<any>(null); const [pod, setPod] = useState<any>(null);
   const [skad, setSkad] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
+  const [zad, setZad] = useState<any>(null);
   const set = (p: any) => setF((x: any) => ({ ...x, ...p }));
 
   // dane z (symulowanego) ZUS po zalogowaniu
@@ -26,6 +28,16 @@ export default function Ciaza() {
       } catch (er: any) { setSkad(""); }
     })();
   }, [sesja]); // eslint-disable-line
+
+  // zadłużenie zależy od dnia powstania prawa, więc przy zmianie daty porodu pobieramy je ponownie
+  useEffect(() => {
+    if (!sesja || !/^\d{4}-\d{2}-\d{2}$/.test(f.data)) return;
+    let aktualne = true;
+    api(`/api/zus/zadluzenie?pesel=${sesja.pesel}&naDzien=${f.data}`)
+      .then((z: any) => { if (aktualne) { setZad(z); setF((x: any) => ({ ...x, zadl: z.kwotaZadluzenia })); } })
+      .catch(() => { if (aktualne) setZad(null); });
+    return () => { aktualne = false; };
+  }, [sesja, f.data]);
 
   async function licz() {
     setBusy(true); setErr("");
@@ -63,7 +75,8 @@ export default function Ciaza() {
           <label className="check"><input type="checkbox" checked={f.wDniu} onChange={(e) => set({ wDniu: e.target.checked })} />W dniu porodu nadal będę ubezpieczona chorobowo</label>
           <label className="check"><input type="checkbox" checked={f.dziesiec} onChange={(e) => set({ dziesiec: e.target.checked })} />Mam co najmniej 10 lat obowiązkowego ubezpieczenia chorobowego</label>
           {f.tytul === "umowa_o_prace" && <Field label="Ilu ubezpieczonych zgłasza Twój pracodawca?" hint="Powyżej 20 – zasiłek wypłaca pracodawca"><input type="number" value={f.platnik} onChange={(e) => set({ platnik: e.target.value })} /></Field>}
-          {f.tytul === "dzialalnosc" && <Field label="Zadłużenie składkowe (zł)"><input type="number" value={f.zadl} onChange={(e) => set({ zadl: e.target.value })} /></Field>}
+          {f.tytul === "dzialalnosc" && <Field label="Zadłużenie składkowe (zł)" hint="Liczone na dzień porodu"><input type="number" value={f.zadl} onChange={(e) => set({ zadl: e.target.value })} /></Field>}
+          {f.tytul === "dzialalnosc" && zad && <Alert t={zad.przekroczonyProg ? "warn" : "info"}><b>Stan zadłużenia na dzień {dataPL(zad.naDzien)} (symulacja):</b> {pln(zad.kwotaZadluzenia)}, próg {pln(zad.prog)}. Wynik: {wynikZadluzenia(zad)}. {zad.komunikat}</Alert>}
           <Field label="Średnie wynagrodzenie brutto / mies." hint="Do wyliczenia kwot poniżej"><input type="number" value={f.brutto} onChange={(e) => set({ brutto: e.target.value })} /></Field>
           <Field label="Dni zwolnienia lekarskiego w ciąży (kod B)"><input type="number" value={f.niezd} onChange={(e) => set({ niezd: e.target.value })} /></Field>
           <label className="check"><input type="checkbox" checked={f.w50} onChange={(e) => set({ w50: e.target.checked })} />Mam ukończone 50 lat</label>

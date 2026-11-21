@@ -32,3 +32,25 @@ export function rodzajChorobowego(chorobowe: string) {
     default: return "do sprawdzenia";
   }
 }
+
+export interface StanZadluzeniaNaDzien {
+  naDzien: string;
+  kwotaZadluzenia: number;
+  prog: number;
+  przekroczonyProg: boolean;
+  wynik: "nie_dotyczy" | "brak_zadluzenia" | "ponizej_progu" | "powyzej_progu";
+  komunikat: string;
+  numerZaswiadczenia: string;
+  wystawiono: string;
+  skladniki: { okres: string; kwota: number; terminPlatnosci: string }[];
+}
+
+/** Krótki wynik dla ekranu: czy prawo do zasiłku jest zachowane przy zadłużeniu w wybranym dniu. */
+export function wynikZadluzenia(z: Pick<StanZadluzeniaNaDzien, "wynik">) {
+  switch (z.wynik) {
+    case "powyzej_progu": return "ryzyko: zasiłek po spłacie zadłużenia";
+    case "ponizej_progu": return "prawo zachowane (zadłużenie poniżej progu)";
+    case "brak_zadluzenia": return "prawo zachowane (brak zadłużenia)";
+    default: return "nie dotyczy (składki opłaca płatnik)";
+  }
+}
