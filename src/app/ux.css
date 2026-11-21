@@ -133,3 +133,40 @@ html.hc .zus-subnav a { color: #ffe14d !important; }
   .zus-side { display: none; }
   .zus-layout__main { padding-left: 0; }
 }
+
+/* === nawigacja === */
+/* „Więcej": rozwijane podmenu w głównym menu (komputer) i składana grupa w panelu menu (telefon). */
+.zus-nav__more { position: relative; }
+.zus-nav__more-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 52px; padding: 12px 6px 19px;
+  background: transparent; border: 0; border-radius: 0; font: inherit; font-weight: 700; font-size: 15.4px; line-height: 23px;
+  color: var(--zus-green-link); cursor: pointer;
+}
+.zus-nav__more-btn:hover { text-decoration: underline; }
+.zus-nav__chev { flex: none; transition: transform .15s ease; }
+.zus-nav__more-btn[aria-expanded="true"] .zus-nav__chev { transform: rotate(180deg); }
+.zus-nav__drop[hidden] { display: none; }
+.zus-nav ul.zus-nav__drop { list-style: none; margin: 0; padding: 4px 0; }
+.zus-nav ul.zus-nav__drop li { border: 0; flex: none; }
+.zus-nav ul.zus-nav__drop a { justify-content: flex-start; text-align: left; font-weight: 400; }
+.zus-nav ul.zus-nav__drop a[aria-current="page"] { font-weight: 700; }
+@media (min-width: 1100px) {
+  .zus-nav ul.zus-nav__drop {
+    position: absolute; top: 100%; right: 0; z-index: 80; min-width: 320px; background: #fff;
+    border: 1px solid var(--line); border-top: 3px solid var(--zus-green); box-shadow: 0 6px 14px rgba(0, 0, 0, .14);
+  }
+  .zus-nav ul.zus-nav__drop a { padding: 10px 16px; min-height: 44px; font-size: 15px; line-height: 22px; }
+  .zus-nav ul.zus-nav__drop a:hover { background: #f3f3f3; }
+  .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 var(--zus-green); }
+}
+@media (max-width: 1099px) {
+  .zus-nav__more-btn { justify-content: space-between; padding: 12px 16px; min-height: 48px; font-size: 16px; }
+  .zus-nav ul.zus-nav__drop { padding: 0; }
+  .zus-nav ul.zus-nav__drop li { border-top: 1px solid #e7e7e7; }
+  .zus-nav ul.zus-nav__drop a { padding-left: 32px; min-height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) { .zus-nav__chev { transition: none; } }
+html.hc .zus-nav__more-btn { color: #ffe14d; }
+html.hc .zus-nav ul.zus-nav__drop { background: #000; border-color: #fff; border-top-color: #ffe14d; box-shadow: none; }
+html.hc .zus-nav ul.zus-nav__drop a:hover { background: #222; }
+html.hc .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 #ffe14d; }
