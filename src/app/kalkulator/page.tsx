@@ -1,10 +1,24 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { DataPole } from "@/components/DataPole";
+import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/sesja";
-import { pln, dataPL, dataKrotka, RODZAJE, tygodnie } from "@/lib/format";
+import { pln, dataPL, RODZAJE, tygodnie, liczba } from "@/lib/format";
 import Timeline from "@/components/Timeline";
-import { Alert, Field, Kroki, Lista, Spin } from "@/components/ui";
+import { Alert, Kroki, Lista, Spin } from "@/components/ui";
+import { Pole as Field } from "@/components/Pole";
+import parametry from "../../../data/parametry.json";
+import Ojcowski from "./Ojcowski";
+
+const P = parametry.procenty;
+const L = parametry.limity_dni;
+const W = parametry.wymiary_tygodnie;
+const T = parametry.terminy_dni;
+const niezbywalne = W.niezbywalne_prawo_kazdego_rodzica_rodzicielski;
+const standard = `${liczba(P.zasilek_za_urlop_macierzynski)}% / ${liczba(P.zasilek_za_urlop_rodzicielski)}%`;
+const usredniony = `${liczba(P.wariant_pelny_wymiar_81_5)}%`;
+const komunikat = (s: string) => s.replace(/\d{4}-\d{2}-\d{2}/g, (d) => dataPL(d)).replace(/(\d+(?:\.\d+)?) zł/g, (_, n) => pln(Number(n)));
 
 type Tryb = "matka" | "oboje" | "laczenie" | "adopcja" | "wlasne";
 const plus = (n: number) => { const d = new Date(); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
@@ -13,13 +27,13 @@ const num = (s: string) => (s === "" || s == null ? NaN : Number(String(s).repla
 const START = {
   tryb: "oboje" as Tryb, tytul: "porod", data: plus(100), dzieci: 1, zaZyciem: false, martwe: false,
   bruttoM: "6500", bruttoO: "7000", podstawaM: "", podstawaO: "",
-  przedPorodem: 0, ojciecPrzejmuje: 0, rodzM: 32, rodzO: 9, laczTyg: 0, etat: 0.5,
+  przedPorodem: 0, ojciecPrzejmuje: 0, rodzM: 32, rodzO: niezbywalne, laczTyg: 0, etat: 0.5,
   ojcowski: true, ojcowskiOd: "", uzup: 0, wariant: "zmienny_100_70",
-  dataUrDziecka: "", rodzajAdopcji: "przysposobienie", extra: {} as Record<string, any>,
+  dataUrDziecka: "", extra: {} as Record<string, any>,
 };
 type F = typeof START;
 
-export default function Kalkulator() {
+function PlanRodziny() {
   const [f, setF] = useState<F>(START);
   const [podM, setPodM] = useState<any>(null);
   const [podO, setPodO] = useState<any>(null);
@@ -37,7 +51,7 @@ export default function Kalkulator() {
   useEffect(() => { api("/api/scenariusze").then((j) => setScen((j.przypadki || []).filter((c: any) => c.wejscie?.tytul))).catch(() => {}); }, []);
   useEffect(() => {
     try { const pre = JSON.parse(localStorage.getItem("rodzice.prefill") || "null"); if (pre?.podstawaM) { setF((x) => ({ ...x, podstawaM: String(pre.podstawaM), bruttoM: "", tryb: "wlasne", ...(pre.data ? { data: pre.data } : {}), ...(pre.dzieci ? { dzieci: Math.min(pre.dzieci, 5) } : {}) })); localStorage.removeItem("rodzice.prefill"); } } catch {}
-    const q = new URLSearchParams(location.search).get("tryb"); if (q) setF((x) => ({ ...x, tryb: q as Tryb, ...(q === "matka" ? { rodzO: 0, ojcowski: false } : {}), ...(q === "laczenie" ? { rodzM: 14, laczTyg: 20 } : {}), ...(q === "adopcja" ? { tytul: "przysposobienie" } : {}) }));
+    const q = new URLSearchParams(location.search).get("tryb"); if (q && ["matka", "oboje", "laczenie", "adopcja", "wlasne"].includes(q)) setF((x) => ({ ...x, tryb: q as Tryb, ...(q === "matka" ? { rodzO: 0, ojcowski: false } : {}), ...(q === "laczenie" ? { rodzM: 14, laczTyg: 20 } : {}), ...(q === "adopcja" ? { tytul: "przysposobienie", ojcowski: false } : {}) }));
   }, []);
 
   // podstawa wymiaru z wynagrodzenia brutto
@@ -63,32 +77,49 @@ export default function Kalkulator() {
     if (f.tytul === "porod" && f.przedPorodem > 0) w.przedPorodemDni = f.przedPorodem; else if (f.tytul === "porod") delete w.przedPorodemDni;
     if (dwoje && f.ojciecPrzejmuje > 0) w.macierzynskiOjciecPrzejmujeTyg = f.ojciecPrzejmuje; else if (!f.extra.macierzynskiOjciecPrzejmujeDni) delete w.macierzynskiOjciecPrzejmujeTyg;
     if (f.uzup > 0 && !f.martwe) w.uzupelniajacy = { kto: "matka", tygodnie: f.uzup }; else delete w.uzupelniajacy;
-    if (dwoje && f.ojcowski && f.tytul !== "rodzina_zastepcza" && !f.martwe) w.ojcowski = [{ od: f.ojcowskiOd || f.data, dni: 14 }]; else if (!f.extra.ojcowski) delete w.ojcowski;
+    if (dwoje && f.ojcowski && f.tytul === "porod" && !f.martwe) w.ojcowski = [{ od: f.ojcowskiOd || f.data, dni: L.urlop_ojcowski_dni }]; else if (!f.extra.ojcowski) delete w.ojcowski;
     if (wiekGranicy) w.wiekGranicyDzieckaData = wiekGranicy;
     return w;
   }, [f, podstawaM, podstawaO, dwoje, wiekGranicy]);
 
   const seq = useRef(0);
   useEffect(() => {
-    if (!(podstawaM > 0)) { setWyn(null); return; }
-    const my = ++seq.current; setBusy(true); setBlad("");
+    const my = ++seq.current;
+    setWyn(null);
+    setPor(null);
+    setBlad("");
+    if (!f.data || !(podstawaM > 0)) { setBusy(false); return; }
+    setBusy(true);
     const t = setTimeout(async () => {
       try {
         const r = await api("/api/oblicz/plan", wejscie);
-        if (my !== seq.current) return; setWyn(r);
-        const { wariant, ...bez } = wejscie; setPor(await api("/api/oblicz/porownanie", bez));
-        localStorage.setItem("rodzice.plan", JSON.stringify({ wejscie }));
-      } catch (e: any) { if (my === seq.current) { setBlad(e.message); setWyn(null); } } finally { if (my === seq.current) setBusy(false); }
+        if (my !== seq.current) return;
+        setWyn(r);
+        if (r.bledy.length) return;
+        const { wariant, ...bez } = wejscie;
+        const porownanie = await api("/api/oblicz/porownanie", bez);
+        if (my !== seq.current) return;
+        setPor(porownanie);
+        try { localStorage.setItem("rodzice.plan", JSON.stringify({ wejscie })); } catch {}
+      } catch {
+        if (my === seq.current) setBlad("Nie udało się policzyć zasiłku. Sprawdź wpisane dane.");
+      } finally {
+        if (my === seq.current) setBusy(false);
+      }
     }, 350);
-    return () => clearTimeout(t);
-  }, [wejscie, podstawaM]);
+    return () => { clearTimeout(t); ++seq.current; };
+  }, [wejscie, podstawaM, f.data]);
 
-  // wymiary (limit rodzicielskiego dla suwaków)
-  useEffect(() => { if (!(podstawaM > 0)) return; api("/api/oblicz/plan", { tytul: f.tytul, dataZdarzenia: f.data, liczbaDzieci: f.dzieci, zaswiadczenieZaZyciem: f.zaZyciem, wariant: "zmienny_100_70", podstawy: { matka: podstawaM }, rodzicielski: [] }).then((r) => setWym(r.wymiary)).catch(() => {}); }, [f.tytul, f.data, f.dzieci, f.zaZyciem, podstawaM]);
+  useEffect(() => {
+    if (!f.data || !(podstawaM > 0)) return;
+    let aktualne = true;
+    api("/api/oblicz/plan", { tytul: f.tytul, dataZdarzenia: f.data, liczbaDzieci: f.dzieci, zaswiadczenieZaZyciem: f.zaZyciem, wariant: "zmienny_100_70", podstawy: { matka: podstawaM }, rodzicielski: [] })
+      .then((r) => { if (aktualne) setWym(r.wymiary); }).catch(() => {});
+    return () => { aktualne = false; };
+  }, [f.tytul, f.data, f.dzieci, f.zaZyciem, podstawaM]);
 
-  const limit = wym?.rodzicielskiTyg ?? 41;
-  const zast = wyn ? (f.wariant === "zmienny_100_70" ? wyn : wyn) : null;
-  const podzial = () => set({ rodzO: Math.min(9, limit), rodzM: Math.max(limit - 9, 0), laczTyg: 0 });
+  const limit = wym?.rodzicielskiTyg ?? W.urlop_rodzicielski["1"];
+  const podzial = () => set({ rodzO: Math.min(niezbywalne, limit), rodzM: Math.max(limit - niezbywalne, 0), laczTyg: 0 });
 
   function wczytaj(id: string) {
     const c = scen.find((x) => x.id === id); if (!c) return; const w = c.wejscie;
@@ -105,15 +136,18 @@ export default function Kalkulator() {
   }
 
   const zasilki = wyn?.okresy ?? [];
+  const przyjecie = f.tytul !== "porod";
+  const rodzicPierwszy = przyjecie ? "Rodzic 1" : "Matka";
+  const rodzicDrugi = przyjecie ? "Rodzic 2" : "Ojciec";
+  const rola = (kto: string) => kto === "matka" ? rodzicPierwszy : rodzicDrugi;
   return (
     <>
-      <h1>Kalkulator zasiłku macierzyńskiego</h1>
-      <p className="lead">Jeden kalkulator dla wszystkich sytuacji: policzy, ile tygodni i ile pieniędzy przysługuje każdemu z rodziców. Kwoty są <b>przed zaliczką na podatek</b>. Silnik obliczeń to zwykły kod (bez AI) – każdy wynik pokazuje kroki i podstawę.</p>
+      <p className="lead">Zaplanuj urlopy i porównaj kwoty dla rodziny. Zasiłek pokazujemy przed zaliczką na podatek. Kwoty startowe są przykładowe.</p>
 
-      <div className="tabs" role="tablist">
-        {([["matka", "Matka"], ["oboje", "Oboje rodzice"], ["laczenie", "Praca + urlop rodzicielski"], ["adopcja", "Adopcja / rodzina zastępcza"], ["wlasne", "Moje dane / przykładowa sprawa"]] as [Tryb, string][]).map(([k, t]) => (
-          <button key={k} role="tab" aria-selected={f.tryb === k} className={"tab" + (f.tryb === k ? " on" : "")}
-            onClick={() => set({ tryb: k, ...(k === "matka" ? { rodzO: 0, ojciecPrzejmuje: 0, ojcowski: false } : k === "oboje" ? { rodzO: 9, rodzM: Math.max(limit - 9, 0), ojcowski: true, laczTyg: 0 } : k === "laczenie" ? { rodzM: 14, laczTyg: 20, rodzO: 9 } : k === "adopcja" ? { tytul: f.tytul === "porod" ? "przysposobienie" : f.tytul } : {}), ...(k !== "adopcja" && f.tytul !== "porod" && k !== "wlasne" ? { tytul: "porod" } : {}) })}>{t}</button>
+      <div className="tabs" role="group" aria-label="Ustawienia planu">
+        {([["matka", "Plan dla mamy"], ["oboje", "Oboje rodzice"], ["laczenie", "Praca + urlop rodzicielski"], ["adopcja", "Adopcja / rodzina zastępcza"], ["wlasne", "Moje dane / przykładowa sprawa"]] as [Tryb, string][]).map(([k, t]) => (
+          <button key={k} aria-pressed={f.tryb === k} className={"tab" + (f.tryb === k ? " on" : "")}
+            onClick={() => set({ tryb: k, ...(k === "matka" ? { rodzO: 0, ojciecPrzejmuje: 0, ojcowski: false } : k === "oboje" ? { rodzO: niezbywalne, rodzM: Math.max(limit - niezbywalne, 0), ojcowski: true, laczTyg: 0 } : k === "laczenie" ? { rodzM: 14, laczTyg: 20, rodzO: niezbywalne } : k === "adopcja" ? { tytul: f.tytul === "porod" ? "przysposobienie" : f.tytul, martwe: false, ojcowski: false, ojciecPrzejmuje: 0, uzup: 0 } : {}), ...(k !== "adopcja" && f.tytul !== "porod" && k !== "wlasne" ? { tytul: "porod" } : {}) })}>{t}</button>
         ))}
       </div>
 
@@ -123,17 +157,17 @@ export default function Kalkulator() {
             <div className="card accent">
               <h3>Przykładowa sprawa lub własny wniosek</h3>
               <p className="small muted">Wczytaj gotowy scenariusz (fikcyjna osoba) albo <Link href="/wgraj">wgraj skan wniosku</Link> – podstawa wymiaru zostanie odczytana z dokumentu.</p>
-              <Field label="Scenariusz"><select defaultValue="" onChange={(e) => e.target.value && wczytaj(e.target.value)}><option value="">— wybierz —</option>{scen.map((c) => <option key={c.id} value={c.id}>{c.id} · {c.osoba}</option>)}</select></Field>
+              <Field label="Scenariusz"><select defaultValue="" onChange={(e) => e.target.value && wczytaj(e.target.value)}><option value="">— wybierz —</option>{scen.map((c) => <option key={c.id} value={c.id}>{c.osoba}</option>)}</select></Field>
             </div>
           )}
           <div className="card">
             <h3>1. Zdarzenie</h3>
-            <Field label="Co się wydarzyło / wydarzy?"><select value={f.tytul} onChange={(e) => set({ tytul: e.target.value, ...(e.target.value !== "porod" ? { rodzM: 32 } : {}) })}>
+            <Field label="Co się wydarzyło / wydarzy?"><select value={f.tytul} onChange={(e) => set({ tytul: e.target.value, ...(e.target.value !== "porod" ? { martwe: false, ojcowski: false, ojciecPrzejmuje: 0, uzup: 0 } : {}) })}>
               <option value="porod">Poród (urodzenie dziecka)</option><option value="przysposobienie">Przysposobienie (adopcja)</option><option value="rodzina_zastepcza">Rodzina zastępcza niezawodowa</option></select></Field>
-            <Field label={f.tytul === "porod" ? "Data porodu (planowana)" : "Data przyjęcia dziecka na wychowanie"}><input type="date" value={f.data} onChange={(e) => set({ data: e.target.value })} /></Field>
+            <DataPole label={f.tytul === "porod" ? "Data urodzenia lub przewidywana data porodu" : "Data przyjęcia dziecka na wychowanie"} value={f.data} onChange={(iso) => set({ data: iso })} />
             <div className="grid g2">
-              <Field label="Liczba dzieci przy jednym porodzie"><select value={f.dzieci} onChange={(e) => set({ dzieci: +e.target.value })}>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? "5 lub więcej" : n}</option>)}</select></Field>
-              {f.tytul !== "porod" && <Field label="Data urodzenia dziecka" hint="Do limitu wieku (7/10 lat – rodzina zastępcza, 14 lat – adopcja)"><input type="date" value={f.dataUrDziecka} onChange={(e) => set({ dataUrDziecka: e.target.value })} /></Field>}
+              <Field label={f.tytul === "porod" ? "Liczba dzieci przy jednym porodzie" : "Liczba dzieci przyjmowanych jednocześnie"}><select value={f.dzieci} onChange={(e) => set({ dzieci: +e.target.value })}>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? "5 lub więcej" : n}</option>)}</select></Field>
+              {f.tytul !== "porod" && <DataPole label="Data urodzenia dziecka" hint="Do limitu wieku (7/10 lat – rodzina zastępcza, 14 lat – adopcja)" value={f.dataUrDziecka} onChange={(iso) => set({ dataUrDziecka: iso })} />}
             </div>
             <label className="check"><input type="checkbox" checked={f.zaZyciem} onChange={(e) => set({ zaZyciem: e.target.checked })} />Dziecko ma zaświadczenie „Za życiem” (dłuższy urlop rodzicielski)</label>
             {f.tytul === "porod" && <label className="check"><input type="checkbox" checked={f.martwe} onChange={(e) => set({ martwe: e.target.checked })} />Dziecko urodziło się martwe</label>}
@@ -142,53 +176,54 @@ export default function Kalkulator() {
           <div className="card">
             <h3>2. Zarobki (podstawa zasiłku)</h3>
             <div className="grid g2">
-              <Field label={dwoje ? "Matka – średnie brutto / mies." : "Średnie wynagrodzenie brutto / mies."} hint="Średnia z 12 miesięcy przed porodem"><input type="number" inputMode="decimal" value={f.bruttoM} onChange={(e) => set({ bruttoM: e.target.value, podstawaM: "" })} /></Field>
-              {dwoje && <Field label="Ojciec – średnie brutto / mies."><input type="number" inputMode="decimal" value={f.bruttoO} onChange={(e) => set({ bruttoO: e.target.value, podstawaO: "" })} /></Field>}
+              <Field label={dwoje ? `${rodzicPierwszy}: średnie wynagrodzenie brutto` : "Średnie wynagrodzenie brutto"} hint="Wpisz średnie miesięczne wynagrodzenie przed potrąceniami. Jeśli znasz podstawę zasiłku, możesz podać ją niżej."><input type="number" inputMode="decimal" value={f.bruttoM} onChange={(e) => set({ bruttoM: e.target.value, podstawaM: "" })} /></Field>
+              {dwoje && <Field label={`${rodzicDrugi}: średnie wynagrodzenie brutto`}><input type="number" inputMode="decimal" value={f.bruttoO} onChange={(e) => set({ bruttoO: e.target.value, podstawaO: "" })} /></Field>}
             </div>
-            <p className="small muted">Podstawa zasiłku = średnia pomniejszona o 13,71% (składki). {podM && <>Matka: <b>{pln(podM.podstawaMiesieczna)}</b></>}{dwoje && podO && <> · Ojciec: <b>{pln(podO.podstawaMiesieczna)}</b></>}</p>
+            <p className="small muted">Przy umowie o pracę od średniej odejmujemy składki ({liczba(P.skladki_odliczane_od_podstawy)}%). {podstawaM > 0 && <>{rodzicPierwszy}: <b>{pln(podstawaM)}</b></>}{dwoje && podstawaO > 0 && <> · {rodzicDrugi}: <b>{pln(podstawaO)}</b></>}</p>
             <details className="dl"><summary>Znam gotową podstawę wymiaru (np. z decyzji lub Z-3)</summary>
-              <div className="grid g2 mt"><Field label="Podstawa – matka (zł)"><input type="number" value={f.podstawaM} onChange={(e) => set({ podstawaM: e.target.value })} /></Field>
-              {dwoje && <Field label="Podstawa – ojciec (zł)"><input type="number" value={f.podstawaO} onChange={(e) => set({ podstawaO: e.target.value })} /></Field>}</div></details>
-            <Kroki kroki={podM?.kroki} tytul="Jak policzono podstawę matki" />
-            {podM?.ostrzezenia?.length > 0 && <Lista items={podM.ostrzezenia} warn />}
+              <div className="grid g2 mt"><Field label={`${rodzicPierwszy}: podstawa zasiłku (zł)`}><input type="number" value={f.podstawaM} onChange={(e) => set({ podstawaM: e.target.value })} /></Field>
+              {dwoje && <Field label={`${rodzicDrugi}: podstawa zasiłku (zł)`}><input type="number" value={f.podstawaO} onChange={(e) => set({ podstawaO: e.target.value })} /></Field>}</div></details>
+            <Kroki kroki={podM?.kroki?.map(komunikat)} tytul="Jak policzono podstawę zasiłku" />
+            {podM?.ostrzezenia?.length > 0 && <Lista items={podM.ostrzezenia.map(komunikat)} warn />}
           </div>
 
           <div className="card">
             <h3>3. Urlopy i ich podział</h3>
-            {f.tytul === "porod" && !f.martwe && <Field label={`Urlop macierzyński przed porodem: ${f.przedPorodem} dni`} hint="Matka może rozpocząć urlop do 6 tygodni (42 dni) przed porodem"><input type="range" min={0} max={42} value={f.przedPorodem} onChange={(e) => set({ przedPorodem: +e.target.value })} /></Field>}
+            {f.tytul === "porod" && !f.martwe && <Field label={`Urlop macierzyński przed porodem: ${f.przedPorodem} dni`} hint={`Urlop można rozpocząć do ${tygodnie(W.macierzynski_przed_porodem_max)} przed porodem.`}><input type="range" min={0} max={W.macierzynski_przed_porodem_max * 7} value={f.przedPorodem} onChange={(e) => set({ przedPorodem: +e.target.value })} /></Field>}
             {!f.martwe && <>
-              <Field label={`Urlop rodzicielski – matka: ${tygodnie(f.rodzM)}`} hint={wym ? `Łącznie do ${tygodnie(limit)} dla obojga rodziców` : ""}><input type="range" min={0} max={limit} value={f.rodzM} onChange={(e) => set({ rodzM: +e.target.value })} /></Field>
-              {dwoje && <Field label={`Urlop rodzicielski – ojciec: ${tygodnie(f.rodzO)}`} hint="Każdemu rodzicowi przysługuje 9 tygodni wyłącznie dla siebie"><input type="range" min={0} max={limit} value={f.rodzO} onChange={(e) => set({ rodzO: +e.target.value })} /></Field>}
-              {dwoje && <button className="btn btn-ghost btn-sm" onClick={podzial}>Ustaw: ojciec 9 tyg., matka reszta</button>}
+              <Field label={`${rodzicPierwszy}: urlop rodzicielski ${tygodnie(f.rodzM)}`} hint={wym ? `Łącznie do ${tygodnie(limit)} dla obojga rodziców` : ""}><input type="range" min={0} max={limit} value={f.rodzM} onChange={(e) => set({ rodzM: +e.target.value })} /></Field>
+              {dwoje && <Field label={`${rodzicDrugi}: urlop rodzicielski ${tygodnie(f.rodzO)}`} hint={`Każdy rodzic ma ${tygodnie(niezbywalne)} wyłącznie dla siebie.`}><input type="range" min={0} max={limit} value={f.rodzO} onChange={(e) => set({ rodzO: +e.target.value })} /></Field>}
+              {dwoje && <button className="btn btn-ghost btn-sm" onClick={podzial}>Ustaw {tygodnie(niezbywalne)} dla drugiego rodzica</button>}
               <div className="card mt" style={{ background: "#f8fafb" }}>
                 <b>Łączenie pracy z urlopem rodzicielskim</b>
                 <p className="small muted">Można pracować do ½ etatu u pracodawcy, który udziela urlopu. Urlop wydłuża się proporcjonalnie, a zasiłek maleje proporcjonalnie.</p>
-                <Field label={`Tygodnie urlopu rodzicielskiego matki z pracą: ${f.laczTyg}`}><input type="range" min={0} max={60} value={f.laczTyg} onChange={(e) => set({ laczTyg: +e.target.value })} /></Field>
-                {f.laczTyg > 0 && <Field label={`Wymiar etatu w pracy: ${f.etat}`}><input type="range" min={0.1} max={0.5} step={0.05} value={f.etat} onChange={(e) => set({ etat: +e.target.value })} /></Field>}
+                <Field label={`${rodzicPierwszy}: tygodnie urlopu połączone z pracą ${f.laczTyg}`}><input type="range" min={0} max={60} value={f.laczTyg} onChange={(e) => set({ laczTyg: +e.target.value })} /></Field>
+                {f.laczTyg > 0 && <Field label={`Wymiar etatu w pracy: ${f.etat}`}><input type="range" min={0.1} max={L.laczenie_z_praca_max_wymiar_etatu} step={0.05} value={f.etat} onChange={(e) => set({ etat: +e.target.value })} /></Field>}
               </div>
-              {dwoje && f.tytul !== "rodzina_zastepcza" && <label className="check mt"><input type="checkbox" checked={f.ojcowski} onChange={(e) => set({ ojcowski: e.target.checked })} />Ojciec bierze urlop ojcowski (14 dni)</label>}
-              {dwoje && f.ojcowski && <Field label="Początek urlopu ojcowskiego" hint="Domyślnie dzień porodu"><input type="date" value={f.ojcowskiOd} onChange={(e) => set({ ojcowskiOd: e.target.value })} /></Field>}
-              {dwoje && <Field label={`Ojciec przejmuje końcówkę urlopu macierzyńskiego: ${f.ojciecPrzejmuje} tyg.`} hint="Dopiero po 14 tygodniach wykorzystanych przez matkę"><input type="range" min={0} max={6} value={f.ojciecPrzejmuje} onChange={(e) => set({ ojciecPrzejmuje: +e.target.value })} /></Field>}
-              {f.tytul === "porod" && <Field label={`Uzupełniający urlop macierzyński (wcześniak/szpital): ${f.uzup} tyg.`}><input type="range" min={0} max={15} value={f.uzup} onChange={(e) => set({ uzup: +e.target.value })} /></Field>}
+              {dwoje && f.tytul === "porod" && <label className="check mt"><input type="checkbox" checked={f.ojcowski} onChange={(e) => set({ ojcowski: e.target.checked })} />Uwzględnij urlop ojcowski ({tygodnie(L.urlop_ojcowski_dni / 7)})</label>}
+              {dwoje && f.tytul === "porod" && f.ojcowski && <DataPole label="Początek urlopu ojcowskiego" hint="Domyślnie dzień porodu" value={f.ojcowskiOd} onChange={(iso) => set({ ojcowskiOd: iso })} />}
+              {dwoje && !przyjecie && <Field label={`Ojciec przejmuje końcówkę urlopu macierzyńskiego: ${f.ojciecPrzejmuje} tyg.`} hint={`Po co najmniej ${W.macierzynski_matka_obowiazkowo_po_porodzie_min} tygodniach urlopu matki po porodzie.`}><input type="range" min={0} max={W.urlop_macierzynski_wg_liczby_dzieci["1"] - W.macierzynski_matka_obowiazkowo_po_porodzie_min} value={f.ojciecPrzejmuje} onChange={(e) => set({ ojciecPrzejmuje: +e.target.value })} /></Field>}
+              {f.tytul === "porod" && <Field label={`Uzupełniający urlop macierzyński (wcześniak/szpital): ${f.uzup} tyg.`}><input type="range" min={0} max={W.uzupelniajacy_limit_do_tygodnia_po_porodzie.przed_28_tc_lub_masa_do_1000g} value={f.uzup} onChange={(e) => set({ uzup: +e.target.value })} /></Field>}
               {f.tytul === "porod" && <details className="dl"><summary>Ile przysługuje uzupełniającego? (kalkulator wcześniaka)</summary>
                 <div className="grid g2 mt"><Field label="Tydzień ciąży w dniu porodu"><input type="number" value={uzupForm.tc} onChange={(e) => setUzupForm({ ...uzupForm, tc: +e.target.value })} /></Field>
                 <Field label="Masa urodzeniowa (g)"><input type="number" value={uzupForm.masa} onChange={(e) => setUzupForm({ ...uzupForm, masa: +e.target.value })} /></Field>
-                <Field label="Pobyt w szpitalu – od"><input type="date" value={uzupForm.od} onChange={(e) => setUzupForm({ ...uzupForm, od: e.target.value })} /></Field>
-                <Field label="Pobyt w szpitalu – do"><input type="date" value={uzupForm.do} onChange={(e) => setUzupForm({ ...uzupForm, do: e.target.value })} /></Field></div>
-                <button className="btn btn-secondary btn-sm" onClick={liczUzup}>Oblicz</button>
-                {uzupWyn && (uzupWyn.error ? <Alert t="err">{uzupWyn.error}</Alert> : <Alert t="ok">Przysługuje <b>{tygodnie(uzupWyn.tygodnie)}</b> ({uzupWyn.przypadek}, dni w oknie: {uzupWyn.dniWOknie}). <button className="btn btn-sm btn-ghost" onClick={() => set({ uzup: uzupWyn.tygodnie })}>Użyj w planie</button></Alert>)}</details>}
+                <DataPole label="Pobyt w szpitalu – od" value={uzupForm.od} onChange={(iso) => setUzupForm({ ...uzupForm, od: iso })} />
+                <DataPole label="Pobyt w szpitalu – do" value={uzupForm.do} onChange={(iso) => setUzupForm({ ...uzupForm, do: iso })} /></div>
+                <button className="btn btn-secondary btn-sm" onClick={liczUzup}>Policz dodatkowy urlop</button>
+                {uzupWyn && (uzupWyn.error ? <Alert t="err">{uzupWyn.error}</Alert> : <Alert t="ok">Przysługuje <b>{tygodnie(uzupWyn.tygodnie)}</b> (uwzględnione dni pobytu: {uzupWyn.dniWOknie}). <button className="btn btn-sm btn-ghost" onClick={() => set({ uzup: uzupWyn.tygodnie })}>Dodaj urlop do planu</button></Alert>)}</details>}
             </>}
           </div>
 
           <div className="card">
             <h3>4. Wariant wysokości zasiłku</h3>
-            <label className="check"><input type="radio" name="w" checked={f.wariant === "zmienny_100_70"} onChange={() => set({ wariant: "zmienny_100_70" })} />Standardowy: 100% za urlop macierzyński, 70% za rodzicielski</label>
-            <label className="check"><input type="radio" name="w" checked={f.wariant === "usredniony_81_5"} onChange={() => set({ wariant: "usredniony_81_5" })} />Uśredniony: 81,5% przez cały okres (wniosek najpóźniej 21 dni po porodzie)</label>
+            <label className="check"><input type="radio" name="w" checked={f.wariant === "zmienny_100_70"} onChange={() => set({ wariant: "zmienny_100_70" })} />Standardowy ({standard}): wyższa stawka na początku, niższa na urlopie rodzicielskim</label>
+            <label className="check"><input type="radio" name="w" checked={f.wariant === "usredniony_81_5"} onChange={() => set({ wariant: "usredniony_81_5" })} />Uśredniony ({usredniony}): wniosek w ciągu {przyjecie ? T.adopcja_wniosek_81_5_po_przyjeciu : T.wniosek_pelny_wymiar_81_5_po_porodzie} dni {przyjecie ? "od przyjęcia dziecka" : "od porodu"}. Wyłączne tygodnie drugiego rodzica zachowują stawkę {liczba(P.zasilek_za_9_tyg_drugiego_rodzica)}%.</label>
           </div>
         </div>
 
         <div style={{ position: "sticky", top: 90 }}>
-          {!(podstawaM > 0) && <Alert>Podaj zarobki, aby zobaczyć wynik.</Alert>}
+          {!f.data && <Alert>Wpisz datę, aby zobaczyć wynik.</Alert>}
+          {!(podstawaM > 0) && <Alert>Podaj zarobki lub podstawę zasiłku, aby zobaczyć wynik.</Alert>}
           {blad && <Alert t="err">{blad}</Alert>}
           {busy && <p><Spin /> Liczę…</p>}
           {wyn && (
@@ -197,31 +232,55 @@ export default function Kalkulator() {
                 <h2>Wynik</h2>
                 <div className="grid g3">
                   <div className="stat"><div className="v">{pln(wyn.sumy.razem)}</div><div className="l">razem zasiłków</div></div>
-                  <div className="stat"><div className="v">{pln(wyn.sumy.matka)}</div><div className="l">matka / rodzic 1</div></div>
-                  {dwoje && <div className="stat"><div className="v">{pln(wyn.sumy.ojciec)}</div><div className="l">ojciec / rodzic 2</div></div>}
+                  <div className="stat"><div className="v">{pln(wyn.sumy.matka)}</div><div className="l">{rodzicPierwszy}</div></div>
+                  {dwoje && <div className="stat"><div className="v">{pln(wyn.sumy.ojciec)}</div><div className="l">{rodzicDrugi}</div></div>}
                 </div>
-                <p className="small muted mt">Wymiar: macierzyński <b>{tygodnie(wyn.wymiary.macierzynskiTyg)}</b>, rodzicielski <b>{tygodnie(wyn.wymiary.rodzicielskiTyg)}</b> (wykorzystano {tygodnie(wyn.wymiary.rodzicielskiWykorzystaneTyg)}; przy łączeniu z pracą maks. {tygodnie(wyn.wymiary.rodzicielskiMaxPrzyLaczeniuTyg)}).</p>
-                {wyn.bledy?.map((b: string, i: number) => <Alert key={i} t="err">{b}</Alert>)}
-                {wyn.ostrzezenia?.map((b: string, i: number) => <Alert key={i} t="warn">{b}</Alert>)}
+                <p className="small muted mt">Wymiar: {przyjecie ? "urlop na warunkach macierzyńskiego" : "urlop macierzyński"} <b>{tygodnie(wyn.wymiary.macierzynskiTyg)}</b>, rodzicielski <b>{tygodnie(wyn.wymiary.rodzicielskiTyg)}</b> (wykorzystano {tygodnie(wyn.wymiary.rodzicielskiWykorzystaneTyg)}; przy łączeniu z pracą maks. {tygodnie(wyn.wymiary.rodzicielskiMaxPrzyLaczeniuTyg)}).</p>
+                {wyn.bledy?.map((b: string, i: number) => <Alert key={i} t="err">{komunikat(b)}</Alert>)}
+                {wyn.ostrzezenia?.map((b: string, i: number) => <Alert key={i} t="warn">{komunikat(b)}</Alert>)}
               </div>
-              <div className="card"><h3>Oś czasu</h3><Timeline okresy={wyn.okresy} start={f.data} /></div>
+              <div className="card"><h3>Oś czasu</h3><Timeline okresy={wyn.okresy} start={f.data} etykiety={{ matka: rodzicPierwszy, ojciec: rodzicDrugi }} /></div>
               <div className="card"><h3>Okresy i kwoty</h3>
                 <div className="tbl-wrap"><table className="tbl"><thead><tr><th>Rodzaj</th><th>Kto</th><th>Od – do</th><th className="num">Dni</th><th className="num">%</th><th className="num">Kwota</th></tr></thead>
-                  <tbody>{zasilki.map((o: any, i: number) => <tr key={i}><td>{RODZAJE[o.rodzaj] ?? o.rodzaj}{o.podwyzszoneDoSwiadczeniaRodzicielskiego && <span className="badge warn"> do 1000 zł</span>}{o.uwagi && <div className="small muted">{o.uwagi}</div>}</td><td>{o.kto}</td>
-                    <td>{dataKrotka(o.od)} – {dataKrotka(o.do)}</td><td className="num">{o.dni}</td><td className="num">{o.procent}{o.wspolczynnikZasilku !== 1 ? ` × ${o.wspolczynnikZasilku}` : ""}</td><td className="num">{pln(o.kwota)}</td></tr>)}</tbody>
+                  <tbody>{zasilki.map((o: any, i: number) => <tr key={i}><td>{RODZAJE[o.rodzaj] ?? "Okres zasiłku"}{o.podwyzszoneDoSwiadczeniaRodzicielskiego && <span className="badge warn"> do {pln(parametry.kwoty.swiadczenie_rodzicielskie_miesieczne)}</span>}{o.uwagi && <div className="small muted">{o.uwagi}</div>}</td><td>{rola(o.kto)}</td>
+                    <td>{dataPL(o.od)} do {dataPL(o.do)}</td><td className="num">{o.dni}</td><td className="num">{liczba(o.procent)}{o.wspolczynnikZasilku !== 1 ? ` × ${liczba(o.wspolczynnikZasilku)}` : ""}</td><td className="num">{pln(o.kwota)}</td></tr>)}</tbody>
                   <tfoot><tr><td colSpan={5}>Razem</td><td className="num">{pln(wyn.sumy.razem)}</td></tr></tfoot></table></div>
-                <Kroki kroki={wyn.kroki} />
+                <Kroki kroki={wyn.kroki.map(komunikat)} />
               </div>
               {por && <div className="card navy"><h3>Porównanie wariantów</h3>
-                <div className="grid g2"><div className="stat"><div className="v">{pln(por.zmienny_100_70.sumy.razem)}</div><div className="l">standardowy 100% / 70%</div></div>
-                <div className="stat"><div className="v">{pln(por.usredniony_81_5.sumy.razem)}</div><div className="l">uśredniony 81,5%</div></div></div>
-                <Alert t={por.roznicaRazem >= 0 ? "ok" : "warn"}>{por.roznicaRazem >= 0 ? <>Wariant 81,5% daje <b>{pln(por.roznicaRazem)}</b> więcej łącznie. Pamiętaj o terminie: wniosek najpóźniej 21 dni po porodzie.</> : <>Wariant 81,5% daje <b>{pln(-por.roznicaRazem)}</b> mniej łącznie – w Twojej sytuacji bardziej opłaca się wariant standardowy.</>}</Alert>
-                <p className="small muted">Wariant uśredniony wypłaca mniej na początku, a więcej w późniejszym okresie – wybierz go, gdy zależy Ci na stałym dochodzie.</p></div>}
-              <div className="card"><Link href="/dokumenty" className="btn btn-primary">Co teraz złożyć i do kiedy →</Link></div>
+                <div className="grid g2"><div className="stat"><div className="v">{pln(por.zmienny_100_70.sumy.razem)}</div><div className="l">standardowy {standard}</div></div>
+                <div className="stat"><div className="v">{pln(por.usredniony_81_5.sumy.razem)}</div><div className="l">uśredniony {usredniony}</div></div></div>
+                <p className="mt">Różnica łącznych kwot: <b>{pln(Math.abs(por.roznicaRazem))}</b>{por.roznicaRazem !== 0 && (por.roznicaRazem > 0 ? " na korzyść wariantu uśrednionego" : " na korzyść wariantu standardowego")}.</p>
+                <p className="small muted">Porównaj też wypłaty w poszczególnych okresach. Przy uśrednionej stawce na początku wypłata jest niższa, a na urlopie rodzicielskim może być wyższa.</p></div>}
+              <div className="card"><Link href="/dokumenty" className="btn btn-primary">Sprawdź dokumenty i terminy</Link></div>
             </>
           )}
         </div>
       </div>
     </>
   );
+}
+
+
+function ZakresKalkulatora() {
+  const query = useSearchParams();
+  const tryb = query.get("tryb");
+  const tylkoOjciec = tryb === "ojciec";
+
+
+  return (
+    <>
+      <h1>Kalkulator zasiłku macierzyńskiego</h1>
+      <nav className="tabs" aria-label="Wybierz zakres obliczeń">
+        <Link className={`tab${tylkoOjciec === false ? " on" : ""}`} href="/kalkulator" aria-current={tylkoOjciec === false ? "page" : undefined}>Plan rodziny lub adopcja</Link>
+        <Link className={`tab${tylkoOjciec ? " on" : ""}`} href="/kalkulator?tryb=ojciec" aria-current={tylkoOjciec ? "page" : undefined}>Tata lub drugi rodzic</Link>
+      </nav>
+      {tylkoOjciec ? <Ojcowski /> : <PlanRodziny key={tryb} />}
+    </>
+  );
+}
+
+
+export default function Kalkulator() {
+  return <Suspense fallback={<h1>Kalkulator zasiłku macierzyńskiego</h1>}><ZakresKalkulatora /></Suspense>;
 }

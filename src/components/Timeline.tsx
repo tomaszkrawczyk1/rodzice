@@ -1,10 +1,10 @@
-import { KOLORY, RODZAJE, dataKrotka } from "@/lib/format";
+import { KOLORY, RODZAJE, dataPL } from "@/lib/format";
 
 export interface OkresT { rodzaj: string; kto: string; od: string; do: string; dni: number; kwota?: number }
 const MS = 86400000;
 const t = (s: string) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
 
-export default function Timeline({ okresy, start }: { okresy: OkresT[]; start?: string }) {
+export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]; start?: string; etykiety?: Record<string, string> }) {
   if (!okresy.length) return null;
   const min = Math.min(...okresy.map((o) => t(o.od)), start ? t(start) : Infinity);
   const max = Math.max(...okresy.map((o) => t(o.do))) + MS;
@@ -22,16 +22,16 @@ export default function Timeline({ okresy, start }: { okresy: OkresT[]; start?: 
       <div className="tl-axis">{ticks.map((k) => <span key={k.l} className="tl-tick" style={{ left: `${k.p}%` }}>{k.l}</span>)}</div>
       {kto.map((k) => (
         <div key={k}>
-          <div className="tl-row-label">{k === "matka" ? "Matka / rodzic 1" : "Ojciec / rodzic 2"}</div>
+          <div className="tl-row-label">{etykiety?.[k] ?? (k === "matka" ? "Matka" : "Ojciec")}</div>
           <div className="tl-row">
             {okresy.filter((o) => o.kto === k).map((o, i) => (
               <div key={i} className="tl-bar" style={{ left: `${pct(t(o.od))}%`, width: `${Math.max(((t(o.do) + MS - t(o.od)) / span) * 100, 0.4)}%`, background: KOLORY[o.rodzaj] ?? "#555" }}
-                title={`${RODZAJE[o.rodzaj] ?? o.rodzaj}: ${dataKrotka(o.od)} – ${dataKrotka(o.do)} (${o.dni} dni)`}>{RODZAJE[o.rodzaj]?.replace("Urlop ", "")}</div>
+                title={`${RODZAJE[o.rodzaj] ?? "Okres zasiłku"}: ${dataPL(o.od)} – ${dataPL(o.do)} (${o.dni} dni)`}>{RODZAJE[o.rodzaj]?.replace("Urlop ", "")}</div>
             ))}
           </div>
         </div>
       ))}
-      <div className="leg">{uzyte.map((r) => <span key={r}><i style={{ background: KOLORY[r] ?? "#555" }} />{RODZAJE[r] ?? r}</span>)}</div>
+      <div className="leg">{uzyte.map((r) => <span key={r}><i style={{ background: KOLORY[r] ?? "#555" }} />{RODZAJE[r] ?? "Okres zasiłku"}</span>)}</div>
     </div>
   );
 }
