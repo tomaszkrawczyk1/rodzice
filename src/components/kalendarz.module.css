@@ -1,0 +1,103 @@
+.kalendarz {
+  max-width: 55rem;
+  margin-inline: auto;
+  overflow-wrap: anywhere;
+}
+
+.kalendarz h1 { font-size: 2em; }
+.kalendarz h2 { font-size: 1.4em; }
+.kalendarz h3 { font-size: 1.15em; }
+.kalendarz h4 { font-size: 1em; }
+.kalendarz small { display: block; color: var(--muted); font-size: .875em; }
+.kalendarz ul { padding-inline-start: 1.35em; }
+.kalendarz li + li { margin-top: .25em; }
+.kalendarz :global(.card) { border-radius: var(--radius); }
+.kalendarz :global(.badge) { font-size: .8125em; }
+.kalendarz :global(.btn), .kalendarz :global(.field) > label { font-size: 1em; }
+.kalendarz :focus-visible { outline-color: var(--zus-navy); }
+
+.wstep { max-width: 65ch; }
+.formularz { margin-block: 1.25rem 1.5rem; background: var(--gray); border-top: 4px solid var(--zus-green); }
+.formularz :is(details, .wyczysc) { margin-top: .75rem; }
+.formularz details {
+  padding-inline: .75rem;
+  padding-bottom: .25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+.formularz details[open] { padding-bottom: .75rem; }
+.kalendarz summary {
+  min-height: 44px;
+  padding-block: .55em;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--zus-green-link);
+}
+.glownaData { max-width: 24rem; }
+.kalendarz input[type="date"] { font-size: 1em; min-width: 0; border-color: var(--zus-navy); }
+.kalendarz input[aria-invalid="true"] { border-width: 2px; }
+.dwieDaty { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.warunek { min-height: 44px; padding-block: .5rem; cursor: pointer; }
+.warunek .odznaka { display: table; margin-top: .3rem; font-weight: 700; }
+.blad { margin-top: .75rem; font-weight: 700; }
+
+.odznaki { display: flex; flex-wrap: wrap; gap: .375rem; margin-bottom: .75rem; }
+.odznaka { max-width: 100%; }
+.podsumowanie { border-left: 4px solid var(--zus-green); }
+.podsumowanie .odznaka { margin-bottom: .5rem; }
+.kalendarz :is(.podsumowanie, .teraz, .zus, .wydarzenie) p:last-child { margin-bottom: 0; }
+.teraz { margin-top: 1rem; background: var(--gray); border-color: var(--zus-green); }
+.teraz ul { margin-bottom: 0; }
+.teraz li + li { margin-top: .75rem; }
+.teraz a { display: inline-block; align-content: center; min-height: 44px; font-weight: 700; }
+
+ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-block: 1.5rem; list-style: none; }
+.nawigacja li + li { margin: 0; }
+.nawigacja a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .35em .65em;
+  border: 1px solid currentColor;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-decoration: none;
+}
+.nawigacja a:hover { background: var(--gray); text-decoration: underline; }
+.nawigacja .linkZus { color: var(--zus-navy); }
+
+.etap { margin-block: 2rem; border-top: 6px solid var(--zus-green); padding-top: .75rem; }
+.opisEtapu { color: var(--muted); }
+.wydarzenie { scroll-margin-top: 1rem; }
+.wydarzenie h3 { margin-bottom: .5rem; }
+.wydarzenie details ul { margin-top: .25rem; }
+.wydarzenie details h4 { margin-top: .5rem; }
+.daty span { display: block; color: var(--muted); }
+.skutek { padding: .6em .75em; border-left: 3px solid var(--line); background: var(--gray); }
+.skutek strong { display: block; }
+.trwa { border-left: 4px solid var(--zus-green); }
+.informacja { background: var(--gray); }
+.informacja ul { margin-bottom: 0; }
+.zus { border-top: 6px solid var(--zus-navy); background: var(--zus-navy-soft); }
+.zus > a { display: inline-block; align-content: center; min-height: 44px; color: var(--zus-navy); }
+.start { font-weight: 700; }
+
+.tylkoCzytnik {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:global(html.hc) .kalendarz { color-scheme: dark; }
+:global(html.hc) .kalendarz :global(.badge) { color: #000; background: #ffe14d; }
+:global(html.hc) .wyczysc { color: #ffe14d; background: #000; }
+:global(html.hc) .blad { color: #ffe14d; }
+
+@media (max-width: 560px) {
+  .dwieDaty { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .kalendarz :global(.card) { padding-inline: .75rem; }
+}

@@ -15,6 +15,14 @@ Na stronie głównej „Co chcesz załatwić?” wybierz etap: planowanie dzieck
 
 Interfejs korzysta z palety inspirowanej serwisem ZUS. Na telefonie nawigacja rozwija się z przycisku „Menu”.
 
+## Kalendarz ciąży i połogu
+
+Otwórz [kalendarz](/kalendarz) i wpisz termin porodu. Zobaczysz okna wizyt i badań od początku ciąży do pierwszego roku życia dziecka. Po wpisaniu daty porodu i wypisu kalendarz przeliczy powiązane daty. Bez daty porodu terminy poporodowe są orientacyjne.
+
+Blok „W ZUS” korzysta z parametrów aplikacji. Termin wniosku o zasiłek w wariancie 81,5% jest liczony od tej samej daty co część poporodowa. Daty wniosków do pracodawcy zależą od planu urlopów.
+
+Obliczenia odbywają się w przeglądarce. Formularz jest zapisywany lokalnie pod kluczem `rodzice.kalendarz`, osobno dla gościa i każdej persony testowej. Termin z profilu jest podpowiadany przy pierwszym otwarciu. [Baza kalendarza](data/kalendarz_medyczny.json) zawiera treści do weryfikacji medycznej. `npm test` uruchamia też testy kalendarza i walidację tej bazy.
+
 ## Uruchomienie i testy
 
 ```bash
