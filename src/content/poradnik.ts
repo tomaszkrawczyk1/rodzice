@@ -27,7 +27,7 @@ export const pytanie = (id: string) => PYTANIA.find((p) => p.id === id);
 /** Dokąd prowadzi wynik kreatora/pytania poradnika (tryb z drzewa → podstrona aplikacji). */
 export function kalkulatorLink(k?: { tryb: string; opcja?: string } | null): { href: string; etykieta: string } | null {
   if (!k) return null;
-  const kalk = (t: string) => ({ href: `/kalkulator?tryb=${t}`, etykieta: "Policz w kalkulatorze" });
+  const kalk = (t: string) => ({ href: `/kalkulator?tryb=${t}`, etykieta: "Policz zasiłek w kalkulatorze" });
   switch (k.tryb) {
     case "matka": case "uprawnienia_matka": return kalk("matka");
     case "ojciec": case "oboje_rodzice": case "porownanie_wariantow": return kalk("oboje");
@@ -35,15 +35,15 @@ export function kalkulatorLink(k?: { tryb: string; opcja?: string } | null): { h
     case "adopcja": return kalk("adopcja");
     case "podstawa": return kalk("wlasne");
     case "chorobowe_w_ciazy": case "rehabilitacja": case "uprawnienia": case "swiadczenie_rodzicielskie":
-      return { href: "/ciaza", etykieta: "Sprawdź w module „W ciąży”" };
-    case "terminy": case "dokumenty": return { href: "/dokumenty", etykieta: "Dokumenty i terminy" };
-    case "wczesniak": case "martwe_dziecko": return { href: "/trudne", etykieta: "Trudne sytuacje – co przysługuje" };
+      return { href: "/ciaza", etykieta: "Sprawdź świadczenia w ciąży" };
+    case "terminy": case "dokumenty": return { href: "/dokumenty", etykieta: "Zobacz dokumenty i terminy" };
+    case "wczesniak": case "martwe_dziecko": return { href: "/trudne", etykieta: "Poznaj wsparcie w trudnej sytuacji" };
   }
   return null;
 }
 
 export const STATUS_OPIS: Record<Status, string> = {
   ok: "",
-  do_potwierdzenia: "Sprawdź w ZUS – nasze źródła są w tym miejscu niepewne lub niespójne.",
-  luka: "Ten przypadek nie jest opisany w naszych źródłach – nie podajemy wyniku. Skonsultuj się z ZUS.",
+  do_potwierdzenia: "W tej sprawie przepisy nie są jednoznaczne. Warto potwierdzić szczegóły bezpośrednio w ZUS.",
+  luka: "Tego nietypowego przypadku nie opisują oficjalne wytyczne. Skonsultuj się bezpośrednio z ZUS.",
 };
