@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "Sprawdź, jakie świadczenia z ZUS przysługują w ciąży i po urodzeniu dziecka: zasiłek chorobowy, macierzyński, urlopy. Kalkulator, dokumenty, terminy, ryzyka.",
 };
 const PRZED_MALOWANIEM = `try{var d=document.documentElement,c=d.classList,z=JSON.parse(localStorage.getItem("rodzice.dostepnosc")||"{}");c.toggle("fs-l",z.rozm===1);c.toggle("fs-xl",z.rozm===2);c.toggle("hc",!!z.hc);if(localStorage.getItem("rodzice.sesja"))d.dataset.sesja="1"}catch(e){}`;
-const lato = Lato({ subsets: ["latin", "latin-ext"], weight: ["400", "700", "900"], variable: "--font-lato", display: "swap" });
+const lato = Lato({ subsets: ["latin", "latin-ext"], weight: ["400", "700"], variable: "--font-lato", display: "swap" });
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#007834" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

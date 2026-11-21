@@ -1,0 +1,35 @@
+{
+  "_opis": "Adresy pustych wzorów druków na zus.pl (kopia pól url_zus i pdf_zus z druki.json z paczki, stan 2026-11-21). Używane tylko, gdy druki.json w repo nie ma własnego url_zus. Nie zawiera wypełnionych dokumentów.",
+  "druki": {
+    "ZAM": {
+      "nazwa": "ZAM – Wniosek o zasiłek macierzyński",
+      "url_zus": "https://www.zus.pl/-/wniosek-zas-54",
+      "pdf_zus": "https://www.zus.pl/documents/10182/4223950/ZAM_pobierz+i+drukuj.pdf/f1ad7e3f-0eaa-fdbc-20ec-5b07ab59566a"
+    },
+    "Z-3": {
+      "nazwa": "Z-3 – Zaświadczenie płatnika składek (pracownik)",
+      "url_zus": "https://www.zus.pl/-/zaswiadczenie-zus-z-3"
+    },
+    "Z-3a": {
+      "nazwa": "Z-3a – Zaświadczenie płatnika składek (inny tytuł niż umowa o pracę)",
+      "url_zus": "https://www.zus.pl/-/zaswiadczenie-zus-z-3a"
+    },
+    "ZAS-26": {
+      "nazwa": "ZAS-26 – Oświadczenie o przyjęciu na wychowanie dziecka",
+      "url_zus": "https://www.zus.pl/-/oswiadczenie-zas-26"
+    },
+    "ZAS-53": {
+      "nazwa": "ZAS-53 – Wniosek o zasiłek chorobowy (osoba prowadząca działalność)",
+      "url_zus": "https://www.zus.pl/-/zaswiadczenie-zas-53"
+    },
+    "ZAS-12": {
+      "nazwa": "ZAS-12 – Zaświadczenie płatnika składek (dalszy okres zasiłku chorobowego)",
+      "url_zus": "https://www.zus.pl/-/zaswiadczenie-zas-4"
+    },
+    "ZCNA": {
+      "nazwa": "ZUS ZCNA – Zgłoszenie danych o członkach rodziny (ubezpieczenie zdrowotne)",
+      "url_zus": "https://www.zus.pl/-/zgloszenie-zus-zcna",
+      "pdf_zus": "https://www.zus.pl/documents/10182/18428/zcna.pdf/42c2bfc3-5281-4b22-8901-7f3d3c9c3c1a"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { api, useSesja, type Sesja } from "@/lib/sesja";
-import { sprawa, zbudujCtx, etykietaOdp, zaIle, aktywneOdpowiedzi, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, type Ctx, type Odp, type Pyt, type Sprawa, type Wynik } from "@/lib/sprawy";
+import { SPRAWY, sprawa, zbudujCtx, etykietaOdp, zaIle, aktywneOdpowiedzi, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, type Ctx, type Odp, type Pyt, type Sprawa, type Wynik } from "@/lib/sprawy";
 import { DRUKI } from "@/content/poradnik";
 import { dataPL } from "@/lib/format";
 import { ekranDotykowy, przejdzDoKroku } from "@/lib/ekran";
@@ -19,8 +19,28 @@ export default function SprawaWidok({ id }: { id: string }) {
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <p className="small no-print"><Link href="/sprawy" className="powrot">← Wróć do listy spraw</Link></p>
+      <WyborSprawy id={id} tytul={s.tytul} />
       <h1>{s.tytul}</h1>
       {gotowa ? <WczytajSprawe key={JSON.stringify([id, sesja?.token])} s={s} sesja={sesja} /> : <Szkielet etykieta="Wczytuję sprawę…" />}
+    </div>
+  );
+}
+
+/** Na szerokości 800-1024 px menu boczne ze sprawami jest za wąskie, więc zastępuje je rozwijany wybór (CSS: .sprawy-wybor). */
+function WyborSprawy({ id, tytul }: { id: string; tytul: string }) {
+  const [otwarte, setOtwarte] = useState(false);
+  useEffect(() => { setOtwarte(false); }, [id]);
+  return (
+    <div className="sprawy-wybor no-print" onKeyDown={(e) => { if (e.key === "Escape") setOtwarte(false); }}>
+      <button type="button" className="sprawy-wybor__btn" aria-expanded={otwarte} aria-controls="sprawy-wybor-lista" onClick={() => setOtwarte(!otwarte)}>
+        <span><span className="sprawy-wybor__etykieta">Inne sprawy</span><b>{tytul}</b></span>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false" className="sprawy-wybor__strzalka"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      <ul id="sprawy-wybor-lista" hidden={!otwarte}>
+        {SPRAWY.map((x) => (
+          <li key={x.id}><Link href={`/sprawa/${x.id}`} aria-current={x.id === id ? "page" : undefined}>{x.tytul}</Link></li>
+        ))}
+      </ul>
     </div>
   );
 }

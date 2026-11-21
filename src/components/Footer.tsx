@@ -20,7 +20,8 @@ export default function Footer() {
         </nav>
         <div className="footer__side">
           <a className="to-top" href="#header">Do góry<span className="to-top__circle" aria-hidden="true" /></a>
-          <p className="footer__note">Przewodnik Przyszłego Rodzica to prototyp. Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
+          {/* Informacja „to nie ZUS" jest tylko w pasku u góry strony. Tu zostaje uwaga o charakterze wyliczeń. */}
+          <p className="footer__note">Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
         </div>
       </div>
     </footer>

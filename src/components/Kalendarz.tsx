@@ -4,6 +4,8 @@ import { Fragment, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import dane from "../../data/kalendarz_medyczny.json";
 import { dniMiedzy, type Parametry, type PlanWejscie } from "@/engine/kalkulator";
+import { DataPole } from "@/components/DataPole";
+import OsKalendarza from "@/components/OsKalendarza";
 import { dataPL, liczba, tygodnie } from "@/lib/format";
 import {
   kalendarz, poprawnaData, terminyKalendarza,
@@ -68,25 +70,6 @@ function dzisLokalnie() {
 
 function Data({ value }: { value: string }) {
   return <time dateTime={value}>{dataPL(value)}</time>;
-}
-
-function PoleDaty({ id, etykieta, wartosc, pomoc, zmien, blad = false }: {
-  id: string;
-  etykieta: string;
-  wartosc: string;
-  pomoc: string;
-  zmien: (value: string) => void;
-  blad?: boolean;
-}) {
-  return (
-    <div className="field">
-      <label htmlFor={id}>{etykieta}</label>
-      <input id={id} type="date" min="0101-01-01" max="9998-12-31" value={wartosc} autoComplete="off"
-        aria-describedby={`${id}-pomoc${blad ? " kalendarz-blad" : ""}`}
-        aria-invalid={blad || undefined} onChange={e => zmien(e.target.value)} />
-      <small id={`${id}-pomoc`}>{pomoc}</small>
-    </div>
-  );
 }
 
 function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) {
@@ -212,7 +195,7 @@ function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi;
         <p className={style.skutek}>
           <strong>Gdy pominiesz termin</strong>
           {e.skutek}
-          <span className={`badge warn ${style.odznaka}`}>opis skutku: do zatwierdzenia przez lekarza</span>
+          <span className={style.porada}>Sprawdź u lekarza prowadzącego, co to oznacza w Twoim przypadku.</span>
         </p>
       )}
       {(!!e.pozycje?.length || !!e.uwagi?.length) && (
@@ -293,6 +276,7 @@ function Os({ wynik, dzis, plan, parametry }: {
           </ul>
         ) : <p>Na dziś w kalendarzu nie ma zaplanowanych wizyt ani badań.</p>}
       </section>
+      <OsKalendarza wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />
       <nav aria-label="Etapy kalendarza">
         <ul className={style.nawigacja}>
           {etapy.map(e => (
@@ -386,19 +370,18 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
       <form className={`card ${style.formularz}`} aria-labelledby="kalendarz-dane" onSubmit={e => e.preventDefault()}>
         <h2 id="kalendarz-dane">Twoje dane</h2>
         <div className={style.glownaData}>
-          <PoleDaty id="kalendarz-termin" etykieta="Planowany termin porodu" wartosc={terminPorodu}
-            pomoc={terminProfilu && stan.terminPorodu === undefined ? "Termin z profilu testowego. Możesz go zmienić." : "Znajdziesz go w karcie ciąży."}
-            zmien={value => ustawDate("terminPorodu", value)} blad={niepoprawneDaty.includes("terminPorodu")} />
+          <DataPole label="Planowany termin porodu" value={terminPorodu}
+            hint={terminProfilu && stan.terminPorodu === undefined ? "Termin z profilu testowego. Możesz go zmienić." : "Znajdziesz go w karcie ciąży."}
+            onChange={value => ustawDate("terminPorodu", value)} />
         </div>
         <details open={pokazPorod} onToggle={e => setPokazPorod(e.currentTarget.open)}>
           <summary>Dziecko już się urodziło?</summary>
           <div className={style.dwieDaty}>
-            <PoleDaty id="kalendarz-porod" etykieta="Data porodu" wartosc={dataPorodu ?? ""}
-              pomoc="Terminy po porodzie przeliczą się od tej daty." zmien={value => ustawDate("dataPorodu", value)}
-              blad={niepoprawneDaty.includes("dataPorodu")} />
-            <PoleDaty id="kalendarz-wypis" etykieta="Data wypisu ze szpitala" wartosc={dataWypisu ?? ""}
-              pomoc={`Bez tej daty przyjmujemy wypis ${pobyt} ${pobyt === 1 ? "dzień" : "dni"} po porodzie.`}
-              zmien={value => ustawDate("dataWypisu", value)} blad={wypisZaWczesnie || niepoprawneDaty.includes("dataWypisu")} />
+            <DataPole label="Data porodu" value={dataPorodu ?? ""}
+              hint="Terminy po porodzie przeliczą się od tej daty." onChange={value => ustawDate("dataPorodu", value)} />
+            <DataPole label="Data wypisu ze szpitala" value={dataWypisu ?? ""}
+              hint={`Bez tej daty przyjmujemy wypis ${pobyt} ${pobyt === 1 ? "dzień" : "dni"} po porodzie.`}
+              onChange={value => ustawDate("dataWypisu", value)} />
           </div>
         </details>
         <details open={pokazWarunki} onToggle={e => setPokazWarunki(e.currentTarget.open)}>
@@ -415,7 +398,7 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
         </details>
         {(niepoprawneDaty.length > 0 || wypisZaWczesnie) && (
           <p id="kalendarz-blad" role="alert" className={style.blad}>
-            {niepoprawneDaty.length ? "Sprawdź rok w zaznaczonej dacie."
+            {niepoprawneDaty.length ? "Sprawdź rok we wpisanej dacie."
               : dataPorodu ? "Data wypisu nie może być wcześniejsza niż data porodu."
               : "Jeśli dziecko urodziło się przed planowanym terminem, wpisz datę porodu przed datą wypisu."}
           </p>
@@ -430,6 +413,7 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
 }
 
 export default function Kalendarz({ parametry }: { parametry: Parametry }) {
+  const pobytZalozony = baza.zalozenia?.pobyt_w_szpitalu_dni ?? 0;
   const { sesja, gotowa } = useSesja();
   return (
     <div className={style.kalendarz}>
@@ -440,8 +424,8 @@ export default function Kalendarz({ parametry }: { parametry: Parametry }) {
         <h2 id="kalendarz-ograniczenia">Podstawa i ograniczenia</h2>
         <ul>
           <li>Wizyta położnej po wypisie ze szpitala: przepis liczy 48 godzin bez sobót, niedziel i świąt. Kalendarz liczy zwykłe dni, więc koniec tego terminu może wypaść wcześniej.</li>
-          <li>Zdanie „Gdy pominiesz termin” nie pochodzi z przepisu. Opis skutku czeka na zatwierdzenie przez lekarza.</li>
-          <li>Gdy nie podasz daty wypisu, przyjmujemy 3 dni pobytu w szpitalu. Żaden przepis nie podaje tej liczby.</li>
+          <li>Zdanie „Gdy pominiesz termin” to ogólne wyjaśnienie, a nie zapis przepisu. Co w Twoim przypadku oznacza pominięcie badania, sprawdź u lekarza prowadzącego.</li>
+          <li>Gdy nie podasz daty wypisu, przyjmujemy {pobytZalozony} {pobytZalozony === 1 ? "dzień" : "dni"} pobytu w szpitalu. Przepisy nie określają tej wartości, więc wpisz prawdziwą datę wypisu, aby terminy przeliczyły się dokładnie.</li>
           <li>Szczepienia i bilanse dziecka są według programu szczepień na 2026 i 2027 rok. Program zmienia się co roku.</li>
           <li>Standard opieki okołoporodowej w obecnym brzmieniu obowiązuje od 7 maja 2026. Przy ciąży prowadzonej wcześniej część badań mogła być inna, na przykład różyczka, konsultacja lekarza, cytologia i test cukru między 24. a 26. tygodniem.</li>
           <li>Test potrójny (badanie krwi między 14. a 20. tygodniem) opisujemy na podstawie opracowań. Sam standard każe poinformować o badaniach genetycznych.</li>
