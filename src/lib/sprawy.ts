@@ -471,15 +471,66 @@ export const TOP: Record<Moment, { tytul: string; ids: string[] }> = {
 export const etykietaOdp = (q: Pyt, v: any): string => (q.typ === "wybor" ? (q.opcje?.find((x) => x.v === String(v))?.label ?? String(v)) : q.typ === "tak_nie" ? (v === "tak" ? "Tak" : "Nie") : q.typ === "data" ? dataPL(v) : q.typ === "liczba" ? `${v}${q.jednostka ? " " + q.jednostka : ""}` : String(v));
 
 /* ============ wyszukiwanie lokalne („opisz własnymi słowami”) ============ */
-const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
-const tok = (s: string) => norm(s).split(/[^a-z0-9%,]+/).filter((w) => w.length >= 3).map((w) => w.slice(0, 5));
+const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/ł/g, "l");
+const pomijane = new Set("aby albo ale bez bo by chce chcialabym czy da dac dla do dostac dostane dziecko dziecka gr ile jak jaka jaki jesli jest juz kiedy kod ktore lub ma mam mnie moge moj moje mu na nam nie np od oraz po pod sie tego to tu ty w we wziac z za ze zus".split(" "));
+const tok = (s: string) => norm(s).match(/\d+(?:[,.]\d+)?%?|[a-z][a-z0-9]+/g) ?? [];
+const istotne = (slowa: string[]) => [...new Set(slowa.filter((w) => w.length >= 3 && !pomijane.has(w) || w === "l4"))];
 
-export function szukaj(q: string, faq: { id: string; pytanie: string; odpowiedz: string }[]) {
-  const t = [...new Set(tok(q))];
-  if (!t.length) return { sprawy: [] as Sprawa[], faq: [] as typeof faq };
-  const wynik = (txt: string) => { const s = new Set(tok(txt)); return t.filter((w) => s.has(w)).length; };
-  const sp = SPRAWY.map((s) => ({ s, p: wynik(s.tytul + " " + s.slowa + " " + s.krotko) * 3 })).filter((x) => x.p > 0).sort((a, b) => b.p - a.p).slice(0, 3).map((x) => x.s);
-  const fq = faq.map((f) => ({ f, p: wynik(f.pytanie) * 2 + wynik(f.odpowiedz) })).filter((x) => x.p > 0).sort((a, b) => b.p - a.p).slice(0, 3).map((x) => x.f);
+function jednaLiterowka(a: string, b: string): boolean {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0;
+  while (i < a.length && a[i] === b[i]) i++;
+  if (a.length === b.length) return a.slice(i + 1) === b.slice(i + 1) ||
+    (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+  return a.length < b.length ? a.slice(i) === b.slice(i + 1) : a.slice(i + 1) === b.slice(i);
+}
+
+function podobienstwo(a: string, b: string): number {
+  if (a === b) return 1;
+  if (/^\d/.test(a) || /^\d/.test(b)) return a.replace("%", "") === b.replace("%", "") ? 1 : 0;
+  const krotsze = Math.min(a.length, b.length);
+  if (krotsze >= 5 && (a.startsWith(b) || b.startsWith(a))) return 0.8;
+  if (krotsze >= 6 && a.slice(0, -2) === b.slice(0, -2)) return 0.75;
+  return krotsze >= 5 && jednaLiterowka(a, b) ? 0.7 : 0;
+}
+
+function intencjaZapytania(slowa: string[]): string | undefined {
+  const ma = (...rdzenie: string[]) => rdzenie.some((r) => slowa.some((w) => podobienstwo(w, r) > 0));
+  const urlop = ma("urlop", "urlopu", "urlopie", "rodziciel", "rodzicielski", "rodzicielskim");
+  if (ma("odpis", "usc") || (ma("akt", "aktu") && ma("urodzen", "urodzenia"))) return "odpis-aktu";
+  if (ma("poron", "poronilam", "poronienie", "wczesniak", "martwe", "zmarlo", "zmarla", "utrata") ||
+      (ma("szpital", "szpitalu") && ma("dziecko", "dziecka"))) return "trudna-sytuacja";
+  if (ma("przedawnienie", "termin", "terminy", "spoznienie") || (ma("czasu") && ma("wniosek", "wniosku"))) return "terminy";
+  if (ma("adopcja", "adopt", "przysposob", "przysposobienie", "zastepcza")) return "adopcja";
+  if (ma("wyczekiwania", "karencja", "ubezpieczen", "ubezpieczenia", "zadluzenie", "dlug", "skladkowe") ||
+      (ma("bez") && ma("chorobowe", "chorobowego"))) return "co-przysluguje";
+  if (ma("l4", "zwolnienie", "ciazowe", "chorobowy", "chorobowym") || (ma("zla") && ma("kod"))) return "zwolnienie-ciaza";
+  if (urlop && ma("pracowac", "praca", "prace", "etatu", "dorabiac", "laczenie", "lacznie")) return "praca-na-urlopie";
+  if ((urlop || ma("macierzynski", "ojcowski")) && ma("szef", "szefa", "kadr", "kadry", "pracodawca", "pracodawcy", "pismo", "papier") ||
+      ma("ojcowski") && ma("wniosek", "wniosku")) return "urlop-pracodawca";
+  if (ma("podzielic", "podzial") || (urlop && ma("maz", "partner", "partnerem", "tata", "taty")) ||
+      (ma("tygodni") && ma("tata", "taty", "ojciec", "ojca"))) return "podzial-urlopu";
+  if (ma("zam", "macierzynski", "81,5", "81.5") || (ma("porodzie") && ma("dostane", "pieniadze", "wyplata"))) return "wniosek-zasilek";
+  if (ma("ojcowski")) return "urlop-pracodawca";
+}
+
+export function szukaj<T extends { id: string; pytanie: string; odpowiedz: string }>(q: string, faq: T[]) {
+  const slowa = tok(q);
+  const t = istotne(slowa);
+  if (!t.length) return { sprawy: [] as Sprawa[], faq: [] as T[] };
+  const id = intencjaZapytania(slowa);
+  const wynik = (txt: string) => {
+    const indeks = istotne(tok(txt));
+    return t.reduce((s, w) => s + Math.max(0, ...indeks.map((k) => podobienstwo(w, k))), 0) / t.length;
+  };
+  const wybrana = id ? sprawa(id) : undefined;
+  const sp = wybrana ? [wybrana] : SPRAWY.map((s) => ({ s, p: wynik(`${s.tytul} ${s.slowa} ${s.krotko}`) }))
+    .filter((x) => x.p >= 0.7).sort((a, b) => b.p - a.p).slice(0, 3).map((x) => x.s);
+  const powiazane = sp[0]?.faq ?? [];
+  const fq = faq.filter((f) => !wybrana || powiazane.includes(f.id))
+    .map((f) => ({ f, p: wynik(f.pytanie), kolejnosc: powiazane.indexOf(f.id) }))
+    .filter((x) => x.p >= 0.7 || (wybrana && x.kolejnosc >= 0 && x.kolejnosc < 2))
+    .sort((a, b) => b.p - a.p || a.kolejnosc - b.kolejnosc).slice(0, 3).map((x) => x.f);
   return { sprawy: sp, faq: fq };
 }
 
