@@ -97,7 +97,7 @@ export default function Header() {
           <button type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}><span className="menu-btn__bars" aria-hidden="true" /><span>{open ? "Zamknij" : "Menu"}</span></button>
           <div className="zus-header__tools">
             <Link href="/#zapytaj" className="zus-search" onClick={zamknij}>
-              <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="17" fill="none" stroke="#007834" strokeWidth="2.4" /><circle cx="17" cy="17" r="7" fill="none" stroke="#007834" strokeWidth="2.6" /><path d="m22.5 22.5 7 7" stroke="#007834" strokeWidth="3" strokeLinecap="round" /></svg>
+              <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="17" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="17" cy="17" r="7" fill="none" stroke="currentColor" strokeWidth="2.6" /><path d="m22.5 22.5 7 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
               <span>Szukaj</span>
             </Link>
             <Dostepnosc />
@@ -120,7 +120,7 @@ export default function Header() {
           <nav className="crumbs" aria-label="Okruszki">
             <div className="container crumbs__row">
               <Link href="/" className="crumbs__home" aria-label="Start" onClick={zamknij}>
-                <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 13.5 14 4l11 9.5M6 11.5V24h6.5v-7h3v7H22V11.5" fill="none" stroke="#007834" strokeWidth="2" strokeLinejoin="round" /></svg>
+                <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 13.5 14 4l11 9.5M6 11.5V24h6.5v-7h3v7H22V11.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg>
               </Link>
               <ol className="crumbs__list">
                 {crumbs.map((c) => (

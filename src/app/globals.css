@@ -717,7 +717,7 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
 /* ścieżka */
 .crumbs { background: #f3f3f3; border-top: 1px solid #dadada; border-bottom: 1px solid #dadada; margin-bottom: 8px; }
 .crumbs__row { min-height: 55px; }
-.crumbs__home { width: 56px; }
+.crumbs__home { width: 56px; color: var(--zus-green); }
 .crumbs__list li { font-size: 12px; font-weight: 400; }
 .crumbs__list li.last, .crumbs__list li.last span { font-weight: 700; }
 .crumbs__list a { font-size: 12px; }
@@ -791,6 +791,23 @@ button.tile { appearance: none; }
 .to-top { font-size: 14px; gap: 12px; }
 .to-top__circle { width: 40px; height: 40px; border: 2px solid #fff; border-radius: 50%; position: relative; }
 .to-top__circle::before { content: ""; position: absolute; left: 13px; top: 15px; width: 9px; height: 9px; border-top: 2px solid #fff; border-left: 2px solid #fff; transform: rotate(45deg); }
+
+/* menu sekcji po lewej jak na stronach treści zus.pl: kolumna 300 px, linia 7 px, aktywna pozycja zielona */
+.zus-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); }
+.zus-side { border-right: 7px solid var(--zus-green); padding-bottom: 24px; }
+.zus-side__h { margin: 0; padding: 16px 20px 16px 16px; font-weight: 700; font-size: 15px; border-bottom: 1px solid #e7e7e7; }
+.zus-side ul { list-style: none; margin: 0; padding: 0; }
+.zus-side li { border-bottom: 1px solid #e7e7e7; }
+.zus-side a { display: block; padding: 10px 20px 10px 32px; font-weight: 700; font-size: 15px; line-height: 21px; color: var(--zus-green-link); text-decoration: none; }
+.zus-side a:hover { text-decoration: underline; }
+.zus-side li.on { background: var(--zus-green); }
+.zus-side li.on a { color: #fff; }
+.zus-layout__main { padding-left: 50px; min-width: 0; }
+@media (max-width: 991px) {
+  .zus-layout { display: block; }
+  .zus-side { display: none; }
+  .zus-layout__main { padding-left: 0; }
+}
 
 @media (max-width: 1099px) {
   .zus-logo__img { width: 190px; }
@@ -930,10 +947,14 @@ html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:ho
 html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 #ffe14d; }
 html.hc .footer__links a { text-decoration: underline; }
 html.hc .a11y button svg { filter: invert(1); }
+html.hc .zus-side li.on a { color: #000 !important; }
+html.hc .zus-side { border-right-color: #ffe14d; }
+html.hc .menu-btn span, html.hc .menu-btn__bars { color: #000 !important; }
+html.hc .ic, html.hc .drop-ic { color: transparent !important; }
 html.hc .linkbar { background: #000 !important; color: #ffe14d !important; border-color: #ffe14d !important; }
 html.hc .tile { border-color: #fff; }
 html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: #ffe14d; color: #ffe14d; }
 html.hc .zus-nav li.selected { border-top-color: #ffe14d; box-shadow: inset 7px 0 0 #ffe14d; }
-html.hc .crumbs__home svg path { fill: #ffe14d; }
+html.hc .crumbs__home { color: #ffe14d; }
 html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) invert(1) brightness(2); }
 html.hc :focus-visible { outline: 3px solid #ffe14d; outline-offset: 2px; }
