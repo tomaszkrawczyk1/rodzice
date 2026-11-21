@@ -1,149 +1,152 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
-import { dataKrotka, pln, dzis } from "@/lib/format";
-import { Alert, Sim } from "@/components/ui";
+import { dataPL, pln, dzis, opisTerminu } from "@/lib/format";
+import { nazwaUbezpieczenia, rodzajChorobowego, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
+import { Alert } from "@/components/ui";
 import Szukaj from "@/components/Szukaj";
-import { SPRAWY, TOP, najpilniejsze, sprawa, zaIle, type Moment } from "@/lib/sprawy";
-import { dataPL } from "@/lib/format";
+import { najpilniejsze, sprawa, zaIle, type Moment } from "@/lib/sprawy";
+
+const MOMENTY = {
+  plan: { tytul: "Planuję dziecko", opis: "Ubezpieczenie i przygotowanie do urlopu", sprawy: ["co-przysluguje", "podzial-urlopu"] },
+  ciaza: { tytul: "Czekamy na dziecko", opis: "Urlopy dla rodziców, zwolnienie w ciąży i przygotowanie do wniosku", sprawy: ["co-przysluguje", "podzial-urlopu", "wniosek-zasilek", "zwolnienie-ciaza"] },
+  dziecko: { tytul: "Dziecko już jest z nami", opis: "Zasiłek, urlopy i terminy po narodzinach", sprawy: ["wniosek-zasilek", "urlop-pracodawca", "podzial-urlopu", "terminy"] },
+} satisfies Record<Moment, { tytul: string; opis: string; sprawy: string[] }>;
+
+type Dane = {
+  u: { dniNieprzerwanegoUbezpieczeniaChorobowego: number; ubezpieczenie: UbezpieczenieProfilu[] };
+  e: { lacznieDni: number };
+  z: { kwotaZadluzenia: number; prog: number; przekroczonyProg: boolean };
+};
+
+function PodgladProfilu({ pesel }: { pesel: string }) {
+  const [dane, setDane] = useState<Dane | null>(null);
+  const [blad, setBlad] = useState(false);
+
+  useEffect(() => {
+    let aktualne = true;
+    const query = new URLSearchParams({ pesel, naDzien: dzis() });
+    Promise.all([
+      api<Dane["u"]>(`/api/zus/ubezpieczenie?${query}`),
+      api<Dane["e"]>(`/api/zus/ezla?${query}`),
+      api<Dane["z"]>(`/api/zus/zadluzenie?${query}`),
+    ]).then(([u, e, z]) => { if (aktualne) setDane({ u, e, z }); })
+      .catch(() => { if (aktualne) setBlad(true); });
+    return () => { aktualne = false; };
+  }, [pesel]);
+
+  return (
+    <section className="card mt">
+      <h2>Dane z profilu testowego</h2>
+      {blad && <Alert t="err">Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.</Alert>}
+      {!dane && !blad && <p role="status">Wczytujemy dane profilu…</p>}
+      {dane && <>
+        <dl>
+          <dt>Dni ubezpieczenia chorobowego</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
+          <dt>Dni zwolnień lekarskich</dt><dd>{dane.e.lacznieDni}</dd>
+          <dt>Zaległości w składkach</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
+        </dl>
+        {dane.u.ubezpieczenie.map((u, i) => (
+          <p key={i}>
+            <b>{nazwaUbezpieczenia(u.tytul)}</b> od {dataPL(u.od)}{u.do && <> do {dataPL(u.do)}</>}.
+            {" Ubezpieczenie chorobowe: "}{rodzajChorobowego(u.chorobowe)}.
+            {u.platnik && <> Płatnik składek: {u.platnik.nazwa}.</>}
+          </p>
+        ))}
+        {dane.z.przekroczonyProg && (
+          <Alert t="warn">Zaległość przekracza próg {pln(dane.z.prog)}. Sprawdź w ZUS, czy wpłynie na wypłatę zasiłku.</Alert>
+        )}
+      </>}
+    </section>
+  );
+}
 
 export default function Home() {
   const { sesja } = useSesja();
-  const [d, setD] = useState<any>(null);
   const [moment, setMoment] = useState<Moment | null>(null);
-  const [pilne, setPilne] = useState<any>(null);
+  const etapy = useRef<HTMLHeadingElement>(null);
+  const poWyborze = useRef(false);
+
+  function wybierzEtap(wybrany: Moment | null) {
+    poWyborze.current = true;
+    setMoment(wybrany);
+  }
 
   useEffect(() => {
-    if (!sesja) { setPilne(null); return; }
-    najpilniejsze(api, sesja).then(setPilne);
-  }, [sesja]);
+    if (!poWyborze.current) return;
+    poWyborze.current = false;
+    etapy.current?.focus();
+  }, [moment]);
+  const [pilnaSprawa, setPilnaSprawa] = useState<{ token: string; termin: Awaited<ReturnType<typeof najpilniejsze>> } | null>(null);
+  const pilne = sesja && pilnaSprawa?.token === sesja.token ? pilnaSprawa.termin : null;
 
   useEffect(() => {
-    if (!sesja) return setD(null);
-    const naDzien = dzis();
-    Promise.all([
-      api(`/api/zus/ubezpieczenie?pesel=${sesja.pesel}&naDzien=${naDzien}`),
-      api(`/api/zus/ezla?pesel=${sesja.pesel}`),
-      api(`/api/zus/zadluzenie?pesel=${sesja.pesel}&naDzien=${naDzien}`),
-    ]).then(([u, e, z]) => setD({ u, e, z })).catch(() => setD(null));
+    if (!sesja) return;
+    let aktualne = true;
+    najpilniejsze(api, sesja).then((termin) => {
+      if (aktualne) setPilnaSprawa({ token: sesja.token, termin });
+    });
+    return () => { aktualne = false; };
   }, [sesja]);
-
-  const MOMENTY: [Moment, string, string][] = [
-    ["plan", "Planuję dziecko", "Co warto wiedzieć wcześniej, żeby nie stracić uprawnień i zasiłku"],
-    ["ciaza", "Jestem w ciąży", "Zwolnienie lekarskie, ochrona zatrudnienia i przygotowanie do urlopu"],
-    ["dziecko", "Dziecko już jest z nami", "Wniosek o zasiłek, plan urlopów i podział z drugim rodzicem"],
-  ];
-
-  const imie = sesja?.osoba.split(" ")[0];
 
   return (
     <>
       <section className="hero">
-        <h1>{sesja ? `Dzień dobry, ${imie}` : "Co chcesz dzisiaj załatwić?"}</h1>
-        <p>
-          {sesja
-            ? (pilne
-                ? "Masz jedną pilną sprawę do załatwienia. Szczegóły znajdziesz poniżej."
-                : "Wybierz sprawę, w której możemy Ci pomóc.")
-            : "Nie musisz znać przepisów ani urzędowych nazw. Wybierz swój etap, a podpowiemy najważniejsze kroki."}
-        </p>
-        {!sesja && (
-          <div className="row">
-            <Link href="/logowanie" className="btn btn-login">Zaloguj się przez mObywatela</Link>
-            <span className="small muted">Pobierzemy Twoje dane z ZUS (symulacja), żeby nie trzeba było wpisywać ich ręcznie.</span>
-          </div>
-        )}
+        <h1>Co chcesz dzisiaj załatwić?</h1>
+        <p>Wybierz sytuację, która dotyczy Ciebie lub bliskiej osoby. Możesz przejść przez sprawę bez logowania.</p>
       </section>
 
       {pilne && (
-        <div className="card urgent mb">
-          <span className="badge warn">Pilna sprawa</span>
-          <h2 style={{ marginTop: 8 }}>{pilne.co}</h2>
-          <p>
-            Termin złożenia: <b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)}). Mamy już przygotowane Twoje dane: imię, PESEL, datę porodu oraz dane pracodawcy.
-          </p>
-          <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">
-            Załatw teraz · {sprawa(pilne.sprawa)?.czas.split(" · ")[1] ?? "kilka minut"}
-          </Link>
-        </div>
+        <section className="card urgent mb" style={{ overflowWrap: "anywhere" }}>
+          <h2>Najbliższy termin z profilu</h2>
+          <p>{opisTerminu(pilne.co)}</p>
+          <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
+          <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
+        </section>
       )}
 
       {!moment ? (
         <>
-          <h2>Na jakim jesteś etapie?</h2>
+          <h2 ref={etapy} tabIndex={-1}>Na jakim jesteście etapie?</h2>
           <div className="grid g3">
-            {MOMENTY.map(([k, t, o]) => (
-              <button key={k} className="tile" onClick={() => { setMoment(k); scrollTo(0, 0); }}>
-                <b>{t}</b>
-                <span>{o}</span>
+            {Object.entries(MOMENTY).map(([id, m]) => (
+              <button key={id} className="tile" onClick={() => wybierzEtap(id as Moment)}>
+                <b>{m.tytul}</b><span>{m.opis}</span>
               </button>
             ))}
+            <Link href="/sprawa/adopcja" className="tile">
+              <b>Adopcja lub rodzina zastępcza</b><span>Urlopy, zasiłek i terminy po przyjęciu dziecka</span>
+            </Link>
+            <Link href="/trudne" className="tile">
+              <b>Trudna sytuacja</b><span>Poronienie, strata dziecka, wcześniactwo lub choroba</span>
+            </Link>
           </div>
-          <p className="mt small">
-            Inne sytuacje: <Link href="/sprawa/adopcja">adopcja lub rodzina zastępcza</Link> · <Link href="/sprawa/trudna-sytuacja">trudna sytuacja życiowa (np. strata, leczenie w szpitalu)</Link>
-          </p>
         </>
       ) : (
         <>
-          <button className="btn btn-ghost btn-sm" onClick={() => setMoment(null)}>← Wróć do wyboru etapu</button>
-          <h2 className="mt">{TOP[moment].tytul}: co chcesz załatwić?</h2>
+          <button className="btn btn-ghost" onClick={() => wybierzEtap(null)}>Wróć do wyboru etapu</button>
+          <h2 className="mt" ref={etapy} tabIndex={-1}>{MOMENTY[moment].tytul}</h2>
           <div className="grid g3">
-            {TOP[moment].ids.map((id) => {
-              const s = sprawa(id)!;
-              return (
-                <Link key={id} href={`/sprawa/${id}`} className="tile">
-                  <b>{s.tytul}</b>
-                  <span>{s.krotko}</span>
-                  <span className="time">Czas: {s.czas}</span>
-                </Link>
-              );
+            <Link href="/kreator?sciezka=ojciec" className="tile">
+              <b>Urlopy dla taty i drugiego rodzica</b><span>Urlop ojcowski i podział urlopu rodzicielskiego</span>
+            </Link>
+            {MOMENTY[moment].sprawy.map((id) => {
+              const s = sprawa(id);
+              return s && <Link key={id} href={`/sprawa/${id}`} className="tile">
+                <b>{s.tytul}</b><span>{s.krotko}</span>
+              </Link>;
             })}
           </div>
-          <p className="mt">
-            <Link href="/sprawy" className="btn btn-secondary btn-sm">
-              Zobacz wszystkie sprawy ({SPRAWY.length - TOP[moment].ids.length} pozostałych)
-            </Link>
-          </p>
+          <p className="mt"><Link href="/sprawy" className="btn btn-secondary">Zobacz wszystkie sprawy</Link></p>
         </>
       )}
 
       <Szukaj />
 
-      {sesja && (
-        <div className="card mt">
-          <div className="row between">
-            <h3>Twoje dane pobrane z ZUS</h3>
-            <span><Sim /> środowisko testowe</span>
-          </div>
-          {d ? (
-            <div className="grid g3">
-              <div className="stat">
-                <div className="v">{d.u.dniNieprzerwanegoUbezpieczeniaChorobowego} dni</div>
-                <div className="l">nieprzerwanego ubezpieczenia chorobowego</div>
-              </div>
-              <div className="stat">
-                <div className="v">{d.e.lacznieDni} dni</div>
-                <div className="l">zwolnień lekarskich e-ZLA ({d.e.ezla.length})</div>
-              </div>
-              <div className="stat">
-                <div className="v">{pln(d.z.kwotaZadluzenia)}</div>
-                <div className="l">zaległości w składkach {d.z.przekroczonyProg ? "– powyżej limitu" : ""}</div>
-              </div>
-            </div>
-          ) : <p className="muted">Wczytuję dane z ZUS…</p>}
-          {d && d.u.ubezpieczenie.map((u: any, i: number) => (
-            <p key={i} className="small muted">
-              Tytuł ubezpieczenia: <b>{u.tytul.replaceAll("_", " ")}</b> · od {dataKrotka(u.od)}{u.do ? ` do ${dataKrotka(u.do)}` : ""} · chorobowe: {u.chorobowe} · pracodawca: {u.platnik.nazwa} ({u.platnik.liczbaUbezpieczonych} pracowników)
-            </p>
-          ))}
-          {d?.z.przekroczonyProg && (
-            <Alert t="warn">
-              Masz zaległość w opłacaniu składek przekraczającą dopuszczalny limit ({pln(d.z.prog)}). Dopóki jej nie uregulujesz, ZUS wstrzyma wypłatę zasiłku.
-            </Alert>
-          )}
-        </div>
-      )}
+      {sesja
+        ? <PodgladProfilu key={sesja.token} pesel={sesja.pesel} />
+        : <p className="mt"><Link href="/logowanie">Wypróbuj logowanie na profilu testowym</Link></p>}
     </>
   );
 }

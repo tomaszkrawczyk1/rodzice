@@ -1,47 +1,108 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { DRZEWO, DRZEWO_START, DRUKI, kalkulatorLink, pytanie } from "@/content/poradnik";
-import { StatusBadge } from "@/components/StatusPytania";
+import { odczytajPostep, rozwinPostep } from "@/lib/postep-kreatora";
 
-export default function Kreator() {
-  const [sciezka, setSciezka] = useState<string[]>([DRZEWO_START]);
-  const [wybory, setWybory] = useState<string[]>([]);
-  const id = sciezka[sciezka.length - 1];
+function Pytania({ start }: { start: string }) {
+  const klucz = `rodzice.kreator.v1.${start}`;
+  const [postep, setPostep] = useState<number[] | null>(null);
+  const [bladZapisu, setBladZapisu] = useState(false);
+  const naglowek = useRef<HTMLHeadingElement>(null);
+  const przeniesFokus = useRef(false);
+  const { id, wybory } = rozwinPostep(postep ?? [], start, DRZEWO);
   const w = DRZEWO[id];
-  const wroc = () => { setSciezka((s) => s.slice(0, -1)); setWybory((s) => s.slice(0, -1)); };
-  const od_nowa = () => { setSciezka([DRZEWO_START]); setWybory([]); };
 
+  useEffect(() => {
+    try {
+      setPostep(odczytajPostep(sessionStorage.getItem(klucz), start, DRZEWO));
+    } catch {
+      setPostep([]);
+      setBladZapisu(true);
+    }
+  }, [klucz, start]);
+
+  useEffect(() => {
+    if (!przeniesFokus.current) return;
+    przeniesFokus.current = false;
+    naglowek.current?.focus();
+  }, [postep]);
+
+  function zapisz(kroki: number[]) {
+    try {
+      if (kroki.length) sessionStorage.setItem(klucz, JSON.stringify(kroki));
+      else sessionStorage.removeItem(klucz);
+      setBladZapisu(false);
+    } catch {
+      setBladZapisu(true);
+    }
+    przeniesFokus.current = true;
+    setPostep(kroki);
+  }
+
+  if (!postep) return <p role="status">Wczytujemy zapisane odpowiedzi…</p>;
   return (
     <>
-      <h1>Kreator spraw: co przysługuje w Twojej sytuacji?</h1>
-      <p className="lead">Odpowiedz na kilka prostych pytań. Wskażemy odpowiedzi z poradnika, potrzebne formularze i kalkulator dopasowany do Twojej sprawy.</p>
-      {wybory.length > 0 && <p className="small muted" aria-label="Twoja ścieżka wyboru">Twoja ścieżka: {wybory.join(" → ")}</p>}
+      <p className="muted" role={bladZapisu ? "status" : undefined}>{bladZapisu
+        ? "Nie można zapisać odpowiedzi. Odświeżenie lub zamknięcie karty je usunie."
+        : "Możesz odświeżyć tę kartę i wrócić do swoich odpowiedzi."}</p>
+      {wybory.length > 0 && <p className="small muted">Twoje wybory: {wybory.join(" / ")}</p>}
       {w.typ === "pytanie" ? (
-        <div className="card navy" role="group" aria-labelledby="kq">
-          <h2 id="kq">{w.tekst}</h2>
-          {w.podpowiedz && <p className="muted">{w.podpowiedz}</p>}
-          <div className="grid">
-            {w.opcje.map((o) => (
-              <button key={o.nastepny + o.etykieta} className="persona" onClick={() => { setSciezka((s) => [...s, o.nastepny]); setWybory((s) => [...s, o.etykieta]); }}>{o.etykieta}</button>
+        <section className="card navy" aria-labelledby="kq">
+          <h2 id="kq" ref={naglowek} tabIndex={-1}>{w.tekst}</h2>
+          {w.podpowiedz && <p>{w.podpowiedz}</p>}
+          <div>
+            {w.opcje.map((o, i) => (
+              <button key={o.nastepny + o.etykieta} className="persona" onClick={() => zapisz([...postep, i])}>{o.etykieta}</button>
             ))}
           </div>
-        </div>
+        </section>
       ) : (
-        <div className="card accent" aria-live="polite">
-          <h2>{w.tytul}</h2>
-          <h3>Najważniejsze odpowiedzi w Twojej sprawie</h3>
+        <section className="card accent">
+          <h2 ref={naglowek} tabIndex={-1}>{w.tytul}</h2>
           <ul className="clean">
-            {w.pytania.map((q) => { const p = pytanie(q); return p && <li key={q}><Link href={`/poradnik#${q}`}>{p.pytanie}</Link> <StatusBadge s={p.status} /></li>; })}
+            {w.pytania.map((q) => {
+              const p = pytanie(q);
+              return p && <li key={q}><Link href={`/poradnik#${q}`}>{p.pytanie}</Link>
+                {p.status !== "ok" && <> <span className="badge warn">Sprawdź w ZUS</span></>}
+              </li>;
+            })}
           </ul>
-          {w.druki.length > 0 && (<><h3 className="mt">Potrzebne formularze</h3><div className="row">{w.druki.map((d) => DRUKI.find((x) => x.id === d) ? <Link key={d} className="btn btn-secondary btn-sm" href={`/druki#${d}`}>Druk {d}</Link> : <span key={d} className="badge sim">{d}</span>)}</div></>)}
-          {(() => { const k = kalkulatorLink(w.kalkulator); return k && <div className="mt"><Link className="btn btn-primary" href={k.href}>{k.etykieta}</Link></div>; })()}
-        </div>
+          {id === "wynik_ojcowski" && <p className="mt"><Link href="/wnioski?urlop=ojcowski">Przygotuj wniosek do pracodawcy</Link></p>}
+          {w.druki.some((id) => DRUKI.some((d) => d.id === id)) && <>
+            <h3 className="mt">Formularze</h3>
+            <ul className="clean">{w.druki.map((id) => {
+              const d = DRUKI.find((x) => x.id === id);
+              return d && <li key={id}><Link href={`/druki#${id}`}>{d.nazwa}</Link></li>;
+            })}</ul>
+          </>}
+          {(() => {
+            const k = kalkulatorLink(w.kalkulator);
+            return k && <p className="mt"><Link className="btn btn-primary" href={k.href}>{id === "wynik_ojcowski" ? "Policz zasiłek dla taty" : k.etykieta}</Link></p>;
+          })()}
+        </section>
       )}
-      <div className="row mt no-print">
-        {sciezka.length > 1 && <button className="btn btn-ghost" onClick={wroc}>← Poprzednie pytanie</button>}
-        {sciezka.length > 1 && <button className="btn btn-ghost" onClick={od_nowa}>Zacznij od początku</button>}
-      </div>
+      {postep.length > 0 && <div className="row mt no-print">
+        <button className="btn btn-ghost" onClick={() => zapisz(postep.slice(0, -1))}>Wróć do poprzedniego pytania</button>
+        <button className="btn btn-ghost" onClick={() => zapisz([])}>Zacznij od początku</button>
+      </div>}
+      {start !== DRZEWO_START && <p className="mt"><Link href="/kreator">Zobacz wszystkie sytuacje</Link></p>}
+    </>
+  );
+}
+
+function SciezkaKreatora() {
+  const start = useSearchParams().get("sciezka") === "ojciec" ? "po_podzial" : DRZEWO_START;
+  return <Pytania key={start} start={start} />;
+}
+
+export default function Kreator() {
+  return (
+    <>
+      <h1>Kreator spraw</h1>
+      <p className="lead">Odpowiedz na kilka pytań, żeby znaleźć potrzebne informacje i formularze.</p>
+      <Suspense fallback={<p role="status">Wczytujemy pytania…</p>}><SciezkaKreatora /></Suspense>
     </>
   );
 }

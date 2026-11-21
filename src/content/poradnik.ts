@@ -30,7 +30,8 @@ export function kalkulatorLink(k?: { tryb: string; opcja?: string } | null): { h
   const kalk = (t: string) => ({ href: `/kalkulator?tryb=${t}`, etykieta: "Policz zasiłek w kalkulatorze" });
   switch (k.tryb) {
     case "matka": case "uprawnienia_matka": return kalk("matka");
-    case "ojciec": case "oboje_rodzice": case "porownanie_wariantow": return kalk("oboje");
+    case "ojciec": return kalk("ojciec");
+    case "oboje_rodzice": case "porownanie_wariantow": return kalk("oboje");
     case "praca_i_urlop": return kalk("laczenie");
     case "adopcja": return kalk("adopcja");
     case "podstawa": return kalk("wlasne");

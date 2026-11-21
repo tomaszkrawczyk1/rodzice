@@ -7,7 +7,7 @@ export default function Druki() {
   return (
     <>
       <h1>Formularze i druki do wniosków</h1>
-      <p className="lead">Sześć najważniejszych druków, z którymi ma do czynienia przyszły i obecny rodzic. Czyste formularze do pobrania znajdziesz na oficjalnej stronie <a href={LINK_WZORY} target="_blank" rel="noopener noreferrer">zus.pl (wzory formularzy)</a>.</p>
+      <p className="lead">Sprawdź, kto składa dany formularz i jak go wypełnić. Wzory znajdziesz na stronie <a href={LINK_WZORY} target="_blank" rel="noopener noreferrer">zus.pl (wzory formularzy)</a>.</p>
       <nav className="tabs" aria-label="Wybierz formularz">{DRUKI.map((d) => <a key={d.id} className="tab" href={`#${d.id}`}>{d.id}</a>)}</nav>
       {DRUKI.map((d) => (
         <section key={d.id} id={d.id} className="card accent mt" aria-labelledby={`h-${d.id}`}>
@@ -22,15 +22,10 @@ export default function Druki() {
           <ol className="steps">{d.tutorial.map((t, i) => <li key={i}>{t}</li>)}</ol>
           {d.uwagi.length > 0 && <div className="alert info"><b>Warto wiedzieć:</b> {d.uwagi.join(" ")}</div>}
           <div className="row mt no-print">
-            <a className="btn btn-primary btn-sm" href={LINK_WZORY} target="_blank" rel="noopener noreferrer">Pobierz formularz z zus.pl</a>
+            <a className="btn btn-primary btn-sm" href={LINK_WZORY} target="_blank" rel="noopener noreferrer">Otwórz wykaz formularzy ZUS</a>
             {d.pytania.slice(0, 4).map((q) => {
               const p = pytanie(q);
-              const label = p ? (p.pytanie.length > 40 ? p.pytanie.slice(0, 37) + "…" : p.pytanie) : `Pytanie ${q}`;
-              return (
-                <Link key={q} className="btn btn-ghost btn-sm" href={`/poradnik#${q}`} title={p?.pytanie}>
-                  {label}
-                </Link>
-              );
+              return p && <Link key={q} className="btn btn-ghost" href={`/poradnik#${q}`}>{p.pytanie}</Link>;
             })}
           </div>
         </section>

@@ -2,48 +2,93 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/sesja";
-import { dataPL, dataKrotka } from "@/lib/format";
-import { DRUKI } from "@/content/tresci";
-import { Alert, Field } from "@/components/ui";
+import { dataPL, liczba, opisTerminu } from "@/lib/format";
+import { DRUKI } from "@/content/poradnik";
+import { Alert } from "@/components/ui";
+import { Pole } from "@/components/Pole";
+import parametry from "../../../data/parametry.json";
+import type { Termin } from "@/engine/kalkulator";
 
-const ETY: Record<string, string> = { wniosek_pelny_wymiar_81_5_po_porodzie: "Wniosek o wariant 81,5% – dni po porodzie", wniosek_urlop_rodzicielski_przed_startem: "Wniosek o urlop rodzicielski – dni przed startem", wniosek_laczenie_z_praca_przed_startem: "Wniosek o łączenie pracy z urlopem – dni przed startem" };
+const T = parametry.terminy_dni;
+const P = parametry.procenty;
+const prog = parametry.platnik.prog_liczby_ubezpieczonych_powyzej;
+const terminy = [
+  ["Wniosek o urlop ojcowski", `Co najmniej ${T.wniosek_urlop_ojcowski_przed_startem} dni przed rozpoczęciem urlopu.`],
+  ["Wniosek o urlop rodzicielski", `Co najmniej ${T.wniosek_urlop_rodzicielski_przed_startem} dni przed rozpoczęciem urlopu.`],
+  ["Wniosek ojca o przejęcie części urlopu macierzyńskiego", `Co najmniej ${T.wniosek_przejecie_macierzynskiego_przez_ojca_przed_startem} dni przed rozpoczęciem urlopu.`],
+  ["Wniosek o łączenie pracy z urlopem rodzicielskim", `Co najmniej ${T.wniosek_laczenie_z_praca_przed_startem} dni przed rozpoczęciem pracy.`],
+  [`Wniosek o uśrednioną stawkę zasiłku (${liczba(P.wariant_pelny_wymiar_81_5)}%)`, `Do ${T.wniosek_pelny_wymiar_81_5_po_porodzie} dni od porodu albo do ${T.adopcja_wniosek_81_5_po_przyjeciu} dni od przyjęcia dziecka.`],
+  ["Wniosek o urlop na warunkach urlopu macierzyńskiego", `Do ${T.adopcja_wniosek_o_urlop_po_przyjeciu_dziecka} dni od przyjęcia dziecka.`],
+] as const;
+
 export default function Dokumenty() {
-  const [f, setF] = useState<any>({ tytul: "umowa_o_prace", platnik: 50 });
-  const [ter, setTer] = useState<any[] | null>(null); const [par, setPar] = useState<any>(null); const [kto, setKto] = useState<any>(null); const [err, setErr] = useState("");
-  useEffect(() => { api("/api/parametry").then(setPar).catch(() => {}); }, []);
+  const [tytul, setTytul] = useState("umowa_o_prace");
+  const [liczbaOsob, setLiczbaOsob] = useState("");
+  const [terminyPlanu, setTerminyPlanu] = useState<Termin[] | null>(null);
+  const [blad, setBlad] = useState(false);
+
   useEffect(() => {
-    api("/api/oblicz/uprawnienia", { tytul: f.tytul, dobrowolneChorobowe: true, dniNieprzerwanegoUbezpieczeniaChorobowego: 400, ubezpieczonaWDniuPorodu: true, liczbaUbezpieczonychPlatnika: +f.platnik }).then(setKto).catch(() => {});
-  }, [f]);
-  useEffect(() => {
-    let wej: any; try { wej = JSON.parse(localStorage.getItem("rodzice.plan") || "null")?.wejscie; } catch {}
-    if (!wej) return setTer(null);
-    api("/api/oblicz/terminy", { wejscie: wej }).then(setTer).catch((e) => setErr(e.message));
+    try {
+      const wejscie = JSON.parse(localStorage.getItem("rodzice.plan") ?? "null")?.wejscie;
+      if (!wejscie) return;
+      api<Termin[]>("/api/oblicz/terminy", { wejscie }).then(setTerminyPlanu).catch(() => setBlad(true));
+    } catch {
+      setBlad(true);
+    }
   }, []);
-  const prac = f.tytul === "umowa_o_prace"; const duzy = prac && +f.platnik > 20;
+
+  const firma = tytul === "dzialalnosc";
+  const zlecenie = tytul === "zlecenie";
   return (
     <>
       <h1>Dokumenty i terminy</h1>
-      <p className="lead">Kto wypłaca zasiłek, jaki druk wypełnić, gdzie go złożyć i do kiedy – zależnie od tego, na jakiej podstawie jesteś ubezpieczona.</p>
+      <p className="lead">Sprawdź, gdzie złożyć wniosek o zasiłek i kiedy trzeba to zrobić.</p>
       <div className="grid g2" style={{ alignItems: "start" }}>
-        <div className="card">
-          <h3>Dla kogo?</h3>
-          <Field label="Tytuł ubezpieczenia"><select value={f.tytul} onChange={(e) => setF({ ...f, tytul: e.target.value })}><option value="umowa_o_prace">Umowa o pracę</option><option value="zlecenie">Umowa zlecenie</option><option value="dzialalnosc">Działalność gospodarcza</option></select></Field>
-          {prac && <Field label="Liczba ubezpieczonych zgłaszanych przez pracodawcę" hint="Pracodawca zgłaszający powyżej 20 osób sam ustala i wypłaca zasiłki"><input type="number" value={f.platnik} onChange={(e) => setF({ ...f, platnik: e.target.value })} /></Field>}
-          <Alert t={duzy ? "ok" : "info"}>{duzy ? <>Zasiłek ustala i <b>wypłaca pracodawca</b>. Wniosek o zasiłek (ZAM) i o urlop składasz <b>do pracodawcy</b>. Druk Z-3 nie jest potrzebny.</> : prac ? <>Pracodawca przyjmuje wniosek, a zasiłek ustala i wypłaca <b>ZUS</b>. Pracodawca przekazuje do ZUS zaświadczenie <b>Z-3</b> z danymi o Twoich zarobkach.</> : f.tytul === "zlecenie" ? <>Zasiłek ustala i wypłaca <b>ZUS</b>. Składasz <b>ZAM do ZUS</b>, a płatnik składek przekazuje zaświadczenie <b>Z-3a</b>.</> : <>Zasiłek ustala i wypłaca <b>ZUS</b>. Składasz <b>ZAM do ZUS</b> (przedsiębiorca nie składa dodatkowo zaświadczenia płatnika). Pamiętaj o spłacie zadłużenia składkowego.</>}</Alert>
-          {kto && <p className="small muted">Silnik: wypłaca <b>{kto.ktoWyplaca}</b>.</p>}
-        </div>
-        <div className="card">
-          <h3>Twoje terminy</h3>
-          {err && <Alert t="err">{err}</Alert>}
-          {ter ? <div className="tbl-wrap"><table className="tbl"><thead><tr><th>Co</th><th>Do kiedy</th><th>Podstawa</th></tr></thead><tbody>
-            {ter.map((t, i) => <tr key={i}><td>{t.co}</td><td>{t.do ? dataPL(t.do) : t.od ? `od ${dataPL(t.od)}` : "—"}</td><td className="small muted">{t.podstawa}</td></tr>)}</tbody></table></div>
-            : <Alert>Terminy zależą od Twojego planu urlopów. <Link href="/kalkulator">Policz zasiłek w kalkulatorze</Link>, a pokażemy tu terminy co do dnia.</Alert>}
-          {par && <><h4 className="mt">Terminy ustawowe (z ustawień)</h4><ul className="clean">{Object.entries(par.terminy_dni).map(([k, v]) => <li key={k}>{ETY[k] ?? k.replaceAll("_", " ")}: <b>{String(v)}</b> dni</li>)}</ul></>}
-        </div>
+        <section className="card">
+          <h2>Kto wypłaca zasiłek?</h2>
+          <Pole label="Forma zatrudnienia lub ubezpieczenia">
+            <select value={tytul} onChange={(e) => { setTytul(e.target.value); setLiczbaOsob(""); }}>
+              <option value="umowa_o_prace">Umowa o pracę</option>
+              <option value="zlecenie">Umowa zlecenia</option>
+              <option value="dzialalnosc">Własna działalność</option>
+            </select>
+          </Pole>
+          {!firma && <Pole label="Ile osób płatnik zgłasza do ubezpieczenia chorobowego?" hint="Jeśli nie wiesz, zapytaj płatnika składek, np. w kadrach.">
+            <select value={liczbaOsob} onChange={(e) => setLiczbaOsob(e.target.value)}>
+              <option value="">Nie wiem</option>
+              <option value="malo">Do {prog} osób</option>
+              <option value="duzo">Powyżej {prog} osób</option>
+            </select>
+          </Pole>}
+          {firma ? <p>Wniosek o zasiłek (ZAM) składasz w ZUS. ZUS go rozpatrzy i wypłaci zasiłek, jeśli Ci przysługuje.</p>
+            : liczbaOsob === "duzo" ? <p>Zasiłek wypłaca {zlecenie ? "płatnik składek" : "pracodawca"}. Tam złóż wniosek o zasiłek (ZAM).</p>
+            : liczbaOsob === "malo" ? <p>Zasiłek wypłaca ZUS. Płatnik składek przekazuje do ZUS zaświadczenie {zlecenie ? "Z-3a" : "Z-3"}.</p>
+            : <p>Sprawdź u {zlecenie ? "płatnika składek" : "pracodawcy"}, kto rozpatrzy Twój wniosek o zasiłek.</p>}
+          <p><Link href="/druki#ZAM">Sprawdź, jak wypełnić formularz ZAM</Link></p>
+        </section>
+        <section className="card">
+          <h2>Daty z Twojego planu</h2>
+          {blad && <Alert t="err">Nie udało się odczytać terminów z zapisanego planu.</Alert>}
+          {terminyPlanu?.length ? <ul className="clean">
+            {terminyPlanu.map((t, i) => <li key={i}>
+              <b>{t.do ? "Do " + dataPL(t.do) : "Od " + dataPL(t.od)}</b><br />{opisTerminu(t.co)}
+            </li>)}
+          </ul> : <p><Link href="/sprawa/terminy">Sprawdź terminy dla swojej sprawy</Link> lub <Link href="/kalkulator">ułóż plan urlopów w kalkulatorze</Link>.</p>}
+        </section>
       </div>
-      <h2 className="mt">Druki i wnioski</h2>
-      <div className="grid g2">{DRUKI.map((d) => <div key={d.kod} className="card"><div className="row between"><h3>{d.kod}</h3><span className="badge ok">{d.kto}</span></div><b>{d.nazwa}</b><p className="small muted">{d.opis}</p></div>)}</div>
-      <div className="row mt"><Link href="/wnioski" className="btn btn-primary">Wypełnij wniosek</Link><Link href="/wgraj" className="btn btn-secondary">Wgraj gotowy wniosek</Link></div>
+      <section className="card mt">
+        <h2>Ile masz czasu na złożenie wniosku</h2>
+        <dl>
+          {terminy.map(([co, kiedy]) => <div key={co} className="mt"><dt><b>{co}</b></dt><dd style={{ margin: 0 }}>{kiedy}</dd></div>)}
+        </dl>
+      </section>
+      <section className="mt">
+        <h2>Formularze</h2>
+        <ul className="clean">
+          {DRUKI.map((d) => <li key={d.id}><Link href={`/druki#${d.id}`}>{d.nazwa}</Link></li>)}
+        </ul>
+        <p className="mt"><Link href="/wnioski" className="btn btn-primary">Przygotuj wniosek</Link></p>
+      </section>
     </>
   );
 }

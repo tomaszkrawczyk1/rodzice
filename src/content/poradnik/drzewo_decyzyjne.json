@@ -6,7 +6,7 @@
       "typ": "pytanie", "tekst": "W jakiej jesteś sytuacji?", "podpowiedz": "Wybierz to, co jest najbliższe Twojej sytuacji. W każdej chwili możesz wrócić i zmienić wybór.",
       "opcje": [
         { "etykieta": "Planuję dziecko", "nastepny": "plan_tytul" },
-        { "etykieta": "Jestem w ciąży", "nastepny": "ciaza_cel" },
+        { "etykieta": "Czekamy na dziecko", "nastepny": "kogo_dotyczy_ciaza" },
         { "etykieta": "Dziecko już jest", "nastepny": "po_cel" },
         { "etykieta": "Adopcja lub rodzina zastępcza", "nastepny": "adopcja_typ" },
         { "etykieta": "Trudna sytuacja (strata, wcześniak, choroba, śmierć matki)", "nastepny": "trudna_cel" },
@@ -15,7 +15,7 @@
     },
 
     "plan_tytul": {
-      "typ": "pytanie", "tekst": "Jak jesteś teraz ubezpieczona chorobowo?",
+      "typ": "pytanie", "tekst": "Jakie masz ubezpieczenie chorobowe?",
       "opcje": [
         { "etykieta": "Mam umowę o pracę", "nastepny": "wynik_plan_praca" },
         { "etykieta": "Prowadzę działalność lub mam umowę zlecenia", "nastepny": "wynik_plan_firma" },
@@ -26,21 +26,30 @@
     "wynik_plan_firma": { "typ": "wynik", "tytul": "Planujesz dziecko, masz działalność lub zlecenie", "pytania": ["F20", "F22", "F02"], "druki": ["ZAM", "ZAS-53"], "kalkulator": { "tryb": "uprawnienia", "opcja": "dzialalnosc" } },
     "wynik_plan_brak": { "typ": "wynik", "tytul": "Planujesz dziecko, nie masz ubezpieczenia chorobowego", "pytania": ["F21", "F22"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" } },
 
+    "kogo_dotyczy_ciaza": {
+      "typ": "pytanie",
+      "tekst": "Czego chcesz się dowiedzieć?",
+      "opcje": [
+        { "etykieta": "Zwolnienie lub praca w ciąży", "nastepny": "ciaza_cel" },
+        { "etykieta": "Urlopy dla taty lub drugiego rodzica", "nastepny": "po_podzial" },
+        { "etykieta": "Zasiłek i dokumenty po narodzinach", "nastepny": "po_cel" }
+      ]
+    },
     "ciaza_cel": {
       "typ": "pytanie", "tekst": "Czego dotyczy Twoje pytanie?",
       "opcje": [
         { "etykieta": "Zwolnienie lekarskie w ciąży – ile dostanę", "nastepny": "ciaza_zwolnienie_tytul" },
         { "etykieta": "Zasiłek się kończy, a nadal nie mogę pracować", "nastepny": "wynik_rehab" },
-        { "etykieta": "Straciłam pracę w trakcie ciąży", "nastepny": "wynik_strata_pracy" },
+        { "etykieta": "Utrata pracy w trakcie ciąży", "nastepny": "wynik_strata_pracy" },
         { "etykieta": "Obawiam się zwolnienia lub kończy mi się umowa", "nastepny": "ciaza_ochrona" },
-        { "etykieta": "Zmieniłam pracę lub miałam przerwę w ubezpieczeniu", "nastepny": "wynik_zmiana_pracy" },
+        { "etykieta": "Zmiana pracy lub przerwa w ubezpieczeniu", "nastepny": "wynik_zmiana_pracy" },
         { "etykieta": "Chcę zaplanować urlop po porodzie", "nastepny": "po_cel" }
       ]
     },
     "ciaza_zwolnienie_tytul": {
-      "typ": "pytanie", "tekst": "Jesteś pracownicą czy prowadzisz firmę?",
+      "typ": "pytanie", "tekst": "Jaka jest forma zatrudnienia?",
       "opcje": [
-        { "etykieta": "Pracownica (umowa o pracę)", "nastepny": "wynik_chorobowe_praca" },
+        { "etykieta": "Umowa o pracę", "nastepny": "wynik_chorobowe_praca" },
         { "etykieta": "Prowadzę działalność / zlecenie z dobrowolnym chorobowym", "nastepny": "wynik_chorobowe_firma" }
       ]
     },
@@ -68,7 +77,7 @@
         { "etykieta": "Gdzie złożyć wniosek i jakie dokumenty", "nastepny": "dok_cel" },
         { "etykieta": "Jakich terminów nie przegapić", "nastepny": "wynik_terminy" },
         { "etykieta": "Nie mam prawa do zasiłku macierzyńskiego", "nastepny": "wynik_brak_zasilku" },
-        { "etykieta": "Jestem w kolejnej ciąży zaraz po poprzednim urlopie", "nastepny": "wynik_druga_ciaza" }
+        { "etykieta": "Kolejna ciąża zaraz po poprzednim urlopie", "nastepny": "wynik_druga_ciaza" }
       ]
     },
     "po_ile_zaswiadczenie": {

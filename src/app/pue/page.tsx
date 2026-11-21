@@ -2,29 +2,110 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, useSesja } from "@/lib/sesja";
-import { dataKrotka, pln } from "@/lib/format";
-import { Alert, Field, Sim } from "@/components/ui";
+import { dataPL, pln } from "@/lib/format";
+import { nazwaUbezpieczenia, rodzajChorobowego, type UbezpieczenieProfilu, type ZwolnienieProfilu } from "@/lib/dane-profilu";
+import { Alert } from "@/components/ui";
+
+type Konto = {
+  osoba: string;
+  pesel: string;
+  dniNieprzerwanegoUbezpieczenia: number;
+  zadluzenie: { kwota: number };
+  ubezpieczenie: UbezpieczenieProfilu[];
+  ezla: ZwolnienieProfilu[];
+};
+
+function PodgladKonta({ pesel }: { pesel: string }) {
+  const [konto, setKonto] = useState<Konto | null>(null);
+  const [q, setQ] = useState({ temat: "Zasiłek macierzyński", tresc: "" });
+  const [numer, setNumer] = useState("");
+  const [bladKonta, setBladKonta] = useState(false);
+  const [bladPytania, setBladPytania] = useState("");
+  const [wysylanie, setWysylanie] = useState(false);
+
+  useEffect(() => {
+    let aktualne = true;
+    api<Konto>(`/api/pue/konto?${new URLSearchParams({ pesel })}`)
+      .then((k) => { if (aktualne) setKonto(k); })
+      .catch(() => { if (aktualne) setBladKonta(true); });
+    return () => { aktualne = false; };
+  }, [pesel]);
+
+  async function wyslij() {
+    setNumer("");
+    setBladPytania("");
+    if (!q.tresc.trim()) return setBladPytania("Wpisz treść pytania.");
+    setWysylanie(true);
+    try {
+      const wynik = await api<{ numerSprawy: string }>("/api/pue/pytanie", { ...q, tresc: q.tresc.trim() });
+      setNumer(wynik.numerSprawy);
+    } catch {
+      setBladPytania("Nie udało się wysłać pytania testowego. Spróbuj ponownie.");
+    } finally {
+      setWysylanie(false);
+    }
+  }
+
+  return (
+    <div className="grid g2" style={{ alignItems: "start" }}>
+      <section className="card" style={{ overflowWrap: "anywhere" }}>
+        <h2>Dane profilu</h2>
+        {bladKonta && <Alert t="err">Nie udało się pobrać danych profilu.</Alert>}
+        {!konto && !bladKonta && <p role="status">Wczytujemy dane konta…</p>}
+        {konto && <>
+          <p><b>{konto.osoba}</b></p>
+          <dl>
+            <dt>PESEL</dt><dd>{konto.pesel}</dd>
+            <dt>Dni ubezpieczenia chorobowego</dt><dd>{konto.dniNieprzerwanegoUbezpieczenia}</dd>
+            <dt>Zaległości w składkach</dt><dd>{pln(konto.zadluzenie.kwota)}</dd>
+          </dl>
+          <h3>Ubezpieczenia</h3>
+          {konto.ubezpieczenie.map((u, i) => <p key={i}>
+            <b>{nazwaUbezpieczenia(u.tytul)}</b> od {dataPL(u.od)}{u.do && <> do {dataPL(u.do)}</>}.
+            {" Ubezpieczenie chorobowe: "}{rodzajChorobowego(u.chorobowe)}.
+            {u.platnik && <> Płatnik składek: {u.platnik.nazwa}, NIP {u.platnik.nip}.</>}
+          </p>)}
+          <h3>Zwolnienia lekarskie</h3>
+          {konto.ezla.length ? <ul className="clean">{konto.ezla.map((z) => <li key={z.seria_numer}>
+            Od {dataPL(z.od)} do {dataPL(z.do)}. Liczba dni: {z.dni}.
+            {z.kodLiterowy === "B" && <> Zwolnienie w ciąży.</>}
+            {z.szpital && <> Pobyt w szpitalu.</>}
+          </li>)}</ul> : <p>Brak zwolnień w profilu.</p>}
+        </>}
+      </section>
+      <form className="card" onSubmit={(e) => { e.preventDefault(); void wyslij(); }}>
+        <h2>Wypróbuj wysłanie pytania</h2>
+        <p>Wpisz przykładową treść. Pytanie zostanie obsłużone w prototypie.</p>
+        <div className="field">
+          <label htmlFor="pue-temat">Temat</label>
+          <select id="pue-temat" value={q.temat} onChange={(e) => setQ({ ...q, temat: e.target.value })}>
+            <option>Zasiłek macierzyński</option><option>Zasiłek chorobowy</option><option>Ubezpieczenie chorobowe</option><option>Inne</option>
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="pue-tresc">Treść pytania</label>
+          <textarea id="pue-tresc" rows={5} value={q.tresc} onChange={(e) => setQ({ ...q, tresc: e.target.value })} />
+        </div>
+        <button className="btn btn-primary" disabled={wysylanie}>Wyślij pytanie testowe</button>
+        {bladPytania && <Alert t="err">{bladPytania}</Alert>}
+        {numer && <Alert t="ok">Zapisano pytanie testowe. Numer: <b>{numer}</b>.</Alert>}
+      </form>
+    </div>
+  );
+}
 
 export default function Pue() {
-  const { sesja } = useSesja(); const [k, setK] = useState<any>(null); const [q, setQ] = useState({ temat: "Zasiłek macierzyński", tresc: "" }); const [wyn, setWyn] = useState<any>(null); const [err, setErr] = useState("");
-  useEffect(() => { if (sesja) api(`/api/pue/konto?pesel=${sesja.pesel}`).then(setK).catch((e) => setErr(e.message)); }, [sesja]);
-  if (!sesja) return <><h1>Konto PUE / eZUS</h1><Alert>Zaloguj się, aby zobaczyć dane. <Link href="/logowanie">Zaloguj przez mObywatela</Link></Alert></>;
-  async function wyslij() { setErr(""); try { setWyn(await api("/api/pue/pytanie", q)); } catch (e: any) { setErr(e.message); setWyn(null); } }
+  const { sesja, gotowa } = useSesja();
   return (
     <>
-      <div className="row between"><h1>Konto PUE / eZUS</h1><Sim /></div>
-      <p className="lead">Podgląd danych zgromadzonych na koncie ubezpieczonego oraz możliwość zadania pytania ZUS.</p>
-      {err && <Alert t="err">{err}</Alert>}
-      {k && <div className="grid g2" style={{ alignItems: "start" }}>
-        <div className="card"><h3>{k.osoba}</h3><dl className="kv"><dt>PESEL</dt><dd>{k.pesel}</dd><dt>Nieprzerwane ubezpieczenie</dt><dd>{k.dniNieprzerwanegoUbezpieczenia} dni</dd><dt>Zadłużenie składkowe</dt><dd>{pln(k.zadluzenie.kwota)}</dd></dl>
-          <h4 className="mt">Ubezpieczenia</h4>{k.ubezpieczenie.map((u: any, i: number) => <p key={i} className="small">{u.tytul.replaceAll("_", " ")} · {dataKrotka(u.od)} – {u.do ? dataKrotka(u.do) : "trwa"} · chorobowe: {u.chorobowe}<br /><span className="muted">{u.platnik.nazwa}, NIP {u.platnik.nip}</span></p>)}
-          <h4>Zwolnienia e-ZLA</h4>{k.ezla.length ? <div className="tbl-wrap"><table className="tbl"><thead><tr>{Object.keys(k.ezla[0]).map((c) => <th key={c}>{c}</th>)}</tr></thead><tbody>{k.ezla.map((z: any, i: number) => <tr key={i}>{Object.values(z).map((v: any, j) => <td key={j}>{String(v)}</td>)}</tr>)}</tbody></table></div> : <p className="muted small">Brak zwolnień.</p>}</div>
-        <div className="card"><h3>Zadaj pytanie ZUS</h3>
-          <Field label="Temat"><select value={q.temat} onChange={(e) => setQ({ ...q, temat: e.target.value })}><option>Zasiłek macierzyński</option><option>Zasiłek chorobowy</option><option>Ubezpieczenie chorobowe</option><option>Inne</option></select></Field>
-          <Field label="Treść pytania"><textarea rows={5} value={q.tresc} onChange={(e) => setQ({ ...q, tresc: e.target.value })} /></Field>
-          <button className="btn btn-primary" onClick={wyslij}>Wyślij pytanie</button>
-          {wyn && <Alert t="ok">Pytanie przyjęte. Numer sprawy: <b>{wyn.numerSprawy}</b>. Odpowiedź: {wyn.przewidywanaOdpowiedz}. <Sim /></Alert>}</div>
-      </div>}
+      <h1>Konto w ZUS (eZUS)</h1>
+      <p className="lead">W eZUS, dawniej PUE ZUS, możesz sprawdzać dane o ubezpieczeniu i zwolnieniach oraz pisać do ZUS. Tutaj możesz wypróbować te czynności na fikcyjnych danych.</p>
+      {!gotowa ? <p role="status">Wczytujemy sesję…</p> : sesja
+        ? <PodgladKonta key={sesja.token} pesel={sesja.pesel} />
+        : <section className="card">
+          <h2>Sprawdź, jak wygląda konto</h2>
+          <Link href="/logowanie?powrot=pue" className="btn btn-primary">Wybierz profil testowy</Link>
+        </section>}
     </>
   );
 }
