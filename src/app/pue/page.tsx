@@ -2,18 +2,56 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, useSesja } from "@/lib/sesja";
-import { dataPL, pln } from "@/lib/format";
-import { nazwaUbezpieczenia, rodzajChorobowego, type UbezpieczenieProfilu, type ZwolnienieProfilu } from "@/lib/dane-profilu";
-import { Alert } from "@/components/ui";
+import { dataPL, dzis, pln } from "@/lib/format";
+import { nazwaUbezpieczenia, rodzajChorobowego, wynikZadluzenia, type StanZadluzeniaNaDzien, type UbezpieczenieProfilu, type ZwolnienieProfilu } from "@/lib/dane-profilu";
+import { Alert, Field, Sim } from "@/components/ui";
 
 type Konto = {
   osoba: string;
   pesel: string;
   dniNieprzerwanegoUbezpieczenia: number;
-  zadluzenie: { kwota: number };
   ubezpieczenie: UbezpieczenieProfilu[];
   ezla: ZwolnienieProfilu[];
 };
+
+function Zaswiadczenie({ pesel }: { pesel: string }) {
+  const [dzien, setDzien] = useState(dzis());
+  const [z, setZ] = useState<StanZadluzeniaNaDzien | null>(null);
+  const [blad, setBlad] = useState(false);
+
+  useEffect(() => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dzien)) return;
+    let aktualne = true;
+    api<StanZadluzeniaNaDzien>(`/api/zus/zadluzenie?${new URLSearchParams({ pesel, naDzien: dzien })}`)
+      .then((w) => { if (aktualne) { setZ(w); setBlad(false); } })
+      .catch(() => { if (aktualne) setBlad(true); });
+    return () => { aktualne = false; };
+  }, [pesel, dzien]);
+
+  return (
+    <section className="card" style={{ overflowWrap: "anywhere" }}>
+      <h2>Zadłużenie z tytułu składek <Sim /></h2>
+      <p>Wybierz dzień, w którym powstaje prawo do świadczenia, na przykład dzień porodu. Pokażemy zadłużenie z tego dnia.</p>
+      <Field label="Stan na dzień"><input type="date" value={dzien} onChange={(e) => setDzien(e.target.value)} /></Field>
+      {blad && <Alert t="err">Nie udało się pobrać zaświadczenia.</Alert>}
+      {z && <>
+        <h3>Stan zadłużenia na dzień {dataPL(z.naDzien)}</h3>
+        {z.wynik === "nie_dotyczy" ? <p>{z.komunikat}</p> : <>
+          <dl>
+            <dt>Zaległości w składkach</dt><dd>{pln(z.kwotaZadluzenia)}</dd>
+            <dt>Próg</dt><dd>{pln(z.prog)}</dd>
+            <dt>Wynik</dt><dd>{wynikZadluzenia(z)}</dd>
+          </dl>
+          <Alert t={z.przekroczonyProg ? "warn" : "ok"}>{z.komunikat}</Alert>
+          {z.skladniki.length > 0 && <ul className="clean">{z.skladniki.map((s) => <li key={s.okres}>
+            Składka za {s.okres.slice(5)}.{s.okres.slice(0, 4)}: {pln(s.kwota)}, termin płatności minął {dataPL(s.terminPlatnosci)}.
+          </li>)}</ul>}
+        </>}
+        <p className="small muted">Zaświadczenie (symulacja) nr {z.numerZaswiadczenia}, wystawione {dataPL(z.wystawiono)}. To nie jest dokument z ZUS.</p>
+      </>}
+    </section>
+  );
+}
 
 function PodgladKonta({ pesel }: { pesel: string }) {
   const [konto, setKonto] = useState<Konto | null>(null);
@@ -57,7 +95,6 @@ function PodgladKonta({ pesel }: { pesel: string }) {
           <dl>
             <dt>PESEL</dt><dd>{konto.pesel}</dd>
             <dt>Dni ubezpieczenia chorobowego</dt><dd>{konto.dniNieprzerwanegoUbezpieczenia}</dd>
-            <dt>Zaległości w składkach</dt><dd>{pln(konto.zadluzenie.kwota)}</dd>
           </dl>
           <h3>Ubezpieczenia</h3>
           {konto.ubezpieczenie.map((u, i) => <p key={i}>
@@ -73,6 +110,7 @@ function PodgladKonta({ pesel }: { pesel: string }) {
           </li>)}</ul> : <p>Brak zwolnień w profilu.</p>}
         </>}
       </section>
+      <Zaswiadczenie pesel={pesel} />
       <form className="card" onSubmit={(e) => { e.preventDefault(); void wyslij(); }}>
         <h2>Wypróbuj wysłanie pytania</h2>
         <p>Wpisz przykładową treść. Pytanie zostanie obsłużone w prototypie.</p>

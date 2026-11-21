@@ -3,8 +3,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
 import { dataPL, pln, dzis, opisTerminu } from "@/lib/format";
-import { nazwaUbezpieczenia, rodzajChorobowego, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
-import { Alert } from "@/components/ui";
+import { nazwaUbezpieczenia, rodzajChorobowego, wynikZadluzenia, type StanZadluzeniaNaDzien, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
+import { Alert, Sim } from "@/components/ui";
 import Szkielet from "@/components/Szkielet";
 import Szukaj from "@/components/Szukaj";
 import { przejdzDoKroku } from "@/lib/ekran";
@@ -19,7 +19,7 @@ const MOMENTY = {
 type Dane = {
   u: { dniNieprzerwanegoUbezpieczeniaChorobowego: number; ubezpieczenie: UbezpieczenieProfilu[] };
   e: { lacznieDni: number };
-  z: { kwotaZadluzenia: number; prog: number; przekroczonyProg: boolean };
+  z: StanZadluzeniaNaDzien;
 };
 
 function PodgladProfilu({ pesel }: { pesel: string }) {
@@ -47,8 +47,15 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
         <dl>
           <dt>Dni ubezpieczenia chorobowego</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
           <dt>Dni zwolnień lekarskich</dt><dd>{dane.e.lacznieDni}</dd>
-          <dt>Zaległości w składkach</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
         </dl>
+        <h3>Stan zadłużenia na dzień {dataPL(dane.z.naDzien)} <Sim /></h3>
+        {dane.z.wynik === "nie_dotyczy" ? <p>{dane.z.komunikat}</p> : (
+          <dl>
+            <dt>Zaległości w składkach</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
+            <dt>Próg</dt><dd>{pln(dane.z.prog)}</dd>
+            <dt>Wynik</dt><dd>{wynikZadluzenia(dane.z)}</dd>
+          </dl>
+        )}
         {dane.u.ubezpieczenie.map((u, i) => (
           <p key={i}>
             <b>{nazwaUbezpieczenia(u.tytul)}</b> od {dataPL(u.od)}{u.do && <> do {dataPL(u.do)}</>}.
@@ -56,9 +63,7 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
             {u.platnik && <> Płatnik składek: {u.platnik.nazwa}.</>}
           </p>
         ))}
-        {dane.z.przekroczonyProg && (
-          <Alert t="warn">Zaległość przekracza próg {pln(dane.z.prog)}. Sprawdź w ZUS, czy wpłynie na wypłatę zasiłku.</Alert>
-        )}
+        {dane.z.przekroczonyProg && <Alert t="warn">{dane.z.komunikat} Sprawdź w ZUS, jak to wygląda w Twojej sprawie.</Alert>}
       </>}
     </section>
   );
