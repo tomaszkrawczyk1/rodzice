@@ -8,7 +8,7 @@ export interface LiniaOcr { tekst: string; pewnosc: number }
 export interface StronaOcr { nr: number; zrodlo: "warstwa_tekstowa" | "ocr"; linie: LiniaOcr[] }
 export interface OdczytTekstu { stron: number; strony: StronaOcr[]; ostrzezenia: string[] }
 
-export const MAKS_STRON = 40;
+export const MAKS_STRON = 80;
 export const MAKS_BAJTOW = 25 * 1024 * 1024;
 /** Poniżej tylu znaków warstwy tekstowej strona traktowana jest jak skan. */
 const MIN_ZNAKOW_WARSTWY = 80;

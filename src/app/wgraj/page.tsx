@@ -29,6 +29,7 @@ export default function Wgraj() {
   const [pod, setPod] = useState<any>(null);
   const [ub, setUb] = useState<any>(null);
   const [ubInfo, setUbInfo] = useState("");
+  const [dzieci, setDzieci] = useState("1");
 
   async function odczytaj(blob: Blob, plik: string, etykieta: string) {
     setBusy(true); setErr(""); setWyn(null); setPod(null); setUb(null); setUbInfo(""); setNazwa(etykieta);
@@ -43,6 +44,7 @@ export default function Wgraj() {
       setData(j.dane?.data_zdarzenia ?? "");
       setWiersze((j.dane?.skladniki_miesieczne ?? []).map((w: any): Wiersz => ({ rok: w.rok, miesiac: w.miesiac, dP: tx(w.dniPrzepracowal), dO: tx(w.dniObowiazany), stale: tx(w.stale), zm: tx(w.zmiennePomniejszone), pr: tx(w.premieFaktyczne), proc: tx(w.procentSkladki), pewnosc: w.pewnosc ?? 1 })));
       setPod(j.podstawa ?? null);
+      setDzieci(String(Math.min(Math.max(j.dane?.dzieci?.length || 1, 1), 5)));
     } catch (e: any) {
       setErr(e?.message || "Nie udało się odczytać dokumentu. Spróbuj ponownie albo wpisz dane w kalkulatorze.");
     } finally { setBusy(false); }
@@ -65,6 +67,12 @@ export default function Wgraj() {
     setWiersze((w) => w.map((x, k) => (k === i ? { ...x, [pole]: v, pewnosc: 1 } : x)));
   }
 
+  /** Gdy odczyt nie znalazł wierszy (np. ręczne pismo), dodaje 12 pustych miesięcy przed datą zdarzenia do ręcznego wpisania. */
+  function dodajMiesiace() {
+    const b = data ? new Date(data) : new Date();
+    setWiersze(Array.from({ length: 12 }, (_, i) => { const d = new Date(b.getFullYear(), b.getMonth() - 12 + i, 1); return { rok: d.getFullYear(), miesiac: d.getMonth() + 1, dP: "", dO: "", stale: "", zm: "", pr: "", proc: "", pewnosc: 1 }; }));
+  }
+
   async function przelicz() {
     setBusy(true); setErr("");
     try {
@@ -85,7 +93,7 @@ export default function Wgraj() {
 
   function policz() {
     const p = pod?.wynik?.podstawaMiesieczna; if (!p) return;
-    localStorage.setItem("rodzice.prefill", JSON.stringify({ podstawaM: p, data: data || undefined, dzieci: wyn?.dane?.dzieci?.length || 1 }));
+    localStorage.setItem("rodzice.prefill", JSON.stringify({ podstawaM: p, data: data || undefined, dzieci: Math.min(Math.max(parseInt(dzieci) || 1, 1), 5) }));
     router.push("/kalkulator");
   }
 
@@ -129,6 +137,7 @@ export default function Wgraj() {
               </dl>
               <div className="grid g2 mt">
                 <Field label="PESEL"><input inputMode="numeric" autoComplete="off" value={pesel} onChange={(e) => setPesel(e.target.value)} /></Field>
+                <Field label="Liczba dzieci"><input inputMode="numeric" autoComplete="off" value={dzieci} onChange={(e) => setDzieci(e.target.value.replace(/\D/g, "").slice(0, 1))} /></Field>
                 <Field label="Data porodu lub przyjęcia dziecka"><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
               </div>
               {(slabo(p.pesel) || slabo(p.data_zdarzenia)) && <p className="small muted">Pola PESEL i data zostały odczytane z niską pewnością. Porównaj je z dokumentem.</p>}
@@ -139,6 +148,9 @@ export default function Wgraj() {
               {ub && <p>Dane fikcyjnego profilu: <b>{ub.osoba}</b>. Nieprzerwane ubezpieczenie chorobowe: <b>{ub.dniNieprzerwanegoUbezpieczeniaChorobowego} dni</b>. Ubezpieczenie w dniu zdarzenia: <b>{ub.ubezpieczonaWDniu ? "aktywne" : "brak"}</b>.</p>}
               {ubInfo && <p>{ubInfo}</p>}</div>}
 
+            {wiersze.length === 0 && <div className="card"><h3>Wynagrodzenia z zaświadczenia</h3>
+              <p className="small muted">Nie udało się odczytać tabeli wynagrodzeń (np. przy piśmie odręcznym). Możesz wpisać je ręcznie z dokumentu.</p>
+              <div className="row mt"><button className="btn btn-secondary" onClick={dodajMiesiace}>Wpisz wynagrodzenia ręcznie</button></div></div>}
             {wiersze.length > 0 && <div className="card"><h3>Wynagrodzenia z zaświadczenia</h3>
               <p className="small muted">Popraw liczby, jeśli odczyt się pomylił, i kliknij „Przelicz podstawę”.</p>
               <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Miesiąc</th><th>Dni przepracowane</th><th>Dni obowiązujące</th><th>Składniki stałe (zł)</th><th>Zmienne (zł)</th><th>Premie (zł)</th></tr></thead>
