@@ -1,13 +1,12 @@
 .kalendarz {
   max-width: 55rem;
-  margin-inline: auto;
+  margin-inline: 0;
   overflow-wrap: anywhere;
 }
 
-.kalendarz h1 { font-size: 2em; }
-.kalendarz h2 { font-size: 1.4em; }
-.kalendarz h3 { font-size: 1.15em; }
-.kalendarz h4 { font-size: 1em; }
+.kalendarz h2 { font-size: 23px; }
+.kalendarz h3 { font-size: 18px; }
+.kalendarz h4 { font-size: 16px; }
 .kalendarz small { display: block; color: var(--muted); font-size: .875em; }
 .kalendarz ul { padding-inline-start: 1.35em; }
 .kalendarz li + li { margin-top: .25em; }
@@ -17,7 +16,7 @@
 .kalendarz :focus-visible { outline-color: var(--zus-navy); }
 
 .wstep { max-width: 65ch; }
-.formularz { margin-block: 1.25rem 1.5rem; background: var(--gray); border-top: 4px solid var(--zus-green); }
+.formularz { margin-block: 1.25rem 1.5rem; background: #f3f3f3; border: 0; border-top: 7px solid var(--zus-green); }
 .formularz :is(details, .wyczysc) { margin-top: .75rem; }
 .formularz details {
   padding-inline: .75rem;

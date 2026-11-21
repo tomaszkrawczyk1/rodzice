@@ -196,6 +196,7 @@ img { max-width: 100%; height: auto; }
   padding: 0;
   max-width: 1200px;
   width: 100%;
+  padding: 0 16px;
 }
 .zus-nav li {
   flex: 1 1 0;
@@ -242,9 +243,20 @@ img { max-width: 100%; height: auto; }
   .menu-btn { display: inline-flex; align-items: center; }
   .zus-header__bar { flex-wrap: wrap; padding-bottom: 12px; }
   .zus-logo { order: 1; }
-  .menu-btn { order: 2; margin-left: auto; }
   .zus-product { order: 3; flex: 1 0 100%; margin-left: 0; border-left: 0; padding-left: 0; }
-  .zus-header__tools { order: 4; width: 100%; margin-left: 0; justify-content: flex-start; flex-wrap: wrap; }
+  .zus-header__tools { display: contents; }
+  .zus-header__bar { column-gap: 8px; }
+  .zus-header__tools .pue-login { order: 2; margin-left: auto; }
+  .menu-btn { order: 3; margin-left: 0; }
+  .zus-product { order: 4; }
+  .zus-search { order: 5; }
+  .a11y { order: 6; }
+  .zus-search span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .zus-search { min-width: 44px; justify-content: center; padding: 4px; }
+  .a11y { gap: 6px; flex-wrap: wrap; }
+  .a11y button { padding: 8px 8px; font-size: 14px; }
+  .pue-login { padding: 8px 10px; }
+  .zus-nav__list { padding: 0; }
   .zus-logo__img { width: 168px; height: auto; }
   .pue-login { max-width: 100%; }
   .zus-nav { display: none; }
@@ -282,14 +294,14 @@ img { max-width: 100%; height: auto; }
   display: flex;
   align-items: center;
   min-height: 44px;
-  padding: 8px 4px;
+  padding: 8px 0;
   color: #fff;
-  font-weight: 700;
-  text-decoration: underline;
+  font-weight: 400;
+  text-decoration: none;
   overflow-wrap: anywhere;
 }
-.footer__links a::before { content: "›"; margin-right: 8px; color: #fff; font-weight: 700; text-decoration: none; }
-.footer__note { color: #fff; font-size: 16px; margin: 12px 0 0; overflow-wrap: anywhere; }
+.footer__links a:hover { text-decoration: underline; }
+.footer__note { color: #fff; font-size: 16px; margin: 0 0 12px; overflow-wrap: anywhere; }
 .footer__side { min-width: 0; }
 .to-top {
   color: #fff;
@@ -306,9 +318,9 @@ img { max-width: 100%; height: auto; }
 
 .a11y { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-width: 0; }
 .a11y button {
-  background: var(--zus-navy);
-  border: 0;
-  color: #fff;
+  background: #fff;
+  border: 1px solid var(--zus-navy);
+  color: var(--zus-navy);
   border-radius: 3px;
   font: inherit;
   font-weight: 700;
@@ -320,7 +332,8 @@ img { max-width: 100%; height: auto; }
   line-height: 1.15;
   text-align: center;
 }
-.a11y button[aria-pressed="true"] { background: var(--zus-orange); color: var(--zus-navy); }
+.a11y button:hover { background: var(--gray); }
+.a11y button[aria-pressed="true"] { background: var(--zus-navy); color: #fff; }
 
 /* karty, układ */
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 0; padding: 16px 18px; box-shadow: none; }
@@ -338,9 +351,9 @@ img { max-width: 100%; height: auto; }
 @media (max-width: 600px) {
   .g2, .g3, .g4 { grid-template-columns: minmax(0, 1fr); }
   .ask form.row { flex-direction: column; align-items: stretch; }
-  .ask form.row .btn { width: 100%; }
-  .chip { display: flex; width: 100%; margin-right: 0; }
+  .ask form.row .btn { width: 100%; flex: none; }
   .row > .btn, .row > a.btn, .row > button.btn { flex: 1 1 160px; }
+  .ask form.row > .btn, form.row > .btn { flex: none; }
   dl.kv { display: flex !important; flex-direction: column; gap: 2px; }
   dl.kv dt { margin-top: 10px; }
 }
@@ -462,7 +475,9 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 16px; border: 3px
 .kv { display: grid; grid-template-columns: minmax(8rem, max-content) minmax(0, 1fr); gap: 6px 16px; }
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; font-weight: 700; }
-.big { font-size: 32px; font-weight: 700; color: var(--zus-green); line-height: 1.1; }
+.big { font-size: 40px; font-weight: 700; color: var(--zus-green); line-height: 1.1; margin: 4px 0 6px; }
+.narrow { max-width: 760px; }
+.section-h { margin: 28px 0 12px; }
 ul.clean { list-style: none; padding: 0; margin: 0; }
 ul.clean li { padding: 6px 0 6px 22px; position: relative; }
 ul.clean li::before { content: ""; position: absolute; left: 0; top: .65em; width: 8px; height: 8px; background: var(--zus-green); }
@@ -568,10 +583,9 @@ html.fs-xl .zus-header__tools { flex-wrap: wrap; width: 100%; justify-content: f
   display: block;
   width: 100%;
   text-align: left;
-  border: 1px solid var(--line);
-  border-top: 7px solid #ececec;
-  border-radius: 0;
-  padding: 12px 14px;
+  border: 1px solid #767676;
+  border-radius: 3px;
+  padding: 12px 16px;
   margin: 8px 0;
   background: #fff;
   font: inherit;
@@ -579,7 +593,8 @@ html.fs-xl .zus-header__tools { flex-wrap: wrap; width: 100%; justify-content: f
   color: #000;
   min-height: 52px;
 }
-.opt:hover, .opt.sel, .opt:focus-visible { border-top-color: var(--zus-green); background: #fff; }
+.opt:hover { border-color: var(--zus-green); box-shadow: inset 4px 0 0 var(--zus-green); }
+.opt.sel { border-color: var(--zus-green); box-shadow: inset 4px 0 0 var(--zus-green); background: var(--gray); }
 .todo { padding-left: 22px; }
 .todo li { margin: 12px 0; }
 .todo .when { color: #6b4e00; }
@@ -649,6 +664,171 @@ pre.wniosek { white-space: pre-wrap; font: inherit; background: var(--gray); pad
 .ask { background: #f5f5f5; padding: 18px; border: 1px solid #dadada; border-radius: 0; max-width: 100%; }
 button.tile, button.opt, button.persona { appearance: none; -webkit-appearance: none; }
 input[type=range] { min-height: 44px; }
+
+/* ===== Wzór zus.pl 1:1 (wartości z żywej strony zus.pl, listopad 2026) =====
+   szerokość 1200, nagłówek: logo 250 px, kwadraty 44 px #00416e, przycisk #fab856,
+   nawigacja Lato Bold 15,4 px #11783b z paskiem 7 px, h1 36/44, kafle #f3f3f3, paski #283754, stopka #007834 */
+.container { max-width: 1232px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+a:hover { color: var(--zus-green-dark); text-decoration: none; }
+h1 { font-size: 36px; line-height: 44px; padding: 27px 0 35px; margin: 0; }
+h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
+.site-main { padding-top: 0; }
+.narrow { max-width: 700px; }
+.hero { padding: 0; margin: 0 0 8px; }
+.hero p, .lead { font-size: 16px; line-height: 24px; }
+.hero h1 { padding-bottom: 20px; }
+
+/* nagłówek */
+.zus-header__bar { max-width: 1232px; padding: 18px 16px 17px 27px; gap: 0 12px; }
+.zus-logo__img { width: 250px; }
+.zus-product { margin-left: 8px; }
+.zus-header__tools { gap: 10px; }
+.a11y { gap: 10px; }
+.a11y button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; min-width: 44px; padding: 0;
+  background: var(--zus-navy); border: 0; border-radius: 3px; color: #fff;
+}
+.a11y button:hover { background: var(--zus-navy-dark); }
+.a11y button[aria-pressed="true"] { background: var(--zus-orange); color: var(--zus-navy); }
+.zus-search { flex-direction: column; gap: 2px; padding: 0 4px; min-height: 60px; justify-content: center; font-weight: 400; font-size: 14px; }
+.zus-search svg { width: 38px; height: 38px; }
+.pue-login, a.pue-login, button.pue-login {
+  min-height: 43px; max-width: 200px; justify-content: space-between; gap: 14px;
+  padding: 10px; border-radius: 3px; font-size: 14px; background: var(--zus-orange);
+}
+.pue-login:hover, .pue-login:focus-visible { background: var(--zus-navy); color: var(--zus-orange) !important; }
+.pue-arrow, .btn-primary::after, .btn-secondary::after, .tile::after, .linkbar::after {
+  content: ""; flex: none; width: 8px; height: 8px;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg);
+}
+.pue-arrow { margin-right: 4px; }
+.menu-btn { flex-direction: column; border: 0; padding: 4px 6px; gap: 5px; color: var(--zus-green-link); font-weight: 700; font-size: 14px; }
+.menu-btn__bars { display: block; width: 36px; height: 3px; margin: 8px 0; background: currentColor; box-shadow: 0 8px 0 currentColor, 0 -8px 0 currentColor; }
+
+/* nawigacja główna */
+.zus-nav__list { max-width: 1232px; padding: 0 16px; }
+.zus-nav li { border-top: 7px solid #ececec; }
+.zus-nav a { min-height: 0; padding: 12px 6px 19px; color: var(--zus-green-link); font-size: 15.4px; line-height: 23px; }
+.zus-nav a:hover, .zus-nav a.active, .zus-nav a[aria-current="page"] { color: var(--zus-green-link); }
+.zus-nav a:hover { text-decoration: underline; }
+
+/* ścieżka */
+.crumbs { background: #f3f3f3; border-top: 1px solid #dadada; border-bottom: 1px solid #dadada; margin-bottom: 8px; }
+.crumbs__row { min-height: 55px; }
+.crumbs__home { width: 56px; color: var(--zus-green); }
+.crumbs__list li { font-size: 12px; font-weight: 400; }
+.crumbs__list li.last, .crumbs__list li.last span { font-weight: 700; }
+.crumbs__list a { font-size: 12px; }
+
+/* przyciski: pomarańczowy główny i granatowy obrys jak na zus.pl */
+.btn {
+  font-size: 14px; padding: 10px 14px; min-height: 44px; gap: 14px; border: 1px solid var(--zus-navy);
+  border-radius: 3px; box-shadow: none; background: transparent; color: var(--zus-navy);
+}
+.btn-primary { background: var(--zus-orange); color: var(--zus-navy); border-color: var(--zus-navy); }
+.btn-primary:hover, .btn-primary:focus-visible { background: var(--zus-navy); color: var(--zus-orange); border-color: var(--zus-navy); box-shadow: none; }
+.btn-secondary { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
+.btn-secondary:hover, .btn-secondary:focus-visible { background: var(--zus-navy); color: #fff; border-color: var(--zus-navy); }
+.btn-ghost { background: transparent; color: var(--zus-navy); border: 1px solid var(--zus-navy); }
+.btn-ghost:hover { background: var(--zus-navy); color: #fff; }
+.btn-danger { background: var(--zus-red); color: #fff; border-color: var(--zus-red); }
+.btn[disabled] { background: #eee; color: #4d4d4d; border-color: #c8c9ca; }
+.btn-sm { font-size: 14px; }
+.chip { border-color: var(--zus-navy); color: var(--zus-navy); font-size: 14px; }
+.chip:hover { background: var(--zus-navy); color: #fff; }
+.btn-login, a.btn-login { background: var(--zus-orange); color: var(--zus-navy); border: 1px solid var(--zus-navy); }
+
+/* kafle: szare pola jak „expandable boxes” na stronie głównej zus.pl */
+.grid:has(> .tile) { gap: 2px; background: #fff; }
+.tile {
+  position: relative; background: #f3f3f3; border: 1px solid transparent; border-radius: 0;
+  padding: 30px 48px 30px 28px; min-height: 120px;
+  transition: background-color .2s ease;
+}
+.tile b { font-size: 17px; line-height: 20.4px; margin-bottom: 8px; }
+.tile span { color: #000; font-size: 16px; line-height: 24px; }
+.tile::after { position: absolute; right: 24px; top: 36px; width: 9px; height: 9px; border-width: 2px; color: #000; }
+.tile:hover, .tile:focus-visible {
+  background: #fff; border-color: #cacaca; box-shadow: 0 -3px 3px 0 rgba(0, 0, 0, .2); z-index: 2; color: #000;
+}
+.tile .ic { width: 50px; height: 50px; margin-bottom: 14px; background-size: 50px 50px; }
+.tile .time { margin-top: 10px; color: #4d4d4d; }
+button.tile { appearance: none; }
+
+/* granatowe paski jak u dołu zus.pl */
+.linkbars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 8px 0 0; }
+.linkbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 90px; padding: 0 28px 0 32px; background: #283754; color: #fff; text-decoration: none;
+  border: 1px solid #fff; font-size: 16px; line-height: 20px;
+}
+.linkbar::after { width: 12px; height: 12px; border-width: 3px; }
+.linkbar:hover, .linkbar:focus-visible { background: #fff; color: #283754; border-color: #283754; text-decoration: none; }
+@media (max-width: 860px) { .linkbars { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .linkbars { grid-template-columns: minmax(0, 1fr); } }
+
+/* opcje odpowiedzi jak kafle */
+.opt { background: #f3f3f3; border: 1px solid transparent; border-radius: 0; padding: 14px 18px; min-height: 56px; transition: background-color .2s ease; }
+.opt:hover, .opt:focus-visible { background: #fff; border-color: #cacaca; box-shadow: 0 -3px 3px 0 rgba(0, 0, 0, .2); }
+.opt.sel { background: #fff; border-color: #cacaca; box-shadow: inset 4px 0 0 var(--zus-green); }
+.card { border-color: #dadada; }
+.ask { background: #f3f3f3; border: 0; }
+.alert { background: #f3f3f3; }
+
+/* stopka */
+.footer { padding: 40px 0 36px; margin-top: 48px; border-top: 0; }
+.footer__cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 300px); gap: 24px 48px; }
+.footer__links li { border: 0 !important; }
+.footer__links a { min-height: 32px; padding: 4px 0 4px 18px; position: relative; font-weight: 700; font-size: 14px; }
+.footer__links a::before {
+  content: ""; position: absolute; left: 1px; top: 50%; width: 6px; height: 6px; margin-top: -4px;
+  border-top: 2px solid #fff; border-right: 2px solid #fff; transform: rotate(45deg);
+}
+.footer__side { display: flex; flex-direction: column-reverse; align-items: flex-end; gap: 16px; }
+.footer__note { font-size: 14px; margin: 0; text-align: left; }
+.to-top { font-size: 14px; gap: 12px; }
+.to-top__circle { width: 40px; height: 40px; border: 2px solid #fff; border-radius: 50%; position: relative; }
+.to-top__circle::before { content: ""; position: absolute; left: 13px; top: 15px; width: 9px; height: 9px; border-top: 2px solid #fff; border-left: 2px solid #fff; transform: rotate(45deg); }
+
+/* menu sekcji po lewej jak na stronach treści zus.pl: kolumna 300 px, linia 7 px, aktywna pozycja zielona */
+.zus-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); }
+.zus-side { border-right: 7px solid var(--zus-green); padding-bottom: 24px; }
+.zus-side__h { margin: 0; padding: 16px 20px 16px 16px; font-weight: 700; font-size: 15px; border-bottom: 1px solid #e7e7e7; }
+.zus-side ul { list-style: none; margin: 0; padding: 0; }
+.zus-side li { border-bottom: 1px solid #e7e7e7; }
+.zus-side a { display: block; padding: 10px 20px 10px 32px; font-weight: 700; font-size: 15px; line-height: 21px; color: var(--zus-green-link); text-decoration: none; }
+.zus-side a:hover { text-decoration: underline; }
+.zus-side li.on { background: var(--zus-green); }
+.zus-side li.on a { color: #fff; }
+.zus-layout__main { padding-left: 50px; min-width: 0; }
+@media (max-width: 991px) {
+  .zus-layout { display: block; }
+  .zus-side { display: none; }
+  .zus-layout__main { padding-left: 0; }
+}
+
+@media (max-width: 1099px) {
+  .zus-logo__img { width: 190px; }
+  .zus-header__bar { column-gap: 8px; row-gap: 10px; align-items: flex-start; }
+  .zus-header__bar { margin: 0 16px; padding: 16px 0 14px; border-bottom: 7px solid #ececec; }
+  .zus-header__tools { display: contents; }
+  .menu-btn { order: 2; margin-left: auto; }
+  .zus-header__tools .pue-login { order: 5; margin-left: 0; }
+  .zus-search { order: 3; min-height: 0; }
+  .a11y { order: 4; }
+  .zus-product { order: 6; padding-left: 0; margin-left: 0; border-left: 0; }
+  .zus-nav a { padding: 12px 16px; font-size: 16px; }
+  .zus-nav__list { padding: 0; }
+}
+@media (max-width: 600px) {
+  h1 { font-size: 32px; line-height: 38px; padding: 20px 0 24px; }
+  .tile { padding: 22px 44px 22px 20px; min-height: 0; }
+  .tile::after { top: 28px; right: 20px; }
+  .footer__side { align-items: flex-start; }
+  .footer__cols { grid-template-columns: 1fr; }
+}
 
 /* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (żółty #ffe14d na czerni ≈ 17:1, czerń na żółtym ≈ 17:1). */
 html.hc {
@@ -763,8 +943,18 @@ html.hc .badge.sim {
 html.hc .footer { background: #000 !important; color: #fff !important; border-top: 2px solid #fff; }
 html.hc .footer a, html.hc .to-top, html.hc .footer__h, html.hc .footer__note { color: #ffe14d !important; }
 html.hc .footer__links li { border-color: #fff; }
-html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .tile:hover { border-color: #ffe14d; }
+html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:hover, html.hc .tile:hover { border-color: #ffe14d; }
+html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 #ffe14d; }
+html.hc .footer__links a { text-decoration: underline; }
+html.hc .a11y button svg { filter: invert(1); }
+html.hc .zus-side li.on a { color: #000 !important; }
+html.hc .zus-side { border-right-color: #ffe14d; }
+html.hc .menu-btn span, html.hc .menu-btn__bars { color: #000 !important; }
+html.hc .ic, html.hc .drop-ic { color: transparent !important; }
+html.hc .linkbar { background: #000 !important; color: #ffe14d !important; border-color: #ffe14d !important; }
+html.hc .tile { border-color: #fff; }
+html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: #ffe14d; color: #ffe14d; }
 html.hc .zus-nav li.selected { border-top-color: #ffe14d; box-shadow: inset 7px 0 0 #ffe14d; }
-html.hc .crumbs__home svg path { fill: #ffe14d; }
-html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) contrast(2) brightness(2); }
+html.hc .crumbs__home { color: #ffe14d; }
+html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) invert(1) brightness(2); }
 html.hc :focus-visible { outline: 3px solid #ffe14d; outline-offset: 2px; }

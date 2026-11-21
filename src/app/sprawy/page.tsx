@@ -14,13 +14,13 @@ export default function Sprawy() {
       </div>
       <Szukaj />
       <h2 className="mt">Dla bardziej zaawansowanych</h2>
-      <div className="grid g3">
-        <Link href="/kalkulator" className="tile"><b>Pełny kalkulator</b><span>Wszystkie ustawienia urlopów, oś czasu, porównanie wariantów.</span></Link>
-        <Link href="/poradnik" className="tile"><b>Poradnik</b><span>28 pytań z odpowiedziami i krokami.</span></Link>
-        <Link href="/wgraj" className="tile"><b>Wgraj wniosek (AI)</b><span>Odczytaj dane ze skanu ZAM / Z-3.</span></Link>
-        <Link href="/ryzyka" className="tile"><b>Ryzyka i ochrona</b><span>Co może pozbawić zasiłku, ochrona przed zwolnieniem.</span></Link>
-        <Link href="/dokumenty" className="tile"><b>Dokumenty i terminy</b><span>Kto wypłaca, jaki druk i do kiedy.</span></Link>
-        <Link href="/kreator" className="tile"><b>Kreator „co mnie dotyczy?”</b><span>Drzewko decyzyjne z odpowiedziami poradnika.</span></Link>
+      <div className="linkbars">
+        <Link href="/kalkulator" className="linkbar" title="Wszystkie ustawienia urlopów, oś czasu, porównanie wariantów">Pełny kalkulator</Link>
+        <Link href="/poradnik" className="linkbar" title="28 pytań z odpowiedziami i krokami">Poradnik</Link>
+        <Link href="/wgraj" className="linkbar" title="Odczytaj dane ze skanu ZAM / Z-3">Wgraj wniosek (AI)</Link>
+        <Link href="/ryzyka" className="linkbar" title="Co może pozbawić zasiłku, ochrona przed zwolnieniem">Ryzyka i ochrona</Link>
+        <Link href="/dokumenty" className="linkbar" title="Kto wypłaca, jaki druk i do kiedy">Dokumenty i terminy</Link>
+        <Link href="/kreator" className="linkbar" title="Drzewko decyzyjne z odpowiedziami poradnika">Kreator „co mnie dotyczy?”</Link>
       </div>
     </>
   );

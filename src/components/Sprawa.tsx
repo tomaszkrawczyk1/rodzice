@@ -222,8 +222,6 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
   );
 }
 
-
-
 function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
   const [skop, setSkop] = useState("");
   const [bladKopii, setBladKopii] = useState(false);
@@ -257,7 +255,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
   }
   return (
     <>
-      <div className={"card " + (w.lagodny ? "navy" : "accent")}>
+      <div className={"card" + (w.lagodny ? " navy" : "")}>
         {w.status === "do_potwierdzenia" && (
           <Alert t="warn">
             <b>Warto potwierdzić w ZUS.</b>{" "}
@@ -318,7 +316,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
 
       {w.jakLiczono && <div id="w-jak"><Kroki kroki={w.jakLiczono} tytul="Jak to policzyliśmy?" /></div>}
 
-      {powiazane.length > 0 && <div className="card mt no-print"><h3>Przydatne kolejne kroki</h3><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className={`ic ic-${s!.id}`} aria-hidden="true">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
+      {powiazane.length > 0 && <div className="mt no-print"><h2 className="section-h">Przydatne kolejne kroki</h2><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className={`ic ic-${s!.id}`} aria-hidden="true">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
 
       {bezPytan && <div className="row mt no-print"><Link href="/sprawy" className="btn btn-ghost">← Wróć do listy spraw</Link></div>}
       <p className="small muted mt">Wyliczenia mają charakter pomocniczy i opierają się na aktualnych przepisach. W wersji testowej dane mają charakter przykładowy.</p>
