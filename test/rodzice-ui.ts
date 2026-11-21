@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { dataZFormularza } from "../src/lib/data-formularza.ts";
 import { nazwaUbezpieczenia, rodzajChorobowego } from "../src/lib/dane-profilu.ts";
-import { dataPL, opisTerminu, pln } from "../src/lib/format.ts";
+import { dataPL, miesiacPL, opisObliczenia, opisTerminu, pln } from "../src/lib/format.ts";
 import { odczytajPostep, rozwinPostep } from "../src/lib/postep-kreatora.ts";
 import { registerHooks } from "node:module";
 
@@ -33,6 +33,8 @@ export async function testyRodziceUI(rowne: Rowne) {
   rowne("Polskie pole odrzuca nieistniejący dzień", dataZFormularza("29.02.2027"), "");
   rowne("Polskie pole przyjmuje datę przestępną", dataZFormularza("29.02.2028"), "2028-02-29");
   rowne("Pełny polski zapis daty", dataPL("2027-04-05"), "5 kwietnia 2027");
+  rowne("Miesiąc w tabeli zarobków", miesiacPL(2027, 4), "kwiecień 2027");
+  rowne("Kwota w opisie wyliczenia zachowuje polski zapis", opisObliczenia("Kwota 5608.85 zł").replaceAll("\u00a0", " "), "Kwota 5 608,85 zł");
   rowne("Format kwoty dla profilu Marka", pln(1200).replaceAll("\u00a0", " "), "1 200,00 zł");
   rowne("Termin z planu nie pokazuje daty ISO", opisTerminu("Wniosek o urlop ojcowski od 2027-04-05"), "Wniosek o urlop ojcowski od 5 kwietnia 2027");
   rowne("Etykieta działalności Marka", nazwaUbezpieczenia("dzialalnosc"), "Działalność gospodarcza");

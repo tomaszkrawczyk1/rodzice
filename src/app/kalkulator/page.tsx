@@ -4,7 +4,7 @@ import Link from "next/link";
 import { DataPole } from "@/components/DataPole";
 import { useSearchParams } from "next/navigation";
 import { api } from "@/lib/sesja";
-import { pln, dataPL, RODZAJE, tygodnie, liczba } from "@/lib/format";
+import { pln, dataPL, RODZAJE, tygodnie, liczba, opisObliczenia } from "@/lib/format";
 import Timeline from "@/components/Timeline";
 import { Alert, Kroki, Lista, Spin } from "@/components/ui";
 import { Pole as Field } from "@/components/Pole";
@@ -18,7 +18,6 @@ const T = parametry.terminy_dni;
 const niezbywalne = W.niezbywalne_prawo_kazdego_rodzica_rodzicielski;
 const standard = `${liczba(P.zasilek_za_urlop_macierzynski)}% / ${liczba(P.zasilek_za_urlop_rodzicielski)}%`;
 const usredniony = `${liczba(P.wariant_pelny_wymiar_81_5)}%`;
-const komunikat = (s: string) => s.replace(/\d{4}-\d{2}-\d{2}/g, (d) => dataPL(d)).replace(/(\d+(?:\.\d+)?) zł/g, (_, n) => pln(Number(n)));
 
 type Tryb = "matka" | "oboje" | "laczenie" | "adopcja" | "wlasne";
 const plus = (n: number) => { const d = new Date(); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
@@ -183,8 +182,8 @@ function PlanRodziny() {
             <details className="dl"><summary>Znam gotową podstawę wymiaru (np. z decyzji lub Z-3)</summary>
               <div className="grid g2 mt"><Field label={`${rodzicPierwszy}: podstawa zasiłku (zł)`}><input type="number" value={f.podstawaM} onChange={(e) => set({ podstawaM: e.target.value })} /></Field>
               {dwoje && <Field label={`${rodzicDrugi}: podstawa zasiłku (zł)`}><input type="number" value={f.podstawaO} onChange={(e) => set({ podstawaO: e.target.value })} /></Field>}</div></details>
-            <Kroki kroki={podM?.kroki?.map(komunikat)} tytul="Jak policzono podstawę zasiłku" />
-            {podM?.ostrzezenia?.length > 0 && <Lista items={podM.ostrzezenia.map(komunikat)} warn />}
+            <Kroki kroki={podM?.kroki?.map(opisObliczenia)} tytul="Jak policzono podstawę zasiłku" />
+            {podM?.ostrzezenia?.length > 0 && <Lista items={podM.ostrzezenia.map(opisObliczenia)} warn />}
           </div>
 
           <div className="card">
@@ -236,8 +235,8 @@ function PlanRodziny() {
                   {dwoje && <div className="stat"><div className="v">{pln(wyn.sumy.ojciec)}</div><div className="l">{rodzicDrugi}</div></div>}
                 </div>
                 <p className="small muted mt">Wymiar: {przyjecie ? "urlop na warunkach macierzyńskiego" : "urlop macierzyński"} <b>{tygodnie(wyn.wymiary.macierzynskiTyg)}</b>, rodzicielski <b>{tygodnie(wyn.wymiary.rodzicielskiTyg)}</b> (wykorzystano {tygodnie(wyn.wymiary.rodzicielskiWykorzystaneTyg)}; przy łączeniu z pracą maks. {tygodnie(wyn.wymiary.rodzicielskiMaxPrzyLaczeniuTyg)}).</p>
-                {wyn.bledy?.map((b: string, i: number) => <Alert key={i} t="err">{komunikat(b)}</Alert>)}
-                {wyn.ostrzezenia?.map((b: string, i: number) => <Alert key={i} t="warn">{komunikat(b)}</Alert>)}
+                {wyn.bledy?.map((b: string, i: number) => <Alert key={i} t="err">{opisObliczenia(b)}</Alert>)}
+                {wyn.ostrzezenia?.map((b: string, i: number) => <Alert key={i} t="warn">{opisObliczenia(b)}</Alert>)}
               </div>
               <div className="card"><h3>Oś czasu</h3><Timeline okresy={wyn.okresy} start={f.data} etykiety={{ matka: rodzicPierwszy, ojciec: rodzicDrugi }} /></div>
               <div className="card"><h3>Okresy i kwoty</h3>
@@ -245,7 +244,7 @@ function PlanRodziny() {
                   <tbody>{zasilki.map((o: any, i: number) => <tr key={i}><td>{RODZAJE[o.rodzaj] ?? "Okres zasiłku"}{o.podwyzszoneDoSwiadczeniaRodzicielskiego && <span className="badge warn"> do {pln(parametry.kwoty.swiadczenie_rodzicielskie_miesieczne)}</span>}{o.uwagi && <div className="small muted">{o.uwagi}</div>}</td><td>{rola(o.kto)}</td>
                     <td>{dataPL(o.od)} do {dataPL(o.do)}</td><td className="num">{o.dni}</td><td className="num">{liczba(o.procent)}{o.wspolczynnikZasilku !== 1 ? ` × ${liczba(o.wspolczynnikZasilku)}` : ""}</td><td className="num">{pln(o.kwota)}</td></tr>)}</tbody>
                   <tfoot><tr><td colSpan={5}>Razem</td><td className="num">{pln(wyn.sumy.razem)}</td></tr></tfoot></table></div>
-                <Kroki kroki={wyn.kroki.map(komunikat)} />
+                <Kroki kroki={wyn.kroki.map(opisObliczenia)} />
               </div>
               {por && <div className="card navy"><h3>Porównanie wariantów</h3>
                 <div className="grid g2"><div className="stat"><div className="v">{pln(por.zmienny_100_70.sumy.razem)}</div><div className="l">standardowy {standard}</div></div>

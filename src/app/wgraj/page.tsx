@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/sesja";
-import { pln, dataPL, RODZAJE } from "@/lib/format";
+import { pln, dataPL, RODZAJE, miesiacPL, opisObliczenia } from "@/lib/format";
 import { Alert, Kroki, Spin } from "@/components/ui";
 
 const DEMO = [
@@ -86,11 +86,11 @@ export default function Wgraj() {
               <p>Dane fikcyjnego profilu: <b>{ub.osoba}</b>. Nieprzerwane ubezpieczenie chorobowe: <b>{ub.dniNieprzerwanegoUbezpieczeniaChorobowego} dni</b>. Ubezpieczenie w dniu zdarzenia: <b>{ub.ubezpieczonaWDniu ? "aktywne" : "nieaktywne"}</b>.</p></div>}
 
             {d.skladniki_miesieczne?.length > 0 && <div className="card"><h3>Wynagrodzenia z zaświadczenia</h3><div className="tbl-wrap"><table className="tbl"><thead><tr><th>Miesiąc</th><th className="num">Dni</th><th className="num">Stałe</th><th className="num">Zmienne</th><th className="num">Premie</th></tr></thead>
-              <tbody>{d.skladniki_miesieczne.map((m: any, i: number) => <tr key={i}><td>{dataPL(`${m.rok}-${String(m.miesiac).padStart(2, "0")}-01`).replace(/^1 /, "")}</td><td className="num">{m.dniPrzepracowal ?? "—"}/{m.dniObowiazany ?? "—"}</td><td className="num">{pln(m.stale)}</td><td className="num">{pln(m.zmiennePomniejszone)}</td><td className="num">{pln(m.premieFaktyczne)}</td></tr>)}</tbody></table></div></div>}
+              <tbody>{d.skladniki_miesieczne.map((m: any, i: number) => <tr key={i}><td>{miesiacPL(m.rok, m.miesiac)}</td><td className="num">{m.dniPrzepracowal ?? "—"}/{m.dniObowiazany ?? "—"}</td><td className="num">{pln(m.stale)}</td><td className="num">{pln(m.zmiennePomniejszone)}</td><td className="num">{pln(m.premieFaktyczne)}</td></tr>)}</tbody></table></div></div>}
 
             {pod && <div className="card accent"><h3>Podstawa wymiaru zasiłku</h3>
               <div className="stat"><div className="v">{pln(pod.podstawaMiesieczna)}</div><div className="l">miesięcznie (dziennie {pln(pod.podstawaDzienna)})</div></div>
-              <Kroki kroki={pod.kroki} />{pod.ostrzezenia?.length > 0 && <Alert t="warn">Sprawdź dane odczytane z zaświadczenia i skonsultuj wynik z ZUS.</Alert>}
+              <Kroki kroki={pod.kroki?.map(opisObliczenia)} />{pod.ostrzezenia?.length > 0 && <Alert t="warn">Sprawdź dane odczytane z zaświadczenia i skonsultuj wynik z ZUS.</Alert>}
               {d.decyzja?.podstawa_wymiaru != null && <Alert t={Math.abs(d.decyzja.podstawa_wymiaru - pod.podstawaMiesieczna) < 1 ? "ok" : "warn"}>Podstawa z decyzji ZUS: <b>{pln(d.decyzja.podstawa_wymiaru)}</b>{Math.abs(d.decyzja.podstawa_wymiaru - pod.podstawaMiesieczna) < 1 ? " – zgodna z naszym wyliczeniem." : " – różni się od naszego wyliczenia, sprawdź dane."}</Alert>}
               <button className="btn btn-primary mt" onClick={policz}>Policz zasiłek z tą podstawą →</button></div>}
             {!pod && <Alert t="info">Z tego dokumentu nie odczytano tabeli wynagrodzeń, więc podstawy nie wyliczono. Wprowadź zarobki ręcznie w <a href="/kalkulator">kalkulatorze</a>.</Alert>}

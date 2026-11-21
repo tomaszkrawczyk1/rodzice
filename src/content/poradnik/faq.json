@@ -78,7 +78,7 @@
       "kategoria": "ryzyka",
       "status": "ok",
       "pytanie": "Kiedy mogę NIE dostać zasiłku chorobowego w ciąży albo dostanę mniej?",
-      "odpowiedz": "Zasiłek nie przysługuje m.in.: gdy nie upłynął okres wyczekiwania (30 lub 90 dni), przy zachowaniu prawa do wynagrodzenia, w czasie urlopu bezpłatnego, wychowawczego, aresztu lub kary pozbawienia wolności, przy pracy zarobkowej lub działaniach niezgodnych z celem zwolnienia i przy sfałszowanym zaświadczeniu. Osobie prowadzącej działalność zasiłek nie przysługuje przy zadłużeniu składkowym. Na pisemny wniosek ubezpieczonej kod B nie jest wpisywany.",
+      "odpowiedz": "Zasiłek nie przysługuje m.in.: gdy nie upłynął okres wyczekiwania (30 lub 90 dni), przy zachowaniu prawa do wynagrodzenia, w czasie urlopu bezpłatnego, wychowawczego, aresztu lub kary pozbawienia wolności, przy pracy zarobkowej lub użyciu zwolnienia niezgodnie z jego przeznaczeniem i przy sfałszowanym zaświadczeniu. Osobie prowadzącej działalność zasiłek nie przysługuje przy zadłużeniu składkowym. Na pisemny wniosek ubezpieczonej kod B nie jest wpisywany.",
       "kroki": [
         "Sprawdź, czy minął okres wyczekiwania.",
         "Nie wykonuj pracy zarobkowej na zwolnieniu.",
@@ -1071,7 +1071,7 @@
       "kategoria": "dokumenty",
       "status": "ok",
       "pytanie": "Jak zdobyć odpis aktu urodzenia dziecka?",
-      "odpowiedz": "Skrócony odpis aktu urodzenia dołącza się do wniosków o zasiłek i urlop. Gdy zasiłek wypłaca ZUS, odpisu nie trzeba przedstawiać – ZUS pozyskuje go z rejestru stanu cywilnego. Wniosek o odpis można złożyć w urzędzie stanu cywilnego albo online (profil zaufany, e-usługa „Uzyskaj odpis aktu stanu cywilnego”). Opłata skarbowa: 22 zł za odpis skrócony i 33 zł za odpis zupełny.",
+      "odpowiedz": "Skrócony odpis aktu urodzenia dołącza się do wniosków o zasiłek i urlop. Gdy zasiłek wypłaca ZUS, odpisu nie trzeba przedstawiać – ZUS pozyskuje go z rejestru stanu cywilnego. Wniosek o odpis można złożyć w urzędzie stanu cywilnego albo online (profil zaufany, e-usługa „Uzyskaj odpis aktu stanu cywilnego”).",
       "kroki": [
         "Zdecyduj: odpis skrócony czy zupełny.",
         "Złóż wniosek online przez gov.pl albo w urzędzie stanu cywilnego.",

@@ -4,7 +4,7 @@ import { DataPole } from "@/components/DataPole";
 import { useState } from "react";
 import parametry from "../../../data/parametry.json";
 import { api } from "@/lib/sesja";
-import { dataPL, liczba, pln, tygodnie } from "@/lib/format";
+import { dataPL, liczba, pln, tygodnie, opisObliczenia } from "@/lib/format";
 import { Alert } from "@/components/ui";
 import type { PlanWejscie, PlanWynik } from "@/engine/kalkulator";
 import { Pole } from "@/components/Pole";
@@ -49,7 +49,7 @@ export default function Ojcowski() {
     try {
       const plan = await api<PlanWynik>("/api/oblicz/plan", wejscie);
       if (plan.bledy.length) {
-        setBlad(plan.bledy.map((b) => b.replace(/\d{4}-\d{2}-\d{2}/g, (d) => dataPL(d))).join(" "));
+        setBlad(plan.bledy.map(opisObliczenia).join(" "));
         return;
       }
       setWynik(plan.okresy.filter((o) => o.kto === "ojciec"));
