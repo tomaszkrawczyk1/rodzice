@@ -1,37 +1,67 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api, useSesja } from "@/lib/sesja";
+import { api, useSesja, type Sesja } from "@/lib/sesja";
+import { nazwaUbezpieczenia } from "@/lib/dane-profilu";
 import { PERSONA_OPIS } from "@/content/tresci";
-import { Alert, Spin } from "@/components/ui";
+import { Alert } from "@/components/ui";
+
+type Profil = { id: string; osoba: string; pesel: string; tytul?: string };
 
 export default function Logowanie() {
-  const router = useRouter(); const { zaloguj } = useSesja();
-  const [krok, setKrok] = useState(1); const [persony, setPersony] = useState<any[]>([]); const [wyb, setWyb] = useState<any>(null); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
-  useEffect(() => { api("/api/personas").then(setPersony).catch((e) => setErr(e.message)); }, []);
+  const router = useRouter();
+  const { zaloguj } = useSesja();
+  const [krok, setKrok] = useState(1);
+  const [persony, setPersony] = useState<Profil[] | null>(null);
+  const [wybrany, setWybrany] = useState<Profil | null>(null);
+  const [bladListy, setBladListy] = useState(false);
+  const [bladLogowania, setBladLogowania] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    api<Profil[]>("/api/personas").then(setPersony).catch(() => setBladListy(true));
+  }, []);
+
   async function potwierdz() {
-    setBusy(true); setErr("");
-    try { const s = await api("/api/auth/mobywatel", { personaId: wyb.id }); zaloguj(s); router.push("/"); } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+    if (!wybrany) return;
+    setBusy(true);
+    setBladLogowania(false);
+    try {
+      const sesja = await api<Sesja>("/api/auth/mobywatel", { personaId: wybrany.id });
+      zaloguj(sesja);
+      router.push(new URLSearchParams(location.search).get("powrot") === "pue" ? "/pue" : "/");
+    } catch {
+      setBladLogowania(true);
+      setBusy(false);
+    }
   }
+
   return (
-    <div className="mobywatel">
-      <div className="logo">mObywatel</div>
-      <div className="card" style={{ textAlign: "left" }}>
-        <p><span className="badge sim">symulacja</span> To atrapa logowania – nic nie jest przesyłane do prawdziwego mObywatela.</p>
-        {krok === 1 && <>
-          <h2>Zaloguj się</h2><p className="muted">Zaloguj się, aby aplikacja pobrała Twoje dane o ubezpieczeniu z ZUS (dane testowe).</p>
-          <button className="btn btn-primary" style={{ width: "100%", background: "#d0021b" }} onClick={() => setKrok(2)}>Zaloguj przez mObywatela</button>
-          <p className="small muted mt">Wolisz nie logować się? <a href="/kalkulator">Wpisz dane ręcznie w kalkulatorze</a>.</p></>}
-        {krok === 2 && <>
-          <h2>Wybierz profil testowy</h2>
-          {err && <Alert t="err">{err}</Alert>}
-          {persony.map((p) => <button key={p.id} className="persona" onClick={() => { setWyb(p); setKrok(3); }}><b>{p.osoba}</b><br /><span className="small muted">{PERSONA_OPIS[p.id] ?? p.tytul}</span></button>)}</>}
-        {krok === 3 && wyb && <>
-          <h2>Zgoda na udostępnienie danych</h2>
-          <p>Aplikacja <b>Przewodnik Przyszłego Rodzica</b> prosi o dostęp do danych: <b>{wyb.osoba}</b>, PESEL {wyb.pesel} (fikcyjny), informacje o ubezpieczeniu chorobowym, zwolnieniach e-ZLA i stanie zadłużenia składkowego w ZUS.</p>
-          {err && <Alert t="err">{err}</Alert>}
-          <div className="row"><button className="btn btn-primary" onClick={potwierdz} disabled={busy}>{busy ? <Spin /> : "Zgadzam się i loguję"}</button><button className="btn btn-ghost" onClick={() => setKrok(2)}>Wstecz</button></div></>}
-      </div>
+    <div className="mobywatel" style={{ textAlign: "left", overflowWrap: "anywhere" }}>
+      <h1>Logowanie testowe</h1>
+      <p>Wypróbuj logowanie przez mObywatela na fikcyjnym profilu. Wybierz gotową osobę bez wpisywania własnych danych.</p>
+      {krok === 1 && <>
+        <button className="btn btn-primary" onClick={() => setKrok(2)}>Pokaż profile testowe</button>
+        <p className="mt"><Link href="/sprawy">Wybierz sprawę bez logowania</Link></p>
+      </>}
+      {krok === 2 && <>
+        <h2>Wybierz profil testowy</h2>
+        {bladListy && <Alert t="err">Nie udało się wczytać profili. Odśwież stronę i spróbuj ponownie.</Alert>}
+        {!persony && !bladListy && <p role="status">Wczytujemy profile…</p>}
+        {persony?.map((p) => <button key={p.id} className="persona" onClick={() => { setWybrany(p); setBladLogowania(false); setKrok(3); }}>
+          <b>{p.osoba}</b><br /><span>{PERSONA_OPIS[p.id] ?? (p.tytul && nazwaUbezpieczenia(p.tytul))}</span>
+        </button>)}
+      </>}
+      {krok === 3 && wybrany && <section className="card">
+        <h2>Potwierdź wybór profilu</h2>
+        <p>Profil <b>{wybrany.osoba}</b> ma fikcyjny PESEL {wybrany.pesel} oraz przykładowe dane o ubezpieczeniu, zwolnieniach i składkach.</p>
+        {bladLogowania && <Alert t="err">Nie udało się zalogować. Spróbuj ponownie.</Alert>}
+        <div className="row">
+          <button className="btn btn-primary" onClick={potwierdz} disabled={busy}>{busy ? "Logujemy…" : "Zaloguj się na ten profil"}</button>
+          <button className="btn btn-ghost" disabled={busy} onClick={() => setKrok(2)}>Zmień profil</button>
+        </div>
+      </section>}
     </div>
   );
 }

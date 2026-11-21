@@ -1,12 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { UbezpieczenieProfilu, ZwolnienieProfilu } from "./dane-profilu";
 import { dataDir } from "./params";
 import { dniMiedzy, dodajDni } from "@/engine/kalkulator";
 
 export interface Persona {
   id: string; osoba: string; pesel: string;
-  ubezpieczenie: { tytul: string; od: string; do: string | null; chorobowe: string; platnik: { nazwa: string; nip: string; liczbaUbezpieczonych: number } }[];
-  ezla: any[]; zadluzenie: { kwota: number; naDzien: string };
+  ubezpieczenie: UbezpieczenieProfilu[];
+  ezla: ZwolnienieProfilu[]; zadluzenie: { kwota: number; naDzien: string };
 }
 
 export function wszystkiePersony(): Persona[] {
