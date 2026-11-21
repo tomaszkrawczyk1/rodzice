@@ -2,6 +2,7 @@
 // Oczekiwane liczby poniżej policzono NIEZALEŻNIE od silnika (osobne obliczenie 6500*0,8629 itd.),
 // nie wygenerowano ich z silnika. Jeśli test pada — to jest błąd w silniku (albo w parametrach), nie w teście.
 import { readFileSync } from "node:fs";
+import { testySpraw } from "./sprawy.ts";
 import {
   podstawaPracownik, podstawaNiepracownik, wierszZ3NaMiesiac, swiadczenieRehabilitacyjne, swiadczenieRodzicielskie, zasilekChorobowyWCiazy, wymiarMacierzynski, wymiarRodzicielski, maxRodzicielskiPrzyLaczeniu,
   wymiarUzupelniajacy, planZasilku, porownajWarianty, uprawnienia, minPodstawaZasilkuPracownik, maxPodstawaZasilkuNiepracownik, r2,
@@ -151,6 +152,8 @@ const ch50 = zasilekChorobowyWCiazy({ podstawaMiesieczna: 6000, dniNiezdolnosci:
 rowne("chorobowe w ciąży >= 50 lat: 14 dni pracodawca", ch50.dniPracodawca, 14);
 const chJdg = zasilekChorobowyWCiazy({ podstawaMiesieczna: 6000, dniNiezdolnosci: 10, pracownik: false }, p);
 rowne("chorobowe niepracownika: ZUS od 1. dnia", [chJdg.dniPracodawca, chJdg.dniZUS], [0, 10]);
+
+await testySpraw(rowne);
 
 console.log(`\nWYNIK: ${ok} OK, ${fail} FAIL`);
 process.exit(fail ? 1 : 0);

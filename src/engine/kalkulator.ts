@@ -192,7 +192,7 @@ export function kwotaOkresu(podstawaMies: number, procent: number, dni: number, 
   // art. 31 ust. 3a, 3c: podwyższenie do 1000 zł/mies., proporcjonalnie za niepełny miesiąc.
   // Przy łączeniu z pracą NIE stosujemy (niejasne w przepisach — patrz LUKI_I_DECYZJE.md).
   if (!laczenieZPraca && dzienna < minDzienna) { dzienna = minDzienna; podwyzszone = true; }
-  return { kwotaDzienna: r2(dzienna * 100) / 100, kwota: r2(dzienna * dni), podwyzszone };
+  return { kwotaDzienna: r2(dzienna), kwota: r2(dzienna * dni), podwyzszone };
 }
 
 function zrobOkres(base: Omit<Okres, "dni" | "do" | "kwotaDzienna" | "kwota" | "podwyzszoneDoSwiadczeniaRodzicielskiego">, dni: number, podstawa: number, laczenie: boolean, p: Parametry): Okres {
