@@ -2,98 +2,159 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/sesja";
-import { pln, dataPL, RODZAJE, miesiacPL, opisObliczenia } from "@/lib/format";
-import { Alert, Kroki, Spin } from "@/components/ui";
+import { pln, dataPL, miesiacPL, opisObliczenia } from "@/lib/format";
+import { Alert, Field, Kroki, Spin } from "@/components/ui";
 
 const DEMO = [
   ["Z-3_przyklad_Anna_Kowalska.pdf", "Zaświadczenie płatnika składek Z-3, przykład 1"],
   ["Z-3_przyklad_Dominika_Kaminska.pdf", "Zaświadczenie płatnika składek Z-3, przykład 2"],
   ["ZAM_przyklad_Anna_Kowalska.pdf", "Wniosek o zasiłek macierzyński ZAM"],
 ] as const;
-const ZDARZENIA: Record<string, string> = { porod: "Poród", przysposobienie: "Adopcja", rodzina_zastepcza: "Rodzina zastępcza", inna: "Inna sytuacja" };
+const MAKS_MB = 25;
+const NISKA = 0.8;
+
+type Wiersz = { rok: number; miesiac: number; dP: string; dO: string; stale: string; zm: string; pr: string; proc: string; pewnosc: number };
+const tx = (n: number | null | undefined) => (n == null ? "" : String(n).replace(".", ","));
+const num = (s: string) => { const t = s.trim().replace(/\s/g, "").replace(",", "."); return t === "" || !/^-?\d+(\.\d+)?$/.test(t) ? null : +t; };
 
 export default function Wgraj() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [wyn, setWyn] = useState<any>(null);
   const [err, setErr] = useState("");
   const [nazwa, setNazwa] = useState("");
+  const [wyn, setWyn] = useState<any>(null);
+  const [pesel, setPesel] = useState("");
+  const [data, setData] = useState("");
+  const [wiersze, setWiersze] = useState<Wiersz[]>([]);
+  const [pod, setPod] = useState<any>(null);
   const [ub, setUb] = useState<any>(null);
+  const [ubInfo, setUbInfo] = useState("");
 
-  async function demo(plik: string, etykieta: string) {
-    setBusy(true);
-    setErr("");
-    setWyn(null);
-    setUb(null);
-    setNazwa(etykieta);
+  async function odczytaj(blob: Blob, plik: string, etykieta: string) {
+    setBusy(true); setErr(""); setWyn(null); setPod(null); setUb(null); setUbInfo(""); setNazwa(etykieta);
     try {
-      const przyklad = await fetch(`/demo/${plik}`);
-      if (!przyklad.ok) throw new Error();
       const fd = new FormData();
-      fd.append("plik", await przyklad.blob(), plik);
+      fd.append("plik", blob, plik);
       const r = await fetch("/api/parser", { method: "POST", body: fd });
-      if (!r.ok) throw new Error();
-      const j = await r.json();
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j?.error || "Nie udało się odczytać dokumentu.");
       setWyn(j);
-      const pesel = j.dane?.ubezpieczony?.pesel;
-      if (pesel) {
-        const query = new URLSearchParams({ pesel, naDzien: j.dane?.data_zdarzenia ?? new Date().toISOString().slice(0, 10) });
-        setUb(await api(`/api/zus/ubezpieczenie?${query}`).catch(() => null));
-      }
-    } catch {
-      setErr("Nie udało się odczytać przykładu. Spróbuj ponownie lub wpisz dane w kalkulatorze.");
-    } finally {
-      setBusy(false);
-    }
+      setPesel(j.dane?.ubezpieczony?.pesel ?? "");
+      setData(j.dane?.data_zdarzenia ?? "");
+      setWiersze((j.dane?.skladniki_miesieczne ?? []).map((w: any): Wiersz => ({ rok: w.rok, miesiac: w.miesiac, dP: tx(w.dniPrzepracowal), dO: tx(w.dniObowiazany), stale: tx(w.stale), zm: tx(w.zmiennePomniejszone), pr: tx(w.premieFaktyczne), proc: tx(w.procentSkladki), pewnosc: w.pewnosc ?? 1 })));
+      setPod(j.podstawa ?? null);
+    } catch (e: any) {
+      setErr(e?.message || "Nie udało się odczytać dokumentu. Spróbuj ponownie albo wpisz dane w kalkulatorze.");
+    } finally { setBusy(false); }
   }
+
+  async function przyklad(plik: string, etykieta: string) {
+    const p = await fetch(`/demo/${plik}`).catch(() => null);
+    if (!p?.ok) { setErr("Nie udało się pobrać przykładu."); return; }
+    await odczytaj(await p.blob(), plik, etykieta);
+  }
+
+  function wybranoPlik(f: File | undefined) {
+    if (!f) return;
+    if (!/\.(pdf|png|jpe?g)$/i.test(f.name)) { setErr("Obsługiwane formaty: PDF, JPG i PNG."); return; }
+    if (f.size > MAKS_MB * 1024 * 1024) { setErr(`Plik jest za duży (maksymalnie ${MAKS_MB} MB).`); return; }
+    odczytaj(f, f.name, f.name);
+  }
+
+  function zmien(i: number, pole: keyof Wiersz, v: string) {
+    setWiersze((w) => w.map((x, k) => (k === i ? { ...x, [pole]: v, pewnosc: 1 } : x)));
+  }
+
+  async function przelicz() {
+    setBusy(true); setErr("");
+    try {
+      const sk = wiersze.map((w) => ({ rok: w.rok, miesiac: w.miesiac, dniPrzepracowal: num(w.dP), dniObowiazany: num(w.dO), stale: num(w.stale), zmiennePomniejszone: num(w.zm), premieFaktyczne: num(w.pr), procentSkladki: num(w.proc) }));
+      const j = await api<any>("/api/parser/podstawa", { typ_dokumentu: wyn.dane.typ_dokumentu, zatrudnienie: wyn.dane.zatrudnienie, skladniki_miesieczne: sk });
+      setPod(j.podstawa);
+    } catch (e: any) { setErr(e?.message || "Nie udało się przeliczyć podstawy. Sprawdź wpisane liczby."); }
+    finally { setBusy(false); }
+  }
+
+  async function sprawdzUb() {
+    setUb(null); setUbInfo("");
+    if (!/^\d{11}$/.test(pesel.trim())) { setUbInfo("Wpisz 11-cyfrowy numer PESEL."); return; }
+    const naDzien = data || new Date().toISOString().slice(0, 10);
+    try { setUb(await api(`/api/zus/ubezpieczenie?${new URLSearchParams({ pesel: pesel.trim(), naDzien })}`)); }
+    catch { setUbInfo("W danych testowych nie ma takiej osoby. W prawdziwym systemie ZUS sprawdzenie dotyczyłoby jej konta ubezpieczonego."); }
+  }
+
   function policz() {
-    const p = wyn.podstawa?.wynik?.podstawaMiesieczna; if (!p) return;
-    localStorage.setItem("rodzice.prefill", JSON.stringify({ podstawaM: p, data: wyn.dane?.data_zdarzenia, dzieci: wyn.dane?.dzieci?.length || 1 })); router.push("/kalkulator");
+    const p = pod?.wynik?.podstawaMiesieczna; if (!p) return;
+    localStorage.setItem("rodzice.prefill", JSON.stringify({ podstawaM: p, data: data || undefined, dzieci: wyn?.dane?.dzieci?.length || 1 }));
+    router.push("/kalkulator");
   }
-  const d = wyn?.dane; const pod = wyn?.podstawa?.wynik;
+
+  const d = wyn?.dane;
+  const p = wyn?.pewnosc ?? {};
+  const slabo = (x: number | null | undefined) => x != null && x < NISKA;
+  const Sprawdz = ({ x }: { x: number | null | undefined }) => (slabo(x) ? <span className="badge warn" style={{ marginLeft: 8 }}>sprawdź</span> : null);
+
   return (
     <>
-      <h1>Odczytaj dane ze skanu</h1>
-      <p className="lead">Wypróbuj odczyt danych i obliczenie zasiłku na jednym z fikcyjnych formularzy.</p>
+      <h1>Odczytaj dane z dokumentu</h1>
+      <p className="lead">Wybierz przykładowy formularz albo wgraj własny skan lub PDF. Odczyt odbywa się na naszym serwerze, bez zewnętrznych usług. Dokument nie jest zapisywany.</p>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
-          <h2>Wybierz przykładowy formularz</h2>
+          <h2>Wybierz dokument</h2>
           <ul className="clean">{DEMO.map(([plik, etykieta]) => <li key={plik}>
             <b>{etykieta}</b>
             <div className="row">
-              <button className="btn btn-secondary" disabled={busy} onClick={() => demo(plik, etykieta)}>Odczytaj przykład</button>
+              <button className="btn btn-secondary" disabled={busy} onClick={() => przyklad(plik, etykieta)}>Odczytaj przykład</button>
               <a className="btn btn-ghost" href={`/demo/${plik}`} download>Pobierz przykład</a>
             </div>
           </li>)}</ul>
+          <h3 className="mt">Własny plik</h3>
+          <Field label="Skan lub PDF (Z-3, Z-3a, ZAM)" hint={`PDF, JPG lub PNG, do ${MAKS_MB} MB. Odczyt skanu może potrwać kilkanaście sekund.`}>
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" disabled={busy} onChange={(e) => { wybranoPlik(e.target.files?.[0]); e.target.value = ""; }} />
+          </Field>
         </section>
 
         <div>
           {busy && <p role="status"><Spin /> Odczytujemy dokument „{nazwa}”…</p>}
           {err && <Alert t="err">{err}</Alert>}
           {wyn && d && <>
-            <div className="card accent"><h2>Dane odczytane z przykładu</h2>
-              <p>Sprawdź odczytane informacje przed użyciem w kalkulatorze.</p>
+            <div className="card accent"><h2>Dane odczytane z dokumentu</h2>
+              <p className="small muted">Źródło odczytu: {wyn.zrodla?.join(", ")}. Sprawdź pola oznaczone „sprawdź” i popraw, jeśli odczyt jest błędny.</p>
+              {wyn.ostrzezenia?.length > 0 && <Alert t="warn"><ul className="clean">{wyn.ostrzezenia.map((o: string, i: number) => <li key={i}>{o}</li>)}</ul></Alert>}
               <dl className="kv mt">
-                <dt>Rodzaj dokumentu</dt><dd>{d.typ_dokumentu === "mieszany" ? "Kilka rodzajów dokumentów" : d.typ_dokumentu === "decyzja" ? "Decyzja ZUS" : ["ZAM", "Z-3", "Z-3a"].includes(d.typ_dokumentu) ? d.typ_dokumentu : "—"}</dd>
-                <dt>Ubezpieczony</dt><dd>{[d.ubezpieczony?.imie, d.ubezpieczony?.nazwisko].filter(Boolean).join(" ") || "—"} {d.ubezpieczony?.pesel && <span className="small muted">PESEL {d.ubezpieczony.pesel}</span>}</dd>
+                <dt>Rodzaj dokumentu</dt><dd>{d.typ_dokumentu === "mieszany" ? "Kilka rodzajów dokumentów" : d.typ_dokumentu ?? "nie rozpoznano"}</dd>
+                <dt>Ubezpieczony</dt><dd>{[d.ubezpieczony?.imie, d.ubezpieczony?.nazwisko].filter(Boolean).join(" ") || "—"}<Sprawdz x={p.osoba} /></dd>
                 <dt>Płatnik</dt><dd>{d.platnik?.nazwa ?? "—"}{d.platnik?.liczba_ubezpieczonych && <span className="small muted"> ({d.platnik.liczba_ubezpieczonych === "powyzej_20" ? "powyżej 20 ubezpieczonych" : "do 20 ubezpieczonych"})</span>}</dd>
-                {(d.podstawa_wniosku || d.data_zdarzenia) && <><dt>Zdarzenie</dt><dd>{[ZDARZENIA[d.podstawa_wniosku], d.data_zdarzenia && dataPL(d.data_zdarzenia), d.dzieci?.length ? `dzieci: ${d.dzieci.length}` : null].filter(Boolean).join(", ")}</dd></>}
-                <dt>Wnioskowane okresy</dt><dd>{d.wnioskowane_okresy?.length ? d.wnioskowane_okresy.map((o: any, i: number) => <div key={i}>{RODZAJE[o.rodzaj] ?? (o.rodzaj === "chorobowy" ? "Zasiłek chorobowy" : "Inny okres")}: {dataPL(o.od)} – {dataPL(o.do)}</div>) : "—"}</dd>
-                <dt>Wariant 81,5%</dt><dd>{d.wariant_81_5 == null ? "—" : d.wariant_81_5 ? "tak" : "nie"}</dd>
-              </dl></div>
+                {d.wnioskowane_okresy?.length > 0 && <><dt>Wnioskowane okresy</dt><dd>{d.wnioskowane_okresy.map((o: any, i: number) => <div key={i}>{o.od ? dataPL(o.od) : "?"} – {o.do ? dataPL(o.do) : "?"}<Sprawdz x={o.pewnosc} /></div>)}</dd></>}
+              </dl>
+              <div className="grid g2 mt">
+                <Field label="PESEL"><input inputMode="numeric" autoComplete="off" value={pesel} onChange={(e) => setPesel(e.target.value)} /></Field>
+                <Field label="Data porodu lub przyjęcia dziecka"><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
+              </div>
+              {(slabo(p.pesel) || slabo(p.data_zdarzenia)) && <p className="small muted">Pola PESEL i data zostały odczytane z niską pewnością. Porównaj je z dokumentem.</p>}
+              <div className="row mt"><button className="btn btn-secondary" onClick={sprawdzUb}>Sprawdź ubezpieczenie (symulacja ZUS)</button></div>
+            </div>
 
-            {ub && <div className="card navy"><h3>Czy ma ubezpieczenie? <span className="badge sim">symulacja ZUS</span></h3>
-              <p>Dane fikcyjnego profilu: <b>{ub.osoba}</b>. Nieprzerwane ubezpieczenie chorobowe: <b>{ub.dniNieprzerwanegoUbezpieczeniaChorobowego} dni</b>. Ubezpieczenie w dniu zdarzenia: <b>{ub.ubezpieczonaWDniu ? "aktywne" : "nieaktywne"}</b>.</p></div>}
+            {(ub || ubInfo) && <div className="card navy"><h3>Czy ma ubezpieczenie? <span className="badge sim">symulacja ZUS</span></h3>
+              {ub && <p>Dane fikcyjnego profilu: <b>{ub.osoba}</b>. Nieprzerwane ubezpieczenie chorobowe: <b>{ub.dniNieprzerwanegoUbezpieczeniaChorobowego} dni</b>. Ubezpieczenie w dniu zdarzenia: <b>{ub.ubezpieczonaWDniu ? "aktywne" : "brak"}</b>.</p>}
+              {ubInfo && <p>{ubInfo}</p>}</div>}
 
-            {d.skladniki_miesieczne?.length > 0 && <div className="card"><h3>Wynagrodzenia z zaświadczenia</h3><div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Miesiąc</th><th className="num">Dni</th><th className="num">Stałe</th><th className="num">Zmienne</th><th className="num">Premie</th></tr></thead>
-              <tbody>{d.skladniki_miesieczne.map((m: any, i: number) => <tr key={i}><td data-label="Miesiąc">{miesiacPL(m.rok, m.miesiac)}</td><td className="num" data-label="Dni">{m.dniPrzepracowal ?? "—"}/{m.dniObowiazany ?? "—"}</td><td className="num" data-label="Stałe">{pln(m.stale)}</td><td className="num" data-label="Zmienne">{pln(m.zmiennePomniejszone)}</td><td className="num" data-label="Premie">{pln(m.premieFaktyczne)}</td></tr>)}</tbody></table></div></div>}
+            {wiersze.length > 0 && <div className="card"><h3>Wynagrodzenia z zaświadczenia</h3>
+              <p className="small muted">Popraw liczby, jeśli odczyt się pomylił, i kliknij „Przelicz podstawę”.</p>
+              <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Miesiąc</th><th>Dni przepracowane</th><th>Dni obowiązujące</th><th>Składniki stałe (zł)</th><th>Zmienne (zł)</th><th>Premie (zł)</th></tr></thead>
+                <tbody>{wiersze.map((w, i) => <tr key={`${w.rok}-${w.miesiac}`}>
+                  <td data-label="Miesiąc">{miesiacPL(w.rok, w.miesiac)}{w.pewnosc < NISKA && <span className="badge warn" style={{ marginLeft: 8 }}>sprawdź</span>}</td>
+                  {([["dP", "Dni przepracowane"], ["dO", "Dni obowiązujące"], ["stale", "Składniki stałe (zł)"], ["zm", "Zmienne (zł)"], ["pr", "Premie (zł)"]] as const).map(([k, et]) =>
+                    <td key={k} data-label={et}><input inputMode="decimal" aria-label={`${miesiacPL(w.rok, w.miesiac)}: ${et}`} autoComplete="off" value={w[k]} onChange={(e) => zmien(i, k, e.target.value)} /></td>)}
+                </tr>)}</tbody></table></div>
+              <div className="row mt"><button className="btn btn-secondary" disabled={busy} onClick={przelicz}>Przelicz podstawę</button></div></div>}
 
-            {pod && <div className="card accent"><h3>Podstawa wymiaru zasiłku</h3>
-              <div className="stat"><div className="v">{pln(pod.podstawaMiesieczna)}</div><div className="l">miesięcznie (dziennie {pln(pod.podstawaDzienna)})</div></div>
-              <Kroki kroki={pod.kroki?.map(opisObliczenia)} />{pod.ostrzezenia?.length > 0 && <Alert t="warn">Sprawdź dane odczytane z zaświadczenia i skonsultuj wynik z ZUS.</Alert>}
-              {d.decyzja?.podstawa_wymiaru != null && <Alert t={Math.abs(d.decyzja.podstawa_wymiaru - pod.podstawaMiesieczna) < 1 ? "ok" : "warn"}>Podstawa z decyzji ZUS: <b>{pln(d.decyzja.podstawa_wymiaru)}</b>{Math.abs(d.decyzja.podstawa_wymiaru - pod.podstawaMiesieczna) < 1 ? " – zgodna z naszym wyliczeniem." : " – różni się od naszego wyliczenia, sprawdź dane."}</Alert>}
+            {pod?.wynik && <div className="card accent"><h3>Podstawa wymiaru zasiłku</h3>
+              <div className="stat"><div className="v">{pln(pod.wynik.podstawaMiesieczna)}</div><div className="l">miesięcznie (dziennie {pln(pod.wynik.podstawaDzienna)})</div></div>
+              <Kroki kroki={pod.wynik.kroki?.map(opisObliczenia)} />
+              {pod.wynik.ostrzezenia?.length > 0 && <Alert t="warn">Sprawdź dane odczytane z zaświadczenia i skonsultuj wynik z ZUS.</Alert>}
               <button className="btn btn-primary mt" onClick={policz}>Policz zasiłek z tą podstawą →</button></div>}
-            {!pod && <Alert t="info">Z tego dokumentu nie odczytano tabeli wynagrodzeń, więc podstawy nie wyliczono. Wprowadź zarobki ręcznie w <a href="/kalkulator">kalkulatorze</a>.</Alert>}
+            {!pod?.wynik && <Alert t="info">Z tego dokumentu nie wyliczono podstawy. Uzupełnij wynagrodzenia w tabeli powyżej albo wprowadź je ręcznie w <a href="/kalkulator">kalkulatorze</a>.</Alert>}
           </>}
         </div>
       </div>
