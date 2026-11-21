@@ -35,3 +35,4 @@ Panel administratora pozwala zmieniać stawki, wymiary i terminy bez programisty
 4. (1:40–2:20) Wgraj wniosek: dokument demo Z-3 → AI odczytuje 12 miesięcy → kod liczy podstawę 5 608,85 zł → kalkulator.
 5. (2:20–2:45) Dokumenty i terminy, ryzyka, trudne sytuacje.
 6. (2:45–3:00) Panel admina (zmiana parametru), podsumowanie: silnik bez AI, 76 testów, twarde limity.
+
