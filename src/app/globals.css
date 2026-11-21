@@ -665,6 +665,154 @@ pre.wniosek { white-space: pre-wrap; font: inherit; background: var(--gray); pad
 button.tile, button.opt, button.persona { appearance: none; -webkit-appearance: none; }
 input[type=range] { min-height: 44px; }
 
+/* ===== Wzór zus.pl 1:1 (wartości z żywej strony zus.pl, listopad 2026) =====
+   szerokość 1200, nagłówek: logo 250 px, kwadraty 44 px #00416e, przycisk #fab856,
+   nawigacja Lato Bold 15,4 px #11783b z paskiem 7 px, h1 36/44, kafle #f3f3f3, paski #283754, stopka #007834 */
+.container { max-width: 1232px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+a:hover { color: var(--zus-green-dark); text-decoration: none; }
+h1 { font-size: 36px; line-height: 44px; padding: 27px 0 35px; margin: 0; }
+h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
+.site-main { padding-top: 0; }
+.narrow { max-width: 700px; }
+.hero { padding: 0; margin: 0 0 8px; }
+.hero p, .lead { font-size: 16px; line-height: 24px; }
+.hero h1 { padding-bottom: 20px; }
+
+/* nagłówek */
+.zus-header__bar { max-width: 1232px; padding: 18px 16px 17px 27px; gap: 0 12px; }
+.zus-logo__img { width: 250px; }
+.zus-product { margin-left: 8px; }
+.zus-header__tools { gap: 10px; }
+.a11y { gap: 10px; }
+.a11y button {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; min-width: 44px; padding: 0;
+  background: var(--zus-navy); border: 0; border-radius: 3px; color: #fff;
+}
+.a11y button:hover { background: var(--zus-navy-dark); }
+.a11y button[aria-pressed="true"] { background: var(--zus-orange); color: var(--zus-navy); }
+.zus-search { flex-direction: column; gap: 2px; padding: 0 4px; min-height: 60px; justify-content: center; font-weight: 400; font-size: 14px; }
+.zus-search svg { width: 38px; height: 38px; }
+.pue-login, a.pue-login, button.pue-login {
+  min-height: 43px; max-width: 200px; justify-content: space-between; gap: 14px;
+  padding: 10px; border-radius: 3px; font-size: 14px; background: var(--zus-orange);
+}
+.pue-login:hover, .pue-login:focus-visible { background: var(--zus-navy); color: var(--zus-orange) !important; }
+.pue-arrow, .btn-primary::after, .btn-secondary::after, .tile::after, .linkbar::after {
+  content: ""; flex: none; width: 8px; height: 8px;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg);
+}
+.pue-arrow { margin-right: 4px; }
+.menu-btn { flex-direction: column; border: 0; padding: 4px 6px; gap: 5px; color: var(--zus-green-link); font-weight: 700; font-size: 14px; }
+.menu-btn__bars { display: block; width: 36px; height: 3px; margin: 8px 0; background: currentColor; box-shadow: 0 8px 0 currentColor, 0 -8px 0 currentColor; }
+
+/* nawigacja główna */
+.zus-nav__list { max-width: 1232px; padding: 0 16px; }
+.zus-nav li { border-top: 7px solid #ececec; }
+.zus-nav a { min-height: 0; padding: 12px 6px 19px; color: var(--zus-green-link); font-size: 15.4px; line-height: 23px; }
+.zus-nav a:hover, .zus-nav a.active, .zus-nav a[aria-current="page"] { color: var(--zus-green-link); }
+.zus-nav a:hover { text-decoration: underline; }
+
+/* ścieżka */
+.crumbs { background: #f3f3f3; border-top: 1px solid #dadada; border-bottom: 1px solid #dadada; margin-bottom: 8px; }
+.crumbs__row { min-height: 55px; }
+.crumbs__home { width: 56px; }
+.crumbs__list li { font-size: 12px; font-weight: 400; }
+.crumbs__list li.last, .crumbs__list li.last span { font-weight: 700; }
+.crumbs__list a { font-size: 12px; }
+
+/* przyciski: pomarańczowy główny i granatowy obrys jak na zus.pl */
+.btn {
+  font-size: 14px; padding: 10px 14px; min-height: 44px; gap: 14px; border: 1px solid var(--zus-navy);
+  border-radius: 3px; box-shadow: none; background: transparent; color: var(--zus-navy);
+}
+.btn-primary { background: var(--zus-orange); color: var(--zus-navy); border-color: var(--zus-navy); }
+.btn-primary:hover, .btn-primary:focus-visible { background: var(--zus-navy); color: var(--zus-orange); border-color: var(--zus-navy); box-shadow: none; }
+.btn-secondary { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
+.btn-secondary:hover, .btn-secondary:focus-visible { background: var(--zus-navy); color: #fff; border-color: var(--zus-navy); }
+.btn-ghost { background: transparent; color: var(--zus-navy); border: 1px solid var(--zus-navy); }
+.btn-ghost:hover { background: var(--zus-navy); color: #fff; }
+.btn-danger { background: var(--zus-red); color: #fff; border-color: var(--zus-red); }
+.btn[disabled] { background: #eee; color: #4d4d4d; border-color: #c8c9ca; }
+.btn-sm { font-size: 14px; }
+.chip { border-color: var(--zus-navy); color: var(--zus-navy); font-size: 14px; }
+.chip:hover { background: var(--zus-navy); color: #fff; }
+.btn-login, a.btn-login { background: var(--zus-orange); color: var(--zus-navy); border: 1px solid var(--zus-navy); }
+
+/* kafle: szare pola jak „expandable boxes” na stronie głównej zus.pl */
+.grid:has(> .tile) { gap: 2px; background: #fff; }
+.tile {
+  position: relative; background: #f3f3f3; border: 1px solid transparent; border-radius: 0;
+  padding: 30px 48px 30px 28px; min-height: 120px;
+  transition: background-color .2s ease;
+}
+.tile b { font-size: 17px; line-height: 20.4px; margin-bottom: 8px; }
+.tile span { color: #000; font-size: 16px; line-height: 24px; }
+.tile::after { position: absolute; right: 24px; top: 36px; width: 9px; height: 9px; border-width: 2px; color: #000; }
+.tile:hover, .tile:focus-visible {
+  background: #fff; border-color: #cacaca; box-shadow: 0 -3px 3px 0 rgba(0, 0, 0, .2); z-index: 2; color: #000;
+}
+.tile .ic { width: 50px; height: 50px; margin-bottom: 14px; background-size: 50px 50px; }
+.tile .time { margin-top: 10px; color: #4d4d4d; }
+button.tile { appearance: none; }
+
+/* granatowe paski jak u dołu zus.pl */
+.linkbars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 8px 0 0; }
+.linkbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 90px; padding: 0 28px 0 32px; background: #283754; color: #fff; text-decoration: none;
+  border: 1px solid #fff; font-size: 16px; line-height: 20px;
+}
+.linkbar::after { width: 12px; height: 12px; border-width: 3px; }
+.linkbar:hover, .linkbar:focus-visible { background: #fff; color: #283754; border-color: #283754; text-decoration: none; }
+@media (max-width: 860px) { .linkbars { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .linkbars { grid-template-columns: minmax(0, 1fr); } }
+
+/* opcje odpowiedzi jak kafle */
+.opt { background: #f3f3f3; border: 1px solid transparent; border-radius: 0; padding: 14px 18px; min-height: 56px; transition: background-color .2s ease; }
+.opt:hover, .opt:focus-visible { background: #fff; border-color: #cacaca; box-shadow: 0 -3px 3px 0 rgba(0, 0, 0, .2); }
+.opt.sel { background: #fff; border-color: #cacaca; box-shadow: inset 4px 0 0 var(--zus-green); }
+.card { border-color: #dadada; }
+.ask { background: #f3f3f3; border: 0; }
+.alert { background: #f3f3f3; }
+
+/* stopka */
+.footer { padding: 40px 0 36px; margin-top: 48px; border-top: 0; }
+.footer__cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 300px); gap: 24px 48px; }
+.footer__links li { border: 0 !important; }
+.footer__links a { min-height: 32px; padding: 4px 0 4px 18px; position: relative; font-weight: 700; font-size: 14px; }
+.footer__links a::before {
+  content: ""; position: absolute; left: 1px; top: 50%; width: 6px; height: 6px; margin-top: -4px;
+  border-top: 2px solid #fff; border-right: 2px solid #fff; transform: rotate(45deg);
+}
+.footer__side { display: flex; flex-direction: column-reverse; align-items: flex-end; gap: 16px; }
+.footer__note { font-size: 14px; margin: 0; text-align: left; }
+.to-top { font-size: 14px; gap: 12px; }
+.to-top__circle { width: 40px; height: 40px; border: 2px solid #fff; border-radius: 50%; position: relative; }
+.to-top__circle::before { content: ""; position: absolute; left: 13px; top: 15px; width: 9px; height: 9px; border-top: 2px solid #fff; border-left: 2px solid #fff; transform: rotate(45deg); }
+
+@media (max-width: 1099px) {
+  .zus-logo__img { width: 190px; }
+  .zus-header__bar { column-gap: 8px; row-gap: 10px; align-items: flex-start; }
+  .zus-header__bar { margin: 0 16px; padding: 16px 0 14px; border-bottom: 7px solid #ececec; }
+  .zus-header__tools { display: contents; }
+  .menu-btn { order: 2; margin-left: auto; }
+  .zus-header__tools .pue-login { order: 5; margin-left: 0; }
+  .zus-search { order: 3; min-height: 0; }
+  .a11y { order: 4; }
+  .zus-product { order: 6; padding-left: 0; margin-left: 0; border-left: 0; }
+  .zus-nav a { padding: 12px 16px; font-size: 16px; }
+  .zus-nav__list { padding: 0; }
+}
+@media (max-width: 600px) {
+  h1 { font-size: 32px; line-height: 38px; padding: 20px 0 24px; }
+  .tile { padding: 22px 44px 22px 20px; min-height: 0; }
+  .tile::after { top: 28px; right: 20px; }
+  .footer__side { align-items: flex-start; }
+  .footer__cols { grid-template-columns: 1fr; }
+}
+
 /* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (żółty #ffe14d na czerni ≈ 17:1, czerń na żółtym ≈ 17:1). */
 html.hc {
   --ink: #fff;
@@ -781,6 +929,10 @@ html.hc .footer__links li { border-color: #fff; }
 html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:hover, html.hc .tile:hover { border-color: #ffe14d; }
 html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 #ffe14d; }
 html.hc .footer__links a { text-decoration: underline; }
+html.hc .a11y button svg { filter: invert(1); }
+html.hc .linkbar { background: #000 !important; color: #ffe14d !important; border-color: #ffe14d !important; }
+html.hc .tile { border-color: #fff; }
+html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: #ffe14d; color: #ffe14d; }
 html.hc .zus-nav li.selected { border-top-color: #ffe14d; box-shadow: inset 7px 0 0 #ffe14d; }
 html.hc .crumbs__home svg path { fill: #ffe14d; }
 html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) invert(1) brightness(2); }

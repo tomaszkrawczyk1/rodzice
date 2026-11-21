@@ -76,10 +76,10 @@ export default function Header() {
   const imie = sesja ? sesja.osoba.split(" ")[0] : "";
   const logowanie = sesja ? (
     <button type="button" className="pue-login" title={sesja.osoba} onClick={() => { wyloguj(); zamknij(); }}>
-      <span className="pue-login__label">Wyloguj ({imie})</span>
+      <span className="pue-login__label">Wyloguj ({imie})</span><span className="pue-arrow" aria-hidden="true" />
     </button>
   ) : (
-    <Link href="/logowanie" className="pue-login login" onClick={zamknij}>Zaloguj</Link>
+    <Link href="/logowanie" className="pue-login login" onClick={zamknij}><span className="pue-login__label">Zaloguj</span><span className="pue-arrow" aria-hidden="true" /></Link>
   );
 
   return (
@@ -94,10 +94,10 @@ export default function Header() {
             <b>Przewodnik Przyszłego Rodzica</b>
             <span>Prototyp: zasiłki i urlopy dla rodziców</span>
           </div>
-          <button type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Zamknij" : "Menu"}</button>
+          <button type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}><span className="menu-btn__bars" aria-hidden="true" /><span>{open ? "Zamknij" : "Menu"}</span></button>
           <div className="zus-header__tools">
             <Link href="/#zapytaj" className="zus-search" onClick={zamknij}>
-              <img src="/Ikona_Lupa.svg" alt="" width={28} height={28} />
+              <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><circle cx="19" cy="19" r="17" fill="none" stroke="#007834" strokeWidth="2.4" /><circle cx="17" cy="17" r="7" fill="none" stroke="#007834" strokeWidth="2.6" /><path d="m22.5 22.5 7 7" stroke="#007834" strokeWidth="3" strokeLinecap="round" /></svg>
               <span>Szukaj</span>
             </Link>
             <Dostepnosc />
@@ -120,7 +120,7 @@ export default function Header() {
           <nav className="crumbs" aria-label="Okruszki">
             <div className="container crumbs__row">
               <Link href="/" className="crumbs__home" aria-label="Start" onClick={zamknij}>
-                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#007834" d="M12 3.2 3 11h2.2v9h5.3v-6.2h3v6.2H19V11H21.2L12 3.2z" /></svg>
+                <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 13.5 14 4l11 9.5M6 11.5V24h6.5v-7h3v7H22V11.5" fill="none" stroke="#007834" strokeWidth="2" strokeLinejoin="round" /></svg>
               </Link>
               <ol className="crumbs__list">
                 {crumbs.map((c) => (

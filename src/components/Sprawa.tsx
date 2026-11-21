@@ -194,7 +194,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
   const powiazane = (w.nastepne ?? []).map((id) => sprawa(id)).filter(Boolean);
   return (
     <>
-      <div className={"card " + (w.lagodny ? "navy" : "accent")}>
+      <div className={"card" + (w.lagodny ? " navy" : "")}>
         {w.status === "do_potwierdzenia" && (
           <Alert t="warn">
             <b>Warto potwierdzić w ZUS.</b>{" "}
