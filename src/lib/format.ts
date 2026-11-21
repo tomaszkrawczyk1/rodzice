@@ -3,7 +3,10 @@ const pelnaData = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "lon
 const miesiacRok = new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric", timeZone: "UTC" });
 
 export const pln = (n: number | undefined | null) => n == null || !Number.isFinite(n) ? "—" : waluta.format(n);
-export const liczba = (n: number, d = 2) => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: d }).format(n);
+const walutaPelna = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0, useGrouping: "always" });
+/** Kwota „na oko", do pełnych złotych: tam, gdzie obok stoi „ok.", grosze tylko by udawały dokładność. */
+export const plOk = (n: number | undefined | null) => n == null || !Number.isFinite(n) ? "—" : walutaPelna.format(n);
+export const liczba =(n: number, d = 2) => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: d }).format(n);
 export function dataPL(iso?: string | null) {
   if (!iso) return "—";
   const data = new Date(iso + "T00:00:00Z");

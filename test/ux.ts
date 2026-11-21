@@ -5,7 +5,7 @@ import { TYTULY_SPRAW } from "../src/lib/sprawy-tytuly.ts";
 import { celPrzewijania, czyZasloniety, MARGINES } from "../src/lib/ekran.ts";
 import { dataZFormularza } from "../src/lib/data-formularza.ts";
 import { etapZAdresu, ETAP_W_ADRESIE, MAKS_ZAPYTANIA, normalizujZapytanie } from "../src/lib/adres-glowna.ts";
-import { odczytajWpis, polaczPrzyPowrocie, stanHistorii, type Migawka } from "../src/lib/stan-sprawy.ts";
+import { odczytajPostep, odczytajWpis, polaczPrzyPowrocie, stanHistorii, usunPostep, zapiszPostep, type Migawka } from "../src/lib/stan-sprawy.ts";
 
 let ok = 0, fail = 0;
 function rowne(nazwa: string, got: unknown, exp: unknown) {
@@ -49,6 +49,24 @@ const wczesniej: Migawka = { faza: "pytania", historia: ["a"], odp: { a: "tak" }
 rowne("po cofnięciu zostają późniejsze odpowiedzi", polaczPrzyPowrocie(wczesniej, m, true).odp, { a: "tak", b: "5000" });
 rowne("po cofnięciu historia i faza są z wcześniejszego kroku", [polaczPrzyPowrocie(wczesniej, m, true).historia, polaczPrzyPowrocie(wczesniej, m, true).faza], [["a"], "pytania"]);
 rowne("ruch do przodu bierze zapisaną migawkę", polaczPrzyPowrocie(m, wczesniej, false), m);
+
+// ---- postęp zapisany w przeglądarce: wracamy po przerwie, ale nie przenosimy go między sprawami i profilami ----
+{
+  const pamiec = new Map<string, string>();
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: {
+    getItem: (k: string) => pamiec.get(k) ?? null, setItem: (k: string, v: string) => void pamiec.set(k, v), removeItem: (k: string) => void pamiec.delete(k),
+  } });
+  zapiszPostep("k", wpis);
+  rowne("zapisany postęp wraca", odczytajPostep("k", "sprawa", "tok", ID), m);
+  rowne("zapis innego profilu jest ignorowany", odczytajPostep("k", "sprawa", "inny", ID), null);
+  rowne("zapis innej sprawy jest ignorowany", odczytajPostep("k", "inna", "tok", ID), null);
+  zapiszPostep("pusty", { ...wpis, m: { faza: "pytania", historia: [], odp: {}, potwierdzone: {} } });
+  rowne("ekran startowy bez odpowiedzi nie jest postępem", odczytajPostep("pusty", "sprawa", "tok", ID), null);
+  pamiec.set("zly", "{nie json");
+  rowne("uszkodzony zapis nie psuje strony", odczytajPostep("zly", "sprawa", "tok", ID), null);
+  usunPostep("k");
+  rowne("po „Zacznij od nowa” nie ma zapisu", odczytajPostep("k", "sprawa", "tok", ID), null);
+}
 
 // ---- data wpisywana z klawiatury dziesiętnej telefonu (kropka albo przecinek) ----
 rowne("data z kropkami", dataZFormularza("5.04.2027"), "2027-04-05");

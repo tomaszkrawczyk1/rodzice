@@ -1,5 +1,5 @@
 import { dodajDni, dodajMiesiace, dniMiedzy, wymiarRodzicielski, type Parametry } from "@/engine/kalkulator";
-import { pln, dataPL, dataKrotka, liczba, tygodnie, dzis, RODZAJE } from "./format";
+import { pln, plOk, dataPL, dataKrotka, liczba, tygodnie, dzis, RODZAJE } from "./format";
 import { pytanie, type Status } from "@/content/poradnik";
 import { WSPARCIE, WSPARCIE_UWAGA } from "@/content/tresci";
 import parametry from "../../data/parametry.json";
@@ -40,7 +40,13 @@ export interface Wynik {
   zrob: { kiedy?: string; tekst: string; uwaga?: string }[];
   sciaga?: { tytul: string; wiersze: [string, string, string][]; uwaga?: string };
   tekstDoKopii?: { tytul: string; tresc: string };
-  info?: { tytul: string; tresc: string }[];
+  info?: { tytul: string; tresc: string; zwiniete?: boolean }[];
+  /** Najważniejszy termin: pokazujemy go na samej górze wyniku, nie na dole strony. */
+  pilne?: { do: string; tekst: string };
+  /** Lista „Weź ze sobą" z polami do odhaczania. */
+  dokumenty?: { tytul: string; pozycje: string[] };
+  /** Tabela z wyliczeniem jest pod rozwijaną sekcją, żeby wynik mieścił się na jednym ekranie. */
+  zwinTabele?: boolean;
   druki?: string[]; linki?: { href: string; etykieta: string }[];
   terminy?: { co: string; do: string }[];
   jakLiczono?: string[]; status?: Status; uwagaStatus?: string; lagodny?: boolean;
@@ -128,8 +134,8 @@ const ZATRUDNIENIE = [
 const czyPracownik = (o: Odp) => o.zatrudnienie === "umowa" || !o.zatrudnienie;
 const maChorobowe = (o: Odp) => o.tytul === "umowa_o_prace" || ((o.tytul === "zlecenie" || o.tytul === "dzialalnosc") && o.dobrowolne === "tak");
 const pPlatnik: Pyt = {
-  id: "platnik", typ: "wybor", tekst: "Ile osób Twój pracodawca lub zleceniodawca zgłasza do ubezpieczenia chorobowego?",
-  opcje: [{ v: "duzy", label: `Więcej niż ${progPlatnika} osób (zasiłek wypłaca pracodawca)` }, { v: "maly", label: `${progPlatnika} osób lub mniej (zasiłek wypłaca ZUS)` }, { v: "nie_wiem", label: "Nie wiem – sprawdzimy to" }],
+  id: "platnik", typ: "wybor", tekst: "Ile osób zatrudnia Twój pracodawca (lub zleceniodawca)?",
+  opcje: [{ v: "duzy", label: `Więcej niż ${progPlatnika} osób`, opis: "Zasiłek wypłaca pracodawca" }, { v: "maly", label: `${progPlatnika} osób lub mniej`, opis: "Zasiłek wypłaca ZUS" }, { v: "nie_wiem", label: "Nie wiem", opis: "Podpowiemy, jak to szybko sprawdzić" }],
   domyslne: (c) => c.liczbaUbezpieczonychPlatnika === undefined ? undefined : c.liczbaUbezpieczonychPlatnika > progPlatnika ? "duzy" : "maly",
   etykietaDanych: "Liczba ubezpieczonych u pracodawcy",
   poCo: "W firmach zgłaszających powyżej 20 osób zasiłek wypłaca pracodawca razem z pensją. W mniejszych firmach wypłatą zajmuje się bezpośrednio ZUS.", skad: "Możesz zapytać w kadrach lub księgowości (liczy się stan na 30 listopada poprzedniego roku). Jeśli nie masz pewności, wybierz «Nie wiem».",
@@ -331,18 +337,14 @@ export const SPRAWY: Sprawa[] = [
 
   /* ---- 3. Wniosek o zasiłek (ZAM) ---- */
   {
-    id: "wniosek-zasilek", tytul: "Złożyć wniosek o zasiłek po porodzie", krotko: "Ile dostaniesz, kiedy złożyć wniosek i co wpisać w druku ZAM", ikona: "📄", czas: "5 pytań · 3 min",
+    id: "wniosek-zasilek", tytul: "Złożyć wniosek o zasiłek po porodzie", krotko: "Ile dostaniesz, do kiedy złożyć wniosek i co zanieść", ikona: "📄", czas: "kilka krótkich pytań · 2 min",
     slowa: "zasiłek macierzyński wniosek zam po porodzie ile dostanę pieniądze kwota 81,5 100% 70% urlop rodzicielski macierzyński wypłata druk", faq: ["F07", "F08", "F09", "F17", "F18"],
     pytania: [
       pZatrudnienie, pChorobowe, ...poPotwierdzeniuChorobowego([pDataPorodu, pDzieci, pPelnyEtat("M"), pPodstawaZUS("M"), pBrutto("M"),
-      { ...pPlatnik, warunek: (o) => o.zatrudnienie === "umowa" || o.zatrudnienie === "zlecenie", zalezyOd: ["zatrudnienie"] },
-      { id: "wariant", typ: "wybor", tekst: "W jaki sposób chcesz otrzymywać zasiłek macierzyński?",
-        opcje: [
-          { v: "zmienny", label: "Wariant standardowy: 100% i 70%", opis: "100% podstawy przez urlop macierzyński (pierwsze 20 tygodni), potem 70% w czasie rodzicielskiego" },
-          { v: "usredniony", label: "Wariant stały: 81,5% przez cały rok", opis: "Jednakowa wypłata co miesiąc – wniosek musisz złożyć w ciągu 21 dni po porodzie" },
-          { v: "nie_wiem", label: "Nie wiem – chcę porównać oba warianty", opis: "Przeliczymy i pokażemy różnicę między obiema opcjami" },
-        ],
-        poCo: "Wybór wariantu decyduje o wysokości comiesięcznych wypłat. Pokażemy różnicę i podpowiemy, co zaznaczyć we wniosku.", skad: "Możesz wybrać «Nie wiem», aby porównać obie opcje przed podjęciem decyzji." },
+      // Pytanie o liczbę ubezpieczonych zadajemy tylko wtedy, gdy ZUS ma tę liczbę w profilu (ekran „Sprawdź swoje dane").
+      // Gościa nie męczymy pytaniem, na które zwykle nie zna odpowiedzi: wynik opisuje oba przypadki.
+      // Pytania o wariant wypłaty (100/70 czy 81,5%) też nie ma: zawsze pokazujemy oba i różnicę, a wybór jest na druku ZAM.
+      { ...pPlatnik, warunek: (o, c) => (o.zatrudnienie === "umowa" || o.zatrudnienie === "zlecenie") && c.liczbaUbezpieczonychPlatnika !== undefined, zalezyOd: ["zatrudnienie"] },
       ]),
     ],
     async licz(o, c, api) {
@@ -351,8 +353,11 @@ export const SPRAWY: Sprawa[] = [
       const par: Parametry = await api("/api/parametry");
       const t815 = dodajDni(o.dataPorodu, par.terminy_dni.wniosek_pelny_wymiar_81_5_po_porodzie);
       const poTerminie = t815 < dzis();
-      const uzywa815 = o.wariant === "usredniony" && !poTerminie;
-      const porownaj = o.wariant === "nie_wiem" && !poTerminie;
+      // Bez pytania o wariant: domyślnie pokazujemy oba i różnicę (wcześniejsze wywołania mogą nadal podać wariant wprost).
+      const wybor = o.wariant ?? "nie_wiem";
+      const nieznanyPlatnik = !o.platnik || o.platnik === "nie_wiem";
+      const uzywa815 = wybor === "usredniony" && !poTerminie;
+      const porownaj = wybor === "nie_wiem" && !poTerminie;
       const { baza, limit, matkaMax } = await bazaPlanu(api, o, podM);
       const wejscie = { ...baza, wariant: uzywa815 ? "usredniony_81_5" as const : "zmienny_100_70" as const, rodzicielski: [{ kto: "matka", tygodnie: matkaMax }] };
       const { wariant, ...bez } = wejscie;
@@ -363,30 +368,64 @@ export const SPRAWY: Sprawa[] = [
       const okr = wyn.okresy;
       const mac = okr.find((x: any) => x.rodzaj === "macierzynski");
       const rod = okr.find((x: any) => x.rodzaj === "rodzicielski");
-      const adresat = o.platnik === "duzy" ? "Pracodawca (płatnik składek)" : o.platnik === "nie_wiem" ? "Do ustalenia w kadrach (pracodawca lub ZUS)" : "Zakład Ubezpieczeń Społecznych (ZUS)";
-      const ost = [...wyn.bledy, ...wyn.ostrzezenia, `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi (część nieprzenoszalna dla drugiego rodzica). Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli oboje rodzice biorą urlop, sprawdź sprawę „Podzielić urlop z partnerem”.`];
-      if (o.wariant !== "zmienny" && poTerminie) ost.push(`Termin złożenia wniosku o stawkę 81,5% minął ${dataPL(t815)} (21 dni od porodu). Pokazujemy wariant standardowy (100% / 70%) przy założeniu, że wniosek o stawkę 81,5% nie został złożony w terminie.`);
+      const adresat = o.platnik === "duzy" ? "Twój pracodawca (kadry lub księgowość)" : nieznanyPlatnik ? `Pracodawca albo ZUS: zależy, czy firma zgłasza więcej niż ${progPlatnika} osób` : "ZUS (przez PUE / eZUS albo w placówce)";
+      const ost = [...wyn.bledy, ...wyn.ostrzezenia];
+      if (wybor !== "zmienny" && poTerminie) ost.push(`Termin na stałą kwotę 81,5% minął ${dataPL(t815)}. Pokazujemy wariant standardowy: pierwsze tygodnie po 100%, potem po 70%.`);
+      const krokGdzie = o.platnik === "duzy"
+        ? { tekst: "Zanieś wniosek ZAM do pracodawcy (kadry lub księgowość)." }
+        : o.platnik === "maly" || o.zatrudnienie === "dzialalnosc"
+        ? { tekst: "Złóż wniosek ZAM w ZUS: przez PUE / eZUS albo w placówce." }
+        : { tekst: "Złóż wniosek ZAM tam, skąd będzie wypłacany zasiłek.", uwaga: `Zapytaj w kadrach: „Ile osób zgłaszacie do ubezpieczenia chorobowego?”. Więcej niż ${progPlatnika}: wniosek składasz u pracodawcy. ${progPlatnika} lub mniej: w ZUS (PUE / eZUS albo placówka).` };
       const zrob: Wynik["zrob"] = [
-        { kiedy: uzywa815 ? `do ${dataPL(t815)}` : "po porodzie", tekst: o.platnik === "nie_wiem" ? "Ustal w kadrach, gdzie złożyć wniosek ZAM." : o.platnik === "duzy" ? "Złóż wniosek ZAM u pracodawcy." : "Złóż wniosek ZAM w ZUS (elektronicznie przez PUE / eZUS lub w placówce).",
-          uwaga: porownaj ? `Jeśli wybierzesz stawkę 81,5%, złóż wniosek do ${dataPL(t815)}.` : undefined },
-        { tekst: "Dołącz dokumenty z listy w poradniku (m.in. odpis aktu urodzenia dziecka lub zaświadczenie lekarskie).", uwaga: "Pełną listę znajdziesz w pytaniu «Jakie dokumenty muszę dołączyć?»." },
-        { kiedy: `do ${par.terminy_dni.zasilek_wyplata_po_wyjasnieniu_okolicznosci_max} dni`, tekst: "Maksymalny czas oczekiwania na pierwszą wypłatę po wyjaśnieniu wszystkich okoliczności." },
+        { kiedy: uzywa815 ? `do ${dataPL(t815)}` : "Teraz", ...krokGdzie },
+        { tekst: "Zbierz dokumenty z listy poniżej i dołącz je do wniosku." },
+        { tekst: "Poczekaj na pieniądze.", uwaga: `Pierwsza wypłata przyjdzie najpóźniej ${par.terminy_dni.zasilek_wyplata_po_wyjasnieniu_okolicznosci_max} dni po tym, jak ZUS wyjaśni wszystkie okoliczności.` },
+      ];
+      const przyszlyPorod = o.dataPorodu > dzis();
+      const dokumenty = [
+        "Dowód osobisty (potrzebny do danych we wniosku)",
+        "Odpis skrócony aktu urodzenia dziecka" + (o.platnik === "duzy" ? "" : " (gdy zasiłek wypłaca ZUS, może pobrać go sam z rejestru)"),
+        ...(przyszlyPorod ? ["Zaświadczenie lekarskie o przewidywanej dacie porodu (przy wniosku za okres przed porodem)"] : []),
+        ...(o.zatrudnienie === "umowa" && o.platnik !== "duzy" ? ["Zaświadczenie Z-3: wystawia je pracodawca, gdy zasiłek wypłaca ZUS"] : []),
+        ...(o.zatrudnienie === "zlecenie" && o.platnik !== "duzy" ? ["Zaświadczenie Z-3a: wystawia je zleceniodawca, gdy zasiłek wypłaca ZUS"] : []),
+        ...(o.zatrudnienie === "dzialalnosc" ? ["Nie potrzebujesz zaświadczenia płatnika: składasz sam wniosek ZAM"] : []),
+        "Przy urlopie rodzicielskim: oświadczenia o drugim rodzicu (rubryki na druku ZAM)",
+        "Numer rachunku bankowego, jeśli chcesz wypłatę na konto (wpisujesz go sama na druku)",
       ];
       const sciagaWiersze: [string, string, string][] = [
-        ["Dane wnioskodawcy", `${c.osoba ?? "Twoje imię i nazwisko"}, PESEL ${c.pesel ?? "…"}`, "Dowód osobisty"],
+        ["Dane wnioskodawcy", `${c.osoba ?? "Twoje imię i nazwisko"}, PESEL ${c.pesel ?? "(z dowodu osobistego)"}`, "Dowód osobisty"],
         ["Data urodzenia dziecka", dataPL(o.dataPorodu), "Akt urodzenia (albo termin z karty ciąży przed porodem)"],
-        ["Za jaki okres wnioskujesz", [mac && `urlop macierzyński: od ${dataPL(mac.od)} do ${dataPL(mac.do)}`, rod && `urlop rodzicielski: od ${dataPL(rod.od)} do ${dataPL(rod.do)}`].filter(Boolean).join("; "), "Wynika z Twojego planu (tabela powyżej)"],
-        ["Pełny wymiar (81,5%)", uzywa815 ? "Zaznacz pole" : porownaj ? "Zaznacz tylko, jeśli wybierzesz stawkę 81,5%" : "Nie zaznaczaj", "Dotyczy wyboru stawki 81,5%"],
-        ["Do kogo składasz", adresat, `Sprawdź, czy płatnik zgłasza do ubezpieczenia chorobowego więcej niż ${progPlatnika} osób.`],
+        ["Za jaki okres wnioskujesz", [mac && `urlop macierzyński: od ${dataPL(mac.od)} do ${dataPL(mac.do)}`, rod && `urlop rodzicielski: od ${dataPL(rod.od)} do ${dataPL(rod.do)}`].filter(Boolean).join("; "), "Daty z tej strony (tabela z wyliczeniem)"],
+        ["Pełny wymiar (81,5%)", uzywa815 ? "Zaznacz pole" : porownaj ? "Zaznacz tylko, jeśli wybierasz stałą kwotę 81,5%" : "Nie zaznaczaj", "Dotyczy wyboru stałej kwoty 81,5%"],
+        ["Do kogo składasz", adresat, `Pracodawca z więcej niż ${progPlatnika} osobami wypłaca sam, w pozostałych przypadkach ZUS.`],
+      ];
+      const kwotaStd = por?.zmienny_100_70?.sumy?.razem;
+      const kwotaStala = por?.usredniony_81_5?.sumy?.razem;
+      const porownanie = por ? [
+        `Standardowo (100%, potem 70%): ${pln(kwotaStd)}`,
+        `Stała kwota co miesiąc (81,5%): ${pln(kwotaStala)}`,
+        por.roznicaRazem === 0
+          ? "Razem wychodzi tak samo."
+          : `Razem więcej dostaniesz przy ${kwotaStd > kwotaStala ? "wariancie standardowym" : "stałej kwocie"} (o ${pln(Math.abs(por.roznicaRazem))}).`,
+        "",
+        "Standardowy daje więcej pieniędzy na początku. Stała kwota daje taki sam budżet co miesiąc.",
+      ].join("\n") : undefined;
+      const info: NonNullable<Wynik["info"]> = [
+        ...(porownanie ? [{ tytul: "Porównanie wariantów", tresc: porownanie, zwiniete: true }] : []),
+        { tytul: "Dla drugiego rodzica", zwiniete: true, tresc: `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi. Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli oboje rodzice biorą urlop, sprawdź sprawę „Podzielić urlop z partnerem”.` },
       ];
       return {
-        glowne: `Za cały urlop dostaniesz ok. ${pln(wyn.sumy.razem)} (macierzyński ${tygodnie(wyn.wymiary.macierzynskiTyg)} i rodzicielski ${tygodnie(matkaMax)}).`,
-        duza: pln(wyn.sumy.razem), podpis: mac ? `W okresie macierzyńskim: ok. ${pln(miesiecznie(mac))} miesięcznie` : undefined,
-        szczegoly: [["Urlop macierzyński", mac ? `${dataPL(mac.od)} – ${dataPL(mac.do)}` : "—"], ["Urlop rodzicielski", rod ? `${dataPL(rod.od)} – ${dataPL(rod.do)}` : "—"], ["Podstawa zasiłku", `${pln(podM)} miesięcznie`], ["Wariant", uzywa815 ? "uśredniona stawka 81,5%" : "standardowy (100% / 70%)"]],
-        ostrzezenia: ost, terminy: terminyDlaRodzica(term), zrob, sciaga: { tytul: "Ściąga: co wpisać w druku ZAM", wiersze: sciagaWiersze, uwaga: "Nazwy pól mogą się nieznacznie różnić od aktualnego druku – sprawdź wzór na zus.pl." },
+        glowne: `Tyle dostaniesz za cały urlop (macierzyński ${tygodnie(wyn.wymiary.macierzynskiTyg)} i rodzicielski ${tygodnie(matkaMax)}):`,
+        duza: pln(wyn.sumy.razem), podpis: mac ? `Na początek ok. ${plOk(miesiecznie(mac))} miesięcznie (brutto, przed podatkiem)` : "Kwota brutto, przed podatkiem",
+        szczegoly: [["Urlop macierzyński", mac ? `${dataPL(mac.od)} – ${dataPL(mac.do)}` : "—"], ["Urlop rodzicielski", rod ? `${dataPL(rod.od)} – ${dataPL(rod.do)}` : "—"], ["Od tej kwoty liczymy zasiłek", `${pln(podM)} miesięcznie`], ["Jak będzie wypłacany", uzywa815 ? "równa kwota co miesiąc (81,5%)" : `pierwsze ${tygodnie(wyn.wymiary.macierzynskiTyg)} po 100%, potem po 70%`]],
+        pilne: uzywa815 || porownaj
+          ? { do: t815, tekst: `Chcesz mieć stałą kwotę co miesiąc (81,5%)? Złóż wniosek ZAM najpóźniej ${dataPL(t815)} (${zaIle(t815)}). Tego terminu nie da się przedłużyć.` }
+          : undefined,
+        ostrzezenia: ost, terminy: terminyDlaRodzica(term), zrob, dokumenty: { tytul: "Weź ze sobą", pozycje: dokumenty },
+        sciaga: { tytul: "Ściąga: co wpisać w druku ZAM", wiersze: sciagaWiersze, uwaga: "Druk ZAM obowiązuje od 24.10.2026. Jeśli rubryka nazywa się trochę inaczej, wpisz w nią tę samą informację." },
         druki: ["ZAM", ...(o.zatrudnienie === "umowa" ? ["Z-3"] : o.zatrudnienie === "zlecenie" ? ["Z-3a"] : [])],
-        status: o.platnik === "nie_wiem" ? "do_potwierdzenia" : "ok", uwagaStatus: "Ustal w kadrach, gdzie złożyć wniosek ZAM.",
-        info: por ? [{ tytul: "Porównanie wariantów", tresc: `Standardowy (100% i 70%): ${pln(por.zmienny_100_70.sumy.razem)}\nUśredniony (81,5%): ${pln(por.usredniony_81_5.sumy.razem)}\n${por.roznicaRazem === 0 ? "Łącznie obie stawki dają tę samą kwotę." : `Różnica: ${pln(Math.abs(por.roznicaRazem))}.`}\n\nWskazówka: wariant stały 81,5% gwarantuje równy budżet co miesiąc, a wariant standardowy daje wyższy zastrzyk gotówki w pierwszych miesiącach po narodzinach.` }] : undefined,
+        status: nieznanyPlatnik ? "do_potwierdzenia" : "ok", uwagaStatus: `Zapytaj w kadrach, ilu pracowników firma zgłasza do ubezpieczenia chorobowego. Od tego zależy, gdzie złożysz wniosek (krok 1 poniżej).`,
+        info, zwinTabele: true,
         linki: [LINK_KALK], nastepne: o.zatrudnienie === "umowa" ? ["urlop-pracodawca", "podzial-urlopu"] : ["podzial-urlopu"],
         jakLiczono: wyn.kroki,
         tabela: { kolumny: ["Rodzaj urlopu", "Okres", "Dni", "Kwota brutto"], wiersze: okr.map((x: any) => [RODZAJE[x.rodzaj] ?? x.rodzaj, `${dataPL(x.od)} – ${dataPL(x.do)}`, String(x.dni), pln(x.kwota)]) },

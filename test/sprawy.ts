@@ -108,6 +108,18 @@ export async function testySpraw(rowne: Rowne) {
   const pozny = await licz(wniosek, { dataPorodu: "2020-06-10", liczbaDzieci: "2", podstawaM: "5522.56", zatrudnienie: "umowa", platnik: "maly", wariant: "usredniony" });
   rowne("Po terminie 81,5%: kwota w standardowym wariancie i ostrzeżenie", [pozny.duza, pozny.ostrzezenia?.some((w) => w.includes("minął"))], [pln(70615.14), true]);
 
+  // Poprawki UX: najważniejszy termin na górze, lista dokumentów, mniej pytań, kwoty „ok." bez groszy.
+  rowne("ZAM: termin 81,5% jest osobno, na górze wyniku", zam.pilne?.do, dodajDni(przyszlaData, parametry.terminy_dni.wniosek_pelny_wymiar_81_5_po_porodzie));
+  rowne("ZAM po terminie: brak ramki z terminem", pozny.pilne, undefined);
+  rowne("ZAM: lista „Weź ze sobą” zawiera akt urodzenia i Z-3", [zam.dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia")), zam.dokumenty?.pozycje.some((x) => x.includes("Z-3"))], [true, true]);
+  rowne("ZAM, przyszły poród: jest zaświadczenie lekarskie", zam.dokumenty?.pozycje.some((x) => x.includes("Zaświadczenie lekarskie")), true);
+  rowne("ZAM: kwota miesięczna „ok.” bez groszy", /ok\. [\d\s]+zł miesięcznie/.test(zam.podpis ?? ""), true);
+  rowne("ZAM nie pyta o wariant wypłaty (zawsze porównanie)", pytania(wniosek).some((q) => q.id === "wariant"), false);
+  const pPlat = pyt(wniosek, "platnik");
+  rowne("ZAM pyta o wielkość firmy tylko, gdy ZUS ma ją w profilu", [pPlat.warunek?.({ zatrudnienie: "umowa" }, {}), pPlat.warunek?.({ zatrudnienie: "umowa" }, { liczbaUbezpieczonychPlatnika: 30 })], [false, true]);
+  const zdzialalnosc = await licz(wniosek, { dataPorodu: przyszlaData, liczbaDzieci: "1", podstawaM: "5000", zatrudnienie: "dzialalnosc", chorobowe: "tak" });
+  rowne("Działalność: bez zaświadczenia płatnika, wniosek do ZUS", [zdzialalnosc.dokumenty?.pozycje.some((x) => x.includes("Z-3")), zdzialalnosc.zrob[0].tekst.includes("w ZUS")], [false, true]);
+
   const p4 = await licz(urlop, { rodzaj: "uzupelniajacy", od: "2027-06-15", do: "2027-06-28", dziecko: "2027-01-02", imie: "Jan Testowy", pracodawca: "Firma testowa" });
   rowne("Uzupełniający: poprawny nagłówek i termin od końca macierzyńskiego", [p4.glowne.includes("o uzupełniający urlop macierzyński"), p4.terminy?.[0]?.do], [true, "2027-05-24"]);
   const p5 = await licz("podzial-urlopu", { dataPorodu: "2027-06-10", liczbaDzieci: "3", podstawaM: "5522.56", zatrudnienieO: "dzialalnosc", bruttoO: "7800", ojcowski: "tak", odOjcowski: "2027-07-02" });

@@ -170,3 +170,27 @@ html.hc .zus-nav__more-btn { color: var(--hc-accent); }
 html.hc .zus-nav ul.zus-nav__drop { background: #000; border-color: #fff; border-top-color: var(--hc-accent); box-shadow: none; }
 html.hc .zus-nav ul.zus-nav__drop a:hover { background: #222; }
 html.hc .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 var(--hc-accent); }
+
+/* ---- Ścieżka sprawy: czytelniej dla zmęczonej osoby z telefonem w jednej ręce ---- */
+/* Opcje odpowiedzi mają widoczne kółko: od razu wiadomo, że to się klika i co jest zaznaczone. */
+.opt { position: relative; padding-left: 58px; }
+.opt::before { content: ""; position: absolute; left: 18px; top: 50%; width: 22px; height: 22px; margin-top: -11px; box-sizing: border-box; border: 2px solid var(--muted); border-radius: 50%; background: #fff; }
+.opt.sel::before { border-color: var(--zus-green); background: radial-gradient(circle, var(--zus-green) 0 4px, #fff 5px); }
+.opt:hover::before, .opt:focus-visible::before { border-color: var(--zus-green); }
+.opt .small { margin-top: 2px; }
+html.hc .opt::before { border-color: #fff; background: #000; }
+html.hc .opt.sel::before { border-color: var(--hc-accent); background: radial-gradient(circle, var(--hc-accent) 0 4px, #000 5px); }
+
+/* Ważny termin nad wynikiem */
+.pilne { border-left-width: 6px; padding: 14px 16px; margin: 0 0 14px; }
+.pilne__lab { display: block; font-weight: 700; color: var(--zus-red); }
+.pilne p { margin: 4px 0 0; font-size: 18px; font-weight: 700; }
+html.hc .pilne__lab { color: var(--hc-accent); }
+
+/* Lista „Weź ze sobą" z polami do odhaczania */
+.zabierz { list-style: none; margin: 0; padding: 0; }
+.zabierz li { border-bottom: 1px solid var(--line); }
+.zabierz li:last-child { border-bottom: 0; }
+.zabierz label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 2px; min-height: 52px; cursor: pointer; }
+.zabierz input { flex: none; width: 26px; height: 26px; margin: 0; accent-color: var(--zus-green); }
+.zabierz input:checked + span { color: var(--muted); text-decoration: line-through; }

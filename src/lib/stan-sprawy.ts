@@ -54,3 +54,25 @@ export function polaczPrzyPowrocie(zapisana: Migawka, biezaca: Migawka, wstecz: 
 export function stanHistorii(poprzedni: unknown, wpis: WpisHistorii): Record<string, unknown> {
   return { ...(prosty(poprzedni) ? poprzedni : {}), rks: wpis };
 }
+
+// Postęp zapisany też w pamięci przeglądarki, żeby po przerwie (dziecko płacze, telefon się wyłączył) nie zaczynać od zera.
+// Trzymamy tylko odpowiedzi tej sprawy i tego profilu, tylko na tym urządzeniu; do niczego się nie wysyłają.
+export const kluczPostepu = (idSprawy: string, token: string) => `rks-postep:${idSprawy}:${token}`;
+
+export function zapiszPostep(klucz: string, wpis: WpisHistorii): void {
+  try { localStorage.setItem(klucz, JSON.stringify(wpis)); } catch { /* tryb prywatny albo brak miejsca: bez zapisu */ }
+}
+
+export function usunPostep(klucz: string): void {
+  try { localStorage.removeItem(klucz); } catch { /* jak wyżej */ }
+}
+
+/** Zapisany postęp, jeśli jest poprawny i dalej niż ekran startowy. Zły albo stary zapis ignorujemy. */
+export function odczytajPostep(klucz: string, idSprawy: string, token: string, idPytan: readonly string[]): Migawka | null {
+  try {
+    const tekst = localStorage.getItem(klucz);
+    if (!tekst) return null;
+    const w = odczytajWpis({ rks: JSON.parse(tekst) }, idSprawy, token, idPytan);
+    return w && (w.m.faza === "wynik" || w.m.historia.length > 0) ? w.m : null;
+  } catch { return null; }
+}

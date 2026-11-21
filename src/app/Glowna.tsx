@@ -15,12 +15,12 @@ import { ETAP_W_ADRESIE, etapZAdresu, normalizujZapytanie } from "@/lib/adres-gl
 import { najpilniejsze, sprawa, zaIle, type Moment } from "@/lib/sprawy";
 
 const MOMENTY = {
-  plan: { tytul: "Planuję dziecko", opis: "Ubezpieczenie i przygotowanie do urlopu", sprawy: ["co-przysluguje", "podzial-urlopu"] },
-  ciaza: { tytul: "Czekamy na dziecko", opis: "Urlopy dla rodziców, zwolnienie w ciąży i przygotowanie do wniosku", sprawy: ["co-przysluguje", "podzial-urlopu", "wniosek-zasilek", "zwolnienie-ciaza"] },
-  dziecko: { tytul: "Dziecko już jest z nami", opis: "Zasiłek, urlopy i terminy po narodzinach", sprawy: ["wniosek-zasilek", "urlop-pracodawca", "podzial-urlopu", "terminy"] },
+  plan: { tytul: "Planuję dziecko", opis: "Ubezpieczenie i urlop", sprawy: ["co-przysluguje", "podzial-urlopu"] },
+  ciaza: { tytul: "Czekamy na dziecko", opis: "Zwolnienie, urlopy, wnioski", sprawy: ["co-przysluguje", "podzial-urlopu", "wniosek-zasilek", "zwolnienie-ciaza"] },
+  dziecko: { tytul: "Dziecko już jest z nami", opis: "Zasiłek, urlopy, terminy", sprawy: ["wniosek-zasilek", "urlop-pracodawca", "podzial-urlopu", "terminy"] },
 } satisfies Record<Moment, { tytul: string; opis: string; sprawy: string[] }>;
-// „Czekamy na dziecko" jest pierwszy i wyróżniony: to etap, w którym najwięcej rzeczy trzeba załatwić z wyprzedzeniem.
-const KOLEJNOSC: Moment[] = ["ciaza", "plan", "dziecko"];
+// „Dziecko już jest z nami" jest pierwsze i wyróżnione: kto jest po porodzie, ma najmniej sił i najkrótszy czas na wnioski.
+const KOLEJNOSC: Moment[] = ["dziecko", "ciaza", "plan"];
 
 type Dane = {
   u: { dniNieprzerwanegoUbezpieczeniaChorobowego: number; ubezpieczenie: UbezpieczenieProfilu[] };
@@ -115,7 +115,7 @@ export default function Home() {
     <>
       <section className="hero">
         <h1>Co chcesz dzisiaj załatwić?</h1>
-        <p>Opisz sprawę własnymi słowami albo wybierz sytuację z listy poniżej. Możesz przejść przez sprawę bez logowania.</p>
+        <p>Wybierz sytuację albo opisz sprawę swoimi słowami. Bez logowania.</p>
       </section>
 
       {/* Wyszukiwarka jest pierwszą rzeczą po tytule: kto wie, czego szuka, nie musi przechodzić przez kafle. */}
@@ -140,22 +140,22 @@ export default function Home() {
           <h2 ref={etapy} tabIndex={-1}>Na jakim jesteście etapie?</h2>
           <div className="grid g3 grid--etapy">
             {KOLEJNOSC.map((id) => (
-              <button key={id} type="button" className={"tile tile--ico" + (id === "ciaza" ? " tile--glowny" : "")} onClick={() => wybierzEtap(id)}>
+              <button key={id} type="button" className={"tile tile--ico" + (id === "dziecko" ? " tile--glowny" : "")} onClick={() => wybierzEtap(id)}>
                 <Plakietka nazwa={id} />
                 <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span>{MOMENTY[id].opis}</span></span>
               </button>
             ))}
             <Link href="/kalendarz" className="tile tile--ico">
               <Plakietka nazwa="kalendarz" />
-              <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania, wizyty i terminy ZUS na jednej osi czasu</span></span>
+              <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania i terminy ZUS w jednym miejscu</span></span>
             </Link>
             <Link href="/sprawa/adopcja" className="tile tile--ico">
               <Plakietka nazwa="adopcja" />
-              <span className="tile__txt"><b>Adopcja lub rodzina zastępcza</b><span>Urlopy, zasiłek i terminy po przyjęciu dziecka</span></span>
+              <span className="tile__txt"><b>Adopcja lub rodzina zastępcza</b><span>Urlopy i zasiłek po przyjęciu dziecka</span></span>
             </Link>
             <Link href="/trudne" className="tile tile--ico tile--szeroki">
               <Plakietka nazwa="trudne" />
-              <span className="tile__txt"><b>Trudna sytuacja</b><span>Poronienie, strata dziecka, wcześniactwo lub choroba</span></span>
+              <span className="tile__txt"><b>Trudna sytuacja</b><span>Strata, wcześniactwo, choroba</span></span>
             </Link>
           </div>
         </>
@@ -164,14 +164,21 @@ export default function Home() {
           <button type="button" className="btn btn-ghost" onClick={wrocDoWyboru}>Wróć do wyboru etapu</button>
           <h2 className="mt" ref={etapy} tabIndex={-1}>{MOMENTY[moment].tytul}</h2>
           <div className="grid g3">
+            {MOMENTY[moment].sprawy.map((id) => {
+              const s = sprawa(id);
+              return s && <Link key={id} href={`/sprawa/${id}`} className="tile tile--ico">
+                <Plakietka nazwa={ikonaSprawy(id)} />
+                <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
+              </Link>;
+            })}
             <Link href="/kreator?sciezka=ojciec" className="tile tile--ico">
               <Plakietka nazwa="rodzina" />
-              <span className="tile__txt"><b>Urlopy dla taty i drugiego rodzica</b><span>Urlop ojcowski i podział urlopu rodzicielskiego</span></span>
+              <span className="tile__txt"><b>Urlopy dla taty i drugiego rodzica</b><span>Urlop ojcowski i podział urlopu</span></span>
             </Link>
             {(moment === "ciaza" || moment === "dziecko") && (
               <Link href="/kalendarz" className="tile tile--ico">
                 <Plakietka nazwa="kalendarz" />
-                <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania, wizyty i terminy ZUS na jednej osi czasu</span></span>
+                <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania i terminy ZUS w jednym miejscu</span></span>
               </Link>
             )}
             {moment === "plan" && (
@@ -180,21 +187,12 @@ export default function Home() {
                 <span className="tile__txt"><b>Ubezpieczenie i ochrona w pracy</b><span>Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę</span></span>
               </Link>
             )}
-            {MOMENTY[moment].sprawy.map((id) => {
-              const s = sprawa(id);
-              return s && <Link key={id} href={`/sprawa/${id}`} className="tile tile--ico">
-                <Plakietka nazwa={ikonaSprawy(id)} />
-                <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
-              </Link>;
-            })}
           </div>
           <p className="mt"><Link href="/sprawy" className="btn btn-secondary">Zobacz wszystkie sprawy</Link></p>
         </>
       )}
 
-      {sesja
-        ? <PodgladProfilu key={sesja.token} pesel={sesja.pesel} />
-        : <p className="home-login"><Link href="/logowanie" className="btn btn-secondary">Wypróbuj logowanie na profilu testowym</Link></p>}
+      {sesja && <PodgladProfilu key={sesja.token} pesel={sesja.pesel} />}
     </>
   );
 }
