@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSesja } from "@/lib/sesja";
-import { sprawa } from "@/lib/sprawy";
+import { TYTULY_SPRAW } from "@/lib/sprawy-tytuly";
 import Dostepnosc from "./Dostepnosc";
 
 // Siedem pozycji na wierzchu plus „Więcej": cztery podstrony o papierach (druki, kreator wniosków, wgrywanie, konto w ZUS)
@@ -57,7 +57,7 @@ function okruszki(path: string): { href: string; label: string; biezacy?: boolea
   if (path.startsWith("/sprawa/")) {
     return [
       { href: "/sprawy", label: "Sprawy" },
-      { href: path, label: sprawa(path.split("/")[2])?.tytul ?? "Sprawa", biezacy: true },
+      { href: path, label: TYTULY_SPRAW[path.split("/")[2]] ?? "Sprawa", biezacy: true },
     ];
   }
   const bazowy = "/" + path.split("/").filter(Boolean)[0];

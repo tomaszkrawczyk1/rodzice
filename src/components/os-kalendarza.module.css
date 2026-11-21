@@ -25,8 +25,8 @@
   bottom: -.5rem;
   width: 6px;
   margin-left: -3px;
-  background: #fab856;
-  border: 1px solid #00416e;
+  background: #fff;
+  border: 1px solid var(--zus-navy);
   border-radius: 2px;
 }
 .etykieta {
@@ -96,8 +96,8 @@
 .r_badanie { --kolor: #00416e; }
 .r_wizyta { --kolor: #025a28; }
 .r_szczepienie { --kolor: #5b2a8c; }
-.r_zajecia { --kolor: #6b4a00; }
-.r_urlop { --kolor: #7a3e00; }
+.r_zajecia { --kolor: #00606b; }
+.r_urlop { --kolor: #283754; }
 .r_wniosek { --kolor: #8a1c4d; }
 .r_porod { --kolor: #000; }
 
@@ -122,16 +122,16 @@
 .rodzaj { color: var(--kolor); }
 .stan { color: #222; background: #fff; border-color: #222; }
 
-/* Znacznik „Dziś” — pomarańcz z granatowym tekstem (6,1:1 wg DESIGN_ZUS.md). */
+/* Znacznik „Dziś” — zieleń z białym tekstem (5,6:1). */
 .lista > li.dzis { padding-bottom: .75rem; }
 .dzis p {
   margin: 0;
   padding: .45rem .75rem;
   border-radius: var(--radius);
-  background: #fab856;
-  color: #00416e;
+  background: var(--zus-green);
+  color: #fff;
 }
-.dzis .kropka { --kolor: #00416e; background: #fab856; }
+.dzis .kropka { --kolor: var(--zus-navy); background: var(--zus-green); }
 
 .przypis { max-width: 65ch; margin: .75rem 0 0; color: var(--muted); }
 
@@ -142,15 +142,15 @@
   .znaczki { grid-column: 2; margin-top: 0 !important; }
 }
 
-:global(html.hc) .ciaza, :global(html.hc) .rok { background: #000; color: #ffe14d; border: 2px solid #ffe14d; }
-:global(html.hc) .filtr { background: #000; color: #ffe14d; border-color: #ffe14d; }
-:global(html.hc) .filtr[aria-pressed="true"] { background: #ffe14d; color: #000; }
+:global(html.hc) .ciaza, :global(html.hc) .rok { background: #000; color: var(--hc-accent); border: 2px solid var(--hc-accent); }
+:global(html.hc) .filtr { background: #000; color: var(--hc-accent); border-color: var(--hc-accent); }
+:global(html.hc) .filtr[aria-pressed="true"] { background: var(--hc-accent); color: #000; }
 :global(html.hc) .filtr:focus-visible { outline-color: #fff; }
 :global(html.hc) .lista::before { background: #fff; }
-:global(html.hc) .kropka { --kolor: #ffe14d; border-color: #000; background: #ffe14d; }
-:global(html.hc) .rodzaj { color: #ffe14d; }
-:global(html.hc) .stan { background: #ffe14d; color: #000; border-color: #000; }
-:global(html.hc) .dzis p { background: #ffe14d; color: #000; }
-:global(html.hc) .znacznikDzis { background: #ffe14d; border-color: #fff; }
-:global(html.hc) .r_porod .tresc { border-color: #ffe14d; }
-:global(html.hc) .tresc.trwa { border-left-color: #ffe14d; }
+:global(html.hc) .kropka { --kolor: var(--hc-accent); border-color: #000; background: var(--hc-accent); }
+:global(html.hc) .rodzaj { color: var(--hc-accent); }
+:global(html.hc) .stan { background: var(--hc-accent); color: #000; border-color: #000; }
+:global(html.hc) .dzis p { background: var(--hc-accent); color: #000; }
+:global(html.hc) .znacznikDzis { background: var(--hc-accent); border-color: #fff; }
+:global(html.hc) .r_porod .tresc { border-color: var(--hc-accent); }
+:global(html.hc) .tresc.trwa { border-left-color: var(--hc-accent); }

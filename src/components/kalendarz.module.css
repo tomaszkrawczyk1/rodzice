@@ -81,7 +81,7 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
 .ostrzezenie {
   margin-top: 1rem;
   padding: .75rem 1rem;
-  border-left: 4px solid #b36b00;
+  border-left: 4px solid var(--zus-warn);
   background: var(--gray);
   font-weight: 700;
 }
@@ -106,9 +106,9 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
 }
 
 :global(html.hc) .kalendarz { color-scheme: dark; }
-:global(html.hc) .kalendarz :global(.badge) { color: #000; background: #ffe14d; }
-:global(html.hc) .wyczysc { color: #ffe14d; background: #000; }
-:global(html.hc) .blad { color: #ffe14d; }
+:global(html.hc) .kalendarz :global(.badge) { color: #000; background: var(--hc-accent); }
+:global(html.hc) .wyczysc { color: var(--hc-accent); background: #000; }
+:global(html.hc) .blad { color: var(--hc-accent); }
 
 @media (max-width: 560px) {
   .dwieDaty { grid-template-columns: minmax(0, 1fr); gap: 0; }

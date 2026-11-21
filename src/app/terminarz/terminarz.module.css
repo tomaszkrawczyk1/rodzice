@@ -83,7 +83,7 @@
 
 .data { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .75rem; margin: 0 0 .25rem; font-size: 17px; font-weight: 700; }
 .ile { font-weight: 400; color: #222; }
-.orient { font-size: 14px; font-weight: 700; color: #5c3300; border: 1px solid #5c3300; border-radius: 3px; padding: 1px 6px; background: #fff; }
+.orient { font-size: 14px; font-weight: 700; color: var(--zus-navy); border: 1px solid var(--zus-navy); border-radius: 3px; padding: 1px 6px; background: #fff; }
 
 .znaczniki { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .5rem; }
 .znacznik { display: inline-block; padding: 3px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; border-radius: 3px; border: 1px solid transparent; }
@@ -101,9 +101,9 @@
 .sprawdz {
   margin: .6rem 0 .25rem;
   padding: 8px 12px;
-  background: #fff4d1;
-  color: #3d2c00;
-  border: 1px solid #b36b00;
+  background: var(--zus-warn-bg);
+  color: var(--zus-warn-text);
+  border: 1px solid var(--zus-warn);
   border-left-width: 5px;
   border-radius: var(--radius);
 }
@@ -125,11 +125,11 @@
 
 /* wysoki kontrast włączany w ustawieniach dostępności strony */
 :global(html.hc) .karta, :global(html.hc) .opcja { background: #000; color: #fff; border-color: #fff; }
-:global(html.hc) .sprawdz { background: #000; color: #ffe14d; border-color: #ffe14d; }
+:global(html.hc) .sprawdz { background: #000; color: var(--hc-accent); border-color: var(--hc-accent); }
 :global(html.hc) .ile, :global(html.hc) .meta, :global(html.hc) .prywatnosc, :global(html.hc) .kategoria { color: #fff; background: #000; }
-:global(html.hc) .znacznik_deadline, :global(html.hc) .znacznik_porod { background: #ffe14d; color: #000; }
+:global(html.hc) .znacznik_deadline, :global(html.hc) .znacznik_porod { background: var(--hc-accent); color: #000; }
 :global(html.hc) .znacznik_recommended, :global(html.hc) .znacznik_info { background: #000; color: #fff; border-color: #fff; }
-:global(html.hc) .orient { background: #000; color: #ffe14d; border-color: #ffe14d; }
-:global(html.hc) .karta_deadline { border-color: #ffe14d; }
-:global(html.hc) .blad { color: #ffe14d; }
+:global(html.hc) .orient { background: #000; color: var(--hc-accent); border-color: var(--hc-accent); }
+:global(html.hc) .karta_deadline { border-color: var(--hc-accent); }
+:global(html.hc) .blad { color: var(--hc-accent); }
 :global(html.hc) .podsumowanie, :global(html.hc) .formularz { background: #000; }

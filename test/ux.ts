@@ -1,5 +1,7 @@
 // Uruchom: node --experimental-strip-types test/ux.ts   (Node 22+)
 // Mechanika przewijania, fokusu i stanu kroku w sprawach. Bez przeglądarki: tylko czysta logika.
+import { readFileSync } from "node:fs";
+import { TYTULY_SPRAW } from "../src/lib/sprawy-tytuly.ts";
 import { celPrzewijania, czyZasloniety, MARGINES } from "../src/lib/ekran.ts";
 import { dataZFormularza } from "../src/lib/data-formularza.ts";
 import { etapZAdresu, ETAP_W_ADRESIE, MAKS_ZAPYTANIA, normalizujZapytanie } from "../src/lib/adres-glowna.ts";
@@ -71,6 +73,58 @@ rowne("zapytanie z polskimi znakami i HTML przechodzi przez URLSearchParams bez 
   return new URLSearchParams(new URLSearchParams({ q: fraza }).toString()).get("q");
 })(), "ile dostanę po porodzie? <b>x</b> & 81,5%");
 rowne("kodowanie zapytania w adresie", new URLSearchParams({ q: "szef nie chce dać urlopu" }).toString(), "q=szef+nie+chce+da%C4%87+urlopu");
+
+// ---- tytuły spraw w nagłówku (okruszki) muszą się zgadzać z sprawy.ts ----
+{
+  const zrodlo = readFileSync(new URL("../src/lib/sprawy.ts", import.meta.url), "utf8");
+  const wSprawach = Object.fromEntries([...zrodlo.matchAll(/^\s{4}id: "([a-z-]+)", tytul: "([^"]+)"/gm)].map((m) => [m[1], m[2]]));
+  rowne("tytuły spraw w nagłówku = tytuły w sprawy.ts", TYTULY_SPRAW, wSprawach);
+}
+
+// ---- paleta: zieleń/granat/neutralne w tokenach, bursztyn tylko jako ostrzeżenie, kontrasty WCAG AA ----
+{
+  const css = readFileSync(new URL("../src/app/globals.css", import.meta.url), "utf8");
+  const korzen = css.slice(css.indexOf(":root {"), css.indexOf("}", css.indexOf(":root {")));
+  const tok = (n: string) => new RegExp(`--${n}:\\s*(#[0-9a-fA-F]{6})`).exec(korzen)?.[1] ?? "";
+  const lum = (h: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => { const c = parseInt(h.slice(i, i + 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const kontrast = (a: string, b: string) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const co = (a: string, b: string, min: number) => kontrast(a, b) >= min;
+  rowne("przycisk główny: biały na zieleni >= 4,5:1", co("#ffffff", tok("zus-green"), 4.5), true);
+  rowne("przycisk główny, hover: biały na ciemnej zieleni >= 4,5:1", co("#ffffff", tok("zus-green-dark"), 4.5), true);
+  rowne("ciemna zieleń ciemniejsza od zieleni głównej", lum(tok("zus-green-dark")) < lum(tok("zus-green")), true);
+  rowne("link zielony na bieli i na #f3f3f3 >= 4,5:1", [co(tok("zus-green-link"), "#ffffff", 4.5), co(tok("zus-green-link"), "#f3f3f3", 4.5)], [true, true]);
+  rowne("zieleń na jasnozielonym tle plakietek >= 4,5:1", co(tok("zus-green"), tok("zus-green-soft"), 4.5), true);
+  rowne("granat na bieli >= 4,5:1", co(tok("zus-navy"), "#ffffff", 4.5), true);
+  rowne("fokus: kolor >= 3:1 na bieli", co(tok("focus"), "#ffffff", 3), true);
+  rowne("fokus: biała przerwa >= 3:1 na zielonym tle", co("#ffffff", tok("zus-green"), 3), true);
+  rowne("ostrzeżenie: tekst na jasnym bursztynie >= 4,5:1", co(tok("zus-warn-text"), tok("zus-warn-bg"), 4.5), true);
+  rowne("ostrzeżenie: ramka >= 3:1 na bieli i na tle ostrzeżenia", [co(tok("zus-warn"), "#ffffff", 3), co(tok("zus-warn"), tok("zus-warn-bg"), 3)], [true, true]);
+  rowne("tryb wysokiego kontrastu: akcent >= 7:1 na czerni, czerń na akcencie >= 7:1", [co(tok("hc-accent"), "#000000", 7), co("#000000", tok("hc-accent"), 7)], [true, true]);
+
+  // żółte i pomarańczowe odcienie (barwa 20-70°, nasycenie > 0,25) mogą wystąpić tylko w tokenach ostrzeżenia
+  const odcien = (h: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    if (!d) return { h: 0, s: 0 };
+    const hue = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return { h: hue * 60, s: d / mx };
+  };
+  const pliki = ["app/globals.css", "app/ux.css", "app/kalkulator/kalkulator.module.css", "app/logowanie/logowanie.module.css", "app/terminarz/terminarz.module.css",
+    "components/kalendarz.module.css", "components/os-kalendarza.module.css", "components/Pole.module.css", "components/Sprawa.module.css", "lib/format.ts"];
+  const ciepleGdzie: string[] = [];
+  for (const f of pliki) {
+    readFileSync(new URL(`../src/${f}`, import.meta.url), "utf8").split("\n").forEach((linia, i) => {
+      if (/--zus-warn(-bg|-text)?:/.test(linia)) return;
+      for (const m of linia.matchAll(/#[0-9a-fA-F]{6}\b/g)) { const o = odcien(m[0]); if (o.s > 0.25 && o.h >= 20 && o.h <= 70) ciepleGdzie.push(`${f}:${i + 1} ${m[0]}`); }
+    });
+  }
+  rowne("żółte/pomarańczowe kolory tylko w tokenach ostrzeżenia", ciepleGdzie, []);
+  const wszystko = pliki.map((f) => readFileSync(new URL(`../src/${f}`, import.meta.url), "utf8")).join("\n");
+  rowne("nie ma już tokenów --zus-orange / --zus-amber", /--zus-orange|--zus-amber/.test(wszystko), false);
+}
 
 console.log(`WYNIK: ${ok} OK, ${fail} FAIL`);
 if (fail) process.exit(1);

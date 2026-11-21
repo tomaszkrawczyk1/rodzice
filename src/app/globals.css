@@ -1,27 +1,41 @@
-/* Motyw z zus.pl (zus_wzor/main(1).css): #007834, #00416e, #fab856, #11783b, #283754, #dadada, #ececec, #f5f5f5.
+/* Paleta w jednym miejscu. Motyw z zus.pl (zus_wzor/main(1).css): #007834, #00416e, #11783b, #283754, #dadada, #ececec, #f5f5f5.
+   Zasada: przyciski, chipy, nagłówki, hover i akcenty są ZIELONE, GRANATOWE albo NEUTRALNE.
+   Bursztyn (--zus-warn*) jest tylko kolorem semantycznym OSTRZEŻENIA (adnotacje „Sprawdź w ZUS lub gminie", alert.warn).
+   Kontrasty (WCAG): biały na --zus-green 5,6:1, biały na --zus-green-dark 8,4:1, --zus-green-link na bieli 5,6:1,
+   --zus-navy na bieli 10,6:1, --zus-warn-text na --zus-warn-bg 12,3:1, ramka --zus-warn na bieli 4,2:1.
    Tekst treści 16px (WCAG); nagłówki w pikselach jak przy bazie 14px na zus.pl. */
 :root {
-  --zus-green: #007834;
-  --zus-green-dark: #025a28;
-  --zus-green-soft: #f3f3f3;
-  --zus-green-link: #11783b;
-  --zus-orange: #fab856;
+  /* zieleń */
+  --zus-green: #007834;          /* główna: przyciski, aktywne elementy, stopka, logo */
+  --zus-green-dark: #025a28;     /* hover / active przycisków */
+  --zus-green-link: #11783b;     /* linki i menu */
+  --zus-green-soft: #e6f2ea;     /* jasne tło: plakietki ikon */
+  --zus-green-tint: #eef6f1;     /* jasne tło: duże panele */
+  --zus-green-line: #cfe3d6;     /* obwódka jasnych paneli */
+  /* granat */
   --zus-navy: #00416e;
   --zus-navy-dark: #283754;
   --zus-navy-soft: #f5f5f5;
-  --zus-red: #cd0000;
-  --zus-red-soft: #fff;
-  --zus-amber: #00416e;
-  --zus-amber-soft: #fff;
+  /* neutralne */
   --ink: #000;
   --muted: #4d4d4d;
   --line: #dadada;
   --bg: #fff;
   --gray: #f5f5f5;
   --card: #fff;
+  /* błąd */
+  --zus-red: #cd0000;
+  --zus-red-soft: #fff;
+  /* ostrzeżenie (jedyne miejsce z bursztynem): ciemny tekst na jasnym tle, ramka co najmniej 3:1 */
+  --zus-warn: #b36b00;
+  --zus-warn-bg: #fff4d1;
+  --zus-warn-text: #3d2c00;
+  /* wysoki kontrast: akcent na czerni (jasna zieleń, 16,7:1) */
+  --hc-accent: #7dffa0;
   --radius: 3px;
   --shadow: none;
-  --focus: #fab856;
+  /* fokus: granat (10,6:1 na bieli) + biała przerwa z ux.css, więc widać go też na zielonym tle */
+  --focus: #00416e;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; font-size: 16px; overflow-x: clip; }
@@ -150,9 +164,9 @@ img { max-width: 100%; height: auto; }
   min-height: 44px;
   min-width: 44px;
   max-width: 11.5rem;
-  background: var(--zus-orange);
-  color: var(--zus-navy) !important;
-  border: 1px solid var(--zus-navy);
+  background: var(--zus-green);
+  color: #fff !important;
+  border: 1px solid var(--zus-green);
   border-radius: 3px;
   padding: 8px 12px;
   font: inherit;
@@ -171,8 +185,9 @@ img { max-width: 100%; height: auto; }
   white-space: nowrap;
 }
 .pue-login:hover, .pue-login:focus-visible {
-  background: var(--zus-navy);
-  color: var(--zus-orange) !important;
+  background: var(--zus-green-dark);
+  border-color: var(--zus-green-dark);
+  color: #fff !important;
   text-decoration: none;
 }
 
@@ -303,7 +318,7 @@ img { max-width: 100%; height: auto; }
 .card + .card { margin-top: 16px; }
 .card.accent { border-top: 7px solid var(--zus-green); }
 .card.navy { border-left: 4px solid var(--zus-navy); }
-.card.warn { border-left: 4px solid var(--zus-orange); background: #fff; }
+.card.warn { border-left: 4px solid var(--zus-warn); background: #fff; }
 .card.danger { border-left: 4px solid var(--zus-red); background: #fff; }
 .grid { display: grid; gap: 16px; }
 .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -325,11 +340,11 @@ img { max-width: 100%; height: auto; }
 .hero h1 { color: #000; overflow-wrap: anywhere; }
 .hero p { color: #000; max-width: 68ch; font-size: 18px; overflow-wrap: anywhere; }
 .btn-login, a.btn-login {
-  background: var(--zus-orange);
-  color: var(--zus-navy);
-  border: 1px solid var(--zus-navy);
+  background: var(--zus-green);
+  color: #fff;
+  border: 1px solid var(--zus-green);
 }
-.btn-login:hover, a.btn-login:hover { background: var(--zus-navy); color: var(--zus-orange); }
+.btn-login:hover, a.btn-login:hover { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); }
 .lead { color: #000; font-size: 18px; max-width: 70ch; line-height: 1.5; }
 .muted { color: var(--muted); }
 .small { font-size: 16px; }
@@ -362,7 +377,7 @@ img { max-width: 100%; height: auto; }
   transition: background .15s, border-color .15s, color .15s;
 }
 .btn-primary { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
-.btn-primary:hover { background: #fff; color: var(--zus-green); border-color: var(--zus-red); box-shadow: none; }
+.btn-primary:hover { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); box-shadow: none; }
 .btn-secondary { background: #f3f3f3; color: var(--zus-green-dark); border-color: #f3f3f3; box-shadow: none; }
 .btn-secondary:hover { background: #fff; color: var(--zus-green); border-color: var(--zus-green); }
 .btn-ghost { background: #fff; color: var(--zus-green-link); border: 1px solid var(--zus-green-link); box-shadow: none; }
@@ -377,6 +392,8 @@ a.btn:hover { text-decoration: none; }
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
+/* „Przejdź do treści" ma zielone tło i obrys wewnątrz: tam obrys jest biały (5,6:1 na zieleni) */
+.skip:focus-visible { outline-color: #fff; }
 
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
 .field > label, .lbl { font-weight: 700; font-size: 16px; color: #000; }
@@ -421,13 +438,13 @@ a.tab { color: #000; }
 .alert { padding: 12px 14px; border-radius: 0; border: 1px solid var(--line); border-left: 4px solid var(--zus-navy); margin: 10px 0; font-size: 16px; background: var(--gray); color: #000; }
 .alert.info { background: var(--gray); border-color: var(--line); border-left-color: var(--zus-navy); }
 .alert.ok { background: var(--gray); border-left-color: var(--zus-green); }
-.alert.warn { background: #fff; border-left-color: #b36b00; }
+.alert.warn { background: #fff; border-left-color: var(--zus-warn); }
 .alert.err { background: #fff; border-left-color: var(--zus-red); }
 .badge { display: inline-block; padding: 4px 8px; border-radius: 3px; font-size: 16px; font-weight: 700; line-height: 1.3; }
 .badge.ok { background: var(--gray); color: var(--zus-green-dark); }
 .badge.no { background: #fff; color: #9d0000; border: 1px solid #9d0000; }
 .badge.sim { background: var(--gray); color: #222; }
-.badge.warn { background: #fff; color: #5c3300; border: 1px solid #5c3300; }
+.badge.warn { background: var(--zus-warn-bg); color: var(--zus-warn-text); border: 1px solid var(--zus-warn); }
 
 .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
 table.tbl { width: 100%; border-collapse: collapse; font-size: 16px; border: 3px solid #dadada; }
@@ -444,7 +461,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 16px; border: 3px
 ul.clean { list-style: none; padding: 0; margin: 0; }
 ul.clean li { padding: 6px 0 6px 22px; position: relative; }
 ul.clean li::before { content: ""; position: absolute; left: 0; top: .65em; width: 8px; height: 8px; background: var(--zus-green); }
-ul.warnlist li::before { background: #b36b00; }
+ul.warnlist li::before { background: var(--zus-warn); }
 ol.steps { padding-left: 22px; }
 ol.steps li { margin: 6px 0; }
 details.dl { border: 1px solid var(--line); border-radius: 0; padding: 10px 12px; background: #fff; margin: 8px 0; }
@@ -493,7 +510,7 @@ details.dl summary:hover { color: var(--zus-green-link); }
   min-height: 44px;
 }
 .persona:hover, .persona:focus-visible { border-top-color: var(--zus-green); background: #fff; }
-.spin { display: inline-block; width: 18px; height: 18px; border: 3px solid #cfe3d6; border-top-color: var(--zus-green); border-radius: 50%; animation: sp .8s linear infinite; vertical-align: -3px; }
+.spin { display: inline-block; width: 18px; height: 18px; border: 3px solid var(--zus-green-line); border-top-color: var(--zus-green); border-radius: 50%; animation: sp .8s linear infinite; vertical-align: -3px; }
 @keyframes sp { to { transform: rotate(360deg); } }
 .chip {
   display: inline-flex;
@@ -556,7 +573,7 @@ html.fs-xl .tile span, html.fs-xl .lead, html.fs-xl .hero p { font-size: 20px; }
 .opt.sel { border-color: var(--zus-green); box-shadow: inset 4px 0 0 var(--zus-green); background: var(--gray); }
 .todo { padding-left: 22px; }
 .todo li { margin: 12px 0; }
-.todo .when { color: #6b4e00; }
+.todo .when { color: var(--zus-navy); }
 pre.wniosek { white-space: pre-wrap; font: inherit; background: var(--gray); padding: 14px; border-radius: 0; border: 1px solid var(--line); }
 .tile {
   display: block;
@@ -625,7 +642,7 @@ button.tile, button.opt, button.persona { appearance: none; -webkit-appearance: 
 input[type=range] { min-height: 44px; }
 
 /* ===== Wzór zus.pl 1:1 (wartości z żywej strony zus.pl, listopad 2026) =====
-   szerokość 1200, nagłówek: logo 250 px, kwadraty 44 px #00416e, przycisk #fab856,
+   szerokość 1200, nagłówek: logo 250 px, kwadraty 44 px #00416e, przycisk zielony (zus.pl ma tu pomarańcz, u nas zieleń),
    nawigacja Lato Bold 15,4 px #11783b z paskiem 7 px, h1 36/44, kafle #f3f3f3, paski #283754, stopka #007834 */
 .container { max-width: 1232px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -650,14 +667,14 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
   background: var(--zus-navy); border: 0; border-radius: 3px; color: #fff;
 }
 .a11y button:hover { background: var(--zus-navy-dark); }
-.a11y button[aria-pressed="true"] { background: var(--zus-orange); color: var(--zus-navy); }
+.a11y button[aria-pressed="true"] { background: var(--zus-green); color: #fff; }
 .zus-search { flex-direction: column; gap: 2px; padding: 0 4px; min-height: 60px; justify-content: center; font-weight: 400; font-size: 14px; }
 .zus-search svg { width: 38px; height: 38px; }
 .pue-login, a.pue-login, button.pue-login {
   min-height: 44px; max-width: 200px; justify-content: space-between; gap: 14px;
-  padding: 10px; border-radius: 3px; font-size: 14px; background: var(--zus-orange);
+  padding: 10px; border-radius: 3px; font-size: 14px; background: var(--zus-green);
 }
-.pue-login:hover, .pue-login:focus-visible { background: var(--zus-navy); color: var(--zus-orange) !important; }
+.pue-login:hover, .pue-login:focus-visible { background: var(--zus-green-dark); color: #fff !important; }
 .pue-arrow, .btn-primary::after, .btn-secondary::after, .tile::after, .linkbar::after {
   content: ""; flex: none; width: 8px; height: 8px;
   border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg);
@@ -681,13 +698,13 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
 .crumbs__list li.last, .crumbs__list li.last span { font-weight: 700; }
 .crumbs__list a { font-size: 12px; }
 
-/* przyciski: pomarańczowy główny i granatowy obrys jak na zus.pl */
+/* przyciski: zielony główny i granatowy obrys */
 .btn {
   font-size: 14px; padding: 10px 14px; min-height: 44px; gap: 14px; border: 1px solid var(--zus-navy);
   border-radius: 3px; box-shadow: none; background: transparent; color: var(--zus-navy);
 }
-.btn-primary { background: var(--zus-orange); color: var(--zus-navy); border-color: var(--zus-navy); }
-.btn-primary:hover, .btn-primary:focus-visible { background: var(--zus-navy); color: var(--zus-orange); border-color: var(--zus-navy); box-shadow: none; }
+.btn-primary { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
+.btn-primary:hover, .btn-primary:focus-visible, .btn-primary:active { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); box-shadow: none; }
 .btn-secondary { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
 .btn-secondary:hover, .btn-secondary:focus-visible { background: var(--zus-navy); color: #fff; border-color: var(--zus-navy); }
 .btn-ghost { background: transparent; color: var(--zus-navy); border: 1px solid var(--zus-navy); }
@@ -697,7 +714,8 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
 .btn-sm { font-size: 14px; }
 .chip { border-color: var(--zus-navy); color: var(--zus-navy); font-size: 14px; }
 .chip:hover { background: var(--zus-navy); color: #fff; }
-.btn-login, a.btn-login { background: var(--zus-orange); color: var(--zus-navy); border: 1px solid var(--zus-navy); }
+.btn-login, a.btn-login { background: var(--zus-green); color: #fff; border: 1px solid var(--zus-green); }
+.btn-login:hover, a.btn-login:hover { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); }
 
 /* kafle: szare pola jak „expandable boxes” na stronie głównej zus.pl */
 .grid:has(> .tile) { gap: 2px; background: #fff; }
@@ -817,7 +835,7 @@ button.tile { appearance: none; }
 .hero p { margin-bottom: 16px; }
 .home-login { margin: 20px 0 0; }
 
-.ask--glowny { background: #eef6f1; border: 1px solid #cfe3d6; border-radius: 16px; padding: 22px 24px 18px; margin: 0 0 24px; }
+.ask--glowny { background: var(--zus-green-tint); border: 1px solid var(--zus-green-line); border-radius: 16px; padding: 22px 24px 18px; margin: 0 0 24px; }
 .ask--glowny h2 { font-size: 24px; line-height: 30px; margin: 0 0 12px; color: var(--zus-navy-dark); }
 .search { flex-wrap: nowrap; align-items: stretch; gap: 10px; margin: 0; }
 .search__box { position: relative; flex: 1 1 auto; min-width: 0; }
@@ -854,7 +872,7 @@ button.tile { appearance: none; }
 .tile--ico { display: flex; align-items: flex-start; gap: 16px; }
 .tile .tile__ic {
   flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
-  background: #e6f2ea; color: var(--zus-green); transition: background-color .18s, color .18s;
+  background: var(--zus-green-soft); color: var(--zus-green); transition: background-color .18s, color .18s;
 }
 .tile__ic .ikona { width: 32px; height: 32px; }
 .tile .tile__txt { display: block; flex: 1 1 auto; min-width: 0; }
@@ -910,7 +928,8 @@ button.tile { appearance: none; }
 .sprawy-wybor a:hover { background: #f3f3f3; }
 .sprawy-wybor a[aria-current="page"] { background: var(--zus-green); color: #fff; }
 
-/* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (żółty #ffe14d na czerni ≈ 17:1, czerń na żółtym ≈ 17:1). */
+/* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (jasna zieleń #7dffa0 na czerni ≈ 16,7:1, czerń na niej tyle samo).
+   Cały akcent trybu jest w jednym tokenie --hc-accent (w :root). */
 html.hc {
   --ink: #fff;
   --muted: #fff;
@@ -918,18 +937,20 @@ html.hc {
   --bg: #000;
   --gray: #000;
   --card: #000;
-  --zus-navy: #ffe14d;
-  --zus-navy-dark: #ffe14d;
+  --zus-navy: var(--hc-accent);
+  --zus-navy-dark: var(--hc-accent);
   --zus-navy-soft: #000;
+  --zus-warn: var(--hc-accent);
+  --zus-warn-bg: #000;
+  --zus-warn-text: #fff;
   --zus-green-soft: #000;
-  --zus-amber: #ffe14d;
-  --zus-amber-soft: #000;
+  --zus-green-tint: #000;
+  --zus-green-line: #fff;
   --zus-red-soft: #000;
-  --zus-green-link: #ffe14d;
-  --zus-green: #ffe14d;
-  --zus-green-dark: #ffe14d;
-  --zus-orange: #ffe14d;
-  --focus: #ffe14d;
+  --zus-green-link: var(--hc-accent);
+  --zus-green: var(--hc-accent);
+  --zus-green-dark: var(--hc-accent);
+  --focus: var(--hc-accent);
 }
 html.hc body,
 html.hc .site-top,
@@ -989,11 +1010,11 @@ html.hc .crumbs__list a,
 html.hc .zus-product b,
 html.hc .zus-search,
 html.hc .chip {
-  color: #ffe14d !important;
+  color: var(--hc-accent) !important;
 }
 html.hc .pue-login__label,
 html.hc .btn span { color: #000 !important; }
-html.hc .footer__links a::before { color: #ffe14d !important; }
+html.hc .footer__links a::before { color: var(--hc-accent) !important; }
 html.hc .btn,
 html.hc .btn-primary,
 html.hc .btn-secondary,
@@ -1006,7 +1027,7 @@ html.hc button.pue-login,
 html.hc .mobywatel .btn-primary,
 html.hc .a11y button,
 html.hc .menu-btn {
-  background: #ffe14d !important;
+  background: var(--hc-accent) !important;
   color: #000 !important;
   border-color: #000 !important;
 }
@@ -1016,42 +1037,42 @@ html.hc .badge.warn,
 html.hc .badge.ok,
 html.hc .badge.no,
 html.hc .badge.sim {
-  background: #ffe14d !important;
+  background: var(--hc-accent) !important;
   color: #000 !important;
   border-color: #000 !important;
 }
 html.hc .footer { background: #000 !important; color: #fff !important; border-top: 2px solid #fff; }
-html.hc .footer a, html.hc .to-top, html.hc .footer__h, html.hc .footer__note { color: #ffe14d !important; }
+html.hc .footer a, html.hc .to-top, html.hc .footer__h, html.hc .footer__note { color: var(--hc-accent) !important; }
 html.hc .footer__links li { border-color: #fff; }
-html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:hover, html.hc .tile:hover { border-color: #ffe14d; }
-html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 #ffe14d; }
+html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:hover, html.hc .tile:hover { border-color: var(--hc-accent); }
+html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 var(--hc-accent); }
 html.hc .footer__links a { text-decoration: underline; }
 html.hc .a11y button svg { filter: none; }
 html.hc .a11y button span, html.hc .pue-login__imie { color: #000 !important; }
 html.hc .zus-side li.on a { color: #000 !important; }
-html.hc .zus-side { border-right-color: #ffe14d; }
+html.hc .zus-side { border-right-color: var(--hc-accent); }
 html.hc .menu-btn span, html.hc .menu-btn__bars { color: #000 !important; }
 html.hc .ic, html.hc .drop-ic { color: transparent !important; }
-html.hc .linkbar { background: #000 !important; color: #ffe14d !important; border-color: #ffe14d !important; }
+html.hc .linkbar { background: #000 !important; color: var(--hc-accent) !important; border-color: var(--hc-accent) !important; }
 html.hc .tile { border-color: #fff; }
-html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: #ffe14d; color: #ffe14d; }
-html.hc .zus-nav li.selected { border-top-color: #ffe14d; box-shadow: inset 7px 0 0 #ffe14d; }
-html.hc .crumbs__home { color: #ffe14d; }
+html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: var(--hc-accent); color: var(--hc-accent); }
+html.hc .zus-nav li.selected { border-top-color: var(--hc-accent); box-shadow: inset 7px 0 0 var(--hc-accent); }
+html.hc .crumbs__home { color: var(--hc-accent); }
 html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) invert(1) brightness(2); }
-html.hc :focus-visible { outline: 3px solid #ffe14d; outline-offset: 2px; }
+html.hc :focus-visible { outline: 3px solid var(--hc-accent); outline-offset: 2px; }
 
 /* wysoki kontrast: nowe elementy strony głównej, menu i wyboru sprawy */
 html.hc .tile { border-width: 2px; box-shadow: none; }
-html.hc .tile .tile__ic { background: #000 !important; color: #ffe14d !important; border: 2px solid #ffe14d; }
-html.hc .tile--glowny { border-color: #ffe14d; border-width: 3px; }
-html.hc .tile:hover, html.hc .tile:focus-visible { border-color: #ffe14d; }
-html.hc .ask--glowny { border: 2px solid #ffe14d; }
-html.hc .search input[type=search] { border-color: #ffe14d; }
-html.hc .search__icon { color: #ffe14d; }
-html.hc .chip, html.hc .ask .chip { background: #000 !important; border-color: #ffe14d; color: #ffe14d !important; }
-html.hc .ask .chip:hover { background: #ffe14d !important; color: #000 !important; }
+html.hc .tile .tile__ic { background: #000 !important; color: var(--hc-accent) !important; border: 2px solid var(--hc-accent); }
+html.hc .tile--glowny { border-color: var(--hc-accent); border-width: 3px; }
+html.hc .tile:hover, html.hc .tile:focus-visible { border-color: var(--hc-accent); }
+html.hc .ask--glowny { border: 2px solid var(--hc-accent); }
+html.hc .search input[type=search] { border-color: var(--hc-accent); }
+html.hc .search__icon { color: var(--hc-accent); }
+html.hc .chip, html.hc .ask .chip { background: #000 !important; border-color: var(--hc-accent); color: var(--hc-accent) !important; }
+html.hc .ask .chip:hover { background: var(--hc-accent) !important; color: #000 !important; }
 html.hc .sim-banner { border-bottom: 1px solid #fff; }
 html.hc .menu-btn svg { color: #000; }
 html.hc .sprawy-wybor__btn, html.hc .sprawy-wybor ul { background: #000; color: #fff; border-color: #fff; }
-html.hc .sprawy-wybor a[aria-current="page"] { background: #ffe14d; color: #000 !important; }
+html.hc .sprawy-wybor a[aria-current="page"] { background: var(--hc-accent); color: #000 !important; }
 html.hc .zus-header__bar { border-bottom-color: #fff; }

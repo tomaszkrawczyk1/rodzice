@@ -23,7 +23,7 @@ export const RODZAJE: Record<string, string> = {
 };
 export const KOLORY: Record<string, string> = {
   macierzynski: "#00993f", macierzynski_przed_porodem: "#4cb86f", uzupelniajacy: "#7a4cc4", rodzicielski: "#00416e", rodzicielski_9tyg_drugiego_rodzica: "#0a7fb8",
-  ojcowski: "#d97a00", na_warunkach_macierzynskiego: "#00993f",
+  ojcowski: "#8a1c4d", na_warunkach_macierzynskiego: "#00993f",
 };
 
 export function opisObliczenia(tekst: string) {

@@ -26,18 +26,18 @@ button, .btn, .opt, .tile, .chip, .persona, .tab, summary { -webkit-user-select:
   .opt:hover:not(.sel), .persona:hover { border-top-color: #ececec; }
   .zus-nav li:hover:not(.selected) { border-top-color: #ececec; }
   .tile:hover { background: #fff; border-color: #c9d3cd; box-shadow: 0 1px 3px rgba(0, 40, 20, .12); transform: none; }
-  .tile:hover .tile__ic { background: #e6f2ea; color: var(--zus-green); }
+  .tile:hover .tile__ic { background: var(--zus-green-soft); color: var(--zus-green); }
   .tile:hover::after { color: #000; transform: rotate(45deg); }
   .tile--glowny:hover { background: var(--zus-green); border-color: var(--zus-green); box-shadow: 0 4px 14px rgba(0, 80, 40, .30); }
   .tile--glowny:hover .tile__ic { background: rgba(255, 255, 255, .2); color: #fff; }
   .tile--glowny:hover::after { color: #fff; }
-  .btn-primary:hover { background: var(--zus-orange); color: var(--zus-navy); border-color: var(--zus-navy); }
+  .btn-primary:hover { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
   .btn-secondary:hover, .btn-ghost:hover { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
   .btn-szukaj:hover { background: var(--zus-green); border-color: var(--zus-green); color: #fff; }
   .chip:hover, .ask .chip:hover { background: #fff; color: var(--zus-navy); }
 }
 
-/* Obrys fokusu: ciemny na jasnym tle (pomarańcz miał 1,7:1, wymagane jest 3:1), biała przerwa na ciemnym. */
+/* Obrys fokusu: granat --focus (10,6:1 na bieli; wymagane 3:1) + biała przerwa 2 px, dzięki której widać go też na zielonym tle (biel na #007834 5,6:1). */
 :focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 2px; box-shadow: 0 0 0 2px #fff; }
 .btn-primary:focus-visible, .zus-nav a:focus-visible { outline-color: var(--zus-navy); }
 html.hc :focus-visible { box-shadow: 0 0 0 2px #000; }
@@ -104,7 +104,7 @@ html.hc .na-stronie { background: #000; border-color: #fff; }
   .zus-subnav a[aria-current="page"] { font-weight: 700; box-shadow: inset 0 -4px 0 var(--zus-green); }
 }
 html.hc .zus-subnav { background: #000; border-color: #fff; }
-html.hc .zus-subnav a { color: #ffe14d !important; }
+html.hc .zus-subnav a { color: var(--hc-accent) !important; }
 
 /* --- Tabele na wąskich ekranach: wiersz = karta „etykieta: wartość" ------------------------------ */
 @media (max-width: 600px) {
@@ -166,7 +166,7 @@ html.hc .zus-subnav a { color: #ffe14d !important; }
   .zus-nav ul.zus-nav__drop a { padding-left: 32px; min-height: 48px; }
 }
 @media (prefers-reduced-motion: reduce) { .zus-nav__chev { transition: none; } }
-html.hc .zus-nav__more-btn { color: #ffe14d; }
-html.hc .zus-nav ul.zus-nav__drop { background: #000; border-color: #fff; border-top-color: #ffe14d; box-shadow: none; }
+html.hc .zus-nav__more-btn { color: var(--hc-accent); }
+html.hc .zus-nav ul.zus-nav__drop { background: #000; border-color: #fff; border-top-color: var(--hc-accent); box-shadow: none; }
 html.hc .zus-nav ul.zus-nav__drop a:hover { background: #222; }
-html.hc .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 #ffe14d; }
+html.hc .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 var(--hc-accent); }
