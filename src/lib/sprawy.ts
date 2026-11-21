@@ -1,7 +1,7 @@
 import { dodajDni, dodajMiesiace, dniMiedzy, wymiarRodzicielski, type Parametry } from "@/engine/kalkulator";
 import { pln, dataPL, dataKrotka, liczba, tygodnie, dzis, RODZAJE } from "./format";
 import { pytanie, type Status } from "@/content/poradnik";
-import { WSPARCIE, WSPARCIE_UWAGA } from "@/content/tresci";
+import { WSPARCIE_UWAGA, podmiotyDla, liniaKontaktu } from "@/lib/wsparcie";
 import parametry from "../../data/parametry.json";
 
 /* ============ typy ============ */
@@ -587,15 +587,15 @@ export const SPRAWY: Sprawa[] = [
     id: "trudna-sytuacja", tytul: "Trudna sytuacja: strata, wcześniak, śmierć matki", krotko: "Co przysługuje i gdzie szukać pomocy. Bez pośpiechu", ikona: "🕊️", czas: "1 pytanie · 1 min",
     slowa: "strata martwe urodzenie poronienie zgon śmierć dziecka wcześniak szpital żałoba trudna sytuacja choroba matka zmarła wsparcie psycholog", faq: ["F24", "F15", "F25", "F26"],
     pytania: [
-      { id: "sytuacja", typ: "wybor", tekst: "Wybierz sytuację, w której potrzebujesz wsparcia i informacji:", opcje: [{ v: "martwe", label: "Dziecko urodziło się martwe lub doszło do poronienia" }, { v: "wczesniak", label: "Dziecko urodziło się przedwcześnie lub przebywa w szpitalu" }, { v: "zgon", label: "Mama dziecka zmarła lub nie może się nim zająć" }, { v: "wsparcie", label: "Potrzebuję rozmowy lub wsparcia psychologicznego" }], poCo: "Dobierzemy najważniejsze informacje prawne i kontakty. Nie musisz niczego załatwiać od razu – najważniejszy jest spokój." },
+      { id: "sytuacja", typ: "wybor", tekst: "Wybierz sytuację, w której potrzebujesz wsparcia i informacji:", opcje: [{ v: "martwe", label: "Dziecko urodziło się martwe lub doszło do poronienia" }, { v: "wczesniak", label: "Dziecko urodziło się przedwcześnie lub przebywa w szpitalu" }, { v: "zgon", label: "Mama dziecka zmarła lub nie może się nim zająć" }, { v: "chore", label: "Dziecko jest ciężko chore" }, { v: "wsparcie", label: "Potrzebuję rozmowy lub wsparcia psychologicznego" }], poCo: "Dobierzemy najważniejsze informacje prawne i kontakty. Nie musisz niczego załatwiać od razu – najważniejszy jest spokój." },
     ],
     async licz(o) {
       const mapa: Record<string, string> = { martwe: "F24", wczesniak: "F15", zgon: "F25", wsparcie: "F26" };
       const f = pyt(mapa[o.sytuacja]);
-      const org = WSPARCIE.filter((w) => o.sytuacja === "wsparcie" || w.dla.includes(o.sytuacja === "zgon" ? "zgon" : o.sytuacja));
+      const org = podmiotyDla(o.sytuacja === "zgon" ? "matka" : o.sytuacja);
       return {
         lagodny: true, glowne: "Bardzo nam przykro z powodu Twojej straty i trudnej sytuacji. Nie musisz załatwiać formalności natychmiast – poniżej zebraliśmy najważniejsze informacje prawne oraz kontakty do bezpłatnego wsparcia.",
-        info: [...(f ? [{ tytul: o.sytuacja === "wsparcie" ? "Gdzie szukać wsparcia" : "Co Ci przysługuje", tresc: f.odpowiedz }] : []), ...(org.length ? [{ tytul: "Organizacje, które mogą pomóc", tresc: org.map((x) => `• ${x.nazwa}: ${x.opis}`).join("\n") + `\n\n${WSPARCIE_UWAGA}` }] : [])],
+        info: [...(f ? [{ tytul: o.sytuacja === "wsparcie" ? "Gdzie szukać wsparcia" : "Co Ci przysługuje", tresc: f.odpowiedz }] : []), ...(org.length ? [{ tytul: "Organizacje, które mogą pomóc", tresc: org.map((x) => `• ${x.nazwa}: ${x.opis} ${liniaKontaktu(x)}. Sprawdzone ${dataPL(x.dataSprawdzenia)}.${x.pewnosc === "do_potwierdzenia" ? " Do potwierdzenia przed telefonem." : ""}`).join("\n") + `\n\n${WSPARCIE_UWAGA}` }] : [])],
         zrob: f ? kroki(f.id).map((t) => ({ tekst: t })) : [],
         druki: f?.druki, status: f?.status, linki: o.sytuacja === "wsparcie" ? undefined : [{ href: "/trudne", etykieta: "Sprawdź świadczenia w trudnej sytuacji" }],
       };

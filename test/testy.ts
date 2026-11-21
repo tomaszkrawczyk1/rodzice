@@ -3,6 +3,7 @@
 // nie wygenerowano ich z silnika. Jeśli test pada — to jest błąd w silniku (albo w parametrach), nie w teście.
 import { readFileSync } from "node:fs";
 import { testySpraw } from "./sprawy.ts";
+import { testyWsparcie } from "./wsparcie.ts";
 import { testyRodziceUI } from "./rodzice-ui.ts";
 import {
   podstawaPracownik, podstawaNiepracownik, wierszZ3NaMiesiac, swiadczenieRehabilitacyjne, swiadczenieRodzicielskie, zasilekChorobowyWCiazy, wymiarMacierzynski, wymiarRodzicielski, maxRodzicielskiPrzyLaczeniu,
@@ -155,6 +156,7 @@ const chJdg = zasilekChorobowyWCiazy({ podstawaMiesieczna: 6000, dniNiezdolnosci
 rowne("chorobowe niepracownika: ZUS od 1. dnia", [chJdg.dniPracodawca, chJdg.dniZUS], [0, 10]);
 
 await testySpraw(rowne);
+testyWsparcie(rowne);
 await testyRodziceUI(rowne);
 
 console.log(`\nWYNIK: ${ok} OK, ${fail} FAIL`);
