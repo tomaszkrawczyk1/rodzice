@@ -125,3 +125,16 @@ html.hc a { color: #8dffb0; } html.hc h1, html.hc h2, html.hc h3, html.hc h4, ht
 html.hc .btn-primary { background: #1f9e4d; color: #000; } html.hc .tab.on { background: #ffe14d; color: #000; } html.hc .nav a.active { background: #ffe14d; color: #000; }
 html.hc .btn-login, html.hc .nav a.login { background: #fab856; color: #000; }
 html.hc .sim-banner { background: #000; color: #ffe14d; border-color: #ffe14d; } html.hc .footer { background: #000; border-top: 2px solid #fff; }
+
+/* sprawy: ekran jednej sprawy */
+.prog { height: 6px; background: var(--line); border-radius: 3px; margin: 10px 0 18px; overflow: hidden; } .prog i { display: block; height: 100%; background: var(--zus-green); transition: width .25s; }
+.lab { display: inline-block; background: var(--zus-navy); color: #fff; font-size: .78rem; font-weight: 700; padding: 3px 10px; border-radius: 3px; }
+.opt { display: block; width: 100%; text-align: left; border: 2px solid var(--line); border-radius: 3px; padding: 14px; margin: 8px 0; background: var(--card); font: inherit; cursor: pointer; color: var(--ink); min-height: 52px; }
+.opt:hover, .opt.sel, .opt:focus-visible { border-color: var(--zus-green); background: var(--zus-green-soft); }
+.todo { padding-left: 22px; } .todo li { margin: 12px 0; } .todo .when { color: #8a5a00; }
+pre.wniosek { white-space: pre-wrap; font: inherit; background: var(--gray); padding: 14px; border-radius: 3px; border: 1px solid var(--line); }
+.tile { display: block; text-decoration: none; color: inherit; border: 1px solid var(--line); border-radius: 3px; padding: 16px; background: var(--card); text-align: left; font: inherit; cursor: pointer; width: 100%; }
+.tile:hover, .tile:focus-visible { border-color: var(--zus-green); box-shadow: inset 0 -4px 0 var(--zus-green); }
+.tile b { display: block; font-size: 1.06rem; color: var(--zus-navy); margin-bottom: 2px; } .tile span { color: var(--muted); font-size: .92rem; } .tile .ic { font-size: 1.7rem; display: block; margin-bottom: 6px; } .tile .time { display: block; margin-top: 6px; font-size: .85rem; }
+.urgent { border: 2px solid var(--zus-green); background: var(--zus-green-soft); }
+.ask { background: var(--gray); padding: 18px; border-radius: 3px; }

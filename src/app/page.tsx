@@ -4,45 +4,57 @@ import { useEffect, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
 import { dataKrotka, pln, dzis } from "@/lib/format";
 import { Alert, Sim } from "@/components/ui";
-
-const ETAPY = [
-  ["Planuję dziecko", "Dowiedz się, co przysługuje i jak zabezpieczyć prawo do zasiłków.", "/ciaza"],
-  ["Jestem w ciąży", "Zasiłek chorobowy, rehabilitacyjny i co, jeśli straciłaś pracę.", "/ciaza"],
-  ["Dziecko już jest", "Policz zasiłek macierzyński i zaplanuj urlopy obojga rodziców.", "/kalkulator"],
-  ["Adopcja / rodzina zastępcza", "Urlop na warunkach macierzyńskiego, limity wieku dziecka.", "/kalkulator?tryb=adopcja"],
-] as const;
-const FUNKCJE = [
-  ["/kreator", "Kreator: co mnie dotyczy?", "Kilka pytań i gotowa lista odpowiedzi, druków i właściwy kalkulator."],
-  ["/poradnik", "Poradnik", "28 typowych pytań rodziców z krokami do wykonania."],
-  ["/druki", "Druki", "ZAM, Z-3, Z-3a, ZAS-12, ZAS-26, ZAS-53: do czego, kto składa, do kiedy."],
-  ["/ciaza", "Co mi przysługuje", "Zasiłek chorobowy w ciąży, świadczenie rehabilitacyjne, brak uprawnień i co wtedy."],
-  ["/kalkulator", "Kalkulator zasiłku", "Matka, ojciec, oboje, łączenie z pracą, adopcja – okres i kwota."],
-  ["/dokumenty", "Dokumenty i terminy", "Kto wypłaca (pracodawca czy ZUS), jaki druk i do kiedy."],
-  ["/ryzyka", "Ryzyka i ochrona", "Co może Cię pozbawić zasiłku. Ochrona przed zwolnieniem."],
-  ["/trudne", "Trudne sytuacje", "Martwe urodzenie, wcześniak, choroba, śmierć matki. Organizacje wsparcia."],
-  ["/wnioski", "Kreator wniosków", "Wniosek o urlop i o zasiłek – wypełnij i „wyślij”."],
-  ["/wgraj", "Wgraj wniosek (AI)", "Odczytaj dane ze skanu ZAM / Z-3 i policz zasiłek."],
-  ["/pue", "Konto PUE", "Podgląd danych w ZUS i pytanie do ZUS."],
-] as const;
+import Szukaj from "@/components/Szukaj";
+import { SPRAWY, TOP, najpilniejsze, sprawa, zaIle, type Moment } from "@/lib/sprawy";
+import { dataPL } from "@/lib/format";
 
 export default function Home() {
-  const { sesja } = useSesja(); const [d, setD] = useState<any>(null);
+  const { sesja } = useSesja(); const [d, setD] = useState<any>(null); const [moment, setMoment] = useState<Moment | null>(null); const [pilne, setPilne] = useState<any>(null);
+  useEffect(() => { if (!sesja) { setPilne(null); return; } najpilniejsze(api, sesja).then(setPilne); }, [sesja]);
   useEffect(() => {
     if (!sesja) return setD(null);
     const naDzien = dzis();
     Promise.all([api(`/api/zus/ubezpieczenie?pesel=${sesja.pesel}&naDzien=${naDzien}`), api(`/api/zus/ezla?pesel=${sesja.pesel}`), api(`/api/zus/zadluzenie?pesel=${sesja.pesel}&naDzien=${naDzien}`)]).then(([u, e, z]) => setD({ u, e, z })).catch(() => setD(null));
   }, [sesja]);
+  const MOMENTY: [Moment, string, string, string][] = [["plan", "🗓️", "Planuję dziecko", "Co zrobić wcześniej, żeby niczego nie stracić"], ["ciaza", "🤰", "Jestem w ciąży", "Zwolnienie, zasiłek, urlop"], ["dziecko", "👶", "Dziecko już jest", "Wniosek o zasiłek, urlopy, podział z partnerem"]];
+  const imie = sesja?.osoba.split(" ")[0];
   return (
     <>
       <section className="hero">
-        <h1>Wiesz, co Ci przysługuje, zanim urodzi się dziecko</h1>
-        <p>Odpowiedz na kilka pytań, a pokażemy zasiłki i urlopy dla Ciebie i drugiego rodzica: <b>ile tygodni, ile pieniędzy, gdzie złożyć dokumenty i czego uważać</b>. Bez szukania po przepisach.</p>
-        <div className="row"><Link href="/kalkulator" className="btn btn-primary">Policz zasiłek</Link><Link href="/kreator" className="btn btn-secondary">Co mnie dotyczy?</Link>{!sesja && <Link href="/logowanie" className="btn btn-login">Zaloguj przez mObywatela</Link>}</div>
+        <h1>{sesja ? `Dzień dobry, ${imie}` : "Co chcesz załatwić?"}</h1>
+        <p>{sesja ? (pilne ? "Masz jedną rzecz do zrobienia. Resztę znajdziesz niżej." : "Wybierz, czym się zajmiemy.") : "Nie musisz znać nazw urzędowych. Wybierz, gdzie jesteś, a pokażemy trzy najczęstsze sprawy."}</p>
+        {!sesja && <div className="row"><Link href="/logowanie" className="btn btn-login">Zaloguj przez mObywatela</Link><span className="small muted">Pobierzemy Twoje dane z ZUS (symulacja), żeby nie wpisywać ich ręcznie.</span></div>}
       </section>
 
+      {pilne && (
+        <div className="card urgent mb">
+          <span className="badge warn">Najpilniejsze</span>
+          <h2 style={{ marginTop: 8 }}>{pilne.co}</h2>
+          <p>Termin: <b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)}). Masz już wpisane: imię, PESEL, datę porodu i pracodawcę.</p>
+          <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Zrób to teraz · {sprawa(pilne.sprawa)?.czas.split(" · ")[1] ?? "kilka minut"}</Link>
+        </div>
+      )}
+
+      {!moment ? (
+        <>
+          <h2>1. Gdzie jesteś?</h2>
+          <div className="grid g3">{MOMENTY.map(([k, ic, t, o]) => <button key={k} className="tile" onClick={() => { setMoment(k); scrollTo(0, 0); }}><span className="ic">{ic}</span><b>{t}</b><span>{o}</span></button>)}</div>
+          <p className="mt small">Inna sytuacja: <Link href="/sprawa/adopcja">adopcja lub rodzina zastępcza</Link> · <Link href="/sprawa/trudna-sytuacja">stało się coś trudnego</Link></p>
+        </>
+      ) : (
+        <>
+          <button className="btn btn-ghost btn-sm" onClick={() => setMoment(null)}>← Zmień</button>
+          <h2 className="mt">2. {TOP[moment].tytul}: co chcesz zrobić?</h2>
+          <div className="grid g3">{TOP[moment].ids.map((id) => { const s = sprawa(id)!; return <Link key={id} href={`/sprawa/${id}`} className="tile"><span className="ic">{s.ikona}</span><b>{s.tytul}</b><span>{s.krotko}</span><span className="time">⏱ {s.czas}</span></Link>; })}</div>
+          <p className="mt"><Link href="/sprawy" className="btn btn-secondary btn-sm">Pokaż pozostałe sprawy ({SPRAWY.length - TOP[moment].ids.length})</Link></p>
+        </>
+      )}
+
+      <Szukaj />
+
       {sesja && (
-        <div className="card accent mb">
-          <div className="row between"><h2>Dzień dobry, {sesja.osoba.split(" ")[0]}</h2><span><Sim /> dane z ZUS (dane testowe)</span></div>
+        <div className="card mt">
+          <div className="row between"><h3>Twoje dane z ZUS</h3><span><Sim /> dane testowe</span></div>
           {d ? (
             <div className="grid g3">
               <div className="stat"><div className="v">{d.u.dniNieprzerwanegoUbezpieczeniaChorobowego} dni</div><div className="l">nieprzerwanego ubezpieczenia chorobowego</div></div>
@@ -51,18 +63,9 @@ export default function Home() {
             </div>
           ) : <p className="muted">Pobieram dane…</p>}
           {d && d.u.ubezpieczenie.map((u: any, i: number) => <p key={i} className="small muted">Tytuł: <b>{u.tytul.replaceAll("_", " ")}</b> · od {dataKrotka(u.od)}{u.do ? ` do ${dataKrotka(u.do)}` : ""} · chorobowe: {u.chorobowe} · płatnik: {u.platnik.nazwa} ({u.platnik.liczbaUbezpieczonych} ubezp.)</p>)}
-          {d?.z.przekroczonyProg && <Alert t="warn">Masz zadłużenie składkowe powyżej progu ({pln(d.z.prog)}). To może wstrzymać wypłatę zasiłku – zobacz zakładkę „Ryzyka”.</Alert>}
-          <div className="row mt"><Link href="/ciaza?auto=1" className="btn btn-primary">Sprawdź moje uprawnienia</Link><Link href="/pue" className="btn btn-secondary">Konto PUE</Link></div>
+          {d?.z.przekroczonyProg && <Alert t="warn">Masz zadłużenie składkowe powyżej progu ({pln(d.z.prog)}). To może wstrzymać wypłatę zasiłku.</Alert>}
         </div>
       )}
-
-      <h2>W jakim jesteś momencie?</h2>
-      <div className="grid g4 mb">{ETAPY.map(([t, o, h]) => <Link key={t} href={h} className="card" style={{ textDecoration: "none", color: "inherit" }}><h3>{t}</h3><p className="small muted">{o}</p><span className="btn btn-ghost btn-sm">Dalej →</span></Link>)}</div>
-
-      <h2>Co znajdziesz w przewodniku</h2>
-      <div className="grid g4">{FUNKCJE.map(([h, t, o]) => <Link key={h} href={h} className="card" style={{ textDecoration: "none", color: "inherit" }}><h3>{t}</h3><p className="small muted">{o}</p></Link>)}</div>
-
-      <div className="card navy mt"><h3>Dlaczego to ważne</h3><p>Rodzice często nie wiedzą o swoich uprawnieniach, są zaskakiwani brakiem zasiłku albo rezygnują z elastycznych rozwiązań z obawy przed utratą świadczeń. Dobrze zaplanowane urlopy i terminowe wnioski to więcej spokoju w pierwszych miesiącach z dzieckiem.</p></div>
     </>
   );
 }

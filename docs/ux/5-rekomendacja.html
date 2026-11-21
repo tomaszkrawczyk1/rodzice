@@ -1,0 +1,33 @@
+<!doctype html><html lang="pl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>5. Rekomendacja</title><link rel="stylesheet" href="ux.css">
+<style>.step{display:none}.step.on{display:block}.urgent{border:2px solid var(--g);background:#e6f2ea}.badge{background:var(--amber);color:#6b4a00;font-size:.8rem;font-weight:700;padding:2px 8px;border-radius:3px}.time{color:#4f5b67;font-size:.85rem;margin-top:6px;display:block}.ask{background:var(--gray);padding:18px;border-radius:3px}</style>
+<div class="note">Makieta 5/5 · REKOMENDACJA · prototyp, dane fikcyjne</div>
+<header class="top"><div class="wrap"><a class="logo" href="index.html"><i></i><span>Przewodnik Przyszłego Rodzica<small>Prototyp</small></span></a>
+<div class="r"><button class="btn s sm" onclick="document.getElementById('ask').scrollIntoView()">🔎 Szukaj</button><button class="btn l sm" id="lg" onclick="login()">Zaloguj przez mObywatela</button></div></div></header>
+<div class="wrap">
+<section class="hero"><h1 id="h">Co chcesz załatwić?</h1><p id="sub">Nie musisz znać nazw urzędowych. Wybierz, gdzie jesteś, a pokażemy 3 najczęstsze sprawy.</p></section>
+
+<div id="urg" class="card urgent mt" style="display:none"><span class="badge">Najpilniejsze</span><h2 style="margin-top:8px">Do 21 dni po porodzie złóż wniosek o zasiłek 81,5%</h2><p>Zostało <b>14 dni</b> (do 10 kwietnia). Jeśli nie zdążysz, część urlopu rodzicielskiego zostanie wypłacona niżej (70% zamiast 81,5%).</p><a class="btn p" href="6-sprawa-zam.html">Zrób to teraz · 5 min</a> <span class="small muted">Masz już wpisane: imię, PESEL, datę porodu, pracodawcę.</span></div>
+
+<div class="step on" id="s1"><h2 class="mt">1. Gdzie jesteś?</h2><div class="grid g3">
+<button class="tile" onclick="go('plan')"><span class="ic">🗓️</span><b>Planuję dziecko</b><span>Co zrobić wcześniej, żeby niczego nie stracić</span></button>
+<button class="tile" onclick="go('ciaza')"><span class="ic">🤰</span><b>Jestem w ciąży</b><span>Zwolnienie, zasiłek, urlop</span></button>
+<button class="tile" onclick="go('dziecko')"><span class="ic">👶</span><b>Dziecko już jest</b><span>Wniosek o zasiłek, urlopy, podział z partnerem</span></button></div>
+<p class="mt small">Inna sytuacja: <a href="#">adopcja lub rodzina zastępcza</a> · <a href="#">stało się coś trudnego</a></p></div>
+
+<div class="step" id="s2"><button class="btn s sm" onclick="back()">← Zmień</button><h2 class="mt" id="t2"></h2><div class="grid g3" id="c2"></div>
+<p class="mt"><button class="chip" onclick="more()">Pokaż pozostałe sprawy (7)</button></p></div>
+
+<section class="ask mt" id="ask"><h3>Nie ma tu Twojej sprawy? Opisz własnymi słowami</h3>
+<div class="row"><input type="text" style="flex:1;min-width:220px" placeholder="np. szef nie chce mi dać urlopu po porodzie"><button class="btn p">Zapytaj</button></div>
+<p class="small muted" style="margin:8px 0 0">Odpowiadamy tylko na podstawie przepisów, które znamy. Gdy nie wiemy – mówimy to wprost i odsyłamy do ZUS.</p></section>
+</div>
+<script>
+const T={plan:["Planuję dziecko",[["🛡️","Sprawdź, czy będzie Ci przysługiwał zasiłek","Ubezpieczenie chorobowe, okres wyczekiwania","3 pytania · 2 min"],["💰","Zobacz, ile mniej więcej dostaniesz","Szybki kalkulator","2 pytania · 1 min"],["📅","Zaplanuj urlop z partnerem","Kto ile może wziąć","4 pytania · 3 min"]]],
+ciaza:["Jestem w ciąży",[["🩺","Zwolnienie w ciąży i zasiłek chorobowy","Ile dostaniesz i co zrobić z e-ZLA","3 pytania · 2 min"],["💰","Ile dostanę po porodzie?","Zasiłek macierzyński, wynik w złotych","3 pytania · 2 min"],["📅","Zaplanuj urlop z partnerem","Mama i tata – podział","4 pytania · 3 min"]]],
+dziecko:["Dziecko już jest",[["📄","Złożyć wniosek o zasiłek","Co wpisać w każdym polu. Termin: 21 dni","4 pytania · 5 min"],["🏢","Poprosić pracodawcę o urlop","Gotowy wniosek do wydruku","3 pytania · 3 min"],["📅","Podzielić urlop z partnerem","Zobacz, ile to wyniesie","4 pytania · 3 min"]]]};
+function go(k){s1.classList.remove('on');s2.classList.add('on');t2.textContent="2. "+T[k][0]+": co chcesz zrobić?";c2.innerHTML=T[k][1].map(x=>`<a class="tile" href="6-sprawa-zam.html"><span class="ic">${x[0]}</span><b>${x[1]}</b><span>${x[2]}</span><span class="time">⏱ ${x[3]}</span></a>`).join('');h.textContent="Dobrze. Teraz wybierz, co robimy.";scrollTo(0,0)}
+function back(){s2.classList.remove('on');s1.classList.add('on');h.textContent="Co chcesz załatwić?"}
+function more(){alert("Makieta: tu rozwija się pełna lista 10 spraw.")}
+function login(){document.getElementById('urg').style.display='block';lg.textContent='👤 Anna (symulacja)';h.textContent='Dzień dobry, Anno';sub.textContent='Masz jedną rzecz do zrobienia. Resztę znajdziesz niżej.'}
+</script>
+<div class="verdict"><div class="wrap"><b>Ocena:</b> Trzy warstwy: <b>(1)</b> moment życia (3 duże wybory, a nie 10), <b>(2)</b> dokładnie 3 sprawy zapisane czasownikiem i z czasem („5 min”), <b>(3)</b> zawsze dostępne pole „opisz własnymi słowami” jako siatka bezpieczeństwa. Po zalogowaniu: nad wszystkim jedna <b>najpilniejsza rzecz</b> z terminem i konsekwencją – rodzic nie musi nic wybierać. Kliknij „Zaloguj”, by to zobaczyć.</div></div>

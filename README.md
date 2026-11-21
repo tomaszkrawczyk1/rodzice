@@ -62,3 +62,12 @@ Stan: `GET /llm/v1/usage`. Reset: usunięcie pliku stanu na serwerze.
 Dokumenty i przykładowe sprawy ZUS są przeznaczone wyłącznie na użytek HackNation i **nie są częścią tego repozytorium**.
 Dokumenty demo (`public/demo`) są syntetyczne, z fikcyjnymi danymi (generator: `scripts/generuj_demo.py`).
 Wyliczenia są orientacyjne – przed zaliczką na podatek; nie zastępują decyzji ZUS.
+
+## Strona główna i ścieżki spraw (UX)
+
+Główna zasada: **jedna sprawa = jedna ścieżka, jedno pytanie na ekran, na końcu ściąga „co wpisać w którym polu”.**
+
+- `/` – „Co chcesz załatwić?”: moment życia (3 wybory) → 3 najczęstsze sprawy → pole „opisz własnymi słowami” (wyszukiwanie lokalne w poradniku, bez AI i bez zmyślania). Po zalogowaniu (symulowany mObywatel) na górze pojawia się najpilniejsza rzecz z terminem.
+- `/sprawy` – 10 spraw; `/sprawa/[id]` – ścieżka: sprawdź dane z ZUS → pytania → wynik w zdaniu → „Co teraz zrobić” → ściąga do druku / gotowy tekst wniosku → „Co dalej?”.
+- Definicje spraw (pytania, obliczenia, ściągi) są w `src/lib/sprawy.ts`; liczby zawsze pochodzą z silnika (`src/engine/kalkulator.ts`) i `data/parametry.json`.
+- Makiety porównujące podejścia (10 kafelków, 2 kafelki, czat, wyszukiwarka, rekomendacja): `docs/ux/index.html`.

@@ -6,8 +6,7 @@ import { useSesja } from "@/lib/sesja";
 import Dostepnosc from "./Dostepnosc";
 
 const NAV = [
-  ["/", "Start"], ["/kreator", "Kreator"], ["/poradnik", "Poradnik"], ["/ciaza", "W ciąży"], ["/kalkulator", "Kalkulator"], ["/druki", "Druki"], ["/dokumenty", "Terminy"],
-  ["/wnioski", "Wnioski"], ["/wgraj", "Wgraj wniosek"], ["/ryzyka", "Ryzyka"], ["/trudne", "Trudne sytuacje"], ["/pue", "PUE"],
+  ["/", "Start"], ["/sprawy", "Sprawy"], ["/poradnik", "Poradnik"], ["/kalkulator", "Kalkulator"], ["/druki", "Druki"], ["/wnioski", "Wnioski"], ["/wgraj", "Wgraj wniosek"], ["/pue", "PUE"],
 ] as const;
 
 export default function Header() {

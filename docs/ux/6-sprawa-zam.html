@@ -1,0 +1,36 @@
+<!doctype html><html lang="pl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>6. Sprawa: wniosek o zasiłek</title><link rel="stylesheet" href="ux.css">
+<style>.st{display:none}.st.on{display:block}.prog{display:flex;gap:6px;margin:14px 0}.prog i{flex:1;height:6px;background:var(--line);border-radius:3px}.prog i.d{background:var(--g)}
+.opt{display:block;width:100%;text-align:left;border:2px solid var(--line);border-radius:3px;padding:14px;margin:8px 0;background:#fff;font:inherit;cursor:pointer}.opt:hover,.opt.sel{border-color:var(--g);background:#e6f2ea}
+.big{font-size:2.2rem;font-weight:700;color:var(--g);line-height:1.1}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.95rem}th{background:var(--gray);font-size:.8rem;text-transform:uppercase}
+td.v{font-weight:700;background:#f7fbf8;white-space:nowrap}.help{font-size:.88rem;color:#4f5b67;margin-top:4px}details summary{cursor:pointer;color:var(--n);font-weight:700}.todo li{margin:10px 0}.todo b.d{color:#8a5a00}</style>
+<div class="note">Makieta 6 · ekran sprawy · prototyp, dane fikcyjne</div>
+<header class="top"><div class="wrap"><a class="logo" href="5-rekomendacja.html"><i></i><span>Przewodnik Przyszłego Rodzica<small>Prototyp</small></span></a><div class="r"><span class="small muted">👤 Anna (symulacja)</span></div></div></header>
+<div class="wrap" style="max-width:720px"><p class="mt small"><a href="5-rekomendacja.html">← Wszystkie sprawy</a></p>
+<h1>Złożyć wniosek o zasiłek po porodzie</h1><div class="prog"><i class="d" id="p1"></i><i id="p2"></i><i id="p3"></i><i id="p4"></i></div>
+
+<div class="st on" id="a1"><span class="lab">Krok 1 z 4 · sprawdź swoje dane</span><div class="card mt"><p class="muted small" style="margin-top:0">Pobraliśmy je z ZUS (symulacja). Jeśli coś się nie zgadza – popraw.</p>
+<table><tr><td>Imię i nazwisko</td><td class="v">Anna Kowalska</td></tr><tr><td>Data porodu</td><td class="v">20 marca 2027</td></tr><tr><td>Pracodawca</td><td class="v">Firma Przykład sp. z o.o. (80 osób)</td></tr><tr><td>Zarobki</td><td class="v">6 500 zł brutto miesięcznie</td></tr></table>
+<div class="row mt"><button class="btn p" onclick="to(2)">Wszystko się zgadza</button><button class="btn s">Coś trzeba poprawić</button></div></div></div>
+
+<div class="st" id="a2"><span class="lab">Krok 2 z 4 · jedno pytanie</span><div class="card mt"><h2>Czy urodziło się jedno dziecko?</h2>
+<button class="opt" onclick="to(3)"><b>Tak, jedno</b></button><button class="opt" onclick="to(3)"><b>Nie, bliźnięta lub więcej</b></button>
+<details class="mt"><summary>Po co o to pytamy?</summary><p class="help">Od liczby dzieci urodzonych przy jednym porodzie zależy, ile tygodni urlopu Ci przysługuje.</p></details></div></div>
+
+<div class="st" id="a3"><span class="lab">Krok 3 z 4 · Twój wynik</span><div class="card mt"><p class="muted" style="margin-top:0">Dostaniesz zasiłek za cały urlop:</p><div class="big">ok. 64 369 zł</div><p>przez <b>52 tygodnie</b> (od 20 marca 2027). W pierwszych 20 tygodniach: <b>5 609 zł miesięcznie</b>.</p>
+<div class="card" style="background:var(--amber);border-color:#f0cf8a"><b>Ważne:</b> to wynik przy wniosku złożonym <b>w ciągu 21 dni po porodzie</b>. Później dostaniesz mniej.</div>
+<details class="mt"><summary>Jak to policzyliśmy?</summary><p class="help">Średnia z 12 miesięcy pomniejszona o składki (13,71%), potem 100% za urlop macierzyński i 70% za rodzicielski (lub 81,5% przy wniosku w terminie). Pokażemy każdy krok w pełnej wersji.</p></details>
+<div class="row mt"><button class="btn p" onclick="to(4)">Dalej: co mam zrobić</button></div></div></div>
+
+<div class="st" id="a4"><span class="lab">Krok 4 z 4 · gotowe. Oto co zrobić</span>
+<div class="card mt"><h2>Co teraz zrobić</h2><ol class="todo"><li><b>Do 10 kwietnia</b> (21 dni po porodzie): złóż wniosek ZAM. <span class="help">Pracodawca z 80 osobami wypłaca zasiłek sam, więc wniosek idzie do niego, nie do ZUS.</span></li><li><b>Zanim złożysz:</b> weź akt urodzenia dziecka lub zaświadczenie o urodzeniu.</li><li><b>Po złożeniu:</b> zasiłek powinien być wypłacony w ciągu 30 dni.</li></ol>
+<div class="row"><button class="btn p">Pobierz wypełniony wniosek (PDF)</button><button class="btn s">Wyślij przypomnienie o terminie</button></div></div>
+<div class="card mt"><h2>Ściąga: co wpisać w druku ZAM</h2><p class="help" style="margin-top:0">Otwórz druk obok i przepisz z tej tabeli. <i>(Makieta: nazwy pól do zweryfikowania z aktualnym drukiem.)</i></p>
+<table><tr><th>Pole na druku</th><th>Wpisz</th><th>Skąd to wziąć</th></tr>
+<tr><td>Dane osobowe</td><td class="v">Anna Kowalska, PESEL …</td><td>Dowód osobisty</td></tr>
+<tr><td>Rodzaj zasiłku</td><td class="v">za okres urlopu macierzyńskiego i rodzicielskiego</td><td>Zaznacz oba</td></tr>
+<tr><td>Data urodzenia dziecka</td><td class="v">20.03.2027</td><td>Akt urodzenia</td></tr>
+<tr><td>Pełny wymiar (81,5%)</td><td class="v">☑ zaznacz pole</td><td>Jeśli co najmniej 1 dzień rodzicielskiego wykorzystasz przed 1. urodzinami dziecka</td></tr>
+<tr><td>Płatnik zasiłku</td><td class="v">Firma Przykład sp. z o.o.</td><td>Umowa o pracę</td></tr></table></div></div>
+</div>
+<script>function to(n){document.querySelectorAll('.st').forEach(e=>e.classList.remove('on'));document.getElementById('a'+n).classList.add('on');for(let i=1;i<=4;i++)document.getElementById('p'+i).classList.toggle('d',i<=n);scrollTo(0,0)}</script>
+<div class="verdict"><div class="wrap"><b>Ocena:</b> Jeden cel na stronę. Dane z ZUS już wpisane, <b>jedno pytanie na ekran</b> z „po co pytamy”, wynik <b>w złotych i w zdaniu</b> (szczegóły ukryte), ostrzeżenie o terminie tam, gdzie jest decyzja, a na końcu <b>ściąga: pole → wartość → skąd wziąć</b>. To jest „sprawa załatwiona” zamiast „informacja przeczytana”.</div></div>
