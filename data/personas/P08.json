@@ -1,0 +1,34 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Dominika Kamińska",
+ "pesel": "00000000008",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2022-01-01",
+   "do": "2027-01-31",
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "STARY PRACODAWCA SP. Z O.O.",
+    "nip": "0000000008",
+    "liczbaUbezpieczonych": 30
+   }
+  },
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2027-03-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "NOWY PRACODAWCA SP. Z O.O.",
+    "nip": "0000000018",
+    "liczbaUbezpieczonych": 50
+   }
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-09-25"
+ }
+}

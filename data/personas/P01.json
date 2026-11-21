@@ -1,0 +1,23 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Anna Kowalska",
+ "pesel": "00000000001",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2023-03-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "FIRMA TESTOWA SA",
+    "nip": "0000000001",
+    "liczbaUbezpieczonych": 80
+   }
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-03-15"
+ }
+}

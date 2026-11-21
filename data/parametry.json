@@ -1,0 +1,103 @@
+{
+  "_opis": "Parametry kalkulatora zmieniane BEZ zmiany kodu (zasilają panel admina - wymóg zadania, pkt 3 'Oczekiwany rezultat'). Silnik NIE ma żadnej z tych liczb zaszytej w kodzie. Wartości na rok 2026.",
+  "_zrodla": {
+    "zalacznik": "Załącznik ZUS do wyzwania HackNation 2026 (tabele wymiarów, stawek, płaca min. 4 806 zł, limit 20 321,30 zł)",
+    "ustawa_zasilkowa": "wyciąg z ustawy zasiłkowej (art. 2a, 4, 11, 19, 29, 29a, 30a, 31, 36)",
+    "kodeks_pracy": "wyciąg z KP (art. 180, 1801, 1802, 1821a-1821f, 1823, 183)",
+    "swiadczenie_rodzicielskie": "ustawa o świadczeniach rodzinnych (D20032255Lj.pdf), art. 17c ust. 5: 1000,00 zł miesięcznie"
+  },
+  "wersja_parametrow": "2026-11-21",
+  "obowiazuje_od": "2026-01-01",
+
+  "kwoty": {
+    "placa_minimalna_brutto": 4806.00,
+    "max_podstawa_skladek_chorobowe_dobrowolne": 23550.00,
+    "swiadczenie_rodzicielskie_miesieczne": 1000.00,
+    "zasilek_pogrzebowy_martwe_dziecko": 7000.00
+  },
+
+  "procenty": {
+    "skladki_odliczane_od_podstawy": 13.71,
+    "zasilek_za_urlop_macierzynski": 100,
+    "zasilek_za_urlop_rodzicielski": 70,
+    "zasilek_za_9_tyg_drugiego_rodzica": 70,
+    "zasilek_za_urlop_ojcowski": 100,
+    "zasilek_za_uzupelniajacy_urlop_macierzynski": 100,
+    "wariant_pelny_wymiar_81_5": 81.5,
+    "zasilek_chorobowy_w_ciazy": 100,
+    "zasilek_chorobowy_inny": 80,
+    "swiadczenie_rehabilitacyjne_pierwsze_3_mies": 90,
+    "swiadczenie_rehabilitacyjne_po_3_mies": 75,
+    "swiadczenie_rehabilitacyjne_w_ciazy": 100,
+    "prog_zadluzenia_proc_placy_minimalnej": 1
+  },
+
+  "wymiary_tygodnie": {
+    "urlop_macierzynski_wg_liczby_dzieci": { "1": 20, "2": 31, "3": 33, "4": 35, "5_i_wiecej": 37 },
+    "urlop_na_warunkach_macierzynskiego_wg_liczby_dzieci": { "1": 20, "2": 31, "3": 33, "4": 35, "5_i_wiecej": 37 },
+    "urlop_rodzicielski": { "1": 41, "2_i_wiecej": 43 },
+    "urlop_rodzicielski_za_zyciem": { "1": 65, "2_i_wiecej": 67 },
+    "urlop_rodzicielski_przy_laczeniu_z_praca_max": { "1": 82, "2_i_wiecej": 86 },
+    "urlop_rodzicielski_za_zyciem_przy_laczeniu_z_praca_max": { "1": 130, "2_i_wiecej": 134 },
+    "urlop_rodzicielski_adopcja_art_183_par_3": { "standard": 38, "za_zyciem": 62 },
+    "niezbywalne_prawo_kazdego_rodzica_rodzicielski": 9,
+    "min_urlop_na_warunkach_macierzynskiego_adopcja": 9,
+    "martwe_dziecko_min_po_porodzie": 8,
+    "macierzynski_przed_porodem_max": 6,
+    "macierzynski_matka_obowiazkowo_po_porodzie_min": 14,
+    "macierzynski_matka_z_orzeczeniem_niezdolnosc_do_egzystencji_min": 8,
+    "uzupelniajacy_limit_do_tygodnia_po_porodzie": { "przed_28_tc_lub_masa_do_1000g": 15, "28_do_37_tc_masa_ponad_1000g": 8, "po_37_tc": 8 },
+    "swiadczenie_rodzicielskie_tygodnie": { "1": 52, "2": 65, "3": 67, "4": 69, "5_i_wiecej": 71 },
+    "uzupelniajacy_po_37_tc_pobyt_min_dni": 2,
+    "uzupelniajacy_po_37_tc_pierwszy_dzien_pobytu_miedzy_dniem": [5, 28]
+  },
+
+  "limity_dni": {
+    "urlop_ojcowski_dni": 14,
+    "urlop_ojcowski_min_czesc_dni": 7,
+    "urlop_ojcowski_max_czesci": 2,
+    "urlop_ojcowski_do_wieku_dziecka_miesiecy": 12,
+    "urlop_ojcowski_adopcja_do_miesiecy_od_uprawomocnienia": 12,
+    "urlop_ojcowski_adopcja_max_wiek_dziecka_lat": 14,
+    "urlop_rodzicielski_max_czesci": 5,
+    "urlop_rodzicielski_do_konca_roku_w_ktorym_dziecko_konczy_lat": 6,
+    "laczenie_z_praca_max_wymiar_etatu": 0.5,
+    "dni_w_miesiacu_dla_zasilkow": 30,
+    "okres_zasilkowy_dni": 182,
+    "okres_zasilkowy_ciaza_dni": 270,
+    "wynagrodzenie_chorobowe_dni_do_50_lat": 33,
+    "wynagrodzenie_chorobowe_dni_od_50_lat": 14,
+    "karencja_ubezpieczenie_obowiazkowe_dni": 30,
+    "karencja_ubezpieczenie_dobrowolne_dni": 90,
+    "przerwa_wliczana_do_karencji_dni": 30,
+    "przerwa_miedzy_okresami_zasilkowymi_dni": 60,
+    "przedawnienie_zasilku_miesiace": 6,
+    "przedawnienie_przy_zadluzeniu_miesiace": 6
+  },
+
+  "terminy_dni": {
+    "wniosek_pelny_wymiar_81_5_po_porodzie": 21,
+    "wniosek_urlop_rodzicielski_przed_startem": 21,
+    "wniosek_laczenie_z_praca_przed_startem": 21,
+    "wniosek_urlop_ojcowski_przed_startem": 7,
+    "wniosek_przejecie_macierzynskiego_przez_ojca_przed_startem": 14,
+    "wniosek_rezygnacja_matki_z_czesci_urlopu_przed_powrotem": 7,
+    "adopcja_wniosek_o_urlop_po_przyjeciu_dziecka": 7,
+    "adopcja_start_urlopu_najpozniej_po_przyjeciu": 21,
+    "adopcja_wniosek_81_5_po_przyjeciu": 21,
+    "odmowa_laczenia_z_praca_odpowiedz_pracodawcy": 7,
+    "zasilek_wyplata_po_wyjasnieniu_okolicznosci_max": 30,
+    "zasilek_wyplata_po_splacie_zadluzenia_max": 60
+  },
+
+  "platnik": {
+    "_opis": "Płatnik wypłaca zasiłek gdy zgłasza do ubezpieczenia chorobowego POWYŻEJ 20 osób (stan na 30 listopada poprzedniego roku; art. 61 ust. 1 pkt 1). Inaczej wypłaca ZUS.",
+    "prog_liczby_ubezpieczonych_powyzej": 20
+  },
+
+  "zmiany_od_2026_10_24": {
+    "_opis": "ZUR i ZAO włączone do ZAM; Z-3b zlikwidowany. W aplikacji kierować na ZAM; stare druki traktować tylko jako materiał z przykładowych spraw.",
+    "formularze_zlikwidowane": ["ZUR", "ZAO", "Z-3b"],
+    "formularz_zastepczy": "ZAM"
+  }
+}

@@ -1,0 +1,23 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Piotr Mazur",
+ "pesel": "00000000017",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2012-01-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "FIRMA TESTOWA 4",
+    "nip": "0000000017",
+    "liczbaUbezpieczonych": 300
+   }
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-01-10"
+ }
+}

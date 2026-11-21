@@ -1,0 +1,56 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Karolina Wójcik",
+ "pesel": "00000000009",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2020-05-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "HANDEL TESTOWY SP. Z O.O.",
+    "nip": "0000000009",
+    "liczbaUbezpieczonych": 90
+   }
+  }
+ ],
+ "ezla": [
+  {
+   "seria_numer": "TEST-0001",
+   "kodLiterowy": "B",
+   "od": "2027-03-04",
+   "do": "2027-04-03",
+   "dni": 31,
+   "szpital": false
+  },
+  {
+   "seria_numer": "TEST-0002",
+   "kodLiterowy": "B",
+   "od": "2027-04-04",
+   "do": "2027-04-24",
+   "dni": 21,
+   "szpital": true
+  },
+  {
+   "seria_numer": "TEST-0003",
+   "kodLiterowy": "B",
+   "od": "2027-04-25",
+   "do": "2027-06-02",
+   "dni": 39,
+   "szpital": false
+  },
+  {
+   "seria_numer": "TEST-0004",
+   "kodLiterowy": "B",
+   "od": "2027-06-03",
+   "do": "2027-07-01",
+   "dni": 29,
+   "szpital": false
+  }
+ ],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-08-18"
+ }
+}

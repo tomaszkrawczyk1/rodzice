@@ -1,0 +1,1304 @@
+{
+ "_opis": "Przypadki testowe wg 10 person z persony_testowe.md + P11. Pole 'zalozenia' = dane DOPISANE (nie było ich w personie). Kwoty w PLN, przed zaliczką na PIT.",
+ "wersja_parametrow": "2026-11-21",
+ "przypadki": [
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P01",
+   "osoba": "Anna Kowalska",
+   "testuje": [
+    "a",
+    "b",
+    "f",
+    "g"
+   ],
+   "zalozenia": [
+    "Poród w planowanym terminie 2027-03-15, bez urlopu przed porodem.",
+    "Michał (partner): 7000 zł brutto, wykorzysta swoje niezbywalne 9 tyg. urlopu rodzicielskiego.",
+    "Anna wykorzysta pozostałe 32 tyg. urlopu rodzicielskiego."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-03-15",
+    "liczbaDzieci": 1,
+    "podstawy": {
+     "matka": 5608.85,
+     "ojciec": 6040.3
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 32
+     },
+     {
+      "kto": "ojciec",
+      "tygodnie": 9
+     }
+    ]
+   },
+   "podstawa": {
+    "annaMies": 5608.85,
+    "annaDzienna": 186.96,
+    "kroki": [
+     "Średnie miesięczne wynagrodzenie brutto z 12 mies.: 6500 zł.",
+     "Odjęcie 13.71 % składek społecznych: 5608.85 zł."
+    ]
+   },
+   "wynik_wzorcowy": {
+    "wariant_100_70": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 41,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 55490.22,
+      "ojciec": 8879.24,
+      "razem": 64369.46
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-03-15",
+       "do": "2027-08-01",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 26174.63,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-08-02",
+       "do": "2028-03-12",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 29315.59,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-03-13",
+       "do": "2028-05-14",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 8879.24,
+       "podwyzszone": false
+      }
+     ]
+    },
+    "wariant_81_5": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 41,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 55464.05,
+      "ojciec": 8879.24,
+      "razem": 64343.29
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-03-15",
+       "do": "2027-08-01",
+       "dni": 140,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 1,
+       "kwota": 21332.33,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-08-02",
+       "do": "2028-03-12",
+       "dni": 224,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 1,
+       "kwota": 34131.72,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-03-13",
+       "do": "2028-05-14",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 8879.24,
+       "podwyzszone": false
+      }
+     ]
+    },
+    "roznica_81_5_minus_100_70": -26.17
+   },
+   "uprawnienia": {
+    "zasilekChorobowyWCiazy": {
+     "przysluguje": true,
+     "powod": "Spełniono okres wyczekiwania (30 dni)."
+    },
+    "zasilekMacierzynski": {
+     "przysluguje": true,
+     "powod": "Ubezpieczona w dniu porodu — okres wyczekiwania nie dotyczy zasiłku macierzyńskiego.",
+     "zawieszonyDoSplatyZadluzenia": false
+    },
+    "kwotaProguZadluzenia": 48.06,
+    "ktoWyplaca": "pracodawca",
+    "ostrzezenia": []
+   },
+   "terminy": [
+    {
+     "co": "Wniosek matki o zasiłek w pełnym wymiarze (wariant 81,5 %) — nieprzekraczalnie",
+     "do": "2027-04-05",
+     "podstawa": "art. 30a ust. 1 ustawy zasiłkowej"
+    },
+    {
+     "co": "Przedawnienie roszczenia o zasiłek za okres do 2027-08-01",
+     "do": "2028-02-01",
+     "podstawa": "art. 67 ustawy zasiłkowej"
+    },
+    {
+     "co": "Wniosek o urlop rodzicielski (matka) od 2027-08-02",
+     "do": "2027-07-12",
+     "podstawa": "art. 1821d § 1 KP"
+    },
+    {
+     "co": "Przedawnienie roszczenia o zasiłek za okres do 2028-03-12",
+     "do": "2028-09-12",
+     "podstawa": "art. 67 ustawy zasiłkowej"
+    },
+    {
+     "co": "Wniosek o urlop rodzicielski (ojciec) od 2028-03-13",
+     "do": "2028-02-21",
+     "podstawa": "art. 1821d § 1 KP"
+    },
+    {
+     "co": "Przedawnienie roszczenia o zasiłek za okres do 2028-05-14",
+     "do": "2028-11-14",
+     "podstawa": "art. 67 ustawy zasiłkowej"
+    }
+   ],
+   "oczekiwane_komunikaty": [
+    "Firma ok. 80 pracowników (>20) => zasiłek ustala i wypłaca pracodawca; wniosek ZAM/wniosek o urlop składasz do pracodawcy, Z-3 NIE jest potrzebne.",
+    "Wniosek o zasiłek w pełnym wymiarze (81,5 %) najpóźniej 21 dni po porodzie (do 2027-04-05)."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P02",
+   "osoba": "Marek Nowak (ojciec, JDG)",
+   "testuje": [
+    "b",
+    "d",
+    "f",
+    "g",
+    "h",
+    "zadłużenie"
+   ],
+   "zalozenia": [
+    "Zadeklarowana podstawa składki chorobowej 10 000 zł/mies. przez 12 mies. (persona: 'wyższa niż minimalna').",
+    "Żona: umowa o pracę 6000 zł brutto.",
+    "Marek bierze urlop ojcowski 14 dni od 2027-04-10 i 9 tyg. rodzicielskiego (swoje niezbywalne).",
+    "Brak w persony: czy dobrowolne chorobowe opłacane terminowo — zakładamy tak."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-04-02",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 5177.4,
+     "ojciec": 8629
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 32
+     },
+     {
+      "kto": "ojciec",
+      "tygodnie": 9
+     }
+    ],
+    "ojcowski": [
+     {
+      "od": "2027-04-10",
+      "dni": 14
+     }
+    ]
+   },
+   "podstawa": {
+    "marekMies": 8629,
+    "ostrzezenia": []
+   },
+   "wynik_wzorcowy": {
+    "plan": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 41,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 51221.74,
+      "ojciec": 16711.5,
+      "razem": 67933.24
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-04-02",
+       "do": "2027-08-19",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 24161.2,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-08-20",
+       "do": "2028-03-30",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 27060.54,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-03-31",
+       "do": "2028-06-01",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 12684.63,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "ojcowski",
+       "kto": "ojciec",
+       "od": "2027-04-10",
+       "do": "2027-04-23",
+       "dni": 14,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 4026.87,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "uprawnienia_z_zadluzeniem_1200": {
+    "zasilekChorobowyWCiazy": {
+     "przysluguje": true,
+     "powod": "Spełniono okres wyczekiwania (90 dni)."
+    },
+    "zasilekMacierzynski": {
+     "przysluguje": true,
+     "powod": "Ubezpieczona w dniu porodu — okres wyczekiwania nie dotyczy zasiłku macierzyńskiego. UWAGA: zadłużenie 1200 zł > próg 48.06 zł (1 % płacy min.) w dniu powstania prawa — wypłata po spłacie CAŁOŚCI zadłużenia; prawo przedawnia się, jeśli nie spłacisz w 6 mies. (art. 2a).",
+     "zawieszonyDoSplatyZadluzenia": true
+    },
+    "kwotaProguZadluzenia": 48.06,
+    "ktoWyplaca": "ZUS",
+    "ostrzezenia": [
+     "Ubezpieczona w dniu porodu — okres wyczekiwania nie dotyczy zasiłku macierzyńskiego. UWAGA: zadłużenie 1200 zł > próg 48.06 zł (1 % płacy min.) w dniu powstania prawa — wypłata po spłacie CAŁOŚCI zadłużenia; prawo przedawnia się, jeśli nie spłacisz w 6 mies. (art. 2a)."
+    ]
+   },
+   "uprawnienia_po_splacie": {
+    "zasilekChorobowyWCiazy": {
+     "przysluguje": true,
+     "powod": "Spełniono okres wyczekiwania (90 dni)."
+    },
+    "zasilekMacierzynski": {
+     "przysluguje": true,
+     "powod": "Ubezpieczona w dniu porodu — okres wyczekiwania nie dotyczy zasiłku macierzyńskiego.",
+     "zawieszonyDoSplatyZadluzenia": false
+    },
+    "kwotaProguZadluzenia": 48.06,
+    "ktoWyplaca": "ZUS",
+    "ostrzezenia": []
+   },
+   "oczekiwane_komunikaty": [
+    "Zadłużenie 1200 zł > 48,06 zł (1 % płacy min.) w dniu powstania prawa => świadczenie wstrzymane do spłaty CAŁOŚCI długu; prawo przedawnia się po 6 mies. bez spłaty (art. 2a).",
+    "Symulacja zaświadczenia o stanie zadłużenia na dzień powstania prawa (wymóg zadania)."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P03",
+   "osoba": "Katarzyna Wiśniewska (zlecenie bez chorobowego)",
+   "testuje": [
+    "a",
+    "h"
+   ],
+   "zalozenia": [
+    "Brak dobrowolnego ubezpieczenia chorobowego, w dniu porodu nieubezpieczona chorobowo."
+   ],
+   "wejscie": {
+    "tytul": "zlecenie",
+    "dobrowolneChorobowe": false
+   },
+   "wynik_wzorcowy": {
+    "uprawnienia": {
+     "zasilekChorobowyWCiazy": {
+      "przysluguje": false,
+      "powod": "Brak ubezpieczenia chorobowego (zlecenie/działalność bez dobrowolnego chorobowego, umowa o dzieło, brak tytułu)."
+     },
+     "zasilekMacierzynski": {
+      "przysluguje": false,
+      "powod": "Brak ubezpieczenia chorobowego w dniu porodu.",
+      "zawieszonyDoSplatyZadluzenia": false
+     },
+     "alternatywa": "Rozważ świadczenie rodzicielskie (1000 zł/mies., ustawa o świadczeniach rodzinnych, art. 17c) — wniosek do gminy/ośrodka pomocy społecznej, nie do ZUS.",
+     "kwotaProguZadluzenia": 48.06,
+     "ktoWyplaca": "ZUS",
+     "ostrzezenia": []
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "Brak prawa do zasiłku chorobowego w ciąży i macierzyńskiego.",
+    "Alternatywa: świadczenie rodzicielskie 1000 zł/mies. (nie z ZUS-owego ubezpieczenia chorobowego).",
+    "Dobrowolne chorobowe: zgłoszenie tylko od dnia złożenia (bez wstecz); zasiłek CHOROBOWY po 90 dniach ubezpieczenia. Prawo do macierzyńskiego wymaga ubezpieczenia w dniu porodu — ZUS może jednak zbadać, czy zgłoszenie w ciąży nie służyło wyłącznie uzyskaniu świadczeń. Komunikować jako informację + ostrzeżenie o ryzyku, bez obietnicy (LUKI_I_DECYZJE.md, C7)."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P04",
+   "osoba": "Joanna Zielińska (bliźnięta, łączenie z pracą)",
+   "testuje": [
+    "b",
+    "c",
+    "d"
+   ],
+   "zalozenia": [
+    "Poród w terminie 2027-05-05.",
+    "Joanna: 14 tyg. rodzicielskiego bez pracy, potem 20 tyg. urlopu na pół etatu (=> 40 tyg. kalendarzowych).",
+    "Paweł 7000 zł brutto, 9 tyg. rodzicielskiego."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-05-05",
+    "liczbaDzieci": 2,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 6212.88,
+     "ojciec": 6040.3
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 14
+     },
+     {
+      "kto": "matka",
+      "tygodnie": 20,
+      "wspolczynnikPracy": 0.5
+     },
+     {
+      "kto": "ojciec",
+      "tygodnie": 9
+     }
+    ]
+   },
+   "podstawa": {
+    "joannaMies": 6212.88
+   },
+   "wynik_wzorcowy": {
+    "wariant_100_70": {
+     "bledy": [],
+     "ostrzezenia": [
+      "Łączenie z pracą: wniosek do pracodawcy min. 21 dni przed podjęciem pracy; pracodawca może odmówić z powodu organizacji pracy (art. 1821e § 2) — wtedy odpowiedź w 7 dni."
+     ],
+     "wymiary": {
+      "macierzynskiTyg": 31,
+      "rodzicielskiTyg": 43,
+      "rodzicielskiWykorzystaneTyg": 43,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 86
+     },
+     "sumy": {
+      "matka": 79442.03,
+      "ojciec": 8879.24,
+      "razem": 88321.27
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-05-05",
+       "do": "2027-12-07",
+       "dni": 217,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 44939.83,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-12-08",
+       "do": "2028-03-14",
+       "dni": 98,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 14206.79,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2028-03-15",
+       "do": "2028-12-19",
+       "dni": 280,
+       "procent": 70,
+       "wspolczynnikZasilku": 0.5,
+       "kwota": 20295.41,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-12-20",
+       "do": "2029-02-20",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 8879.24,
+       "podwyzszone": false
+      }
+     ]
+    },
+    "wariant_81_5": {
+     "bledy": [],
+     "ostrzezenia": [
+      "Łączenie z pracą: wniosek do pracodawcy min. 21 dni przed podjęciem pracy; pracodawca może odmówić z powodu organizacji pracy (art. 1821e § 2) — wtedy odpowiedź w 7 dni."
+     ],
+     "wymiary": {
+      "macierzynskiTyg": 31,
+      "rodzicielskiTyg": 43,
+      "rodzicielskiWykorzystaneTyg": 43,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 86
+     },
+     "sumy": {
+      "matka": 76796.37,
+      "ojciec": 8879.24,
+      "razem": 85675.61
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-05-05",
+       "do": "2027-12-07",
+       "dni": 217,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 1,
+       "kwota": 36625.96,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-12-08",
+       "do": "2028-03-14",
+       "dni": 98,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 1,
+       "kwota": 16540.76,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2028-03-15",
+       "do": "2028-12-19",
+       "dni": 280,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 0.5,
+       "kwota": 23629.65,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-12-20",
+       "do": "2029-02-20",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 8879.24,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "Wymiar: macierzyński 31 tyg., rodzicielski 43 tyg. (poród mnogi); przy łączeniu z pracą max 86 tyg.",
+    "Zasiłek za okres pracy na 1/2 etatu = 1/2 normalnej stawki; wniosek do pracodawcy min. 21 dni przed podjęciem pracy."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P05",
+   "osoba": "Ewa Lewandowska (wcześniak)",
+   "testuje": [
+    "b",
+    "h",
+    "i"
+   ],
+   "zalozenia": [
+    "Masa urodzeniowa 1500 g (persona: brak).",
+    "Hospitalizacja od porodu przez 42 dni (6 tyg.).",
+    "Brak partnera w danych: Ewa planuje wykorzystać 32 tyg. rodzicielskiego."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-05-28",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 4659.66
+    },
+    "uzupelniajacy": {
+     "kto": "matka",
+     "tygodnie": 6
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 32
+     }
+    ]
+   },
+   "uzupelniajacy": {
+    "tygodnie": 6,
+    "przypadek": "28_do_37_tc_masa_ponad_1000g",
+    "dniWOknie": 42
+   },
+   "wynik_wzorcowy": {
+    "plan": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 32,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 52623.09,
+      "ojciec": 0,
+      "razem": 52623.09
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-05-28",
+       "do": "2027-10-14",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 21745.08,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "uzupelniajacy",
+       "kto": "matka",
+       "od": "2027-10-15",
+       "do": "2027-11-25",
+       "dni": 42,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 6523.52,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-11-26",
+       "do": "2028-07-06",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 24354.49,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "31. tydzień (28–37), masa > 1000 g => uzupełniający 1 tydz. za każdy tydzień pobytu do upływu 8. tyg. po porodzie: tu 6 tyg.",
+    "Uzupełniający urlop bezpośrednio po macierzyńskim, jednorazowo, 100 %.",
+    "Odnośniki: organizacje wsparcia rodziców wcześniaków (do uzupełnienia z bazy organizacji — LUKI_I_DECYZJE.md)."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P06",
+   "osoba": "Magdalena Dąbrowska (martwe urodzenie)",
+   "testuje": [
+    "b",
+    "h",
+    "i"
+   ],
+   "zalozenia": [
+    "Brak: ciąża 29. tydzień (nie wpływa na wymiar)."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-09-12",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 6040.3
+    },
+    "martwe": {},
+    "rodzicielski": []
+   },
+   "wynik_wzorcowy": {
+    "plan": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 8,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 0,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 11275.23,
+      "ojciec": 0,
+      "razem": 11275.23
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-09-12",
+       "do": "2027-11-06",
+       "dni": 56,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 11275.23,
+       "podwyzszone": false
+      }
+     ]
+    },
+    "zasilek_pogrzebowy": 7000
+   },
+   "oczekiwane_komunikaty": [
+    "8 tyg. (56 dni) zasiłku po porodzie, 100 %, bez rodzicielskiego.",
+    "Dokumenty: odpis skrócony aktu urodzenia z adnotacją o martwym urodzeniu LUB zaświadczenie o martwym urodzeniu.",
+    "Przysługuje też zasiłek pogrzebowy 7000 zł (dla osoby, która pokryła koszty pogrzebu) — wniosek do ZUS.",
+    "Ton komunikatów: bez radosnego tonu, delikatny język; organizacje wsparcia w żałobie."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P07",
+   "osoba": "Piotr i Agnieszka Mazur (adopcja)",
+   "testuje": [
+    "e",
+    "j",
+    "d"
+   ],
+   "zalozenia": [
+    "Data zdarzenia = 2027-01-10 (data z persony: postanowienie sądu). W realu liczy się data PRZYJĘCIA dziecka i wniosku do sądu — do potwierdzenia.",
+    "W adopcji kto='matka' oznacza 'rodzica 1' (Agnieszka — urlop na warunkach macierzyńskiego), kto='ojciec' = Piotr.",
+    "Dziecko 2 lata => limit wieku (14 lat przy przysposobieniu) nie ogranicza wymiaru."
+   ],
+   "wejscie": {
+    "tytul": "przysposobienie",
+    "dataZdarzenia": "2027-01-10",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 5867.72,
+     "ojciec": 7334.65
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 32
+     },
+     {
+      "kto": "ojciec",
+      "tygodnie": 9
+     }
+    ]
+   },
+   "wynik_wzorcowy": {
+    "plan": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 41,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 58051.31,
+      "ojciec": 10781.94,
+      "razem": 68833.25
+     },
+     "okresy": [
+      {
+       "rodzaj": "na_warunkach_macierzynskiego",
+       "kto": "matka",
+       "od": "2027-01-10",
+       "do": "2027-05-29",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 27382.69,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-05-30",
+       "do": "2028-01-08",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 30668.62,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-01-09",
+       "do": "2028-03-11",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 10781.94,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "Urlop na warunkach urlopu macierzyńskiego 20 tyg. 100 %, wniosek do pracodawcy w 7 dni od przyjęcia dziecka, start najpóźniej 21 dni od przyjęcia.",
+    "Urlop rodzicielski 41 tyg. wspólnie; każde z rodziców ma 9 tyg. niezbywalne.",
+    "Urlop ojcowski dla Piotra: do 12 mies. od uprawomocnienia postanowienia, nie później niż do 14 r.ż."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P08",
+   "osoba": "Dominika Kamińska (zmiana pracy w ciąży)",
+   "testuje": [
+    "a",
+    "h",
+    "g"
+   ],
+   "zalozenia": [
+    "Przerwa w zatrudnieniu: luty 2027 (28 dni) — mieści się w 30 dniach (art. 4 ust. 2), więc ubezpieczenie liczy się jako ciągłe do karencji.",
+    "Okres 12 mies. przed wrześniem 2027: wrzesień 2026–sierpień 2027.",
+    "Poród w terminie 2027-09-25."
+   ],
+   "wymaga_decyzji": [
+    "Czy do podstawy wlicza się wynagrodzenie ze starej pracy (scenariusz A) czy tylko z nowej (scenariusz B)? Art. 36 ust. 4 mówi o 'wynagrodzeniu uzyskanym u płatnika składek w okresie nieprzerwanego ubezpieczenia' — niejednoznaczne. Rozstrzygnąć na przykładowych sprawach ZUS / u mentora."
+   ],
+   "wejscie": {
+    "scenariuszA": {
+     "tytul": "porod",
+     "dataZdarzenia": "2027-09-25",
+     "liczbaDzieci": 1,
+     "wariant": "zmienny_100_70",
+     "podstawy": {
+      "matka": 5240.16
+     },
+     "rodzicielski": [
+      {
+       "kto": "matka",
+       "tygodnie": 32
+      }
+     ]
+    },
+    "scenariuszB": {
+     "tytul": "porod",
+     "dataZdarzenia": "2027-09-25",
+     "liczbaDzieci": 1,
+     "wariant": "zmienny_100_70",
+     "podstawy": {
+      "matka": 5436.27
+     },
+     "rodzicielski": [
+      {
+       "kto": "matka",
+       "tygodnie": 32
+      }
+     ]
+    }
+   },
+   "podstawa": {
+    "A": 5240.16,
+    "B": 5436.27
+   },
+   "wynik_wzorcowy": {
+    "A_stara_i_nowa_praca": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 32,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 51842.65,
+      "ojciec": 0,
+      "razem": 51842.65
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-09-25",
+       "do": "2028-02-11",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 24454.08,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2028-02-12",
+       "do": "2028-09-22",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 27388.57,
+       "podwyzszone": false
+      }
+     ]
+    },
+    "B_tylko_nowa_praca": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 32,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 53782.83,
+      "ojciec": 0,
+      "razem": 53782.83
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-09-25",
+       "do": "2028-02-11",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 25369.26,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2028-02-12",
+       "do": "2028-09-22",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 28413.57,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "uprawnienia": {
+    "zasilekChorobowyWCiazy": {
+     "przysluguje": true,
+     "powod": "Spełniono okres wyczekiwania (30 dni)."
+    },
+    "zasilekMacierzynski": {
+     "przysluguje": true,
+     "powod": "Ubezpieczona w dniu porodu — okres wyczekiwania nie dotyczy zasiłku macierzyńskiego.",
+     "zawieszonyDoSplatyZadluzenia": false
+    },
+    "kwotaProguZadluzenia": 48.06,
+    "ktoWyplaca": "pracodawca",
+    "ostrzezenia": []
+   },
+   "oczekiwane_komunikaty": [
+    "Macierzyński przysługuje: ubezpieczona w dniu porodu (nowa praca od 2027-03-01).",
+    "Ostrzeżenie: gdyby przerwa była > 30 dni, karencja liczyłaby się od nowa (30 dni).",
+    "Płatnik: nowy pracodawca (ubezpieczona w dniu porodu u niego)."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P09",
+   "osoba": "Karolina Wójcik (ciąża zagrożona, zmienne wynagrodzenie)",
+   "testuje": [
+    "a",
+    "f",
+    "h"
+   ],
+   "zalozenia": [
+    "Prowizje w kolejnych miesiącach od marca 2026: 1500, 2500, 4000, 5500, 3000, 1500, 5000, 3500, 2000, 4500, 5500, 3000 (średnia 3458,33); stała część 4000.",
+    "Pierwsze zwolnienie z kodem B od ok. 14. tyg. ciąży (marzec 2027) => okres obliczeniowy mar 2026–lut 2027.",
+    "e-ZLA łącznie 120 dni, bez wcześniejszych dni chorobowego w 2027.",
+    "Podstawa macierzyńskiego przyjęta jak dla chorobowego (ciągłość art. 43) — UPROSZCZENIE; w realu może być liczona na nowo."
+   ],
+   "wymaga_decyzji": [
+    "Podstawa macierzyńskiego przy długim zwolnieniu: miesiące z L4 > połowy czasu są wyłączane (art. 38) — wymaga danych miesięcznych Z-3 z okresu sierpień 2026–lipiec 2027."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-08-18",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 6435.8
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 32
+     }
+    ]
+   },
+   "podstawa": {
+    "mies": 6435.8,
+    "srednia_brutto": 7458.33,
+    "kroki": [
+     "Średnie miesięczne wynagrodzenie brutto z 12 mies.: 7458.33 zł.",
+     "Odjęcie 13.71 % składek społecznych: 6435.8 zł."
+    ]
+   },
+   "wynik_wzorcowy": {
+    "chorobowe_w_ciazy_120_dni": {
+     "dniPracodawca": 33,
+     "dniZUS": 87,
+     "kwotaPracodawca": 7079.38,
+     "kwotaZUS": 18663.82,
+     "kwotaRazem": 25743.2,
+     "dzienna": 214.53,
+     "ostrzezenia": []
+    },
+    "macierzynski_plan": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 32,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 63671.51,
+      "ojciec": 0,
+      "razem": 63671.51
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-08-18",
+       "do": "2028-01-04",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 30033.73,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2028-01-05",
+       "do": "2028-08-15",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 33637.78,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "Chorobowe w ciąży (kod B) = 100 % podstawy; pierwsze 33 dni płaci pracodawca, kolejne ZUS; okres zasiłkowy 270 dni.",
+    "Pobyt w szpitalu 21 dni: w ciąży nadal 100 %."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P10",
+   "osoba": "Tomasz Krawczyk (ojciec po śmierci matki)",
+   "testuje": [
+    "b",
+    "d",
+    "h",
+    "i"
+   ],
+   "zalozenia": [
+    "Matka (ubezpieczona, 5000 zł brutto) zmarła 2027-06-07 — wykorzystała 5 dni macierzyńskiego; ojciec przejmuje pozostałe 135 dni od 2027-06-08.",
+    "Ojciec wykorzystuje cały urlop rodzicielski 41 tyg. (zniesienie limitu E-9 przy zgonie matki — ZAŁOŻENIE).",
+    "Urlop ojcowski pominięty (nakłada się na przejęty macierzyński)."
+   ],
+   "wymaga_decyzji": [
+    "Czy przy zgonie matki ojciec może wziąć całe 41 tyg. rodzicielskiego (a nie 32 + własne 9)? Zweryfikować w KP/ZUS."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-06-03",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "podstawy": {
+     "matka": 4314.5,
+     "ojciec": 4832.24
+    },
+    "macierzynskiOjciecPrzejmujeDni": 135,
+    "drugiRodzicNiedostepny": true,
+    "rodzicielski": [
+     {
+      "kto": "ojciec",
+      "tygodnie": 41
+     }
+    ]
+   },
+   "wynik_wzorcowy": {
+    "ojciec_razem": 54104.98,
+    "plan": {
+     "bledy": [],
+     "ostrzezenia": [
+      "Drugi rodzic niedostępny (zgon/porzucenie): przyjęto, że jedyny rodzic może wykorzystać całą pulę urlopu rodzicielskiego — potwierdź w ZUS/PIP."
+     ],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 41,
+      "rodzicielskiWykorzystaneTyg": 41,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 82
+     },
+     "sumy": {
+      "matka": 719.08,
+      "ojciec": 54104.98,
+      "razem": 54824.06
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-06-03",
+       "do": "2027-06-07",
+       "dni": 5,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 719.08,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "macierzynski",
+       "kto": "ojciec",
+       "od": "2027-06-08",
+       "do": "2027-10-20",
+       "dni": 135,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 21745.08,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2027-10-21",
+       "do": "2027-12-22",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 7103.39,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "ojciec",
+       "od": "2027-12-23",
+       "do": "2028-08-02",
+       "dni": 224,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 25256.51,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "Ojciec ma prawo do części urlopu macierzyńskiego przypadającej po dniu zgonu matki (art. 180 § 12 KP; art. 29 ust. 7 ustawy).",
+    "Dokumenty: akt zgonu matki, odpis skrócony aktu urodzenia dziecka; wniosek do pracodawcy min. 14 dni przed startem przejętej części (w sytuacji nagłej — niezwłocznie).",
+    "Organizacje wsparcia po stracie bliskiej osoby."
+   ]
+  },
+  {
+   "status": "wyliczone silnikiem referencyjnym (patrz testy.ts)",
+   "id": "P11",
+   "osoba": "(dodatkowa) Rodzice dziecka z zaświadczeniem 'Za życiem'",
+   "testuje": [
+    "b",
+    "d"
+   ],
+   "zalozenia": [
+    "Oboje 6000 zł brutto; matka 56 tyg. + ojciec 9 tyg. = 65 tyg."
+   ],
+   "wejscie": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-02-10",
+    "liczbaDzieci": 1,
+    "zaswiadczenieZaZyciem": true,
+    "podstawy": {
+     "matka": 5177.4,
+     "ojciec": 5177.4
+    },
+    "rodzicielski": [
+     {
+      "kto": "matka",
+      "tygodnie": 56
+     },
+     {
+      "kto": "ojciec",
+      "tygodnie": 9
+     }
+    ]
+   },
+   "wynik_wzorcowy": {
+    "wariant_100_70": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 65,
+      "rodzicielskiWykorzystaneTyg": 65,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 130
+     },
+     "sumy": {
+      "matka": 71517.15,
+      "ojciec": 7610.78,
+      "razem": 79127.93
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-02-10",
+       "do": "2027-06-29",
+       "dni": 140,
+       "procent": 100,
+       "wspolczynnikZasilku": 1,
+       "kwota": 24161.2,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-06-30",
+       "do": "2028-07-25",
+       "dni": 392,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 47355.95,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-07-26",
+       "do": "2028-09-26",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 7610.78,
+       "podwyzszone": false
+      }
+     ]
+    },
+    "wariant_81_5": {
+     "bledy": [],
+     "ostrzezenia": [],
+     "wymiary": {
+      "macierzynskiTyg": 20,
+      "rodzicielskiTyg": 65,
+      "rodzicielskiWykorzystaneTyg": 65,
+      "rodzicielskiMaxPrzyLaczeniuTyg": 130
+     },
+     "sumy": {
+      "matka": 74827.24,
+      "ojciec": 7610.78,
+      "razem": 82438.02
+     },
+     "okresy": [
+      {
+       "rodzaj": "macierzynski",
+       "kto": "matka",
+       "od": "2027-02-10",
+       "do": "2027-06-29",
+       "dni": 140,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 1,
+       "kwota": 19691.38,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski",
+       "kto": "matka",
+       "od": "2027-06-30",
+       "do": "2028-07-25",
+       "dni": 392,
+       "procent": 81.5,
+       "wspolczynnikZasilku": 1,
+       "kwota": 55135.86,
+       "podwyzszone": false
+      },
+      {
+       "rodzaj": "rodzicielski_9tyg_drugiego_rodzica",
+       "kto": "ojciec",
+       "od": "2028-07-26",
+       "do": "2028-09-26",
+       "dni": 63,
+       "procent": 70,
+       "wspolczynnikZasilku": 1,
+       "kwota": 7610.78,
+       "podwyzszone": false
+      }
+     ]
+    }
+   },
+   "oczekiwane_komunikaty": [
+    "Rodzicielski 65 tyg. zamiast 41 (Za życiem); przy łączeniu z pracą do 130 tyg."
+   ]
+  }
+ ]
+}

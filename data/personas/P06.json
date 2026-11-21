@@ -1,0 +1,23 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Magdalena Dąbrowska",
+ "pesel": "00000000006",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2020-01-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "BIURO RACHUNKOWE TESTOWE",
+    "nip": "0000000006",
+    "liczbaUbezpieczonych": 12
+   }
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-09-12"
+ }
+}

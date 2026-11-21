@@ -1,0 +1,28 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Marek Nowak",
+ "pesel": "00000000002",
+ "ubezpieczenie": [
+  {
+   "tytul": "dzialalnosc",
+   "od": "2021-01-01",
+   "do": null,
+   "chorobowe": "dobrowolne",
+   "dobrowolneOd": "2024-01-01",
+   "zadeklarowanaPodstawa": 10000
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 1200,
+  "naDzien": "2027-04-02",
+  "skladniki": [
+   {
+    "rodzaj": "ubezpieczenie_spoleczne",
+    "okres": "2027-02",
+    "kwota": 1200
+   }
+  ],
+  "progBlokady": 48.06
+ }
+}

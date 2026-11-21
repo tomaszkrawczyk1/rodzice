@@ -1,0 +1,23 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Ewa Lewandowska",
+ "pesel": "00000000005",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2018-09-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "SZKOŁA PODSTAWOWA TESTOWA",
+    "nip": "0000000005",
+    "liczbaUbezpieczonych": 40
+   }
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-05-28"
+ }
+}

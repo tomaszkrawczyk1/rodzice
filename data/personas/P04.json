@@ -1,0 +1,23 @@
+{
+ "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
+ "osoba": "Joanna Zielińska",
+ "pesel": "00000000004",
+ "ubezpieczenie": [
+  {
+   "tytul": "umowa_o_prace",
+   "od": "2019-09-01",
+   "do": null,
+   "chorobowe": "obowiazkowe",
+   "platnik": {
+    "nazwa": "FIRMA TESTOWA 2 SP. Z O.O.",
+    "nip": "0000000004",
+    "liczbaUbezpieczonych": 150
+   }
+  }
+ ],
+ "ezla": [],
+ "zadluzenie": {
+  "kwota": 0,
+  "naDzien": "2027-05-05"
+ }
+}
