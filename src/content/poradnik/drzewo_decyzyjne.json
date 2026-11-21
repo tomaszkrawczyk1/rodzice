@@ -3,7 +3,7 @@
   "start": "start",
   "wezly": {
     "start": {
-      "typ": "pytanie", "tekst": "W jakiej jesteś sytuacji?", "podpowiedz": "Wybierz to, co jest najbliższe. Zawsze możesz wrócić.",
+      "typ": "pytanie", "tekst": "W jakiej jesteś sytuacji?", "podpowiedz": "Wybierz to, co jest najbliższe Twojej sytuacji. W każdej chwili możesz wrócić i zmienić wybór.",
       "opcje": [
         { "etykieta": "Planuję dziecko", "nastepny": "plan_tytul" },
         { "etykieta": "Jestem w ciąży", "nastepny": "ciaza_cel" },
@@ -31,8 +31,8 @@
       "opcje": [
         { "etykieta": "Zwolnienie lekarskie w ciąży – ile dostanę", "nastepny": "ciaza_zwolnienie_tytul" },
         { "etykieta": "Zasiłek się kończy, a nadal nie mogę pracować", "nastepny": "wynik_rehab" },
-        { "etykieta": "Straciłam pracę w ciąży", "nastepny": "wynik_strata_pracy" },
-        { "etykieta": "Boję się zwolnienia lub kończy się umowa", "nastepny": "ciaza_ochrona" },
+        { "etykieta": "Straciłam pracę w trakcie ciąży", "nastepny": "wynik_strata_pracy" },
+        { "etykieta": "Obawiam się zwolnienia lub kończy mi się umowa", "nastepny": "ciaza_ochrona" },
         { "etykieta": "Zmieniłam pracę lub miałam przerwę w ubezpieczeniu", "nastepny": "wynik_zmiana_pracy" },
         { "etykieta": "Chcę zaplanować urlop po porodzie", "nastepny": "po_cel" }
       ]
@@ -96,7 +96,7 @@
     "wynik_wczesniak": { "typ": "wynik", "tytul": "Wcześniak lub dziecko w szpitalu – uzupełniający urlop", "pytania": ["F15", "F26"], "druki": ["ZAM"], "kalkulator": { "tryb": "wczesniak" } },
     "wynik_terminy": { "typ": "wynik", "tytul": "Terminy, których nie można przegapić", "pytania": ["F19", "F09"], "druki": ["ZAM"], "kalkulator": { "tryb": "terminy" } },
     "wynik_brak_zasilku": { "typ": "wynik", "tytul": "Brak prawa do zasiłku macierzyńskiego", "pytania": ["F21", "F20"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" } },
-    "wynik_druga_ciaza": { "typ": "wynik", "status": "luka", "tytul": "Kolejna ciąża po poprzednim urlopie", "pytania": ["F28", "F07", "F22"], "druki": [], "komunikat_luki": "Tej sytuacji nie opisują nasze źródła. Pokazujemy zasady powiązane i odsyłamy do ZUS – nie podajemy wyniku." },
+    "wynik_druga_ciaza": { "typ": "wynik", "status": "luka", "tytul": "Kolejna ciąża po poprzednim urlopie", "pytania": ["F28", "F07", "F22"], "druki": [], "komunikat_luki": "Ta sytuacja wymaga indywidualnej oceny w ZUS ze względu na zbieg uprawnień. Poniżej przedstawiamy powiązane zasady, ale ostateczną decyzję skonsultuj z ZUS." },
 
     "adopcja_typ": {
       "typ": "pytanie", "tekst": "Kim jesteście wobec dziecka?",
@@ -107,11 +107,11 @@
       ]
     },
     "wynik_adopcja": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Adopcja i rodzina zastępcza niezawodowa", "pytania": ["F23", "F09", "F18"], "druki": ["ZAM", "ZAS-26", "Z-3", "Z-3a"], "kalkulator": { "tryb": "adopcja" } },
-    "wynik_rz_zawodowa": { "typ": "wynik", "status": "luka", "tytul": "Zawodowa rodzina zastępcza", "pytania": ["F23"], "druki": [], "komunikat_luki": "Baza zawiera tylko wyłączenie: urlop i zasiłek na warunkach macierzyńskiego dotyczą rodziny zastępczej z wyjątkiem zawodowej. Dalsze informacje – w ZUS." },
+    "wynik_rz_zawodowa": { "typ": "wynik", "status": "luka", "tytul": "Zawodowa rodzina zastępcza", "pytania": ["F23"], "druki": [], "komunikat_luki": "Zasiłek i urlop na warunkach macierzyńskiego nie przysługują zawodowym rodzinom zastępczym. Szczegółowe zasady i wsparcie wyjaśni ZUS lub ośrodek pomocy społecznej." },
 
     "trudna_cel": {
-      "typ": "pytanie", "tekst": "Napisz delikatnie, co się wydarzyło – wybierz to, co pasuje.",
-      "podpowiedz": "Nie musisz niczego uzasadniać. Pokażemy tylko to, co Ci przysługuje.",
+      "typ": "pytanie", "tekst": "Wybierz sytuację, która Cię dotyczy",
+      "podpowiedz": "Nie musisz niczego uzasadniać. Pokażemy tylko to, co może Ci pomóc.",
       "opcje": [
         { "etykieta": "Dziecko urodziło się martwe albo zmarło", "nastepny": "wynik_martwe" },
         { "etykieta": "Mama dziecka zmarła, porzuciła dziecko lub nie może się nim zająć", "nastepny": "wynik_smierc_matki" },
@@ -134,7 +134,7 @@
       ]
     },
     "dok_platnik": {
-      "typ": "pytanie", "tekst": "Jaki masz tytuł ubezpieczenia?",
+      "typ": "pytanie", "tekst": "Jaka jest Twoja forma zatrudnienia lub ubezpieczenia?",
       "opcje": [
         { "etykieta": "Umowa o pracę", "nastepny": "wynik_platnik" },
         { "etykieta": "Umowa zlecenia (lub inny niż umowa o pracę)", "nastepny": "wynik_platnik" },
