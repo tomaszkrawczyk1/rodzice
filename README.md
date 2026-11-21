@@ -1,73 +1,47 @@
-# Przewodnik Przyszłego Rodzica
+# Przewodnik Przyszłego Rodzica · prototyp
 
-Aplikacja webowa z zadania **ZUS – „Zasiłkowy Przewodnik Przyszłego Rodzica”** (HackNation 2026).
-Demo: **https://zxcvbnms.dev**
+Aplikacja webowa przygotowana na HackNation 2026 jako odpowiedź na wyzwanie ZUS „Zasiłkowy Przewodnik Przyszłego Rodzica”. Pomaga sprawdzić uprawnienia, oszacować zasiłek i przygotować dokumenty. Wyliczenia są orientacyjne. Logowanie mObywatelem oraz połączenia z ZUS, PUE/eZUS i USC są symulowane z użyciem fikcyjnych danych.
 
-Prowadzi przyszłych rodziców przez zasiłki i urlopy związane z ciążą i rodzicielstwem: co przysługuje, ile, na jak długo,
-gdzie złożyć dokumenty i czego uważać. Silnik obliczeń to deterministyczny kod (bez AI); AI służy wyłącznie do odczytu skanów wniosków.
+[Otwórz demo](https://zxcvbnms.dev) · [Opis zgłoszenia](docs/ZGLOSZENIE.md) · [Macierz zgodności](docs/ZGODNOSC_Z_WYMAGANIAMI.md) · [Lista braków](docs/BRAKI.md)
 
-![Kalkulator](docs/screenshots/kalkulator.jpg)
+## Jak korzystać
 
-## Co jest w środku (wymagania zadania a–j)
+Na stronie głównej „Co chcesz załatwić?” wybierz etap: planowanie dziecka, ciążę albo czas po urodzeniu. Zobaczysz trzy pasujące sprawy. Możesz też opisać sprawę własnymi słowami, a wyszukiwarka podpowie ścieżki i pytania z poradnika. Po zalogowaniu strona pokazuje dane profilu testowego i najbliższy termin, jeśli taki wynika ze scenariusza.
 
-| Wymóg | Gdzie |
-|---|---|
-| a) świadczenia w ciąży (chorobowe, rehabilitacyjne, w wysokości macierzyńskiego, brak uprawnień) | `/ciaza` |
-| b–e, j) kalkulator: matka, ojciec, oboje, łączenie z pracą, adopcja i rodzina zastępcza | `/kalkulator` (5 trybów, oś czasu, porównanie wariantów 100/70 vs 81,5%) |
-| f) indywidualna podstawa wymiaru z dokumentów | `/wgraj` (parser AI → walidacja → silnik) |
-| g) dokumenty, terminy, kto wypłaca (płatnik >20 os. vs ZUS) | `/dokumenty`, `/wnioski` |
-| h) ryzyka, ochrona przed zwolnieniem, trudne sytuacje | `/ryzyka`, `/trudne` |
-| i) organizacje wsparcia (wyłącznie charytatywne) | `/trudne` |
-| Symulacje: mObywatel, dane ZUS, e-ZLA, zadłużenie składkowe, PUE/eZUS, odpis aktu, wnioski | `/logowanie`, `/pue`, `/odpis`, `/api/zus/*`, `/api/wniosek/*` |
-| Panel admina (zmiana parametrów bez programisty) | `/admin` → edytuje `data/parametry.json` |
-| Responsywność (RWD) | mobile-first CSS, menu na małych ekranach |
+- **Sprawy** (`/sprawy`) to 10 ścieżek: uprawnienia, zwolnienie w ciąży, wniosek po porodzie, urlop u pracodawcy, podział urlopu, praca na urlopie, adopcja lub rodzina zastępcza, trudna sytuacja, terminy i odpis aktu urodzenia. W ścieżkach z formularzem odpowiadasz na jedno pytanie na ekranie. Wynik może zawierać listę kroków, wskazówki do druku lub tekst wniosku do skopiowania.
+- **Kalkulator** (`/kalkulator`) pokazuje okresy, kwoty i oś czasu. Ma tryby „Matka”, „Oboje rodzice”, „Praca + urlop rodzicielski”, „Adopcja / rodzina zastępcza” i „Moje dane / przykładowa sprawa”. Można wpisać zarobki lub gotową podstawę, wczytać fikcyjny scenariusz albo przejść z odczytanego skanu.
+- **Poradnik, druki i wnioski** (`/poradnik`, `/druki`, `/dokumenty`, `/wnioski`) pomagają ustalić, jaki dokument przygotować i do kogo go skierować. Kreator pokazuje podgląd i potwierdzenie symulowanego wysłania. Szczegóły świadczeń w ciąży są pod `/ciaza`, a ryzyka i wsparcie w trudnych sytuacjach pod `/ryzyka` i `/trudne`.
+- **Wgraj wniosek** (`/wgraj`) pokazuje pola odczytane ze skanu. Jeśli w dokumencie odczytano dane potrzebne do obliczenia podstawy, można przenieść wynik do kalkulatora. Do demonstracji służą syntetyczne PDF-y dostępne na stronie.
 
-## Architektura
+Interfejs korzysta z palety inspirowanej serwisem ZUS. Na telefonie nawigacja rozwija się z przycisku „Menu”.
 
-```
-Next.js 16 (App Router, TypeScript)  ──  /src/app/*          strony (React)
-                                      └─  /src/app/api/*      REST API (route handlers, TypeScript)
-src/engine/kalkulator.ts   czysty silnik obliczeń (zero zależności), 76 testów (test/testy.ts)
-data/parametry.json        WSZYSTKIE liczby z przepisów (stawki, wymiary, limity, terminy) – edytowane w /admin
-data/personas, scenariusze dane testowe (fikcyjne) i symulowane „API ZUS”
-src/lib/parser.ts          odczyt skanów: pdftoppm → klasyfikacja stron (AI) → ekstrakcja pól (AI) → walidacja (kod)
-proxy/llm-proxy.mjs        proxy do DeepInfra z limitem 100 zapytań / 1 mln tokenów
-```
-
-**Zasada:** model AI nigdy nie liczy kwot. Odczytuje pola z dokumentu do schematu JSON, a podstawę wymiaru i zasiłek liczy `kalkulator.ts`.
-
-## Uruchomienie
+## Uruchomienie i testy
 
 ```bash
-npm install
-npm test            # 76 testów silnika
-npm run dev         # http://localhost:3100
+npm ci
+npm run dev
 ```
-Parser wymaga `pdftoppm` (pakiet `poppler-utils`). Zmienne środowiskowe: `.env.example`.
 
-## Wdrożenie
+Aplikacja działa domyślnie na `http://localhost:3100`. Ustawienia środowiska są w [`.env.example`](.env.example). Parser PDF wymaga `pdftoppm` z pakietu `poppler-utils`.
 
-`scripts/deploy.sh` buduje `standalone`, wysyła na serwer (SSH `srv`) i restartuje usługi systemd z `deploy/`.
-Caddy kieruje `/llm/*` do proxy, resztę do aplikacji. Parametry zmienione w panelu admina nie są nadpisywane przy kolejnych wdrożeniach.
+```bash
+npm test
+npm run weryfikuj
+npm run build
+npx tsc --noEmit
+```
 
-## Proxy LLM i limity
+## Architektura i wdrożenie
 
-Model: **DeepSeek V4.1 Flash** (DeepInfra). Aplikacja zawsze łączy się przez własne proxy (`proxy/llm-proxy.mjs`),
-a prawdziwy klucz DeepInfra jest wyłącznie w środowisku serwera. W repozytorium jest tylko **publiczny** token proxy.
-Limity są twarde i łączne: **100 zapytań i 1 000 000 tokenów** (plus 20 zapytań/min na IP, allowlista modelu, sufit `max_tokens`).
-Stan: `GET /llm/v1/usage`. Reset: usunięcie pliku stanu na serwerze.
+- Next.js 16 i TypeScript. Strony i REST API są w [`src/app/`](src/app/).
+- [Silnik obliczeń](src/engine/kalkulator.ts) korzysta z [parametrów](data/parametry.json). Panel `/admin` pozwala zmieniać zapisane parametry, takie jak stawki, wymiary i terminy. [Baza reguł](data/baza_regul.json) dokumentuje reguły.
+- GitHub Actions uruchamia testy, weryfikację poradnika i kompilację. Osobny [webhook](deploy/hook.mjs) reaguje na push do `main`. [Skrypt serwerowy](deploy/deploy-server.sh) pobiera kod, sprawdza go, buduje wersję standalone i restartuje usługi systemd. Zachowuje plik parametrów edytowany w panelu. Caddy kieruje ruch do aplikacji, webhooka i proxy LLM.
+- [Proxy LLM](proxy/llm-proxy.mjs) ma domyślny limit 100 zapytań i 1 000 000 tokenów łącznie. Klucz DeepInfra jest ustawiany w środowisku proxy.
 
-## Dane i prawa
+## Oświadczenie o użyciu AI
 
-Dokumenty i przykładowe sprawy ZUS są przeznaczone wyłącznie na użytek HackNation i **nie są częścią tego repozytorium**.
-Dokumenty demo (`public/demo`) są syntetyczne, z fikcyjnymi danymi (generator: `scripts/generuj_demo.py`).
-Wyliczenia są orientacyjne – przed zaliczką na podatek; nie zastępują decyzji ZUS.
+W działającej aplikacji DeepSeek V4.1 Flash służy wyłącznie do klasyfikowania stron i odczytywania pól ze skanów w module „Wgraj wniosek”. Aplikacja wywołuje model w DeepInfra przez własne proxy. Dane z odczytu sprawdza kod, a kwoty i okresy wylicza deterministyczny silnik. Kod i treści projektu tworzono z pomocą modeli, w tym Claude, GPT, Grok i Gemini.
 
-## Strona główna i ścieżki spraw (UX)
+Jeden rzeczywisty skan wysłano do DeepInfra przed poznaniem zasady zakazującej przekazywania dokumentów ZUS do zewnętrznych usług.
 
-Główna zasada: **jedna sprawa = jedna ścieżka, jedno pytanie na ekran, na końcu ściąga „co wpisać w którym polu”.**
-
-- `/` – „Co chcesz załatwić?”: moment życia (3 wybory) → 3 najczęstsze sprawy → pole „opisz własnymi słowami” (wyszukiwanie lokalne w poradniku, bez AI i bez zmyślania). Po zalogowaniu (symulowany mObywatel) na górze pojawia się najpilniejsza rzecz z terminem.
-- `/sprawy` – 10 spraw; `/sprawa/[id]` – ścieżka: sprawdź dane z ZUS → pytania → wynik w zdaniu → „Co teraz zrobić” → ściąga do druku / gotowy tekst wniosku → „Co dalej?”.
-- Definicje spraw (pytania, obliczenia, ściągi) są w `src/lib/sprawy.ts`; liczby zawsze pochodzą z silnika (`src/engine/kalkulator.ts`) i `data/parametry.json`.
-- Makiety porównujące podejścia (10 kafelków, 2 kafelki, czat, wyszukiwarka, rekomendacja): `docs/ux/index.html`.
+Do prób używaj plików syntetycznych. Przykłady z [`public/demo/`](public/demo/) wygenerowano [skryptem](scripts/generuj_demo.py) z fikcyjnymi danymi.
