@@ -5,6 +5,11 @@ import { SPRAWY, sprawa } from "@/lib/sprawy";
 
 export const generateStaticParams = () => SPRAWY.map((s) => ({ id: s.id }));
 
+// Lista spraw jest znana w czasie budowania, więc każdy inny adres /sprawa/… dostaje 404 już na poziomie routera,
+// z gotowego (wyrenderowanego na serwerze) HTML-a strony 404. Bez tego nieznane id było renderowane na żądanie
+// i treść 404 dochodziła dopiero po stronie klienta. notFound() niżej zostaje jako zabezpieczenie.
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return { title: `${sprawa(id)?.tytul ?? "Sprawa"} – Przewodnik Przyszłego Rodzica` };

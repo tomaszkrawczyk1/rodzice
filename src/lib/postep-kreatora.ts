@@ -25,3 +25,11 @@ export function odczytajPostep(surowy: string | null, start: string, drzewo: Drz
     return [];
   }
 }
+
+/** Kroki w adresie: indeksy wybranych opcji rozdzielone kropką, np. `?krok=1.1.2`. Pusty zapis = początek. */
+export const kodujKroki = (kroki: readonly number[]) => kroki.join(".");
+
+export function odczytajKrokiZAdresu(surowy: string | null, start: string, drzewo: Drzewo) {
+  if (!surowy || !/^\d{1,3}(\.\d{1,3})*$/.test(surowy)) return [];
+  return rozwinPostep(surowy.split(".").map(Number), start, drzewo).zapisane;
+}
