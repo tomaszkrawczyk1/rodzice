@@ -92,7 +92,7 @@ export default function Header() {
           </Link>
           <div className="zus-product brand-text">
             <b>Przewodnik Przyszłego Rodzica</b>
-            <span>Prototyp · zasiłki i urlopy dla rodziców</span>
+            <span>Prototyp: zasiłki i urlopy dla rodziców</span>
           </div>
           <button type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Zamknij" : "Menu"}</button>
           <div className="zus-header__tools">

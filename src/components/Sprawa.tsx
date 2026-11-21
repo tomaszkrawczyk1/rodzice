@@ -115,14 +115,14 @@ function KrokiSprawy({ s, c }: { s: Sprawa; c: Ctx }) {
   }
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto" }}>
+    <div className="narrow">
       <p className="small no-print"><Link href="/sprawy">← Wróć do listy spraw</Link></p>
       <h1>{s.tytul}</h1>
       <div className="prog" role="progressbar" aria-valuenow={postep} aria-valuemin={0} aria-valuemax={100} aria-label="Postęp wypełniania sprawy"><i style={{ width: `${postep}%` }} /></div>
 
       {faza === "dane" && (
         <div className="card">
-          <span className="lab">Krok 1 · Sprawdź swoje dane</span>
+          <span className="lab">Krok 1: sprawdź swoje dane</span>
           <p className="muted small mt">Dane pobrane z ZUS (profil testowy: {c.osoba}). Sprawdź, czy wszystko się zgadza. Jeśli zauważysz błąd, możesz go teraz poprawić.</p>
           <dl className="kv" style={kolumnyDanych}>{wstepne.map((x) => <div key={x.id} style={{ display: "contents" }}><dt>{x.etykietaDanych ?? tekstPytania(x, odp)}</dt><dd>{etykietaOdp(x, odp[x.id])}</dd></div>)}</dl>
           <div className="row mt"><button className="btn btn-primary" onClick={() => rozpocznij(Object.fromEntries(wstepne.map((x) => [x.id, odp[x.id]])))}>Potwierdzam dane</button><button className="btn btn-secondary" onClick={() => rozpocznij({})}>Chcę poprawić dane</button></div>
@@ -217,10 +217,6 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
         {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{x}</Alert>)}
       </div>
 
-      {w.tabela && <div className="card mt"><div className="tbl-wrap"><table className="tbl"><thead><tr>{w.tabela.kolumny.map((k) => <th key={k}>{k}</th>)}</tr></thead><tbody>{w.tabela.wiersze.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>)}</tbody></table></div>{w.tabela.uwaga && <p className="small muted mt">{w.tabela.uwaga}</p>}</div>}
-
-      {w.info?.map((x) => <div key={x.tytul} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{x.tresc}</p></div>)}
-
       {w.zrob.length > 0 && (
         <div className="card mt"><h2>Co teraz zrobić krok po kroku</h2>
           <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{z.tekst}{z.uwaga && <div className="small muted">{z.uwaga}</div>}</li>)}</ol>
@@ -240,6 +236,10 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
           <div className="row no-print"><button className="btn btn-primary btn-sm" onClick={() => kopiuj("tekst", w.tekstDoKopii!.tresc)}>{skop === "tekst" ? "Skopiowano do schowka ✓" : "Skopiuj tekst wniosku"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Wydrukuj wniosek</button></div></div>
       )}
 
+      {w.tabela && <div className="card mt"><div className="tbl-wrap"><table className="tbl"><thead><tr>{w.tabela.kolumny.map((k) => <th key={k}>{k}</th>)}</tr></thead><tbody>{w.tabela.wiersze.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>)}</tbody></table></div>{w.tabela.uwaga && <p className="small muted mt">{w.tabela.uwaga}</p>}</div>}
+
+      {w.info?.map((x) => <div key={x.tytul} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{x.tresc}</p></div>)}
+
       {bladKopii && <p role="alert" className="alert err">Kopiowanie do schowka się nie udało. Zaznacz tekst myszką i skopiuj go ręcznie.</p>}
 
       {(druki.length > 0 || (w.linki && w.linki.length > 0)) && (
@@ -248,7 +248,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
 
       {w.jakLiczono && <Kroki kroki={w.jakLiczono} tytul="Jak to policzyliśmy?" />}
 
-      {powiazane.length > 0 && <div className="card mt no-print"><h3>Przydatne kolejne kroki</h3><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className={`ic ic-${s!.id}`} aria-hidden="true">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
+      {powiazane.length > 0 && <div className="mt no-print"><h2 className="section-h">Przydatne kolejne kroki</h2><div className="grid g2">{powiazane.map((s) => <Link key={s!.id} href={`/sprawa/${s!.id}`} className="tile"><span className={`ic ic-${s!.id}`} aria-hidden="true">{s!.ikona}</span><b>{s!.tytul}</b><span>{s!.krotko}</span></Link>)}</div></div>}
 
       {bezPytan && <div className="row mt no-print"><Link href="/sprawy" className="btn btn-ghost">← Wróć do listy spraw</Link></div>}
       <p className="small muted mt">Wyliczenia mają charakter pomocniczy i opierają się na aktualnych przepisach. W wersji testowej dane mają charakter przykładowy.</p>

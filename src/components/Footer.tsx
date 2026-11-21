@@ -21,8 +21,8 @@ export default function Footer() {
           </ul>
         </div>
         <div className="footer__side">
-          <a className="to-top" href="#header"><span aria-hidden="true">↑ </span>Do góry</a>
           <p className="footer__note">Przewodnik Przyszłego Rodzica to prototyp. Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
+          <a className="to-top" href="#header"><span aria-hidden="true">↑ </span>Do góry</a>
         </div>
       </div>
     </footer>
