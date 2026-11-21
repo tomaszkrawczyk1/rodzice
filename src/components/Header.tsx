@@ -9,32 +9,108 @@ const NAV = [
   ["/", "Start"], ["/sprawy", "Sprawy"], ["/poradnik", "Poradnik"], ["/kalkulator", "Kalkulator"], ["/druki", "Druki"], ["/wnioski", "Wnioski"], ["/wgraj", "Wgraj wniosek"], ["/pue", "PUE"],
 ] as const;
 
+const NAZWY: Record<string, string> = {
+  "/sprawy": "Sprawy",
+  "/poradnik": "Poradnik",
+  "/kalkulator": "Kalkulator",
+  "/druki": "Druki",
+  "/wnioski": "Wnioski",
+  "/wgraj": "Wgraj wniosek",
+  "/pue": "PUE",
+  "/logowanie": "Zaloguj",
+  "/kreator": "Kreator",
+  "/ryzyka": "Ryzyka",
+  "/trudne": "Trudne sytuacje",
+  "/dokumenty": "Dokumenty i terminy",
+  "/o-projekcie": "O projekcie i użyciu AI",
+  "/odpis": "Odpis aktu urodzenia",
+  "/admin": "Panel administratora",
+  "/ciaza": "Co mi przysługuje w ciąży",
+};
+
+function aktywny(path: string, href: string) {
+  if (href === "/") return path === "/";
+  if (href === "/sprawy") return path === "/sprawy" || path.startsWith("/sprawa/");
+  return path === href || path.startsWith(href + "/");
+}
+
+function okruszki(path: string): { href: string; label: string; biezacy?: boolean }[] {
+  if (path === "/") return [];
+  if (path.startsWith("/sprawa/")) {
+    return [
+      { href: "/sprawy", label: "Sprawy" },
+      { href: path, label: "Sprawa", biezacy: true },
+    ];
+  }
+  const bazowy = "/" + path.split("/").filter(Boolean)[0];
+  const label = NAZWY[path] || NAZWY[bazowy];
+  if (!label) return [];
+  return [{ href: path, label, biezacy: true }];
+}
+
 export default function Header() {
-  const path = usePathname();
+  const path = usePathname() || "/";
   const [open, setOpen] = useState(false);
   const { sesja, wyloguj } = useSesja();
+  const crumbs = okruszki(path);
+  const zamknij = () => setOpen(false);
+
+  const logowanie = sesja ? (
+    <button type="button" className="pue-login" onClick={() => { wyloguj(); zamknij(); }}>Wyloguj ({sesja.osoba.split(" ")[0]})</button>
+  ) : (
+    <Link href="/logowanie" className="pue-login login" onClick={zamknij}>Zaloguj</Link>
+  );
+
   return (
     <>
       <div className="sim-banner">Prototyp HackNation 2026 · wszystkie integracje (mObywatel, ZUS, PUE, USC) są <b>symulowane</b>, dane są fikcyjne</div>
-      <header className="header">
-        <div className="container">
-          <Link href="/" className="brand" onClick={() => setOpen(false)}>
-            <span className="brand-mark" aria-hidden />
-            <span className="brand-text"><b>Przewodnik Przyszłego Rodzica</b><span>Prototyp · zasiłki i urlopy dla rodziców</span></span>
+      <header id="header" className="header zus-header">
+        <div className="zus-header__bar">
+          <Link href="/" className="zus-logo brand" title="Zakład Ubezpieczeń Społecznych" onClick={zamknij}>
+            <img className="zus-logo__img" src="/logo_zus_darker_with_text.svg" alt="Strona główna" width={250} height={56} />
           </Link>
-          <button className="menu-btn" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Zamknij" : "Menu"}</button>
-          <nav id="nav" className={"nav" + (open ? " open" : "")} aria-label="Główna nawigacja">
-            {NAV.map(([h, t]) => (
-              <Link key={h} href={h} aria-current={path === h ? "page" : undefined} className={path === h ? "active" : ""} onClick={() => setOpen(false)}>{t}</Link>
-            ))}
-            {sesja ? (
-              <a href="#" onClick={(e) => { e.preventDefault(); wyloguj(); setOpen(false); }} title="Wyloguj">Wyloguj ({sesja.osoba.split(" ")[0]})</a>
-            ) : (
-              <Link href="/logowanie" className="login" onClick={() => setOpen(false)}>Zaloguj</Link>
-            )}
+          <div className="zus-product brand-text">
+            <b>Przewodnik Przyszłego Rodzica</b>
+            <span>Prototyp · zasiłki i urlopy dla rodziców</span>
+          </div>
+          <button type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" onClick={() => setOpen(!open)}>{open ? "Zamknij" : "Menu"}</button>
+          <div className="zus-header__tools">
+            <Link href="/#zapytaj" className="zus-search" onClick={zamknij}>
+              <img src="/Ikona_Lupa.svg" alt="" width={28} height={28} />
+              <span>Szukaj</span>
+            </Link>
             <Dostepnosc />
-          </nav>
+            {logowanie}
+          </div>
         </div>
+        <nav id="nav" className={"nav zus-nav" + (open ? " open" : "")} aria-label="Główna nawigacja">
+          <ul className="zus-nav__list">
+            {NAV.map(([h, t]) => {
+              const on = aktywny(path, h);
+              return (
+                <li key={h} className={on ? "selected" : undefined}>
+                  <Link href={h} aria-current={on ? "page" : undefined} className={on ? "active" : ""} onClick={zamknij}>{t}</Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+        {crumbs.length > 0 && (
+          <nav className="crumbs" aria-label="Okruszki">
+            <div className="container crumbs__row">
+              <Link href="/" className="crumbs__home" aria-label="Start" onClick={zamknij}>
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#007834" d="M12 3.2 3 11h2.2v9h5.3v-6.2h3v6.2H19V11H21.2L12 3.2z" /></svg>
+              </Link>
+              <ol className="crumbs__list">
+                {crumbs.map((c) => (
+                  <li key={c.href} className={c.biezacy ? "last" : undefined}>
+                    {c.biezacy ? <span aria-current="page">{c.label}</span> : <Link href={c.href} onClick={zamknij}>{c.label}</Link>}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </nav>
+        )}
       </header>
     </>
   );
