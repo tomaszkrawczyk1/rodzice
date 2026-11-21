@@ -58,8 +58,9 @@ export default function Wgraj() {
 
   function wybranoPlik(f: File | undefined) {
     if (!f) return;
-    if (!/\.(pdf|png|jpe?g)$/i.test(f.name)) { setErr("Obsługiwane formaty: PDF, JPG i PNG."); return; }
-    if (f.size > MAKS_MB * 1024 * 1024) { setErr(`Plik jest za duży (maksymalnie ${MAKS_MB} MB).`); return; }
+    const odrzuc = (m: string) => { setWyn(null); setPod(null); setUb(null); setUbInfo(""); setWiersze([]); setErr(m); };
+    if (!/\.(pdf|png|jpe?g)$/i.test(f.name)) { odrzuc("Obsługiwane formaty: PDF, JPG i PNG."); return; }
+    if (f.size > MAKS_MB * 1024 * 1024) { odrzuc(`Plik jest za duży (maksymalnie ${MAKS_MB} MB).`); return; }
     odczytaj(f, f.name, f.name);
   }
 
@@ -141,7 +142,7 @@ export default function Wgraj() {
                 <Field label="Liczba dzieci"><input inputMode="numeric" autoComplete="off" value={dzieci} onChange={(e) => setDzieci(e.target.value.replace(/\D/g, "").slice(0, 1))} /></Field>
                 <Field label="Data porodu lub przyjęcia dziecka"><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
               </div>
-              {(slabo(p.pesel) || (slabo(p.data_zdarzenia) && !wyn.ostrzezenia?.some((o: string) => /daty porodu/.test(o)))) && <p className="small muted">Pola PESEL i data zostały odczytane z niską pewnością. Porównaj je z dokumentem.</p>}
+              {(() => { const brakDaty = wyn.ostrzezenia?.some((o: string) => /daty porodu/.test(o)); const pola = [slabo(p.pesel) && "PESEL", slabo(p.data_zdarzenia) && !brakDaty && "data"].filter(Boolean); return pola.length > 0 && <p className="small muted">Niska pewność odczytu: {pola.join(", ")}. Porównaj z dokumentem.</p>; })()}
               <div className="row mt"><button className="btn btn-secondary" onClick={sprawdzUb}>Sprawdź ubezpieczenie (symulacja ZUS)</button></div>
             </div>
 
