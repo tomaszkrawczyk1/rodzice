@@ -1,27 +1,41 @@
-/* Motyw z zus.pl (zus_wzor/main(1).css): #007834, #00416e, #fab856, #11783b, #283754, #dadada, #ececec, #f5f5f5.
+/* Paleta w jednym miejscu. Motyw z zus.pl (zus_wzor/main(1).css): #007834, #00416e, #11783b, #283754, #dadada, #ececec, #f5f5f5.
+   Zasada: przyciski, chipy, nagłówki, hover i akcenty są ZIELONE, GRANATOWE albo NEUTRALNE.
+   Bursztyn (--zus-warn*) jest tylko kolorem semantycznym OSTRZEŻENIA (adnotacje „Sprawdź w ZUS lub gminie", alert.warn).
+   Kontrasty (WCAG): biały na --zus-green 5,6:1, biały na --zus-green-dark 8,4:1, --zus-green-link na bieli 5,6:1,
+   --zus-navy na bieli 10,6:1, --zus-warn-text na --zus-warn-bg 12,3:1, ramka --zus-warn na bieli 4,2:1.
    Tekst treści 16px (WCAG); nagłówki w pikselach jak przy bazie 14px na zus.pl. */
 :root {
-  --zus-green: #007834;
-  --zus-green-dark: #025a28;
-  --zus-green-soft: #f3f3f3;
-  --zus-green-link: #11783b;
-  --zus-orange: #fab856;
+  /* zieleń */
+  --zus-green: #007834;          /* główna: przyciski, aktywne elementy, stopka, logo */
+  --zus-green-dark: #025a28;     /* hover / active przycisków */
+  --zus-green-link: #11783b;     /* linki i menu */
+  --zus-green-soft: #e6f2ea;     /* jasne tło: plakietki ikon */
+  --zus-green-tint: #eef6f1;     /* jasne tło: duże panele */
+  --zus-green-line: #cfe3d6;     /* obwódka jasnych paneli */
+  /* granat */
   --zus-navy: #00416e;
   --zus-navy-dark: #283754;
   --zus-navy-soft: #f5f5f5;
-  --zus-red: #cd0000;
-  --zus-red-soft: #fff;
-  --zus-amber: #00416e;
-  --zus-amber-soft: #fff;
+  /* neutralne */
   --ink: #000;
   --muted: #4d4d4d;
   --line: #dadada;
   --bg: #fff;
   --gray: #f5f5f5;
   --card: #fff;
+  /* błąd */
+  --zus-red: #cd0000;
+  --zus-red-soft: #fff;
+  /* ostrzeżenie (jedyne miejsce z bursztynem): ciemny tekst na jasnym tle, ramka co najmniej 3:1 */
+  --zus-warn: #b36b00;
+  --zus-warn-bg: #fff4d1;
+  --zus-warn-text: #3d2c00;
+  /* wysoki kontrast: akcent na czerni (jasna zieleń, 16,7:1) */
+  --hc-accent: #7dffa0;
   --radius: 3px;
   --shadow: none;
-  --focus: #fab856;
+  /* fokus: granat (10,6:1 na bieli) + biała przerwa z ux.css, więc widać go też na zielonym tle */
+  --focus: #00416e;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; font-size: 16px; overflow-x: clip; }
@@ -70,12 +84,14 @@ img { max-width: 100%; height: auto; }
   outline-offset: -3px;
 }
 
+/* Cienki pasek z jedynym komunikatem „to nie ZUS": jeden wiersz, żeby nie zabierał miejsca na telefonie. */
 .sim-banner {
   background: var(--gray);
   border-bottom: 1px solid var(--line);
   font-size: 14px;
+  line-height: 20px;
   text-align: center;
-  padding: 8px 12px;
+  padding: 4px 12px;
   color: #000;
 }
 
@@ -148,9 +164,9 @@ img { max-width: 100%; height: auto; }
   min-height: 44px;
   min-width: 44px;
   max-width: 11.5rem;
-  background: var(--zus-orange);
-  color: var(--zus-navy) !important;
-  border: 1px solid var(--zus-navy);
+  background: var(--zus-green);
+  color: #fff !important;
+  border: 1px solid var(--zus-green);
   border-radius: 3px;
   padding: 8px 12px;
   font: inherit;
@@ -169,8 +185,9 @@ img { max-width: 100%; height: auto; }
   white-space: nowrap;
 }
 .pue-login:hover, .pue-login:focus-visible {
-  background: var(--zus-navy);
-  color: var(--zus-orange) !important;
+  background: var(--zus-green-dark);
+  border-color: var(--zus-green-dark);
+  color: #fff !important;
   text-decoration: none;
 }
 
@@ -239,46 +256,7 @@ img { max-width: 100%; height: auto; }
 .crumbs__list li + li::before { content: ">"; display: inline-block; margin: 0 .35em 0 .15em; font-weight: 400; }
 .crumbs__list li.last { padding-left: 4px; }
 
-@media (max-width: 1099px) {
-  .menu-btn { display: inline-flex; align-items: center; }
-  .zus-header__bar { flex-wrap: wrap; padding-bottom: 12px; }
-  .zus-logo { order: 1; }
-  .zus-product { order: 3; flex: 1 0 100%; margin-left: 0; border-left: 0; padding-left: 0; }
-  .zus-header__tools { display: contents; }
-  .zus-header__bar { column-gap: 8px; }
-  .zus-header__tools .pue-login { order: 2; margin-left: auto; }
-  .menu-btn { order: 3; margin-left: 0; }
-  .zus-product { order: 4; }
-  .zus-search { order: 5; }
-  .a11y { order: 6; }
-  .zus-search span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .zus-search { min-width: 44px; justify-content: center; padding: 4px; }
-  .a11y { gap: 6px; flex-wrap: wrap; }
-  .a11y button { padding: 8px 8px; font-size: 14px; }
-  .pue-login { padding: 8px 10px; }
-  .zus-nav__list { padding: 0; }
-  .zus-logo__img { width: 168px; height: auto; }
-  .pue-login { max-width: 100%; }
-  .zus-nav { display: none; }
-  .zus-nav.open {
-    display: block;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: var(--menu-top, 120px);
-    z-index: 70;
-    background: #fff;
-    overflow: auto;
-    padding: 0 0 32px;
-    border: 0;
-  }
-  body.nav-open { overflow: hidden; }
-  .zus-nav__list { flex-direction: column; max-width: none; }
-  .zus-nav li { border-top: 0; border-bottom: 1px solid #e7e7e7; }
-  .zus-nav li.selected { border-top: 0; box-shadow: inset 7px 0 0 var(--zus-green); }
-  .zus-nav a { justify-content: flex-start; padding: 12px 16px; min-height: 48px; }
-}
+/* Układ nagłówka na telefonie i tablecie jest na końcu pliku (musi być po regułach „wzoru zus.pl"). */
 
 /* stopka jak zus.pl: zielone tło #007834, kolumny, separator #3d9460 */
 .footer { background: #007834; color: #fff; padding: 40px 0 28px; font-size: 16px; margin-top: 36px; border-top: 1px solid #3d9460; }
@@ -340,7 +318,7 @@ img { max-width: 100%; height: auto; }
 .card + .card { margin-top: 16px; }
 .card.accent { border-top: 7px solid var(--zus-green); }
 .card.navy { border-left: 4px solid var(--zus-navy); }
-.card.warn { border-left: 4px solid var(--zus-orange); background: #fff; }
+.card.warn { border-left: 4px solid var(--zus-warn); background: #fff; }
 .card.danger { border-left: 4px solid var(--zus-red); background: #fff; }
 .grid { display: grid; gap: 16px; }
 .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -362,11 +340,11 @@ img { max-width: 100%; height: auto; }
 .hero h1 { color: #000; overflow-wrap: anywhere; }
 .hero p { color: #000; max-width: 68ch; font-size: 18px; overflow-wrap: anywhere; }
 .btn-login, a.btn-login {
-  background: var(--zus-orange);
-  color: var(--zus-navy);
-  border: 1px solid var(--zus-navy);
+  background: var(--zus-green);
+  color: #fff;
+  border: 1px solid var(--zus-green);
 }
-.btn-login:hover, a.btn-login:hover { background: var(--zus-navy); color: var(--zus-orange); }
+.btn-login:hover, a.btn-login:hover { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); }
 .lead { color: #000; font-size: 18px; max-width: 70ch; line-height: 1.5; }
 .muted { color: var(--muted); }
 .small { font-size: 16px; }
@@ -399,7 +377,7 @@ img { max-width: 100%; height: auto; }
   transition: background .15s, border-color .15s, color .15s;
 }
 .btn-primary { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
-.btn-primary:hover { background: #fff; color: var(--zus-green); border-color: var(--zus-red); box-shadow: none; }
+.btn-primary:hover { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); box-shadow: none; }
 .btn-secondary { background: #f3f3f3; color: var(--zus-green-dark); border-color: #f3f3f3; box-shadow: none; }
 .btn-secondary:hover { background: #fff; color: var(--zus-green); border-color: var(--zus-green); }
 .btn-ghost { background: #fff; color: var(--zus-green-link); border: 1px solid var(--zus-green-link); box-shadow: none; }
@@ -414,6 +392,8 @@ a.btn:hover { text-decoration: none; }
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
+/* „Przejdź do treści" ma zielone tło i obrys wewnątrz: tam obrys jest biały (5,6:1 na zieleni) */
+.skip:focus-visible { outline-color: #fff; }
 
 .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
 .field > label, .lbl { font-weight: 700; font-size: 16px; color: #000; }
@@ -458,13 +438,13 @@ a.tab { color: #000; }
 .alert { padding: 12px 14px; border-radius: 0; border: 1px solid var(--line); border-left: 4px solid var(--zus-navy); margin: 10px 0; font-size: 16px; background: var(--gray); color: #000; }
 .alert.info { background: var(--gray); border-color: var(--line); border-left-color: var(--zus-navy); }
 .alert.ok { background: var(--gray); border-left-color: var(--zus-green); }
-.alert.warn { background: #fff; border-left-color: #b36b00; }
+.alert.warn { background: #fff; border-left-color: var(--zus-warn); }
 .alert.err { background: #fff; border-left-color: var(--zus-red); }
 .badge { display: inline-block; padding: 4px 8px; border-radius: 3px; font-size: 16px; font-weight: 700; line-height: 1.3; }
 .badge.ok { background: var(--gray); color: var(--zus-green-dark); }
 .badge.no { background: #fff; color: #9d0000; border: 1px solid #9d0000; }
 .badge.sim { background: var(--gray); color: #222; }
-.badge.warn { background: #fff; color: #5c3300; border: 1px solid #5c3300; }
+.badge.warn { background: var(--zus-warn-bg); color: var(--zus-warn-text); border: 1px solid var(--zus-warn); }
 
 .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
 table.tbl { width: 100%; border-collapse: collapse; font-size: 16px; border: 3px solid #dadada; }
@@ -481,7 +461,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 16px; border: 3px
 ul.clean { list-style: none; padding: 0; margin: 0; }
 ul.clean li { padding: 6px 0 6px 22px; position: relative; }
 ul.clean li::before { content: ""; position: absolute; left: 0; top: .65em; width: 8px; height: 8px; background: var(--zus-green); }
-ul.warnlist li::before { background: #b36b00; }
+ul.warnlist li::before { background: var(--zus-warn); }
 ol.steps { padding-left: 22px; }
 ol.steps li { margin: 6px 0; }
 details.dl { border: 1px solid var(--line); border-radius: 0; padding: 10px 12px; background: #fff; margin: 8px 0; }
@@ -530,7 +510,7 @@ details.dl summary:hover { color: var(--zus-green-link); }
   min-height: 44px;
 }
 .persona:hover, .persona:focus-visible { border-top-color: var(--zus-green); background: #fff; }
-.spin { display: inline-block; width: 18px; height: 18px; border: 3px solid #cfe3d6; border-top-color: var(--zus-green); border-radius: 50%; animation: sp .8s linear infinite; vertical-align: -3px; }
+.spin { display: inline-block; width: 18px; height: 18px; border: 3px solid var(--zus-green-line); border-top-color: var(--zus-green); border-radius: 50%; animation: sp .8s linear infinite; vertical-align: -3px; }
 @keyframes sp { to { transform: rotate(360deg); } }
 .chip {
   display: inline-flex;
@@ -571,10 +551,6 @@ html.fs-xl .btn, html.fs-xl .chip, html.fs-xl .tab, html.fs-xl input, html.fs-xl
 html.fs-l h1, html.fs-xl h1 { font-size: 34px; }
 html.fs-xl h2 { font-size: 26px; }
 html.fs-xl .tile span, html.fs-xl .lead, html.fs-xl .hero p { font-size: 20px; }
-html.fs-l .zus-header__bar,
-html.fs-xl .zus-header__bar { flex-wrap: wrap; }
-html.fs-l .zus-header__tools,
-html.fs-xl .zus-header__tools { flex-wrap: wrap; width: 100%; justify-content: flex-start; }
 
 .prog { height: 7px; background: #ececec; border-radius: 0; margin: 10px 0 18px; overflow: hidden; }
 .prog i { display: block; height: 100%; background: var(--zus-green); }
@@ -597,7 +573,7 @@ html.fs-xl .zus-header__tools { flex-wrap: wrap; width: 100%; justify-content: f
 .opt.sel { border-color: var(--zus-green); box-shadow: inset 4px 0 0 var(--zus-green); background: var(--gray); }
 .todo { padding-left: 22px; }
 .todo li { margin: 12px 0; }
-.todo .when { color: #6b4e00; }
+.todo .when { color: var(--zus-navy); }
 pre.wniosek { white-space: pre-wrap; font: inherit; background: var(--gray); padding: 14px; border-radius: 0; border: 1px solid var(--line); }
 .tile {
   display: block;
@@ -666,14 +642,14 @@ button.tile, button.opt, button.persona { appearance: none; -webkit-appearance: 
 input[type=range] { min-height: 44px; }
 
 /* ===== Wzór zus.pl 1:1 (wartości z żywej strony zus.pl, listopad 2026) =====
-   szerokość 1200, nagłówek: logo 250 px, kwadraty 44 px #00416e, przycisk #fab856,
+   szerokość 1200, nagłówek: logo 250 px, kwadraty 44 px #00416e, przycisk zielony (zus.pl ma tu pomarańcz, u nas zieleń),
    nawigacja Lato Bold 15,4 px #11783b z paskiem 7 px, h1 36/44, kafle #f3f3f3, paski #283754, stopka #007834 */
 .container { max-width: 1232px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 a:hover { color: var(--zus-green-dark); text-decoration: none; }
 h1 { font-size: 36px; line-height: 44px; padding: 27px 0 35px; margin: 0; }
 h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
-.site-main { padding-top: 0; }
+.site-main { padding-top: 0; padding-bottom: 24px; }
 .narrow { max-width: 700px; }
 .hero { padding: 0; margin: 0 0 8px; }
 .hero p, .lead { font-size: 16px; line-height: 24px; }
@@ -691,21 +667,21 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
   background: var(--zus-navy); border: 0; border-radius: 3px; color: #fff;
 }
 .a11y button:hover { background: var(--zus-navy-dark); }
-.a11y button[aria-pressed="true"] { background: var(--zus-orange); color: var(--zus-navy); }
+.a11y button[aria-pressed="true"] { background: var(--zus-green); color: #fff; }
 .zus-search { flex-direction: column; gap: 2px; padding: 0 4px; min-height: 60px; justify-content: center; font-weight: 400; font-size: 14px; }
 .zus-search svg { width: 38px; height: 38px; }
 .pue-login, a.pue-login, button.pue-login {
-  min-height: 43px; max-width: 200px; justify-content: space-between; gap: 14px;
-  padding: 10px; border-radius: 3px; font-size: 14px; background: var(--zus-orange);
+  min-height: 44px; max-width: 200px; justify-content: space-between; gap: 14px;
+  padding: 10px; border-radius: 3px; font-size: 14px; background: var(--zus-green);
 }
-.pue-login:hover, .pue-login:focus-visible { background: var(--zus-navy); color: var(--zus-orange) !important; }
+.pue-login:hover, .pue-login:focus-visible { background: var(--zus-green-dark); color: #fff !important; }
 .pue-arrow, .btn-primary::after, .btn-secondary::after, .tile::after, .linkbar::after {
   content: ""; flex: none; width: 8px; height: 8px;
   border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg);
 }
 .pue-arrow { margin-right: 4px; }
-.menu-btn { flex-direction: column; border: 0; padding: 4px 6px; gap: 5px; color: var(--zus-green-link); font-weight: 700; font-size: 14px; }
-.menu-btn__bars { display: block; width: 36px; height: 3px; margin: 8px 0; background: currentColor; box-shadow: 0 8px 0 currentColor, 0 -8px 0 currentColor; }
+.menu-btn { justify-content: center; align-items: center; width: 44px; height: 44px; min-height: 44px; padding: 0; margin-left: 0; border: 1px solid var(--zus-navy); border-radius: 6px; background: #fff; color: var(--zus-navy); }
+.menu-btn:hover { background: var(--zus-navy); color: #fff; }
 
 /* nawigacja główna */
 .zus-nav__list { max-width: 1232px; padding: 0 16px; }
@@ -722,13 +698,13 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
 .crumbs__list li.last, .crumbs__list li.last span { font-weight: 700; }
 .crumbs__list a { font-size: 12px; }
 
-/* przyciski: pomarańczowy główny i granatowy obrys jak na zus.pl */
+/* przyciski: zielony główny i granatowy obrys */
 .btn {
   font-size: 14px; padding: 10px 14px; min-height: 44px; gap: 14px; border: 1px solid var(--zus-navy);
   border-radius: 3px; box-shadow: none; background: transparent; color: var(--zus-navy);
 }
-.btn-primary { background: var(--zus-orange); color: var(--zus-navy); border-color: var(--zus-navy); }
-.btn-primary:hover, .btn-primary:focus-visible { background: var(--zus-navy); color: var(--zus-orange); border-color: var(--zus-navy); box-shadow: none; }
+.btn-primary { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
+.btn-primary:hover, .btn-primary:focus-visible, .btn-primary:active { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); box-shadow: none; }
 .btn-secondary { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
 .btn-secondary:hover, .btn-secondary:focus-visible { background: var(--zus-navy); color: #fff; border-color: var(--zus-navy); }
 .btn-ghost { background: transparent; color: var(--zus-navy); border: 1px solid var(--zus-navy); }
@@ -738,7 +714,8 @@ h2 { font-size: 23px; line-height: 28px; margin: 0 0 12px; }
 .btn-sm { font-size: 14px; }
 .chip { border-color: var(--zus-navy); color: var(--zus-navy); font-size: 14px; }
 .chip:hover { background: var(--zus-navy); color: #fff; }
-.btn-login, a.btn-login { background: var(--zus-orange); color: var(--zus-navy); border: 1px solid var(--zus-navy); }
+.btn-login, a.btn-login { background: var(--zus-green); color: #fff; border: 1px solid var(--zus-green); }
+.btn-login:hover, a.btn-login:hover { background: var(--zus-green-dark); color: #fff; border-color: var(--zus-green-dark); }
 
 /* kafle: szare pola jak „expandable boxes” na stronie głównej zus.pl */
 .grid:has(> .tile) { gap: 2px; background: #fff; }
@@ -778,10 +755,10 @@ button.tile { appearance: none; }
 .alert { background: #f3f3f3; }
 
 /* stopka */
-.footer { padding: 40px 0 36px; margin-top: 48px; border-top: 0; }
+.footer { padding: 32px 0 32px; margin-top: 24px; border-top: 0; }
 .footer__cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 300px); gap: 24px 48px; }
 .footer__links li { border: 0 !important; }
-.footer__links a { min-height: 32px; padding: 4px 0 4px 18px; position: relative; font-weight: 700; font-size: 14px; }
+.footer__links a { min-height: 44px; padding: 4px 0 4px 18px; position: relative; font-weight: 700; font-size: 14px; }
 .footer__links a::before {
   content: ""; position: absolute; left: 1px; top: 50%; width: 6px; height: 6px; margin-top: -4px;
   border-top: 2px solid #fff; border-right: 2px solid #fff; transform: rotate(45deg);
@@ -809,28 +786,150 @@ button.tile { appearance: none; }
   .zus-layout__main { padding-left: 0; }
 }
 
+/* nagłówek na telefonie i tablecie: jeden wiersz (logo po lewej, szukaj, „Zaloguj" i menu po prawej);
+   rozmiar tekstu i kontrast są w panelu menu, a nazwa produktu pojawia się dopiero od 700 px */
 @media (max-width: 1099px) {
-  .zus-logo__img { width: 190px; }
-  .zus-header__bar { column-gap: 8px; row-gap: 10px; align-items: flex-start; }
-  .zus-header__bar { margin: 0 16px; padding: 16px 0 14px; border-bottom: 7px solid #ececec; }
-  .zus-header__tools { display: contents; }
-  .menu-btn { order: 2; margin-left: auto; }
-  .zus-header__tools .pue-login { order: 5; margin-left: 0; }
-  .zus-search { order: 3; min-height: 0; }
-  .a11y { order: 4; }
-  .zus-product { order: 6; padding-left: 0; margin-left: 0; border-left: 0; }
-  .zus-nav a { padding: 12px 16px; font-size: 16px; }
-  .zus-nav__list { padding: 0; }
+  .menu-btn { display: inline-flex; }
+  .zus-header__bar { flex-wrap: nowrap; align-items: center; gap: 8px; margin: 0; padding: 6px 16px; border-bottom: 1px solid var(--line); }
+  .zus-logo { flex: 0 1 170px; min-width: 96px; margin-right: auto; }
+  .zus-logo__img { width: 100%; max-width: 170px; }
+  .zus-product { display: none; }
+  .zus-header__tools { display: flex; flex: none; flex-wrap: nowrap; width: auto; margin-left: 0; gap: 8px; }
+  .zus-header__tools > .a11y { display: none; }
+  .zus-search { flex-direction: row; gap: 0; min-width: 44px; min-height: 44px; padding: 0; justify-content: center; }
+  .zus-search svg { width: 30px; height: 30px; }
+  .zus-search__txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .pue-login, a.pue-login, button.pue-login { min-width: 0; max-width: none; min-height: 44px; gap: 0; padding: 8px 12px; font-size: 15px; }
+  .pue-arrow { display: none; }
+  .zus-nav { display: none; }
+  .zus-nav.open {
+    display: block; position: fixed; left: 0; right: 0; bottom: 0; top: var(--menu-top, 64px); z-index: 70;
+    background: #fff; overflow: auto; padding: 0 0 32px; border-top: 1px solid var(--line);
+  }
+  body.nav-open { overflow: hidden; }
+  .zus-nav__list { flex-direction: column; max-width: none; padding: 0; }
+  .zus-nav li { border-top: 0; border-bottom: 1px solid #e7e7e7; }
+  .zus-nav li.selected { border-top: 0; box-shadow: inset 7px 0 0 var(--zus-green); }
+  .zus-nav a { justify-content: flex-start; padding: 12px 16px; min-height: 48px; font-size: 16px; }
+  .zus-nav__tools { padding: 16px; }
 }
+@media (min-width: 700px) and (max-width: 1099px) {
+  .zus-logo { flex: 0 0 170px; margin-right: 0; }
+  .zus-product { display: flex; flex: 1 1 0; border-left: 0; padding-left: 0; margin-left: 8px; min-height: 0; }
+  .zus-product span { display: none; }
+}
+@media (min-width: 1100px) { .zus-nav__tools { display: none; } }
 @media (max-width: 600px) {
   h1 { font-size: 32px; line-height: 38px; padding: 20px 0 24px; }
-  .tile { padding: 22px 44px 22px 20px; min-height: 0; }
-  .tile::after { top: 28px; right: 20px; }
   .footer__side { align-items: flex-start; }
   .footer__cols { grid-template-columns: 1fr; }
+  .pue-login__imie { display: none; }
 }
 
-/* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (żółty #ffe14d na czerni ≈ 17:1, czerń na żółtym ≈ 17:1). */
+/* przyciski „Dostępność" w panelu menu na telefonie: z widocznym opisem, na całą szerokość */
+.a11y--menu { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.a11y--menu button { width: auto; height: auto; min-height: 48px; justify-content: flex-start; gap: 12px; padding: 8px 14px; font-size: 16px; text-align: left; }
+
+/* ===== Strona główna: wyszukiwarka, kafle, hierarchia ===== */
+.hero h1 { padding: 20px 0 8px; }
+.hero p { margin-bottom: 16px; }
+.home-login { margin: 20px 0 0; }
+
+.ask--glowny { background: var(--zus-green-tint); border: 1px solid var(--zus-green-line); border-radius: 16px; padding: 22px 24px 18px; margin: 0 0 24px; }
+.ask--glowny h2 { font-size: 24px; line-height: 30px; margin: 0 0 12px; color: var(--zus-navy-dark); }
+.search { flex-wrap: nowrap; align-items: stretch; gap: 10px; margin: 0; }
+.search__box { position: relative; flex: 1 1 auto; min-width: 0; }
+.search__icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--zus-green); pointer-events: none; }
+.search input[type=search] { padding: 8px 12px 8px 48px; min-height: 48px; border: 2px solid var(--zus-green); border-radius: 10px; background: #fff; }
+.search--duze input[type=search] { min-height: 58px; font-size: 18px; }
+.btn-szukaj {
+  flex: none; padding: 8px 24px; min-height: 48px; font-size: 16px; border: 2px solid var(--zus-green); border-radius: 10px;
+  background: var(--zus-green); color: #fff;
+}
+.search--duze .btn-szukaj { min-height: 58px; font-size: 17px; }
+.btn-szukaj:hover, .btn-szukaj:focus-visible { background: var(--zus-green-dark); border-color: var(--zus-green-dark); color: #fff; }
+.ask__przyklady { margin: 10px 0 0; }
+.ask__nota { margin: 12px 0 0; font-size: 14px; }
+/* chipy „Przykłady": zieleń i granat, bez dodatkowych kolorów */
+.ask .chip {
+  background: #fff; border: 1px solid var(--zus-green); color: var(--zus-navy); border-radius: 999px;
+  padding: 8px 16px; margin: 6px 6px 0 0; font-size: 15px; font-weight: 400; text-align: center;
+}
+.ask .chip:hover, .ask .chip:focus-visible { background: var(--zus-green); border-color: var(--zus-green); color: #fff; }
+@media (max-width: 600px) {
+  .ask--glowny { padding: 16px; border-radius: 14px; }
+  .ask--glowny h2 { font-size: 21px; line-height: 26px; }
+  .hero h1 { padding: 14px 0 6px; }
+}
+
+/* kafle: biała karta z zaokrągleniem, lekkim cieniem i ikoną w zielonej plakietce */
+.grid:has(> .tile) { gap: 16px; background: transparent; }
+.tile {
+  background: #fff; border: 1px solid #c9d3cd; border-radius: 12px; box-shadow: 0 1px 3px rgba(0, 40, 20, .12);
+  padding: 20px 48px 20px 20px; min-height: 96px;
+  transition: background-color .18s, border-color .18s, box-shadow .18s, color .18s, transform .18s;
+}
+.tile--ico { display: flex; align-items: flex-start; gap: 16px; }
+.tile .tile__ic {
+  flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--zus-green-soft); color: var(--zus-green); transition: background-color .18s, color .18s;
+}
+.tile__ic .ikona { width: 32px; height: 32px; }
+.tile .tile__txt { display: block; flex: 1 1 auto; min-width: 0; }
+.tile::after { top: 50%; right: 20px; margin-top: -5px; transition: transform .18s, color .18s; }
+.tile:hover, .tile:focus-visible {
+  background: #f6fbf8; border-color: var(--zus-green); box-shadow: 0 6px 16px rgba(0, 60, 30, .20); z-index: 2;
+}
+.tile:hover .tile__ic, .tile:focus-visible .tile__ic { background: var(--zus-green); color: #fff; }
+.tile:hover::after, .tile:focus-visible::after { color: var(--zus-green); }
+.tile:focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .tile:hover, .tile:focus-visible { transform: translateY(-2px); }
+  .tile:hover::after, .tile:focus-visible::after { transform: translateX(3px) rotate(45deg); }
+}
+/* największy kafel („Czekamy na dziecko"): zielone tło, dwie kolumny, większy tytuł */
+.tile--glowny { background: var(--zus-green); border-color: var(--zus-green); color: #fff; padding: 28px 56px 28px 28px; box-shadow: 0 4px 14px rgba(0, 80, 40, .30); }
+.tile--glowny b { color: #fff; font-size: 22px; line-height: 28px; margin-bottom: 6px; }
+.tile--glowny span { color: #fff; }
+.tile--glowny .tile__ic { width: 64px; height: 64px; background: rgba(255, 255, 255, .2); color: #fff; }
+.tile--glowny .tile__ic .ikona { width: 38px; height: 38px; }
+.tile--glowny::after { color: #fff; }
+.tile--glowny:hover, .tile--glowny:focus-visible { background: var(--zus-green-dark); border-color: var(--zus-green-dark); color: #fff; }
+.tile--glowny:hover .tile__ic, .tile--glowny:focus-visible .tile__ic { background: #fff; color: var(--zus-green); }
+.tile--glowny:hover::after, .tile--glowny:focus-visible::after { color: #fff; }
+.grid--etapy .tile--glowny { grid-column: span 2; }
+.grid--etapy .tile--szeroki { grid-column: 1 / -1; }
+@media (max-width: 600px) {
+  .tile { padding: 16px 44px 16px 16px; min-height: 0; }
+  .tile--ico { gap: 14px; }
+  .tile .tile__ic { width: 48px; height: 48px; }
+  .tile__ic .ikona { width: 28px; height: 28px; }
+  .tile--glowny { padding: 20px 44px 20px 16px; }
+  .tile--glowny .tile__ic { width: 56px; height: 56px; }
+  .tile::after { right: 16px; }
+  .grid--etapy .tile--glowny, .grid--etapy .tile--szeroki { grid-column: auto; }
+}
+
+/* wybór sprawy zamiast menu bocznego (800-1024 px) */
+.sprawy-wybor { display: none; margin: 0 0 16px; }
+@media (min-width: 800px) and (max-width: 1024px) { .sprawy-wybor { display: block; } }
+.sprawy-wybor__btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 56px; padding: 8px 14px;
+  background: #fff; border: 1px solid #767676; border-radius: 8px; font: inherit; text-align: left; color: #000; cursor: pointer;
+}
+.sprawy-wybor__btn:hover { border-color: var(--zus-green); }
+.sprawy-wybor__etykieta { display: block; font-size: 14px; color: var(--muted); line-height: 18px; }
+.sprawy-wybor__btn b { display: block; }
+.sprawy-wybor__strzalka { flex: none; transition: transform .15s; }
+.sprawy-wybor__btn[aria-expanded="true"] .sprawy-wybor__strzalka { transform: rotate(180deg); }
+.sprawy-wybor ul { list-style: none; margin: 6px 0 0; padding: 0; background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.sprawy-wybor li + li { border-top: 1px solid #e7e7e7; }
+.sprawy-wybor a { display: flex; align-items: center; min-height: 48px; padding: 8px 14px; font-weight: 700; text-decoration: none; color: var(--zus-green-link); }
+.sprawy-wybor a:hover { background: #f3f3f3; }
+.sprawy-wybor a[aria-current="page"] { background: var(--zus-green); color: #fff; }
+
+/* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (jasna zieleń #7dffa0 na czerni ≈ 16,7:1, czerń na niej tyle samo).
+   Cały akcent trybu jest w jednym tokenie --hc-accent (w :root). */
 html.hc {
   --ink: #fff;
   --muted: #fff;
@@ -838,18 +937,20 @@ html.hc {
   --bg: #000;
   --gray: #000;
   --card: #000;
-  --zus-navy: #ffe14d;
-  --zus-navy-dark: #ffe14d;
+  --zus-navy: var(--hc-accent);
+  --zus-navy-dark: var(--hc-accent);
   --zus-navy-soft: #000;
+  --zus-warn: var(--hc-accent);
+  --zus-warn-bg: #000;
+  --zus-warn-text: #fff;
   --zus-green-soft: #000;
-  --zus-amber: #ffe14d;
-  --zus-amber-soft: #000;
+  --zus-green-tint: #000;
+  --zus-green-line: #fff;
   --zus-red-soft: #000;
-  --zus-green-link: #ffe14d;
-  --zus-green: #ffe14d;
-  --zus-green-dark: #ffe14d;
-  --zus-orange: #ffe14d;
-  --focus: #ffe14d;
+  --zus-green-link: var(--hc-accent);
+  --zus-green: var(--hc-accent);
+  --zus-green-dark: var(--hc-accent);
+  --focus: var(--hc-accent);
 }
 html.hc body,
 html.hc .site-top,
@@ -909,11 +1010,11 @@ html.hc .crumbs__list a,
 html.hc .zus-product b,
 html.hc .zus-search,
 html.hc .chip {
-  color: #ffe14d !important;
+  color: var(--hc-accent) !important;
 }
 html.hc .pue-login__label,
 html.hc .btn span { color: #000 !important; }
-html.hc .footer__links a::before { color: #ffe14d !important; }
+html.hc .footer__links a::before { color: var(--hc-accent) !important; }
 html.hc .btn,
 html.hc .btn-primary,
 html.hc .btn-secondary,
@@ -926,7 +1027,7 @@ html.hc button.pue-login,
 html.hc .mobywatel .btn-primary,
 html.hc .a11y button,
 html.hc .menu-btn {
-  background: #ffe14d !important;
+  background: var(--hc-accent) !important;
   color: #000 !important;
   border-color: #000 !important;
 }
@@ -936,25 +1037,42 @@ html.hc .badge.warn,
 html.hc .badge.ok,
 html.hc .badge.no,
 html.hc .badge.sim {
-  background: #ffe14d !important;
+  background: var(--hc-accent) !important;
   color: #000 !important;
   border-color: #000 !important;
 }
 html.hc .footer { background: #000 !important; color: #fff !important; border-top: 2px solid #fff; }
-html.hc .footer a, html.hc .to-top, html.hc .footer__h, html.hc .footer__note { color: #ffe14d !important; }
+html.hc .footer a, html.hc .to-top, html.hc .footer__h, html.hc .footer__note { color: var(--hc-accent) !important; }
 html.hc .footer__links li { border-color: #fff; }
-html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:hover, html.hc .tile:hover { border-color: #ffe14d; }
-html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 #ffe14d; }
+html.hc .tab.on, html.hc .zus-nav li.selected, html.hc .opt.sel, html.hc .opt:hover, html.hc .tile:hover { border-color: var(--hc-accent); }
+html.hc .opt.sel, html.hc .opt:hover { box-shadow: inset 4px 0 0 var(--hc-accent); }
 html.hc .footer__links a { text-decoration: underline; }
-html.hc .a11y button svg { filter: invert(1); }
+html.hc .a11y button svg { filter: none; }
+html.hc .a11y button span, html.hc .pue-login__imie { color: #000 !important; }
 html.hc .zus-side li.on a { color: #000 !important; }
-html.hc .zus-side { border-right-color: #ffe14d; }
+html.hc .zus-side { border-right-color: var(--hc-accent); }
 html.hc .menu-btn span, html.hc .menu-btn__bars { color: #000 !important; }
 html.hc .ic, html.hc .drop-ic { color: transparent !important; }
-html.hc .linkbar { background: #000 !important; color: #ffe14d !important; border-color: #ffe14d !important; }
+html.hc .linkbar { background: #000 !important; color: var(--hc-accent) !important; border-color: var(--hc-accent) !important; }
 html.hc .tile { border-color: #fff; }
-html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: #ffe14d; color: #ffe14d; }
-html.hc .zus-nav li.selected { border-top-color: #ffe14d; box-shadow: inset 7px 0 0 #ffe14d; }
-html.hc .crumbs__home { color: #ffe14d; }
+html.hc .tile::after, html.hc .to-top__circle, html.hc .to-top__circle::before { border-color: var(--hc-accent); color: var(--hc-accent); }
+html.hc .zus-nav li.selected { border-top-color: var(--hc-accent); box-shadow: inset 7px 0 0 var(--hc-accent); }
+html.hc .crumbs__home { color: var(--hc-accent); }
 html.hc .ic, html.hc .ico-czas, html.hc .zus-logo__img, html.hc .zus-search img { filter: grayscale(1) invert(1) brightness(2); }
-html.hc :focus-visible { outline: 3px solid #ffe14d; outline-offset: 2px; }
+html.hc :focus-visible { outline: 3px solid var(--hc-accent); outline-offset: 2px; }
+
+/* wysoki kontrast: nowe elementy strony głównej, menu i wyboru sprawy */
+html.hc .tile { border-width: 2px; box-shadow: none; }
+html.hc .tile .tile__ic { background: #000 !important; color: var(--hc-accent) !important; border: 2px solid var(--hc-accent); }
+html.hc .tile--glowny { border-color: var(--hc-accent); border-width: 3px; }
+html.hc .tile:hover, html.hc .tile:focus-visible { border-color: var(--hc-accent); }
+html.hc .ask--glowny { border: 2px solid var(--hc-accent); }
+html.hc .search input[type=search] { border-color: var(--hc-accent); }
+html.hc .search__icon { color: var(--hc-accent); }
+html.hc .chip, html.hc .ask .chip { background: #000 !important; border-color: var(--hc-accent); color: var(--hc-accent) !important; }
+html.hc .ask .chip:hover { background: var(--hc-accent) !important; color: #000 !important; }
+html.hc .sim-banner { border-bottom: 1px solid #fff; }
+html.hc .menu-btn svg { color: #000; }
+html.hc .sprawy-wybor__btn, html.hc .sprawy-wybor ul { background: #000; color: #fff; border-color: #fff; }
+html.hc .sprawy-wybor a[aria-current="page"] { background: var(--hc-accent); color: #000 !important; }
+html.hc .zus-header__bar { border-bottom-color: #fff; }

@@ -16,21 +16,28 @@ html { scroll-padding-top: calc(var(--header-h) + var(--ux-gap)); -webkit-tap-hi
 a, button, summary, input, select, textarea, label, [role="button"] { touch-action: manipulation; }
 button, .btn, .opt, .tile, .chip, .persona, .tab, summary { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .btn { transition: background .15s, border-color .15s, color .15s, transform .12s cubic-bezier(.23, 1, .32, 1); }
-.opt, .tile, .chip, .persona { transition: border-color .15s, background .15s, transform .12s cubic-bezier(.23, 1, .32, 1); }
+.opt, .tile, .chip, .persona { transition: border-color .15s, background-color .15s, color .15s, box-shadow .18s, transform .12s cubic-bezier(.23, 1, .32, 1); }
 @media (prefers-reduced-motion: no-preference) {
   .btn:active, .chip:active { transform: scale(.97); }
   .opt:active, .tile:active, .persona:active { transform: scale(.985); }
 }
 /* Na ekranie dotykowym :hover zostaje po tapnięciu. Cofamy stan „najechania", żeby nic nie wyglądało na wybrane. */
 @media (hover: none) {
-  .opt:hover:not(.sel), .tile:hover, .persona:hover { border-top-color: #ececec; }
+  .opt:hover:not(.sel), .persona:hover { border-top-color: #ececec; }
   .zus-nav li:hover:not(.selected) { border-top-color: #ececec; }
-  .btn-primary:hover { background: var(--zus-green); color: #fff; border-color: var(--zus-green); box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .2); }
-  .btn-secondary:hover { background: #f3f3f3; color: var(--zus-green-dark); border-color: #f3f3f3; }
-  .btn-ghost:hover, .chip:hover { background: #fff; }
+  .tile:hover { background: #fff; border-color: #c9d3cd; box-shadow: 0 1px 3px rgba(0, 40, 20, .12); transform: none; }
+  .tile:hover .tile__ic { background: var(--zus-green-soft); color: var(--zus-green); }
+  .tile:hover::after { color: #000; transform: rotate(45deg); }
+  .tile--glowny:hover { background: var(--zus-green); border-color: var(--zus-green); box-shadow: 0 4px 14px rgba(0, 80, 40, .30); }
+  .tile--glowny:hover .tile__ic { background: rgba(255, 255, 255, .2); color: #fff; }
+  .tile--glowny:hover::after { color: #fff; }
+  .btn-primary:hover { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
+  .btn-secondary:hover, .btn-ghost:hover { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
+  .btn-szukaj:hover { background: var(--zus-green); border-color: var(--zus-green); color: #fff; }
+  .chip:hover, .ask .chip:hover { background: #fff; color: var(--zus-navy); }
 }
 
-/* Obrys fokusu: ciemny na jasnym tle (pomarańcz miał 1,7:1, wymagane jest 3:1), biała przerwa na ciemnym. */
+/* Obrys fokusu: granat --focus (10,6:1 na bieli; wymagane 3:1) + biała przerwa 2 px, dzięki której widać go też na zielonym tle (biel na #007834 5,6:1). */
 :focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 2px; box-shadow: 0 0 0 2px #fff; }
 .btn-primary:focus-visible, .zus-nav a:focus-visible { outline-color: var(--zus-navy); }
 html.hc :focus-visible { box-shadow: 0 0 0 2px #000; }
@@ -53,9 +60,11 @@ select { text-overflow: ellipsis; }
 .crumbs__list a { display: inline-flex; align-items: center; min-height: 44px; }
 .crumbs__list li.last > span { display: inline-flex; align-items: center; min-height: 44px; }
 .powrot { display: inline-flex; align-items: center; min-height: 44px; }
-@media (max-width: 1099px) {
-  .pue-login__label { white-space: normal; overflow: visible; text-overflow: clip; }
-}
+
+/* --- Cele dotykowe: co najmniej 44 x 44 px (przyciski, chipy, menu, linki w stopce i ścieżce) ----- */
+.chip, .btn, .tab, .opt, .persona, summary, .menu-btn, .a11y button, .pue-login, .zus-search, .to-top, .linkbar, .powrot,
+.footer__links a, .zus-subnav a, .zus-nav a, .zus-side a, .crumbs__list a { min-height: 44px; }
+.chip, .menu-btn, .a11y button, .zus-search, .crumbs__home, .to-top { min-width: 44px; }
 
 /* --- Stany ładowania: rezerwują miejsce, więc nic nie skacze po załadowaniu ---------------- */
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
@@ -95,7 +104,7 @@ html.hc .na-stronie { background: #000; border-color: #fff; }
   .zus-subnav a[aria-current="page"] { font-weight: 700; box-shadow: inset 0 -4px 0 var(--zus-green); }
 }
 html.hc .zus-subnav { background: #000; border-color: #fff; }
-html.hc .zus-subnav a { color: #ffe14d !important; }
+html.hc .zus-subnav a { color: var(--hc-accent) !important; }
 
 /* --- Tabele: wiersz = karta „etykieta: wartość", gdy brakuje miejsca ------------------------------
    Decyduje szerokość kontenera tabeli, nie okna: w kalkulatorze na tablecie (768-1100 px) wynik leży w wąskiej
@@ -123,3 +132,75 @@ html.hc .zus-subnav a { color: #ffe14d !important; }
 /* --- Cele dotykowe ≥ 44 px: stopka, szukaj, logowanie ------------------------------------------- */
 .footer__links a { min-height: 44px; display: flex; align-items: center; }
 .zus-search, .zus-header__tools .pue-login { min-height: 44px; }
+/* Przycisk logowania ma stałą szerokość w obu stanach („Zaloguj" i „Wyloguj (imię)"), żeby po wczytaniu sesji
+   nic w nagłówku się nie przestawiało. Na telefonie imię jest ukryte, więc wystarczy węższy przycisk. */
+.zus-header__tools .pue-login { min-width: 5rem; }
+@media (min-width: 1100px) { .zus-header__tools .pue-login { min-width: 11.5rem; } }
+
+/* --- Menu boczne w sprawach: do 1024 px zastępuje je rozwijany wybór (Sprawa.tsx) --------------- */
+@media (max-width: 1024px) {
+  .zus-layout { display: block; }
+  .zus-side { display: none; }
+  .zus-layout__main { padding-left: 0; }
+}
+
+/* === nawigacja === */
+/* „Więcej": rozwijane podmenu w głównym menu (komputer) i składana grupa w panelu menu (telefon). */
+.zus-nav__more { position: relative; }
+.zus-nav__more-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; min-height: 52px; padding: 12px 6px 19px;
+  background: transparent; border: 0; border-radius: 0; font: inherit; font-weight: 700; font-size: 15.4px; line-height: 23px;
+  color: var(--zus-green-link); cursor: pointer;
+}
+.zus-nav__more-btn:hover { text-decoration: underline; }
+.zus-nav__chev { flex: none; transition: transform .15s ease; }
+.zus-nav__more-btn[aria-expanded="true"] .zus-nav__chev { transform: rotate(180deg); }
+.zus-nav__drop[hidden] { display: none; }
+.zus-nav ul.zus-nav__drop { list-style: none; margin: 0; padding: 4px 0; }
+.zus-nav ul.zus-nav__drop li { border: 0; flex: none; }
+.zus-nav ul.zus-nav__drop a { justify-content: flex-start; text-align: left; font-weight: 400; }
+.zus-nav ul.zus-nav__drop a[aria-current="page"] { font-weight: 700; }
+@media (min-width: 1100px) {
+  .zus-nav ul.zus-nav__drop {
+    position: absolute; top: 100%; right: 0; z-index: 80; min-width: 320px; background: #fff;
+    border: 1px solid var(--line); border-top: 3px solid var(--zus-green); box-shadow: 0 6px 14px rgba(0, 0, 0, .14);
+  }
+  .zus-nav ul.zus-nav__drop a { padding: 10px 16px; min-height: 44px; font-size: 15px; line-height: 22px; }
+  .zus-nav ul.zus-nav__drop a:hover { background: #f3f3f3; }
+  .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 var(--zus-green); }
+}
+@media (max-width: 1099px) {
+  .zus-nav__more-btn { justify-content: space-between; padding: 12px 16px; min-height: 48px; font-size: 16px; }
+  .zus-nav ul.zus-nav__drop { padding: 0; }
+  .zus-nav ul.zus-nav__drop li { border-top: 1px solid #e7e7e7; }
+  .zus-nav ul.zus-nav__drop a { padding-left: 32px; min-height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) { .zus-nav__chev { transition: none; } }
+html.hc .zus-nav__more-btn { color: var(--hc-accent); }
+html.hc .zus-nav ul.zus-nav__drop { background: #000; border-color: #fff; border-top-color: var(--hc-accent); box-shadow: none; }
+html.hc .zus-nav ul.zus-nav__drop a:hover { background: #222; }
+html.hc .zus-nav ul.zus-nav__drop a[aria-current="page"] { box-shadow: inset 4px 0 var(--hc-accent); }
+
+/* ---- Ścieżka sprawy: czytelniej dla zmęczonej osoby z telefonem w jednej ręce ---- */
+/* Opcje odpowiedzi mają widoczne kółko: od razu wiadomo, że to się klika i co jest zaznaczone. */
+.opt { position: relative; padding-left: 58px; }
+.opt::before { content: ""; position: absolute; left: 18px; top: 50%; width: 22px; height: 22px; margin-top: -11px; box-sizing: border-box; border: 2px solid var(--muted); border-radius: 50%; background: #fff; }
+.opt.sel::before { border-color: var(--zus-green); background: radial-gradient(circle, var(--zus-green) 0 4px, #fff 5px); }
+.opt:hover::before, .opt:focus-visible::before { border-color: var(--zus-green); }
+.opt .small { margin-top: 2px; }
+html.hc .opt::before { border-color: #fff; background: #000; }
+html.hc .opt.sel::before { border-color: var(--hc-accent); background: radial-gradient(circle, var(--hc-accent) 0 4px, #000 5px); }
+
+/* Ważny termin nad wynikiem */
+.pilne { border-left-width: 6px; padding: 14px 16px; margin: 0 0 14px; }
+.pilne__lab { display: block; font-weight: 700; color: var(--zus-red); }
+.pilne p { margin: 4px 0 0; font-size: 18px; font-weight: 700; }
+html.hc .pilne__lab { color: var(--hc-accent); }
+
+/* Lista „Weź ze sobą" z polami do odhaczania */
+.zabierz { list-style: none; margin: 0; padding: 0; }
+.zabierz li { border-bottom: 1px solid var(--line); }
+.zabierz li:last-child { border-bottom: 0; }
+.zabierz label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 2px; min-height: 52px; cursor: pointer; }
+.zabierz input { flex: none; width: 26px; height: 26px; margin: 0; accent-color: var(--zus-green); }
+.zabierz input:checked + span { color: var(--muted); text-decoration: line-through; }

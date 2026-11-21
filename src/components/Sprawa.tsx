@@ -1,31 +1,63 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { api, useSesja, type Sesja } from "@/lib/sesja";
-import { sprawa, zbudujCtx, etykietaOdp, zaIle, aktywneOdpowiedzi, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, type Ctx, type Odp, type Pyt, type Sprawa, type Wynik } from "@/lib/sprawy";
+import { SPRAWY, sprawa, zbudujCtx, etykietaOdp, zaIle, aktywneOdpowiedzi, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, type Ctx, type Odp, type Pyt, type Sprawa, type Wynik } from "@/lib/sprawy";
 import { DRUKI } from "@/content/poradnik";
 import { dataPL } from "@/lib/format";
 import { ekranDotykowy, przejdzDoKroku } from "@/lib/ekran";
-import { odczytajWpis, polaczPrzyPowrocie, stanHistorii, type Migawka } from "@/lib/stan-sprawy";
+import { kluczPostepu, odczytajPostep, odczytajWpis, polaczPrzyPowrocie, stanHistorii, usunPostep, zapiszPostep, type Migawka } from "@/lib/stan-sprawy";
 import { Alert, Kroki } from "./ui";
 import Szkielet from "./Szkielet";
+import st from "./Sprawa.module.css";
 
 const tekstPytania = (q: Pyt, o: Odp) => (typeof q.tekst === "function" ? q.tekst(o) : q.tekst);
 const kolumnyDanych = { gridTemplateColumns: "fit-content(42%) minmax(0, 1fr)", overflowWrap: "anywhere" } as const;
 
-export default function SprawaWidok({ id }: { id: string }) {
+/**
+ * Pierwszy render (na serwerze i przy hydracji) pokazuje sprawę dla gościa: tytuł, wprowadzenie i pierwsze pytanie,
+ * bo sesja siedzi w localStorage i serwer jej nie zna. Dopiero po hydracji (gotowa) dociągamy dane z profilu i stan
+ * zapisany we wpisie historii. `wstepny` to wynik sprawy bez pytań, policzony na serwerze.
+ */
+export default function SprawaWidok({ id, wstepny }: { id: string; wstepny?: Wynik }) {
   const { sesja, gotowa } = useSesja();
   const s = sprawa(id)!;
+  const zPytaniami = s.pytania.length > 0;
+  const przedSesja = !gotowa && zPytaniami;
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <p className="small no-print"><Link href="/sprawy" className="powrot">← Wróć do listy spraw</Link></p>
+      <WyborSprawy id={id} tytul={s.tytul} />
       <h1>{s.tytul}</h1>
-      {gotowa ? <WczytajSprawe key={JSON.stringify([id, sesja?.token])} s={s} sesja={sesja} /> : <Szkielet etykieta="Wczytuję sprawę…" />}
+      <p className="lead">{s.krotko}</p>
+      {przedSesja && <div className={st.sesja}><Szkielet etykieta="Pobieram dane z Twojego profilu…" /></div>}
+      <div className={przedSesja ? st.gosc : undefined}>
+        <WczytajSprawe key={JSON.stringify([id, zPytaniami ? sesja?.token : null])} s={s} sesja={sesja} podglad={!gotowa} wstepny={wstepny} />
+      </div>
     </div>
   );
 }
 
-function WczytajSprawe({ s, sesja }: { s: Sprawa; sesja: Sesja | null }) {
+/** Na szerokości 800-1024 px menu boczne ze sprawami jest za wąskie, więc zastępuje je rozwijany wybór (CSS: .sprawy-wybor). */
+function WyborSprawy({ id, tytul }: { id: string; tytul: string }) {
+  const [otwarte, setOtwarte] = useState(false);
+  useEffect(() => { setOtwarte(false); }, [id]);
+  return (
+    <div className="sprawy-wybor no-print" onKeyDown={(e) => { if (e.key === "Escape") setOtwarte(false); }}>
+      <button type="button" className="sprawy-wybor__btn" aria-expanded={otwarte} aria-controls="sprawy-wybor-lista" onClick={() => setOtwarte(!otwarte)}>
+        <span><span className="sprawy-wybor__etykieta">Inne sprawy</span><b>{tytul}</b></span>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false" className="sprawy-wybor__strzalka"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      <ul id="sprawy-wybor-lista" hidden={!otwarte}>
+        {SPRAWY.map((x) => (
+          <li key={x.id}><Link href={`/sprawa/${x.id}`} aria-current={x.id === id ? "page" : undefined}>{x.tytul}</Link></li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function WczytajSprawe({ s, sesja, podglad, wstepny }: { s: Sprawa; sesja: Sesja | null; podglad: boolean; wstepny?: Wynik }) {
   const [ctx, setCtx] = useState<Ctx | null>(sesja && s.pytania.length ? null : {});
   const [blad, setBlad] = useState(false);
   const [proba, setProba] = useState(0);
@@ -47,25 +79,30 @@ function WczytajSprawe({ s, sesja }: { s: Sprawa; sesja: Sesja | null }) {
     </>
   );
   if (!ctx) return <Szkielet etykieta="Pobieram dane z Twojego profilu…" />;
-  return <KrokiSprawy s={s} c={ctx} token={sesja?.token ?? ""} />;
+  return <KrokiSprawy s={s} c={ctx} token={sesja?.token ?? ""} podglad={podglad} wstepny={wstepny} />;
 }
 
-function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
+// podglad: render z serwera i hydracja, zanim wiadomo, kto jest zalogowany. Historii przeglądarki nie ruszamy wtedy wcale.
+function KrokiSprawy({ s, c, token, podglad, wstepny }: { s: Sprawa; c: Ctx; token: string; podglad: boolean; wstepny?: Wynik }) {
   const idPytan = s.pytania.map((x) => x.id);
   const [domyslne] = useState(() => domyslneOdpowiedzi(s.pytania, c));
-  // Wpis historii z tej samej sprawy i profilu: po odświeżeniu albo powrocie wracamy dokładnie do tego kroku.
-  const [zapis] = useState(() => odczytajWpis(history.state, s.id, token, idPytan));
-  const [m, setM] = useState<Migawka>(() => zapis?.m ?? {
+  // Pierwszy render jest zawsze „od początku" (tak samo na serwerze i w przeglądarce, więc hydracja się nie rozjeżdża).
+  // Wpis historii z tej samej sprawy i profilu przywraca useLayoutEffect niżej, jeszcze przed pierwszym malowaniem:
+  // po odświeżeniu albo powrocie wracamy dokładnie do tego kroku.
+  const [m, setM] = useState<Migawka>(() => ({
     faza: !s.pytania.length ? "wynik" : Object.keys(domyslne).length ? "dane" : "pytania",
     historia: [], odp: domyslne, potwierdzone: {},
-  });
+  }));
   const { faza, historia, odp, potwierdzone } = m;
-  const [n, setN] = useState(zapis?.n ?? 0);
-  const numer = useRef(zapis?.n ?? 0);
+  const [n, setN] = useState(0);
+  const numer = useRef(0);
   const ruch = useRef(false);
+  const czeka = useRef<Migawka | null>(null); // przywrócona migawka, po której trzeba ustawić fokus
   const blok = useRef<HTMLDivElement>(null);
   const [szkice, setSzkice] = useState<Record<string, string>>({});
-  const [wynik, setWynik] = useState<Wynik | null>(null);
+  const klucz = kluczPostepu(s.id, token);
+  const [zapisane, setZapisane] = useState<Migawka | null>(null);
+  const [wynik, setWynik] = useState<Wynik | null>(!s.pytania.length ? wstepny ?? null : null);
   const [blad, setBlad] = useState("");
   const [bladPola, setBladPola] = useState("");
   const [proba, setProba] = useState(0);
@@ -86,14 +123,25 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
     ruch.current = true;
     numer.current += 1;
     setN(numer.current);
-    history.pushState(stanHistorii(history.state, { s: s.id, t: token, n: numer.current, m: nastepna }), "");
+    const wpis = { s: s.id, t: token, n: numer.current, m: nastepna };
+    history.pushState(stanHistorii(history.state, wpis), "");
+    if (!podglad) zapiszPostep(klucz, wpis);
     setM(nastepna);
   }
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (podglad) return;
     const poprzednie = history.scrollRestoration;
     history.scrollRestoration = "manual";
-    if (zapis) ruch.current = zapis.n > 0;
-    else history.replaceState(stanHistorii(history.state, { s: s.id, t: token, n: 0, m }), "");
+    const zapis = odczytajWpis(history.state, s.id, token, idPytan);
+    if (zapis) {
+      numer.current = zapis.n;
+      setN(zapis.n);
+      setM(zapis.m);
+      czeka.current = zapis.n > 0 ? zapis.m : null;
+    } else {
+      history.replaceState(stanHistorii(history.state, { s: s.id, t: token, n: 0, m }), "");
+      setZapisane(odczytajPostep(klucz, s.id, token, idPytan));
+    }
     const poCofnieciu = (e: PopStateEvent) => {
       const w = odczytajWpis(e.state, s.id, token, idPytan);
       if (!w) return;
@@ -109,10 +157,11 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
       window.removeEventListener("popstate", poCofnieciu);
       history.scrollRestoration = poprzednie;
     };
-  }, []);
+  }, [podglad]);
 
   // Wynik liczymy z odpowiedzi, więc działa tak samo po kliknięciu, cofnięciu i odświeżeniu.
   useEffect(() => {
+    if (!s.pytania.length && wstepny) return; // wynik sprawy bez pytań przyszedł już z serwera
     setWynik(null);
     setBlad("");
     if (faza !== "wynik") return;
@@ -127,6 +176,11 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
   // Po zmianie kroku: tytuł pytania na górę widoku (pod nagłówkiem, jeśli jest przyklejony) i fokus na nim.
   // Na telefonie pole nie dostaje fokusu, bo klawiatura zasłoniłaby pytanie.
   useEffect(() => {
+    if (czeka.current) {
+      if (czeka.current !== m) return; // jeszcze nie ten render, w którym widać przywrócony krok
+      czeka.current = null;
+      ruch.current = true;
+    }
     if (!ruch.current || busy) return;
     ruch.current = false;
     const el = blok.current;
@@ -159,6 +213,14 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
     idz({ faza: pierwsze ? "pytania" : "wynik", historia: pierwsze ? [pierwsze.id] : [], odp, potwierdzone: p });
   }
   const wstecz = () => history.back();
+  const wznow = () => { if (zapisane) idz(zapisane); setZapisane(null); };
+  const zacznijOdNowa = () => { usunPostep(klucz); setZapisane(null); };
+  const wznowienie = zapisane && n === 0 && faza !== "wynik" && (
+    <div className="alert info no-print" role="status">
+      <b>Masz zapisane odpowiedzi.</b> Możesz wrócić do tego, co już wpisano, albo zacząć od nowa.
+      <div className="row mt"><button type="button" className="btn btn-primary btn-sm" onClick={wznow}>Wróć do moich odpowiedzi</button><button type="button" className="btn btn-ghost btn-sm" onClick={zacznijOdNowa}>Zacznij od nowa</button></div>
+    </div>
+  );
   const przyciskWstecz = n > 0 && <p className="no-print" style={{ margin: "0 0 12px" }}><button type="button" className="btn btn-ghost btn-sm" onClick={wstecz}>← Poprzednie pytanie</button></p>;
 
   return (
@@ -167,6 +229,7 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
 
       {faza === "dane" && (
         <div className="card" ref={blok}>
+          {wznowienie}
           {przyciskWstecz}
           <span className="lab" data-fokus tabIndex={-1}>Krok 1 · Sprawdź swoje dane</span>
           <p className="muted small mt">Dane pobrane z ZUS (profil testowy: {c.osoba}). Sprawdź, czy wszystko się zgadza. Jeśli zauważysz błąd, możesz go teraz poprawić.</p>
@@ -177,8 +240,9 @@ function KrokiSprawy({ s, c, token }: { s: Sprawa; c: Ctx; token: string }) {
 
       {faza === "pytania" && q && (
         <div className="card" key={q.id} ref={blok}>
+          {wznowienie}
           {przyciskWstecz}
-          <span className="lab">Pytanie {i + 1}</span>
+          <span className="lab">Pytanie {i + 1} z {pytania.length}</span>
           <h2 className="mt" id="pyt" data-fokus tabIndex={-1}>{tekstPytania(q, odp)}</h2>
           {q.typ === "wybor" && <div role="group" aria-labelledby="pyt">{q.opcje!.map((op) => <button key={op.v} className={"opt" + (odp[q.id] === op.v ? " sel" : "")} aria-pressed={odp[q.id] === op.v} onClick={() => odpowiedz(op.v)}><b>{op.label}</b>{op.opis && <span className="muted small" style={{ display: "block" }}>{op.opis}</span>}</button>)}</div>}
           {q.typ === "tak_nie" && <div className="row" role="group" aria-labelledby="pyt"><button className={"opt" + (odp[q.id] === "tak" ? " sel" : "")} aria-pressed={odp[q.id] === "tak"} style={{ flex: 1 }} onClick={() => odpowiedz("tak")}><b>Tak</b></button><button className={"opt" + (odp[q.id] === "nie" ? " sel" : "")} aria-pressed={odp[q.id] === "nie"} style={{ flex: 1 }} onClick={() => odpowiedz("nie")}><b>Nie</b></button></div>}
@@ -235,30 +299,53 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
       setBladKopii(true);
     }
   }
+  // Ściąga i lista dokumentów w jednym pliku tekstowym: da się go otworzyć na telefonie i wysłać sobie.
+  function pobierzPlik() {
+    const tresc = [
+      w.sciaga?.tytul ?? "Moje dane do wniosku",
+      "",
+      ...(w.sciaga?.wiersze.map(([pole, wpisz]) => `${pole}: ${wpisz}`) ?? []),
+      ...(w.dokumenty ? ["", `${w.dokumenty.tytul}:`, ...w.dokumenty.pozycje.map((p) => `[ ] ${p}`)] : []),
+    ].join("\r\n");
+    const adres = URL.createObjectURL(new Blob(["﻿" + tresc], { type: "text/plain;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = adres;
+    a.download = "moje-dane-do-wniosku.txt";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(adres), 1000);
+  }
   const druki = (w.druki ?? []).filter((d, i, a) => a.indexOf(d) === i);
   const powiazane = (w.nastepne ?? []).map((id) => sprawa(id)).filter(Boolean);
-  // Spis „Na tej stronie" tylko przy długim wyniku, żeby nie dokładać elementu tam, gdzie wszystko widać od razu.
-  const spis: [string, string][] = [
-    ...(w.zrob.length ? [["w-zrob", "Co teraz zrobić"] as [string, string]] : []),
-    ...(w.tabela ? [["w-tabela", "Tabela z wyliczeniem"] as [string, string]] : []),
-    ...(w.info ?? []).map((x, i): [string, string] => [`w-info-${i}`, x.tytul]),
-    ...(w.sciaga ? [["w-sciaga", w.sciaga.tytul] as [string, string]] : []),
-    ...(w.tekstDoKopii ? [["w-tekst", w.tekstDoKopii.tytul] as [string, string]] : []),
-    ...(w.jakLiczono?.length ? [["w-jak", "Jak to policzyliśmy"] as [string, string]] : []),
-  ];
-  function skocz(e: React.MouseEvent, id: string) {
-    e.preventDefault();
-    const cel = document.getElementById(id);
-    const naglowek = cel?.querySelector<HTMLElement>("h2, h3, summary") ?? null;
-    if (naglowek && !naglowek.hasAttribute("tabindex") && naglowek.tagName !== "SUMMARY") naglowek.tabIndex = -1;
-    przejdzDoKroku(cel, naglowek);
-  }
+  const infoOtwarte = (w.info ?? []).filter((x) => !x.zwiniete);
+  const infoZwiniete = (w.info ?? []).filter((x) => x.zwiniete);
+  const tabela = w.tabela && (
+    <>
+      <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr>{w.tabela.kolumny.map((k) => <th key={k}>{k}</th>)}</tr></thead><tbody>{w.tabela.wiersze.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j} data-label={w.tabela!.kolumny[j]}>{c}</td>)}</tr>)}</tbody></table></div>
+      {w.tabela.uwaga && <p className="small muted mt">{w.tabela.uwaga}</p>}
+    </>
+  );
+  const tabelaSciagi = w.sciaga && (
+    <>
+      <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Pole na druku</th><th>Wpisz</th><th>Skąd to wziąć</th></tr></thead><tbody>{w.sciaga.wiersze.map(([a, b, c], i) => <tr key={i}><td data-label="Pole na druku">{a}</td><td data-label="Wpisz"><b>{b}</b></td><td data-label="Skąd to wziąć" className="muted">{c}</td></tr>)}</tbody></table></div>
+      {w.sciaga.uwaga && <p className="small muted mt">{w.sciaga.uwaga}</p>}
+    </>
+  );
   return (
     <>
+      {/* Najważniejszy termin jest nad wynikiem, żeby nikt nie musiał go szukać na dole strony. */}
+      {w.pilne && <div className="alert err pilne" role="note" id="w-pilne"><span className="pilne__lab">Ważny termin</span><p>{w.pilne.tekst}</p></div>}
+
       <div className={"card" + (w.lagodny ? " navy" : "")}>
+        <h2 style={{ marginTop: 0 }} data-fokus tabIndex={-1}>{w.glowne}</h2>
+        {w.duza && <div className="big">{w.duza}</div>}
+        {w.podpis && <p className="muted">{w.podpis}</p>}
+        {w.szczegoly && <dl className="kv mt" style={kolumnyDanych}>{w.szczegoly.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}
+        {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{x}</Alert>)}
         {w.status === "do_potwierdzenia" && (
           <Alert t="warn">
-            <b>Warto potwierdzić w ZUS.</b>{" "}
+            <b>Do sprawdzenia.</b>{" "}
             {w.uwagaStatus
               ? w.uwagaStatus.replace(/^Sprawdź w ZUS[\.\s–-]*/i, "")
               : "W tej sytuacji przepisy wymagają indywidualnej oceny przez pracownika ZUS."}
@@ -271,37 +358,36 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
             <Link href="/pue">Napisz do konsultanta ZUS przez PUE / eZUS</Link>
           </Alert>
         )}
-        <h2 style={{ marginTop: 0 }} data-fokus tabIndex={-1}>{w.glowne}</h2>
-        {w.duza && <div className="big">{w.duza}</div>}
-        {w.podpis && <p className="muted">{w.podpis}</p>}
-        {w.szczegoly && <dl className="kv mt" style={kolumnyDanych}>{w.szczegoly.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}
-        {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{x}</Alert>)}
       </div>
 
-      {spis.length >= 3 && (
-        <nav className="na-stronie no-print" aria-label="Na tej stronie">
-          <b>Na tej stronie</b>
-          <ul>{spis.map(([id, t]) => <li key={id}><a href={`#${id}`} onClick={(e) => skocz(e, id)}>{t}</a></li>)}</ul>
-        </nav>
+      {w.zrob.length > 0 && (
+        <div className="card mt" id="w-zrob"><h2>Co teraz zrobić</h2>
+          <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{z.tekst}{z.uwaga && <div className="small muted">{z.uwaga}</div>}</li>)}</ol>
+          {!w.pilne && w.terminy && w.terminy.length > 0 && <><h3 className="mt">Ważne terminy</h3><ul className="clean warnlist">{w.terminy.map((t, i) => <li key={i}><b>{dataPL(t.do)}</b> ({zaIle(t.do)}): {t.co}</li>)}</ul></>}
+        </div>
       )}
 
-      {w.tabela && <div className="card mt" id="w-tabela"><div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr>{w.tabela.kolumny.map((k) => <th key={k}>{k}</th>)}</tr></thead><tbody>{w.tabela.wiersze.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j} data-label={w.tabela!.kolumny[j]}>{c}</td>)}</tr>)}</tbody></table></div>{w.tabela.uwaga && <p className="small muted mt">{w.tabela.uwaga}</p>}</div>}
-
-      {w.info?.map((x, i) => <div key={x.tytul} id={`w-info-${i}`} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{x.tresc}</p></div>)}
-
-      {w.zrob.length > 0 && (
-        <div className="card mt" id="w-zrob"><h2>Co teraz zrobić krok po kroku</h2>
-          <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{z.tekst}{z.uwaga && <div className="small muted">{z.uwaga}</div>}</li>)}</ol>
-          {w.terminy && w.terminy.length > 0 && <><h3 className="mt">Ważne terminy</h3><ul className="clean warnlist">{w.terminy.map((t, i) => <li key={i}><b>{dataPL(t.do)}</b> ({zaIle(t.do)}): {t.co}</li>)}</ul></>}
+      {w.dokumenty && (
+        <div className="card mt" id="w-dokumenty"><h2>{w.dokumenty.tytul}</h2>
+          <ul className="zabierz">{w.dokumenty.pozycje.map((p, i) => <li key={i}><label><input type="checkbox" /><span>{p}</span></label></li>)}</ul>
         </div>
       )}
 
       {w.sciaga && (
-        <div className="card mt" id="w-sciaga"><h2>{w.sciaga.tytul}</h2><p className="small muted" style={{ marginTop: 0 }}>Pobierz formularz ZUS lub otwórz go w PUE / eZUS i przepisz poniższe dane do odpowiednich rubryk:</p>
-          <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>Pole na druku</th><th>Wpisz</th><th>Skąd to wziąć</th></tr></thead><tbody>{w.sciaga.wiersze.map(([a, b, c], i) => <tr key={i}><td data-label="Pole na druku">{a}</td><td data-label="Wpisz"><b>{b}</b></td><td data-label="Skąd to wziąć" className="muted">{c}</td></tr>)}</tbody></table></div>
-          {w.sciaga.uwaga && <p className="small muted mt">{w.sciaga.uwaga}</p>}
-          <div className="row mt no-print"><button className="btn btn-secondary btn-sm" onClick={() => kopiuj("sciaga", w.sciaga!.wiersze.map((r) => r.slice(0, 2).join(": ")).join("\n"))}>{skop === "sciaga" ? "Skopiowano do schowka ✓" : "Skopiuj dane do wniosku"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Wydrukuj ściągę</button></div></div>
+        <div className="card mt" id="w-sciaga"><h2>{w.sciaga.tytul}</h2><p className="small muted" style={{ marginTop: 0 }}>Otwórz druk w PUE / eZUS albo pobierz go ze strony ZUS i wpisz te dane w odpowiednie rubryki.</p>
+          <div className="row no-print"><button className="btn btn-primary btn-sm" onClick={pobierzPlik}>Pobierz moje dane do wniosku (plik)</button><button className="btn btn-secondary btn-sm" onClick={() => kopiuj("sciaga", w.sciaga!.wiersze.map((r) => r.slice(0, 2).join(": ")).join("\n"))}>{skop === "sciaga" ? "Skopiowano do schowka ✓" : "Skopiuj dane do wniosku"}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>Wydrukuj ściągę</button></div>
+          {w.zwinTabele
+            ? <details className="dl mt"><summary>Pokaż, co wpisać w którą rubrykę</summary>{tabelaSciagi}</details>
+            : <div className="mt">{tabelaSciagi}</div>}
+        </div>
       )}
+
+      {tabela && (w.zwinTabele
+        ? <details className="dl mt" id="w-tabela"><summary>Pokaż tabelę z wyliczeniem</summary><div className="card mt">{tabela}</div></details>
+        : <div className="card mt" id="w-tabela">{tabela}</div>)}
+
+      {infoOtwarte.map((x, i) => <div key={x.tytul} id={`w-info-${i}`} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{x.tresc}</p></div>)}
+      {infoZwiniete.map((x) => <details key={x.tytul} className="dl mt"><summary>{x.tytul}</summary><p className="small" style={{ whiteSpace: "pre-line" }}>{x.tresc}</p></details>)}
 
       {w.tekstDoKopii && (
         <div className="card mt" id="w-tekst"><h2>{w.tekstDoKopii.tytul}</h2><pre className="wniosek" style={{ overflowWrap: "anywhere" }}>{w.tekstDoKopii.tresc}</pre>

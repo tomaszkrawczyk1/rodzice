@@ -1,0 +1,86 @@
+/* Kreator kalkulatora. Kolory biorą się ze zmiennych z globals.css, więc tryb wysokiego kontrastu działa sam
+   (tam --zus-green to żółty, --card czarny, --line biały). Tekst na zielonym tle: var(--card), nie biały. */
+
+.kreator { max-width: 62rem; margin-bottom: 24px; }
+
+/* --- pasek postępu i lista kroków --- */
+.postep { margin: 0 0 16px; }
+.licznik { margin: 0 0 8px; font-size: 16px; color: var(--muted); }
+.licznik b { color: var(--ink); }
+.pasek { height: 8px; background: var(--gray); border: 1px solid var(--line); }
+.wypelnienie { height: 100%; background: var(--zus-green); }
+@media (prefers-reduced-motion: no-preference) { .wypelnienie { transition: width .25s ease-out; } }
+
+.kroki { list-style: none; margin: 8px 0 0; padding: 0; display: flex; gap: 4px; }
+.krok { flex: 1 1 0; min-width: 0; display: flex; }
+.krokEl {
+  position: relative; flex: 1; min-width: 44px; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
+  padding: 4px 2px; font: inherit; font-size: 14px; line-height: 1.2; text-align: center; color: var(--ink);
+  background: none; border: 0; border-radius: 3px;
+}
+a.krokEl { cursor: pointer; text-decoration: none; color: var(--ink); }
+a.krokEl:hover { color: var(--ink); }
+a.krokEl:hover .nazwa { text-decoration: underline; }
+.numer {
+  flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%;
+  border: 2px solid var(--zus-green); font-weight: 700; font-size: 16px; background: var(--card); color: var(--ink);
+}
+.biezacy .numer { background: var(--zus-green); color: var(--card); }
+.biezacy .nazwa { font-weight: 700; }
+.zrobiony .numer { background: var(--gray); }
+.przyszly { color: var(--muted); }
+.przyszly .numer { border-color: var(--line); border-style: dashed; background: var(--card); color: var(--muted); }
+.nazwa { overflow-wrap: anywhere; }
+/* Wąski ekran: same numery, nazwa bieżącego kroku jest w liczniku nad paskiem (dla czytnika zostaje w nazwie przycisku). */
+@media (max-width: 719px) {
+  .nazwa { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+
+/* --- panel kroku --- */
+.panel { border: 1px solid var(--line); background: var(--card); padding: 16px 18px 20px; min-width: 0; }
+.tytul { margin: 0 0 16px; }
+.tytul:focus { outline: none; }
+.nawigacja { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.nawigacja > :only-child { margin-left: auto; }
+@media (max-width: 599px) {
+  .panel { padding: 14px 12px 16px; }
+  .nawigacja { flex-direction: column-reverse; }
+  .nawigacja > .btn, .nawigacja > :only-child { width: 100%; margin-left: 0; }
+}
+.sekcja { border: 1px solid var(--line); background: var(--gray); padding: 12px 14px; margin: 16px 0 12px; }
+.sekcja > :first-child { margin-top: 0; }
+.mala { font-size: 16px; color: var(--muted); margin: 8px 0; }
+
+/* --- wybór sytuacji / wariantu: radia w kartach --- */
+.zestaw { border: 0; margin: 0 0 8px; padding: 0; min-width: 0; }
+.zestaw legend { padding: 0; margin: 0 0 10px; font-weight: 700; }
+.opcje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.opcja {
+  display: flex; align-items: flex-start; gap: 12px; min-height: 56px; padding: 12px 14px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--card); min-width: 0;
+}
+.opcja input { flex: none; width: 24px; height: 24px; margin: 1px 0 0; accent-color: var(--zus-green); }
+.opcja b { display: block; }
+.opis { display: block; font-size: 16px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+.opcja:has(input:checked) { border-color: var(--zus-green); box-shadow: inset 5px 0 0 var(--zus-green); background: var(--gray); }
+.opcja:has(input:focus-visible) { outline: 3px solid var(--zus-navy); outline-offset: 2px; }
+.opcja:hover { border-color: var(--zus-green); }
+.pelne { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 719px) { .opcje { grid-template-columns: minmax(0, 1fr); } }
+
+/* --- wynik --- */
+.kwota { background: var(--gray); border: 1px solid var(--line); border-top: 7px solid var(--zus-green); padding: 18px 20px; margin: 0 0 16px; }
+.kwotaOpis { margin: 0; font-size: 16px; color: var(--muted); }
+.kwotaWartosc { margin: 4px 0 8px; font-size: clamp(2.25rem, 9vw, 3.5rem); line-height: 1.1; font-weight: 900; color: var(--zus-green); overflow-wrap: anywhere; }
+.pusta { color: var(--muted); }
+.podzial { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 0; }
+.podzial div { min-width: 0; }
+.podzial dt { font-size: 16px; color: var(--muted); }
+.podzial dd { margin: 0; font-size: 22px; font-weight: 700; overflow-wrap: anywhere; }
+.braki { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.podglad { margin: 16px 0 0; font-size: 16px; color: var(--muted); }
+.podglad b { color: var(--ink); }
+.statusLadowania { display: flex; align-items: center; gap: 10px; margin: 0; }
+.lista { margin: 0; padding: 0; list-style: none; }
+.lista li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+.lista li:last-child { border-bottom: 0; }

@@ -1,0 +1,469 @@
+{
+  "meta": {
+    "version": "1.1.0",
+    "locale": "pl-PL",
+    "asOf": "2026-11-21",
+    "note": "Reguły oparte na zus.pl, gov.pl i wyciągach przepisów z repozytorium (paczka_dla_programisty). Pozycje z verify=true wymagają potwierdzenia w ZUS, gminie lub u prawnika przed publikacją w aplikacji. Liczby zapisane jako {param, fallback} pochodzą z parametry.json."
+  },
+  "labels": {
+    "kind": { "deadline": "Termin", "recommended": "Zalecane", "info": "Informacja" },
+    "kindHelp": {
+      "deadline": "Po tej dacie możesz stracić prawo lub wyrównanie.",
+      "recommended": "Najlepiej zrobić do tej daty.",
+      "info": "Kamień milowy, nic nie składasz."
+    },
+    "category": {
+      "zus": "ZUS",
+      "employer": "Pracodawca",
+      "municipality": "Gmina",
+      "usc": "Urząd stanu cywilnego",
+      "health": "Zdrowie",
+      "tax": "Urząd skarbowy"
+    },
+    "who": { "mama": "Mama", "tata": "Tata", "all": "Oboje rodzice" },
+    "employment": {
+      "umowa": "Umowa o pracę",
+      "zlecenie": "Umowa zlecenie (dobrowolne chorobowe)",
+      "jdg": "Własna działalność (dobrowolne chorobowe)",
+      "brak": "Bez zatrudnienia, studia"
+    }
+  },
+  "rules": [
+    {
+      "id": "opieka10",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "deadline",
+      "when": { "type": "offset", "days": -210 },
+      "title": "Matka: opieka medyczna od 10. tygodnia ciąży",
+      "body": "Poproś lekarza lub położną o zaświadczenie, że opieka trwała od 10. tygodnia do porodu. Jest potrzebne do becikowego. Jeśli ciąża jest już dalej, zacznij od razu.",
+      "institution": "Lekarz lub położna",
+      "forms": ["Zaświadczenie o opiece medycznej od 10. tygodnia ciąży"],
+      "category": "health",
+      "verify": false,
+      "sources": ["https://www.gov.pl/web/gov/uzyskaj-becikowe"]
+    },
+    {
+      "id": "ciaza-prac",
+      "who": "mama",
+      "employment": ["umowa"],
+      "kind": "recommended",
+      "when": { "type": "offset", "days": -200 },
+      "title": "Zgłoś ciążę pracodawcy",
+      "body": "Przynieś zaświadczenie lekarskie o ciąży. Od tej chwili chroni cię zakaz wypowiedzenia. Zwolnienia ciążowe (e-ZLA) lekarz wystawia elektronicznie, nic nie składasz do ZUS.",
+      "institution": "Pracodawca",
+      "forms": ["Zaświadczenie lekarskie o ciąży"],
+      "category": "employer",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "chorobowe90",
+      "who": "mama",
+      "employment": ["zlecenie", "jdg"],
+      "kind": "recommended",
+      "when": { "type": "offset", "days": [{ "param": "limity_dni.karencja_ubezpieczenie_dobrowolne_dni", "multiply": -1, "fallback": 90 }] },
+      "title": "Dobrowolne chorobowe: zgłoś się z wyprzedzeniem",
+      "body": "Do zasiłku macierzyńskiego musisz być objęta ubezpieczeniem chorobowym w dniu porodu. Zasiłek chorobowy (np. zwolnienie w ciąży) z dobrowolnego ubezpieczenia przysługuje dopiero po 90 dniach ubezpieczenia, więc ta data to ostatni moment, by mieć te 90 dni w dniu porodu. ZUS sprawdza, czy zgłoszenie tuż przed porodem nie jest pozorne. Zgłoszenie: ZUS ZUA (zlecenie) albo ZUS ZZA (działalność).",
+      "institution": "ZUS",
+      "forms": ["ZUS ZUA", "ZUS ZZA"],
+      "category": "zus",
+      "verify": true,
+      "sources": []
+    },
+    {
+      "id": "macierz-start",
+      "who": "mama",
+      "employment": ["umowa"],
+      "kind": "info",
+      "when": { "type": "offset", "days": [{ "param": "wymiary_tygodnie.macierzynski_przed_porodem_max", "multiply": -7, "fallback": 6 }] },
+      "title": "Najwcześniejszy początek urlopu macierzyńskiego",
+      "body": "Urlop można zacząć do 6 tygodni przed planowanym porodem. Co najmniej 14 z 20 tygodni przypada po porodzie. Pracodawcy pokaż zaświadczenie z terminem porodu.",
+      "institution": "Pracodawca",
+      "forms": ["Zaświadczenie lekarskie o przewidywanym terminie porodu"],
+      "category": "employer",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "porod",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "info",
+      "isBirth": true,
+      "when": { "type": "offset", "days": 0 },
+      "title": "Poród i karta urodzenia",
+      "body": "Karta urodzenia trafia do urzędu stanu cywilnego (USC) najpóźniej w 3 dni od wystawienia. Dziecko dostaje PESEL po rejestracji urodzenia.",
+      "institution": "Szpital",
+      "forms": ["Karta urodzenia"],
+      "category": "usc",
+      "verify": false,
+      "sources": ["https://www.gov.pl/web/gov/zglos-urodzenie-dziecka"]
+    },
+    {
+      "id": "zcna",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "deadline",
+      "when": { "type": "offset", "days": 7 },
+      "title": "Zgłoszenie dziecka do ubezpieczenia zdrowotnego (ZUS ZCNA)",
+      "bodyByEmployment": {
+        "umowa": "Masz 7 dni od nadania dziecku PESEL, by podać pracodawcy dane i PESEL dziecka. Pracodawca zgłasza dziecko do ZUS (ZUS ZCNA) w kolejnych 7 dniach. Data obok jest orientacyjna: liczona od porodu, a PESEL dziecko dostaje później.",
+        "zlecenie": "Masz 7 dni od nadania dziecku PESEL, by podać zleceniodawcy dane i PESEL dziecka. Zleceniodawca zgłasza dziecko do ZUS (ZUS ZCNA) w kolejnych 7 dniach. Data obok jest orientacyjna: liczona od porodu, a PESEL dziecko dostaje później.",
+        "jdg": "Zgłaszasz dziecko sam jako płatnik składek, bezpośrednio do ZUS (ZUS ZCNA), w ciągu 7 dni od nadania PESEL. Data obok jest orientacyjna: liczona od porodu, a PESEL dziecko dostaje później."
+      },
+      "institution": "Pracodawca (zleceniodawca) lub ZUS",
+      "forms": ["ZUS ZCNA"],
+      "category": "zus",
+      "verify": true,
+      "sources": ["https://www.zus.pl/pracujacy/ubezpieczenie-zdrowotne-w-polsce/zasady-podlegania-ubezpieczeniu-zdrowotnemu/ubezpieczenie-czlonkow-rodziny"],
+      "links": [
+        { "title": "ZUS ZCNA (strona formularza)", "url": "https://www.zus.pl/-/zgloszenie-zus-zcna" },
+        { "title": "ZUS ZCNA (PDF)", "url": "https://www.zus.pl/documents/10182/18428/zcna.pdf/42c2bfc3-5281-4b22-8901-7f3d3c9c3c1a" }
+      ]
+    },
+    {
+      "id": "poz",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "recommended",
+      "when": { "type": "offset", "days": 14 },
+      "title": "Zapisz dziecko do lekarza POZ",
+      "body": "Wybierz lekarza i pielęgniarkę w przychodni (deklaracja wyboru). Zrób to przed pierwszymi bilansami i szczepieniami.",
+      "institution": "Przychodnia POZ",
+      "forms": ["Deklaracja wyboru lekarza POZ"],
+      "category": "health",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "zam-umowa",
+      "who": "mama",
+      "employment": ["umowa"],
+      "kind": "recommended",
+      "when": { "type": "offset", "days": 14 },
+      "title": "Wniosek o zasiłek macierzyński (ZAM)",
+      "body": "Zapytaj w kadrach, kto wypłaca zasiłek (pracodawca, który zgłasza do chorobowego ponad 20 osób, albo ZUS). Gdy ZUS: pracodawca wystawia Z-3, ty składasz ZAM i nie dołączasz odpisu aktu. Gdy pracodawca: dołącz skrócony odpis aktu urodzenia. Od 24 października 2026 jeden formularz ZAM zastąpił ZAM, ZUR i ZAO. Roszczenie o zasiłek przedawnia się po 6 miesiącach od końca okresu zasiłku.",
+      "institution": "ZUS lub pracodawca",
+      "forms": ["ZUS ZAM", "ZUS Z-3 (od pracodawcy)", "Skrócony odpis aktu urodzenia (gdy wypłaca pracodawca)"],
+      "category": "zus",
+      "verify": false,
+      "sources": [
+        "https://www.zus.pl/wzory-formularzy/zasilki/zasilek-macierzynski",
+        "https://www.zus.pl/-/kolejne-uproszczenia-w-zasi%C5%82kach"
+      ],
+      "links": [
+        { "title": "ZAM", "url": "https://www.zus.pl/-/wniosek-zas-54" },
+        { "title": "Z-3 (dla pracodawcy)", "url": "https://www.zus.pl/-/zaswiadczenie-zus-z-3" }
+      ]
+    },
+    {
+      "id": "zam-inne",
+      "who": "mama",
+      "employment": ["zlecenie", "jdg"],
+      "kind": "recommended",
+      "when": { "type": "offset", "days": 14 },
+      "title": "Wniosek o zasiłek macierzyński (ZAM) do ZUS",
+      "bodyByEmployment": {
+        "zlecenie": "Zasiłek wypłaca ZUS, więc nie dołączasz odpisu aktu urodzenia. Zleceniodawca wystawia zaświadczenie Z-3a. Wniosek ZAM złożysz przez PUE ZUS albo na papierze. Zasiłek przysługuje przy dobrowolnym chorobowym. Od 24 października 2026 jeden formularz ZAM zastąpił ZAM, ZUR i ZAO.",
+        "jdg": "Zasiłek wypłaca ZUS, więc nie dołączasz odpisu aktu urodzenia. Prowadząc działalność, składasz samo ZAM, bez dodatkowego zaświadczenia płatnika. Wniosek złożysz przez PUE ZUS albo na papierze. Zasiłek przysługuje przy dobrowolnym chorobowym. Od 24 października 2026 jeden formularz ZAM zastąpił ZAM, ZUR i ZAO."
+      },
+      "institution": "ZUS",
+      "forms": ["ZUS ZAM", "ZUS Z-3a (zlecenie, od zleceniodawcy)"],
+      "category": "zus",
+      "verify": true,
+      "sources": ["https://www.zus.pl/wzory-formularzy/zasilki/zasilek-macierzynski"],
+      "links": [
+        { "title": "ZAM", "url": "https://www.zus.pl/-/wniosek-zas-54" },
+        { "title": "Z-3a (dla zleceniodawcy)", "url": "https://www.zus.pl/-/zaswiadczenie-zus-z-3a" }
+      ]
+    },
+    {
+      "id": "zam-815",
+      "who": "mama",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "deadline",
+      "when": { "type": "offset", "days": [{ "param": "terminy_dni.wniosek_pelny_wymiar_81_5_po_porodzie", "fallback": 21 }] },
+      "title": "Wariant 81,5%: ostatni dzień na wniosek",
+      "body": "Chcesz pełny wymiar zasiłku (macierzyński i rodzicielski po 81,5% zamiast 100% i 70%)? W ZAM zaznacz pole o pełnym wymiarze i złóż wniosek najpóźniej tego dnia. Po terminie dostajesz 100% i 70%. Warunek: co najmniej jeden dzień urlopu rodzicielskiego przypada w pierwszym roku życia dziecka.",
+      "institution": "Płatnik zasiłku (pracodawca albo ZUS)",
+      "forms": ["ZUS ZAM"],
+      "category": "zus",
+      "verify": false,
+      "sources": ["https://www.zus.pl/wzory-formularzy/zasilki/zasilek-macierzynski"],
+      "links": [{ "title": "ZAM", "url": "https://www.zus.pl/-/wniosek-zas-54" }]
+    },
+    {
+      "id": "rodz-wniosek",
+      "who": "all",
+      "employment": ["umowa"],
+      "kind": "recommended",
+      "when": {
+        "type": "offset",
+        "days": [
+          { "param": "wymiary_tygodnie.urlop_macierzynski_wg_liczby_dzieci.1", "multiply": 7, "fallback": 20 },
+          { "param": "terminy_dni.wniosek_urlop_rodzicielski_przed_startem", "multiply": -1, "fallback": 21 }
+        ]
+      },
+      "title": "Wniosek do pracodawcy o urlop rodzicielski",
+      "body": "Składasz go minimum 21 dni przed początkiem urlopu. Gdy urlop rodzicielski zaczyna się zaraz po macierzyńskim ({{birth+140d}}), to ostatni dzień na wniosek. 9 tygodni urlopu rodzicielskiego przysługuje każdemu rodzicowi osobno.",
+      "institution": "Pracodawca",
+      "forms": ["Wniosek o urlop rodzicielski"],
+      "category": "employer",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "usc",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "deadline",
+      "when": { "type": "offset", "days": 21 },
+      "title": "Zgłoszenie urodzenia w USC i akt urodzenia",
+      "body": "Na zgłoszenie urodzenia jest 21 dni od wystawienia karty urodzenia (data obok liczona od porodu). Upewnij się, że szpital przekazał kartę. Ojciec niebędący mężem matki musi wcześniej uznać ojcostwo. Odbierz skrócony odpis aktu urodzenia, przyda się do wniosków, zwłaszcza gdy zasiłek wypłaca pracodawca.",
+      "institution": "Urząd stanu cywilnego (USC)",
+      "forms": ["Akt urodzenia (skrócony odpis)"],
+      "category": "usc",
+      "verify": false,
+      "sources": ["https://www.gov.pl/web/gov/zglos-urodzenie-dziecka"],
+      "links": [{ "title": "Zgłoś urodzenie dziecka (gov.pl)", "url": "https://www.gov.pl/web/gov/zglos-urodzenie-dziecka" }]
+    },
+    {
+      "id": "swiadczenie-rodz",
+      "who": "all",
+      "employment": ["brak"],
+      "kind": "deadline",
+      "when": { "type": "offset", "months": 3 },
+      "title": "Świadczenie rodzicielskie (1000 zł miesięcznie)",
+      "body": "Dla osób bez prawa do zasiłku macierzyńskiego, np. bez pracy lub na studiach. Wniosek SR-7 składasz w gminie lub ośrodku pomocy społecznej (papierowo albo przez Emp@tia lub ePUAP), nie w ZUS. Złożony w ciągu 3 miesięcy od narodzin daje prawo od narodzin, później od miesiąca złożenia. Przy jednym dziecku wypłata trwa zwykle 52 tygodnie.",
+      "institution": "Gmina lub ośrodek pomocy społecznej",
+      "forms": ["Wniosek o świadczenie rodzicielskie (SR-7)", "Akt urodzenia"],
+      "category": "municipality",
+      "verify": true,
+      "sources": ["https://www.gov.pl/web/gov/uzyskaj-swiadczenie-rodzicielskie"],
+      "links": [{ "title": "Uzyskaj świadczenie rodzicielskie (gov.pl)", "url": "https://www.gov.pl/web/gov/uzyskaj-swiadczenie-rodzicielskie" }]
+    },
+    {
+      "id": "kdr",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "minChildren": 3,
+      "kind": "recommended",
+      "when": { "type": "offset", "days": 60 },
+      "title": "Karta Dużej Rodziny",
+      "body": "Rodzina z trzecim i kolejnym dzieckiem ma prawo do Karty Dużej Rodziny (zniżki, m.in. w komunikacji i kulturze). Wniosek złożysz w gminie albo przez internet.",
+      "institution": "Gmina",
+      "forms": ["Wniosek o Kartę Dużej Rodziny"],
+      "category": "municipality",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "plus800",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "deadline",
+      "when": { "type": "offset", "months": 3 },
+      "title": "800+: wniosek z wyrównaniem od dnia urodzenia",
+      "body": "Wniosek SW-R składasz tylko elektronicznie do ZUS (eZUS, aplikacja mZUS, Emp@tia albo bank). Złożony do tego dnia daje świadczenie z wyrównaniem od narodzin, później dopiero od miesiąca złożenia.",
+      "institution": "ZUS",
+      "forms": ["Wniosek SW-R o świadczenie wychowawcze 800+"],
+      "category": "zus",
+      "verify": false,
+      "sources": ["https://www.zus.pl/swiadczenia/swiadczenia-dla-rodzin/swiadczenie-wychowawcze-800-plus"],
+      "links": [{ "title": "Świadczenie wychowawcze 800+ (zus.pl)", "url": "https://www.zus.pl/swiadczenia/swiadczenia-dla-rodzin/swiadczenie-wychowawcze-800-plus" }]
+    },
+    {
+      "id": "tata-zasw",
+      "who": "tata",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "recommended",
+      "when": { "type": "offset", "days": 100 },
+      "title": "Zaświadczenie od płatnika zasiłku matki",
+      "body": "Gdy przejmujesz część zasiłku po matce, do wniosku potrzebne są zaświadczenia od jej płatnika o okresie zasiłku. Niech matka załatwi je z wyprzedzeniem.",
+      "institution": "Płatnik zasiłku matki",
+      "forms": ["Zaświadczenie o okresie pobierania zasiłku przez matkę"],
+      "category": "zus",
+      "verify": true,
+      "sources": ["https://www.infor.pl/prawo/zasilki/zasilek-macierzynski/85676,Jak-ubiegac-sie-o-zasilek-macierzynski.html"]
+    },
+    {
+      "id": "tata-macierzynski",
+      "who": "tata",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "recommended",
+      "when": {
+        "type": "offset",
+        "days": [
+          { "param": "wymiary_tygodnie.macierzynski_matka_obowiazkowo_po_porodzie_min", "multiply": 7, "fallback": 14 },
+          { "param": "terminy_dni.wniosek_przejecie_macierzynskiego_przez_ojca_przed_startem", "multiply": -1, "fallback": 14 }
+        ]
+      },
+      "title": "Tata może przejąć resztę urlopu macierzyńskiego: wniosek",
+      "body": "Matka może zrezygnować z reszty macierzyńskiego po wykorzystaniu co najmniej 14 tygodni po porodzie, a resztę wykorzystuje tata (przy jednym dziecku to maksymalnie 6 z 20 tygodni). Wniosek do pracodawcy tata składa minimum 14 dni przed startem. Data obok dotyczy startu w najwcześniejszym możliwym dniu, czyli po 14 tygodniach od porodu. Matka składa swój wniosek o rezygnację minimum 7 dni przed powrotem do pracy.",
+      "institution": "Pracodawca (przy zleceniu i działalności: ZUS, wniosek ZAM)",
+      "forms": ["Wniosek o urlop macierzyński taty", "ZUS ZAM (zlecenie, działalność)"],
+      "category": "employer",
+      "verify": false,
+      "sources": ["Kodeks pracy, art. 180 § 4–5"],
+      "links": [{ "title": "ZAM", "url": "https://www.zus.pl/-/wniosek-zas-54" }]
+    },
+    {
+      "id": "zam-rodz",
+      "who": "all",
+      "employment": ["zlecenie", "jdg"],
+      "kind": "recommended",
+      "when": {
+        "type": "offset",
+        "days": [
+          { "param": "wymiary_tygodnie.urlop_macierzynski_wg_liczby_dzieci.1", "multiply": 7, "fallback": 20 },
+          { "param": "terminy_dni.wniosek_urlop_rodzicielski_przed_startem", "multiply": -1, "fallback": 21 }
+        ]
+      },
+      "title": "Wniosek ZAM za okres odpowiadający urlopowi rodzicielskiemu",
+      "body": "Bez umowy o pracę nie bierzesz urlopu, ale zasiłek za ten okres jest możliwy. Wniosek ZAM obejmuje konkretny okres, więc złóż go przed końcem zasiłku macierzyńskiego.",
+      "institution": "ZUS",
+      "forms": ["ZUS ZAM"],
+      "category": "zus",
+      "verify": true,
+      "sources": ["https://www.zus.pl/wzory-formularzy/zasilki/zasilek-macierzynski"],
+      "links": [{ "title": "ZAM", "url": "https://www.zus.pl/-/wniosek-zas-54" }]
+    },
+    {
+      "id": "macierz-koniec",
+      "who": "mama",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "info",
+      "when": {
+        "type": "offset",
+        "days": [{ "param": "wymiary_tygodnie.urlop_macierzynski_wg_liczby_dzieci.1", "multiply": 7, "fallback": 20 }, -1]
+      },
+      "title": "Koniec 20 tygodni macierzyńskiego (orientacyjnie)",
+      "body": "Liczone od dnia porodu, gdy nie wykorzystujesz części urlopu przed porodem. Potem następuje okres rodzicielski (41 tygodni), który rodzice mogą dzielić.",
+      "institution": null,
+      "forms": [],
+      "category": "employer",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "rodz-koniec",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "info",
+      "when": {
+        "type": "offset",
+        "days": [
+          { "param": "wymiary_tygodnie.urlop_macierzynski_wg_liczby_dzieci.1", "multiply": 7, "fallback": 20 },
+          { "param": "wymiary_tygodnie.urlop_rodzicielski.1", "multiply": 7, "fallback": 41 },
+          -1
+        ]
+      },
+      "title": "Koniec 41 tygodni urlopu rodzicielskiego (orientacyjnie)",
+      "body": "Przy wykorzystaniu całego okresu zaraz po macierzyńskim. Rodzice mogą go dzielić, więc ustalcie plan z pracodawcami.",
+      "institution": null,
+      "forms": [],
+      "category": "employer",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "becikowe",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "deadline",
+      "when": { "type": "offset", "months": 12 },
+      "title": "Becikowe 1000 zł: ostatni dzień na wniosek",
+      "body": "Wniosek składasz w gminie lub ośrodku pomocy społecznej albo przez Emp@tia, w ciągu 12 miesięcy od urodzenia. Po terminie wniosek nie jest rozpatrywany. Potrzebne jest zaświadczenie o opiece medycznej od 10. tygodnia ciąży do porodu. Obowiązuje kryterium dochodowe: wg gov.pl (stan na 1.10.2026) do 1 922 zł netto na osobę w rodzinie.",
+      "institution": "Gmina lub ośrodek pomocy społecznej",
+      "forms": ["Wniosek o zapomogę z tytułu urodzenia dziecka", "Zaświadczenie o opiece medycznej od 10. tygodnia ciąży"],
+      "category": "municipality",
+      "verify": false,
+      "sources": ["https://www.gov.pl/web/gov/uzyskaj-becikowe"],
+      "links": [
+        { "title": "Uzyskaj becikowe (gov.pl)", "url": "https://www.gov.pl/web/gov/uzyskaj-becikowe" },
+        { "title": "Wzór wniosku", "url": "https://www.gov.pl/web/rodzina/jednorazowa-zapomoga-z-tytulu-urodzenia-sie-dziecka-tzw-becikowe---wzor-wniosku-do-stosowania-od-1-listopada-2021-r" },
+        { "title": "Emp@tia", "url": "https://empatia.gov.pl" }
+      ]
+    },
+    {
+      "id": "aktywni-rodzice",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "recommended",
+      "when": { "type": "offset", "months": 12 },
+      "title": "Aktywny rodzic (tzw. babciowe): dziecko wchodzi w wiek 12 do 35 miesięcy",
+      "body": "Od 1.10.2024 dawny Rodzinny Kapitał Opiekuńczy (RKO) zastąpiły świadczenia Aktywny rodzic dla dzieci w wieku od 12. do 35. miesiąca. Prawo ustala się od miesiąca, w którym wpłynął wniosek, więc złóż go w miesiącu, w którym dziecko kończy 12 miesięcy. Wnioski tylko elektronicznie (PUE/eZUS). Wybierz wariant: „aktywni rodzice w pracy” (oboje rodzice pracują, dziecko nie chodzi do żłobka ani przedszkola; kwota wg strony ZUS z 2024 r.: 1500 zł miesięcznie), „aktywnie w domu” (500 zł miesięcznie) albo „aktywnie w żłobku” (gdy dziecko chodzi do żłobka). Kwoty sprawdź na zus.pl.",
+      "institution": "ZUS",
+      "forms": ["Wniosek o świadczenie Aktywny rodzic (PUE/eZUS)"],
+      "category": "zus",
+      "verify": true,
+      "sources": ["https://www.zus.pl/aktywnyrodzic/swiadczenie-aktywni-rodzice-w-pracy", "https://www.zus.pl/aktywnyrodzic/wiadczenie-aktywnie-w-domu"],
+      "links": [
+        { "title": "Aktywni rodzice w pracy (zus.pl)", "url": "https://www.zus.pl/aktywnyrodzic/swiadczenie-aktywni-rodzice-w-pracy" },
+        { "title": "Aktywnie w domu (zus.pl)", "url": "https://www.zus.pl/aktywnyrodzic/wiadczenie-aktywnie-w-domu" }
+      ]
+    },
+    {
+      "id": "plus800-nowy",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "recommended",
+      "when": { "type": "nextAnnual", "month": 2, "day": 1 },
+      "title": "800+: wniosek na kolejny okres świadczeniowy",
+      "body": "Okres świadczeniowy trwa od 1 czerwca do 31 maja, a nabór wniosków otwiera się 1 lutego. Wniosek złożony do 30 kwietnia daje wypłatę do 30 czerwca. Złożony do 30 czerwca daje prawo od 1 czerwca.",
+      "institution": "ZUS",
+      "forms": ["Wniosek SW-R o świadczenie wychowawcze 800+"],
+      "category": "zus",
+      "verify": false,
+      "sources": ["https://www.zus.pl/swiadczenia/swiadczenia-dla-rodzin/swiadczenie-wychowawcze-800-plus"]
+    },
+    {
+      "id": "pit",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "deadline",
+      "when": { "type": "calendar", "yearOffset": 1, "month": 4, "day": 30 },
+      "title": "PIT za rok urodzenia: ulga prorodzinna",
+      "body": "Rozlicz podatek za rok urodzenia dziecka najpóźniej do 30 kwietnia kolejnego roku. Ulga na dziecko zależy od formy opodatkowania i dochodów, więc sprawdź warunki przed rozliczeniem. Bez własnych dochodów może z niej skorzystać partner.",
+      "institution": "Urząd skarbowy",
+      "forms": ["PIT (roczne zeznanie podatkowe)"],
+      "category": "tax",
+      "verify": false,
+      "sources": []
+    },
+    {
+      "id": "ojcowski",
+      "who": "tata",
+      "employment": ["umowa", "zlecenie", "jdg"],
+      "kind": "deadline",
+      "when": {
+        "type": "offset",
+        "months": [{ "param": "limity_dni.urlop_ojcowski_do_wieku_dziecka_miesiecy", "fallback": 12 }],
+        "days": -1
+      },
+      "title": "Ostatni dzień na urlop ojcowski (2 tygodnie)",
+      "body": "Urlop ojcowski wykorzystasz do ukończenia przez dziecko 12. miesiąca życia (art. 182³ § 1 Kodeksu pracy). Pracodawcy złóż wniosek minimum 7 dni przed startem. Przy zleceniu i działalności składasz wniosek ZAM do ZUS.",
+      "institution": "Pracodawca lub ZUS",
+      "forms": ["Wniosek o urlop ojcowski", "ZUS ZAM (zlecenie, działalność)"],
+      "category": "employer",
+      "verify": false,
+      "sources": ["Kodeks pracy, art. 182³ § 1"],
+      "links": [{ "title": "ZAM", "url": "https://www.zus.pl/-/wniosek-zas-54" }]
+    },
+    {
+      "id": "dobry-start",
+      "who": "all",
+      "employment": ["umowa", "zlecenie", "jdg", "brak"],
+      "kind": "info",
+      "when": { "type": "calendar", "yearOffset": 6, "month": 7, "day": 1 },
+      "title": "Dobry Start 300+: pierwszy nabór wniosków",
+      "body": "Wnioski do ZUS są od 1 lipca do 30 listopada, na dziecko rozpoczynające rok szkolny. Dla dziecka urodzonego teraz to rok, w którym pójdzie do zerówki. Zasady mogą się do tego czasu zmienić.",
+      "institution": "ZUS",
+      "forms": ["Wniosek o Dobry Start 300+"],
+      "category": "zus",
+      "verify": true,
+      "sources": []
+    }
+  ]
+}

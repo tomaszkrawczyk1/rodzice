@@ -3,7 +3,10 @@ const pelnaData = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "lon
 const miesiacRok = new Intl.DateTimeFormat("pl-PL", { month: "long", year: "numeric", timeZone: "UTC" });
 
 export const pln = (n: number | undefined | null) => n == null || !Number.isFinite(n) ? "—" : waluta.format(n);
-export const liczba = (n: number, d = 2) => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: d }).format(n);
+const walutaPelna = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0, useGrouping: "always" });
+/** Kwota „na oko", do pełnych złotych: tam, gdzie obok stoi „ok.", grosze tylko by udawały dokładność. */
+export const plOk = (n: number | undefined | null) => n == null || !Number.isFinite(n) ? "—" : walutaPelna.format(n);
+export const liczba =(n: number, d = 2) => new Intl.NumberFormat("pl-PL", { maximumFractionDigits: d }).format(n);
 export function dataPL(iso?: string | null) {
   if (!iso) return "—";
   const data = new Date(iso + "T00:00:00Z");
@@ -23,7 +26,7 @@ export const RODZAJE: Record<string, string> = {
 };
 export const KOLORY: Record<string, string> = {
   macierzynski: "#00993f", macierzynski_przed_porodem: "#4cb86f", uzupelniajacy: "#7a4cc4", rodzicielski: "#00416e", rodzicielski_9tyg_drugiego_rodzica: "#0a7fb8",
-  ojcowski: "#d97a00", na_warunkach_macierzynskiego: "#00993f",
+  ojcowski: "#8a1c4d", na_warunkach_macierzynskiego: "#00993f",
 };
 
 export function opisObliczenia(tekst: string) {

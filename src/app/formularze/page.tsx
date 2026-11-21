@@ -1,6 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import { kanoniczny } from "@/lib/adres-serwisu";
 
-export const metadata = { title: "Formularze i konto w ZUS – Przewodnik Przyszłego Rodzica" };
+// /formularze to strona wyboru (cztery kafelki); sama instrukcja wypełniania druków jest pod /druki, więc to nie duplikaty.
+export const metadata: Metadata = {
+  title: "Formularze i konto w ZUS – Przewodnik Przyszłego Rodzica",
+  description: "Druki ZUS, kreator wniosków, odczyt danych ze skanu i konto w ZUS (eZUS): wybierz, co chcesz zrobić z papierami.",
+  alternates: { canonical: kanoniczny("/formularze") },
+};
 
 const POZYCJE = [
   { href: "/druki", tytul: "Druki ZUS", opis: "Kto składa który formularz i jak go wypełnić." },

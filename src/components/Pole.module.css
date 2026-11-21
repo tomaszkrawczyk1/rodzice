@@ -1,0 +1,6 @@
+/* Komunikat błędu pola. Kolor #b00020 na bieli ma ok. 7,5:1; w trybie wysokiego kontrastu jasny róż na czerni. */
+.blad { font-size: 16px; color: #b00020; font-weight: 400; }
+.blad b { font-weight: 700; }
+.pole :global([aria-invalid="true"]) { border: 2px solid #b00020; }
+:global(html.hc) .blad { color: #ffb3b3; }
+:global(html.hc) .pole :global([aria-invalid="true"]) { border-color: #ffb3b3; }

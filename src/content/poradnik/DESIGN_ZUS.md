@@ -4,6 +4,8 @@ Kolory i fonty poniżej **zmierzyłem na żywej stronie głównej zus.pl** (odcz
 
 ## Paleta (zmierzona)
 
+> **Decyzja (aktualizacja):** w naszej aplikacji pomarańcz z zus.pl NIE jest używany. Główne przyciski, chipy i akcenty są zielone (`--zus-green` #007834, hover `--zus-green-dark` #025a28), obramowania i drugorzędne przyciski granatowe (`--zus-navy`), fokus granatowy z białą przerwą. Bursztyn zostaje wyłącznie jako kolor ostrzeżeń (`--zus-warn*` w `src/app/globals.css`). Tryb wysokiego kontrastu używa jasnej zieleni `--hc-accent` na czerni. Tokeny są zdefiniowane w `:root` w `globals.css`.
+
 | Rola | Kolor | Gdzie na zus.pl |
 |---|---|---|
 | Zieleń ZUS (podstawowa) | `#007834` | pasek nad kafelkami, aktywny kafelek, logo |

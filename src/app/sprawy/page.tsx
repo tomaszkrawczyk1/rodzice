@@ -10,7 +10,10 @@ export default function Sprawy() {
       <h1>Co chcesz załatwić?</h1>
       <p className="lead">Wybierz sprawę. Zadamy kilka prostych pytań i powiemy, co zrobić krok po kroku.</p>
       <div className="grid g3">
-        {SPRAWY.map((s) => <Link key={s.id} href={`/sprawa/${s.id}`} className="tile"><span className={`ic ic-${s.id}`} aria-hidden="true">{s.ikona}</span><b>{s.tytul}</b><span>{s.krotko}</span><span className="time"><span className="ico-czas" aria-hidden="true" />{s.czas}</span></Link>)}
+        {SPRAWY.flatMap((s, i) => [
+          ...(i === 8 ? [<Link key="terminarz" href="/terminarz" className="tile"><span className="ic ic-terminy" aria-hidden="true">🗓️</span><b>Nie przegapić terminów</b><span>Oś terminów od daty porodu: co złożyć, gdzie i do kiedy. Plik do kalendarza w telefonie.</span><span className="time"><span className="ico-czas" aria-hidden="true" />4 pola · 1 min</span></Link>] : []),
+          <Link key={s.id} href={`/sprawa/${s.id}`} className="tile"><span className={`ic ic-${s.id}`} aria-hidden="true">{s.ikona}</span><b>{s.tytul}</b><span>{s.krotko}</span><span className="time"><span className="ico-czas" aria-hidden="true" />{s.czas}</span></Link>,
+        ])}
       </div>
       <Szukaj />
       <h2 className="mt">Dla bardziej zaawansowanych</h2>

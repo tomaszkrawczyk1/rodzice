@@ -1,0 +1,135 @@
+.terminarz {
+  max-width: 55rem;
+  margin-inline: 0;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.terminarz h2 { font-size: 23px; }
+.terminarz h3 { font-size: 18px; margin-bottom: .35em; }
+.terminarz ul, .terminarz ol { padding-inline-start: 1.35em; margin-block: .35em; }
+.terminarz li + li { margin-top: .25em; }
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- formularz ---------- */
+.formularz { margin-block: 1.25rem 1rem; background: #f3f3f3; }
+.pola { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .25rem 1.25rem; align-items: start; }
+.grupa { border: 0; margin: 0 0 12px; padding: 0; min-width: 0; }
+.grupa legend { font-weight: 700; padding: 0; margin-bottom: 5px; }
+.opcje { display: flex; flex-wrap: wrap; gap: .5rem; }
+.opcja {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  min-height: 44px;
+  padding: .4rem .9rem;
+  background: #fff;
+  border: 1px solid #767676;
+  border-radius: var(--radius);
+  font-weight: 700;
+  cursor: pointer;
+}
+.opcja input { width: 22px; height: 22px; margin: 0; accent-color: var(--zus-green); flex: none; }
+.opcja:has(input:checked) { border-color: var(--zus-green); box-shadow: inset 0 0 0 1px var(--zus-green); background: #fff; }
+.opcja:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.blad { color: #9d0000; font-weight: 700; margin: 0 0 .5rem; }
+.akcje { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; margin-top: .5rem; }
+.prywatnosc { font-size: 15px; color: var(--muted); flex: 1 1 18rem; min-width: 0; }
+
+.uwagi { display: grid; gap: 0; }
+.uwagi :global(.alert) { margin: .35rem 0; }
+
+/* ---------- wyniki ---------- */
+.wyniki { margin-top: 1.5rem; min-width: 0; }
+.start { border-left: 4px solid var(--zus-navy); }
+.start p:last-child { margin-bottom: 0; }
+.podsumowanie { border-top: 7px solid var(--zus-green); }
+.podsumowanieTytul { font-size: 20px; font-weight: 700; margin-bottom: .25rem; }
+.legenda { list-style: none; padding: 0 !important; margin: .75rem 0 !important; display: grid; gap: .4rem; }
+.legenda li { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; margin: 0; }
+.meta { font-size: 16px; margin: .35rem 0; color: #222; }
+.meta ul { margin: .2rem 0; }
+
+.filtr { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.25rem 0 .5rem; }
+.filtr .chip { margin: 0; }
+.chip[aria-pressed="true"] { background: var(--zus-green); border-color: var(--zus-green); color: #fff; }
+.chip[aria-pressed="true"]:hover { background: var(--zus-green-dark); }
+
+.grupaListy { margin-top: 1.75rem; }
+.grupaListy > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.grupaListy > summary h2 { margin: 0; display: inline; }
+.grupaListy > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.lista { list-style: none; padding: 0 !important; margin: .75rem 0 0 !important; display: grid; gap: .75rem; }
+.lista > li { margin: 0 !important; min-width: 0; }
+
+/* ---------- karta terminu ---------- */
+.karta { background: #fff; border: 1px solid var(--line); border-left: 5px solid #8a8a8a; padding: 14px 16px; min-width: 0; }
+.karta p:last-child { margin-bottom: 0; }
+.karta_deadline { border: 2px solid #9d0000; border-left-width: 10px; }
+.karta_recommended { border-left: 5px solid var(--zus-navy); }
+.karta_info { border-left: 5px solid #8a8a8a; background: #fcfcfc; }
+.porod { border-left: 5px solid var(--zus-green); background: #f3f3f3; }
+
+.data { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .75rem; margin: 0 0 .25rem; font-size: 17px; font-weight: 700; }
+.ile { font-weight: 400; color: #222; }
+.orient { font-size: 14px; font-weight: 700; color: var(--zus-navy); border: 1px solid var(--zus-navy); border-radius: 3px; padding: 1px 6px; background: #fff; }
+
+.znaczniki { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .5rem; }
+.znacznik { display: inline-block; padding: 3px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; border-radius: 3px; border: 1px solid transparent; }
+.znacznik_deadline { background: #9d0000; color: #fff; }
+.znacznik_recommended { background: #fff; color: var(--zus-navy); border-color: var(--zus-navy); }
+.znacznik_info { background: #ececec; color: #222; }
+.znacznik_porod { background: var(--zus-green); color: #fff; }
+.kategoria { display: inline-block; padding: 3px 8px; font-size: 15px; line-height: 1.3; border: 1px solid var(--line); border-radius: 3px; background: #fff; color: #222; }
+
+.opis { margin: 0 0 .5rem; }
+.linki { list-style: none; padding: 0 !important; margin: .5rem 0 !important; }
+.linki li { margin: 0; }
+.linki a { display: inline-block; min-height: 44px; align-content: center; font-weight: 700; }
+
+.sprawdz {
+  margin: .6rem 0 .25rem;
+  padding: 8px 12px;
+  background: var(--zus-warn-bg);
+  color: var(--zus-warn-text);
+  border: 1px solid var(--zus-warn);
+  border-left-width: 5px;
+  border-radius: var(--radius);
+}
+.zrodla { margin-top: .5rem; font-size: 15px; }
+.zrodla summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--zus-green-link); font-weight: 700; }
+.zrodla summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.zrodla ul { margin-top: 0; }
+
+@media (max-width: 640px) {
+  .pola { grid-template-columns: minmax(0, 1fr); }
+  .terminarz h1 { font-size: 28px; }
+  .karta { padding: 12px; }
+  .akcje > :global(.btn) { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminarz * { transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* wysoki kontrast włączany w ustawieniach dostępności strony */
+:global(html.hc) .karta, :global(html.hc) .opcja { background: #000; color: #fff; border-color: #fff; }
+:global(html.hc) .sprawdz { background: #000; color: var(--hc-accent); border-color: var(--hc-accent); }
+:global(html.hc) .ile, :global(html.hc) .meta, :global(html.hc) .prywatnosc, :global(html.hc) .kategoria { color: #fff; background: #000; }
+:global(html.hc) .znacznik_deadline, :global(html.hc) .znacznik_porod { background: var(--hc-accent); color: #000; }
+:global(html.hc) .znacznik_recommended, :global(html.hc) .znacznik_info { background: #000; color: #fff; border-color: #fff; }
+:global(html.hc) .orient { background: #000; color: var(--hc-accent); border-color: var(--hc-accent); }
+:global(html.hc) .karta_deadline { border-color: var(--hc-accent); }
+:global(html.hc) .blad { color: var(--hc-accent); }
+:global(html.hc) .podsumowanie, :global(html.hc) .formularz { background: #000; }

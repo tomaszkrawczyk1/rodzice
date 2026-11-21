@@ -34,7 +34,7 @@
   color: var(--zus-green-link);
 }
 .glownaData { max-width: 24rem; }
-.kalendarz input[type="date"] { font-size: 1em; min-width: 0; border-color: var(--zus-navy); }
+.kalendarz input[type="text"] { font-size: 1em; min-width: 0; border-color: var(--zus-navy); }
 .kalendarz input[aria-invalid="true"] { border-width: 2px; }
 .dwieDaty { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
 .warunek { min-height: 44px; padding-block: .5rem; cursor: pointer; }
@@ -75,13 +75,13 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
 .daty span { display: block; color: var(--muted); }
 .skutek { padding: .6em .75em; border-left: 3px solid var(--line); background: var(--gray); }
 .skutek strong { display: block; }
-.skutek .odznaka { display: table; margin-top: .45rem; white-space: normal; }
+.skutek .porada { display: block; margin-top: .45rem; color: var(--muted); }
 .zrodla { margin-top: .75rem; }
 .zrodla p { margin: 0; overflow-wrap: anywhere; }
 .ostrzezenie {
   margin-top: 1rem;
   padding: .75rem 1rem;
-  border-left: 4px solid #b36b00;
+  border-left: 4px solid var(--zus-warn);
   background: var(--gray);
   font-weight: 700;
 }
@@ -106,9 +106,9 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
 }
 
 :global(html.hc) .kalendarz { color-scheme: dark; }
-:global(html.hc) .kalendarz :global(.badge) { color: #000; background: #ffe14d; }
-:global(html.hc) .wyczysc { color: #ffe14d; background: #000; }
-:global(html.hc) .blad { color: #ffe14d; }
+:global(html.hc) .kalendarz :global(.badge) { color: #000; background: var(--hc-accent); }
+:global(html.hc) .wyczysc { color: var(--hc-accent); background: #000; }
+:global(html.hc) .blad { color: var(--hc-accent); }
 
 @media (max-width: 560px) {
   .dwieDaty { grid-template-columns: minmax(0, 1fr); gap: 0; }

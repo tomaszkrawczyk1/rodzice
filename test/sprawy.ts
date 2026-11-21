@@ -25,7 +25,7 @@ export async function testySpraw(rowne: Rowne) {
       return nextLoad(url, context);
     },
   });
-  const { sprawa, szukaj, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, aktywneOdpowiedzi, zbudujCtx, etykietaOdp } = await import("../src/lib/sprawy.ts").finally(() => hook.deregister());
+  const { sprawa, szukaj, zapytanieMaSens, bladOdpowiedzi, domyslneOdpowiedzi, zapiszOdpowiedz, aktywneOdpowiedzi, zbudujCtx, etykietaOdp } = await import("../src/lib/sprawy.ts").finally(() => hook.deregister());
   const pytania = (id: string) => sprawa(id)!.pytania;
   const pyt = (id: string, pole: string) => pytania(id).find((q) => q.id === pole)!;
   const { pln } = await import("../src/lib/format.ts");
@@ -108,6 +108,18 @@ export async function testySpraw(rowne: Rowne) {
   const pozny = await licz(wniosek, { dataPorodu: "2020-06-10", liczbaDzieci: "2", podstawaM: "5522.56", zatrudnienie: "umowa", platnik: "maly", wariant: "usredniony" });
   rowne("Po terminie 81,5%: kwota w standardowym wariancie i ostrzeżenie", [pozny.duza, pozny.ostrzezenia?.some((w) => w.includes("minął"))], [pln(70615.14), true]);
 
+  // Poprawki UX: najważniejszy termin na górze, lista dokumentów, mniej pytań, kwoty „ok." bez groszy.
+  rowne("ZAM: termin 81,5% jest osobno, na górze wyniku", zam.pilne?.do, dodajDni(przyszlaData, parametry.terminy_dni.wniosek_pelny_wymiar_81_5_po_porodzie));
+  rowne("ZAM po terminie: brak ramki z terminem", pozny.pilne, undefined);
+  rowne("ZAM: lista „Weź ze sobą” zawiera akt urodzenia i Z-3", [zam.dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia")), zam.dokumenty?.pozycje.some((x) => x.includes("Z-3"))], [true, true]);
+  rowne("ZAM, przyszły poród: jest zaświadczenie lekarskie", zam.dokumenty?.pozycje.some((x) => x.includes("Zaświadczenie lekarskie")), true);
+  rowne("ZAM: kwota miesięczna „ok.” bez groszy", /ok\. [\d\s]+zł miesięcznie/.test(zam.podpis ?? ""), true);
+  rowne("ZAM nie pyta o wariant wypłaty (zawsze porównanie)", pytania(wniosek).some((q) => q.id === "wariant"), false);
+  const pPlat = pyt(wniosek, "platnik");
+  rowne("ZAM pyta o wielkość firmy tylko, gdy ZUS ma ją w profilu", [pPlat.warunek?.({ zatrudnienie: "umowa" }, {}), pPlat.warunek?.({ zatrudnienie: "umowa" }, { liczbaUbezpieczonychPlatnika: 30 })], [false, true]);
+  const zdzialalnosc = await licz(wniosek, { dataPorodu: przyszlaData, liczbaDzieci: "1", podstawaM: "5000", zatrudnienie: "dzialalnosc", chorobowe: "tak" });
+  rowne("Działalność: bez zaświadczenia płatnika, wniosek do ZUS", [zdzialalnosc.dokumenty?.pozycje.some((x) => x.includes("Z-3")), zdzialalnosc.zrob[0].tekst.includes("w ZUS")], [false, true]);
+
   const p4 = await licz(urlop, { rodzaj: "uzupelniajacy", od: "2027-06-15", do: "2027-06-28", dziecko: "2027-01-02", imie: "Jan Testowy", pracodawca: "Firma testowa" });
   rowne("Uzupełniający: poprawny nagłówek i termin od końca macierzyńskiego", [p4.glowne.includes("o uzupełniający urlop macierzyński"), p4.terminy?.[0]?.do], [true, "2027-05-24"]);
   const p5 = await licz("podzial-urlopu", { dataPorodu: "2027-06-10", liczbaDzieci: "3", podstawaM: "5522.56", zatrudnienieO: "dzialalnosc", bruttoO: "7800", ojcowski: "tak", odOjcowski: "2027-07-02" });
@@ -163,4 +175,18 @@ export async function testySpraw(rowne: Rowne) {
   for (const [fraza, id] of frazy) {
     rowne(`Wyszukiwarka: ${fraza}`, szukaj(fraza, []).sprawy[0]?.id ?? null, id);
   }
+
+  // Pytania i odpowiedzi: przy odmowie pracodawcy ma wyjść pytanie, w którym o odmowie mowa, a nie pierwsze z listy sprawy.
+  const faq = JSON.parse(readFileSync(new URL("../src/content/poradnik/faq.json", import.meta.url), "utf8")).pytania;
+  const idFaq = (fraza: string) => szukaj(fraza, faq).faq.map((f: { id: string }) => f.id);
+  for (const fraza of ["szef nie chce dać urlopu", "pracodawca odmawia urlopu", "szefowa nie zgadza się na urlop", "kadry odmówiły urlopu rodzicielskiego"]) {
+    rowne(`Wyszukiwarka, odmowa pracodawcy: ${fraza}`, [szukaj(fraza, faq).sprawy[0]?.id, idFaq(fraza)], ["urlop-pracodawca", ["F13"]]);
+  }
+  rowne("Szef bez odmowy: nadal pytania powiązane ze sprawą", idFaq("szef urlop wniosek"), ["F12", "F14"]);
+  rowne("Odmowa bez wzmianki o pracodawcy nie zmienia trafień", szukaj("odmowa", faq).sprawy.length, 0);
+  rowne("Zwykłe zapytanie bez zmian (mąż chce wziąć urlop)", idFaq("mąż chce wziąć urlop"), ["F12", "F11"]);
+  rowne("HTML w zapytaniu: brak wyników", [szukaj("<b>x</b>", faq).sprawy.length, szukaj("<b>x</b>", faq).faq.length], [0, 0]);
+  rowne("zapytanieMaSens: <b>x</b>", zapytanieMaSens("<b>x</b>"), false);
+  rowne("zapytanieMaSens: puste i same spacje", [zapytanieMaSens(""), zapytanieMaSens("   ")], [false, false]);
+  rowne("zapytanieMaSens: zwykła fraza", zapytanieMaSens("urlop ojcowski"), true);
 }

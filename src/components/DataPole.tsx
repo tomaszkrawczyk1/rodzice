@@ -1,42 +1,39 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { dataZFormularza } from "@/lib/data-formularza";
-import { dataKrotka } from "@/lib/format";
+import { useRef, useState } from "react";
 import { Pole } from "./Pole";
 
-export function DataPole({ label, hint, value, onChange }: {
+const MIN = "1900-01-01";
+const MAX = "2100-12-31";
+
+/**
+ * Pole daty: natywny input type="date", tak samo jak w kalendarzu ciąży. Zamiast pola tekstowego z maską
+ * dostajemy systemowy wybór daty (na telefonie wygodny, dla czytnika ekranu z segmentami dzień/miesiąc/rok).
+ * API bez zmian: `value` i `onChange` to data ISO (RRRR-MM-DD) albo pusty tekst. Nowy, opcjonalny `error`
+ * pozwala rodzicowi pokazać własny komunikat (np. „pole wymagane").
+ */
+export function DataPole({ label, hint, error, value, onChange }: {
   label: string;
   hint?: string;
+  error?: string;
   value: string;
   onChange: (iso: string) => void;
 }) {
-  const [tekst, setTekst] = useState(() => value ? dataKrotka(value) : "");
-  const [sprawdz, setSprawdz] = useState(false);
-  const ostatnia = useRef(value);
   const pole = useRef<HTMLInputElement>(null);
+  const [wlasny, setWlasny] = useState("");
 
-  useEffect(() => {
-    if (value === ostatnia.current) return;
-    ostatnia.current = value;
-    pole.current?.setCustomValidity("");
-    setTekst(value ? dataKrotka(value) : "");
-    setSprawdz(false);
-  }, [value]);
+  // Niepełna data (np. sam dzień i miesiąc) albo rok spoza zakresu: natywne pole zwraca wtedy pusty tekst.
+  function sprawdz() {
+    const v = pole.current?.validity;
+    if (v?.badInput) setWlasny("Uzupełnij dzień, miesiąc i rok.");
+    else if (v?.rangeUnderflow || v?.rangeOverflow) setWlasny("Wpisz datę z lat 1900–2100.");
+    else setWlasny("");
+  }
 
-  const blad = sprawdz && tekst.trim() && !dataZFormularza(tekst);
   return (
-    <Pole label={label} hint={blad ? "Wpisz prawidłową datę, np. 5.04.2027." : [hint, "Dzień.miesiąc.rok, np. 5.04.2027."].filter(Boolean).join(" ")}>
-      <input ref={pole} type="text" inputMode="decimal" enterKeyHint="next" autoComplete="off" autoCapitalize="off" placeholder="np. 5.04.2027" value={tekst} aria-invalid={blad ? true : undefined}
-        onBlur={() => setSprawdz(true)}
-        onChange={(e) => {
-          const wartosc = e.target.value;
-          const iso = dataZFormularza(wartosc);
-          e.target.setCustomValidity(wartosc.trim() && !iso ? "Wpisz datę w formacie dzień.miesiąc.rok." : "");
-          setTekst(wartosc);
-          setSprawdz(false);
-          ostatnia.current = iso;
-          onChange(iso);
-        }} />
+    <Pole label={label} hint={hint} error={error || wlasny || undefined}>
+      <input ref={pole} type="date" min={MIN} max={MAX} autoComplete="off" value={value}
+        onBlur={sprawdz}
+        onChange={(e) => { setWlasny(""); onChange(e.target.value); }} />
     </Pole>
   );
 }

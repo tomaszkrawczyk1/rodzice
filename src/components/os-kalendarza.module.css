@@ -1,0 +1,156 @@
+/* Oś czasu kalendarza. Kolory z motywu zus.pl; tekst na każdym tle co najmniej 4,5:1 (AA). */
+.os { margin-top: 1rem; }
+.wstep { max-width: 65ch; }
+
+/* Pasek poglądowy (dekoracyjny, aria-hidden). Etykiety są pod i nad paskiem, nie w nim. */
+.pasek { position: relative; margin-block: 1.75rem 1.25rem; padding-block: 1.5rem; }
+.tor { position: relative; display: flex; height: 2.25rem; overflow: visible; }
+.ciaza, .rok {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-inline: .5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: .875rem;
+  font-weight: 700;
+  color: #fff;
+}
+.ciaza { background: #007834; border-radius: var(--radius) 0 0 var(--radius); }
+.rok { background: #00416e; border-radius: 0 var(--radius) var(--radius) 0; }
+.znacznikDzis {
+  position: absolute;
+  top: -.5rem;
+  bottom: -.5rem;
+  width: 6px;
+  margin-left: -3px;
+  background: #fff;
+  border: 1px solid var(--zus-navy);
+  border-radius: 2px;
+}
+.etykieta {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: .875rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.etykietaGora { top: 0; }
+.etykietaDol { bottom: 0; }
+.etykietaLewa { transform: none; margin-left: -3px; }
+.etykietaPrawa { transform: translateX(-100%); margin-right: -3px; }
+
+.filtry { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem .75rem; }
+.filtr {
+  min-width: 44px;
+  min-height: 44px;
+  padding: .35em .9em;
+  border: 1px solid #00416e;
+  border-radius: var(--radius);
+  background: #fff;
+  color: #00416e;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.filtr:hover { background: var(--gray); }
+.filtr[aria-pressed="true"] { background: #00416e; color: #fff; }
+.filtr:focus-visible { outline: 3px solid #00416e; outline-offset: 3px; }
+.minione { margin-bottom: .5rem; }
+
+.tylkoCzytnik {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Lista: jedna kolumna na każdej szerokości, więc bez przewijania poziomego na 375 px. */
+.lista { position: relative; margin: 1rem 0 0; padding: 0; list-style: none; }
+.lista::before {
+  content: "";
+  position: absolute;
+  top: .5rem;
+  bottom: .5rem;
+  left: .6875rem;
+  width: 2px;
+  background: #767676;
+}
+.lista > li { position: relative; margin: 0; padding: 0 0 .75rem 2.25rem; }
+.lista > li + li { margin-top: 0; }
+.kropka {
+  position: absolute;
+  left: .125rem;
+  top: .8rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--kolor, #00416e);
+  box-shadow: 0 0 0 2px var(--kolor, #00416e);
+}
+.r_badanie { --kolor: #00416e; }
+.r_wizyta { --kolor: #025a28; }
+.r_szczepienie { --kolor: #5b2a8c; }
+.r_zajecia { --kolor: #00606b; }
+.r_urlop { --kolor: #283754; }
+.r_wniosek { --kolor: #8a1c4d; }
+.r_porod { --kolor: #000; }
+
+.tresc { padding: .6rem .75rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
+.tresc.trwa { border-left: 4px solid var(--kolor); background: var(--gray); }
+.minelo .tresc { background: var(--gray); }
+.r_porod .tresc { border: 2px solid var(--ink); }
+.tresc p { margin: 0; }
+.data { font-weight: 700; }
+.tytul { margin-top: .15rem !important; }
+.tytul a { display: inline-block; min-height: 24px; font-weight: 700; }
+.znaczki { display: flex; flex-wrap: wrap; gap: .375rem; margin-top: .5rem !important; }
+.rodzaj, .stan {
+  display: inline-block;
+  padding: .1rem .5rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius);
+  font-size: .875rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.rodzaj { color: var(--kolor); }
+.stan { color: #222; background: #fff; border-color: #222; }
+
+/* Znacznik „Dziś” — zieleń z białym tekstem (5,6:1). */
+.lista > li.dzis { padding-bottom: .75rem; }
+.dzis p {
+  margin: 0;
+  padding: .45rem .75rem;
+  border-radius: var(--radius);
+  background: var(--zus-green);
+  color: #fff;
+}
+.dzis .kropka { --kolor: var(--zus-navy); background: var(--zus-green); }
+
+.przypis { max-width: 65ch; margin: .75rem 0 0; color: var(--muted); }
+
+@media (min-width: 700px) {
+  .tresc { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); column-gap: 1rem; row-gap: .25rem; }
+  .data { grid-column: 1; grid-row: 1 / span 2; }
+  .tytul { grid-column: 2; margin-top: 0 !important; }
+  .znaczki { grid-column: 2; margin-top: 0 !important; }
+}
+
+:global(html.hc) .ciaza, :global(html.hc) .rok { background: #000; color: var(--hc-accent); border: 2px solid var(--hc-accent); }
+:global(html.hc) .filtr { background: #000; color: var(--hc-accent); border-color: var(--hc-accent); }
+:global(html.hc) .filtr[aria-pressed="true"] { background: var(--hc-accent); color: #000; }
+:global(html.hc) .filtr:focus-visible { outline-color: #fff; }
+:global(html.hc) .lista::before { background: #fff; }
+:global(html.hc) .kropka { --kolor: var(--hc-accent); border-color: #000; background: var(--hc-accent); }
+:global(html.hc) .rodzaj { color: var(--hc-accent); }
+:global(html.hc) .stan { background: var(--hc-accent); color: #000; border-color: #000; }
+:global(html.hc) .dzis p { background: var(--hc-accent); color: #000; }
+:global(html.hc) .znacznikDzis { background: var(--hc-accent); border-color: #fff; }
+:global(html.hc) .r_porod .tresc { border-color: var(--hc-accent); }
+:global(html.hc) .tresc.trwa { border-left-color: var(--hc-accent); }
