@@ -1,0 +1,110 @@
+{
+  "_opis": "Katalog druków – TYLKO te, które mamy w folderze: ZAM, Z-3, Z-3a, ZAS-12, ZAS-26, ZAS-53. Opisy z Excela/JSON (zrodla). ZAS-12 i ZAS-53 – identyfikacja z treści zadania (sekcja o zasiłku chorobowym) i z Excela (wiersz 2, kol. N); nie ma o nich więcej w bazach, więc opis jest krótki.",
+  "link_wzory_zus": "https://www.zus.pl/wzory-formularzy",
+  "uwaga_prawna": "Puste wzory są publiczne na zus.pl (zakładka Wzory formularzy). Przykładowych SPRAW ZUS nie wolno rozpowszechniać. W aplikacji linkuj do zus.pl albo do własnej kopii pustego wzoru; nie wrzucaj wypełnionych dokumentów.",
+  "druki": [
+    {
+      "id": "ZAM",
+      "nazwa": "ZAM – Wniosek o zasiłek macierzyński",
+      "plik_lokalny": "ZAM_pobierz i drukuj.pdf",
+      "do_czego": "Zasiłek macierzyński za okres urlopu macierzyńskiego, na warunkach macierzyńskiego, rodzicielskiego, uzupełniającego i ojcowskiego.",
+      "kto_sklada": "Ubezpieczony ubiegający się o zasiłek. Osoba prowadząca działalność składa go bezpośrednio do ZUS.",
+      "gdzie": "Do płatnika zasiłku: pracodawca zgłaszający powyżej 20 ubezpieczonych sam ustala i wypłaca zasiłek; w pozostałych przypadkach ZUS.",
+      "terminy": ["Wariant 81,5%: najpóźniej 21 dni po porodzie (adopcja: 21 dni od przyjęcia dziecka).", "Przedawnienie: 6 miesięcy od ostatniego dnia okresu zasiłku."],
+      "uwagi": ["Od 24.10.2026 ZAM zastępuje ZUR i ZAO.", "W druku ZAM podaje się datę przyjęcia dziecka na wychowanie (adopcja / rodzina zastępcza)."],
+      "tutorial": [
+        "Ustal, kto wypłaca zasiłek: pracodawca z powyżej 20 ubezpieczonymi albo ZUS.",
+        "Wskaż, za jakie okresy wnioskujesz (macierzyński, na warunkach macierzyńskiego, rodzicielski, uzupełniający, ojcowski).",
+        "Chcesz wariant 81,5%? Złóż wniosek w ciągu 21 dni po porodzie.",
+        "Dołącz dokumenty właściwe dla Twojej sytuacji (lista w pytaniu o dokumenty).",
+        "Złóż wniosek: do pracodawcy (duży płatnik) albo do ZUS (papierowo lub elektronicznie, np. przez eZUS).",
+        "ZUS wypłaca zasiłek najpóźniej w 30 dni od wyjaśnienia ostatniej okoliczności niezbędnej do ustalenia prawa."
+      ],
+      "pytania": ["F07", "F08", "F09", "F17", "F18"],
+      "zrodla": [{ "typ": "excel", "wiersz": 5, "kol": ["F"] }, { "typ": "excel", "wiersz": 11, "kol": ["F"] }, { "typ": "excel", "wiersz": 20, "kol": ["F"] }, { "typ": "json", "id": "R-WND-01" }, { "typ": "json", "id": "R-WND-17" }, { "typ": "json", "id": "T-WND-01" }]
+    },
+    {
+      "id": "Z-3",
+      "nazwa": "Z-3 – Zaświadczenie płatnika składek (pracownik)",
+      "plik_lokalny": "Z-3_do druku.pdf",
+      "do_czego": "Dane do ustalenia zasiłków dla pracownika: okresy ubezpieczenia, składniki wynagrodzenia, stawka procentowa, dane dziecka i drugiego rodzica.",
+      "kto_sklada": "Płatnik składek (pracodawca) – przekazuje do ZUS, gdy to ZUS wypłaca zasiłek pracownikowi.",
+      "gdzie": "Do ZUS.",
+      "terminy": [],
+      "uwagi": ["Wypełnia pracodawca, nie rodzic – rodzic powinien wiedzieć, że pracodawca go potrzebuje.", "Druk zawiera informacje o wynagrodzeniu za okresy niezdolności do pracy oraz o składnikach wynagrodzenia: miesięcznych, kwartalnych, rocznych i za inne okresy."],
+      "tutorial": [
+        "Sprawdź, czy zasiłek wypłaca ZUS (pracodawca zgłasza 20 lub mniej ubezpieczonych) – tylko wtedy potrzebne jest Z-3.",
+        "Poproś pracodawcę o wystawienie Z-3.",
+        "Pracodawca wpisuje m.in. NIP/REGON, dane ubezpieczonego, okresy ubezpieczenia, datę złożenia wniosku o zasiłek macierzyński, stawkę procentową, dane dziecka, dane drugiego rodzica i numer rachunku bankowego.",
+        "Pracodawca wpisuje składniki wynagrodzenia z 12 miesięcy – z nich ZUS liczy podstawę wymiaru.",
+        "Pracodawca przekazuje Z-3 do ZUS razem z Twoim wnioskiem."
+      ],
+      "pytania": ["F10", "F11", "F17"],
+      "zrodla": [{ "typ": "json", "id": "R-WND-02" }, { "typ": "excel", "wiersz": 14, "kol": ["F"] }, { "typ": "excel", "wiersz": 5, "kol": ["F"] }]
+    },
+    {
+      "id": "Z-3a",
+      "nazwa": "Z-3a – Zaświadczenie płatnika składek (inny tytuł niż umowa o pracę)",
+      "plik_lokalny": "Z-3a_pobierz_plik_do_wydruku.pdf",
+      "do_czego": "Dane do ustalenia zasiłków dla ubezpieczonego niebędącego pracownikiem (np. zlecenie), z sekcją „Informacje o przychodzie”.",
+      "kto_sklada": "Płatnik składek – dla ubezpieczonego z innego tytułu niż umowa o pracę. Nie dotyczy osób prowadzących działalność, współpracujących, duchownych i marynarzy.",
+      "gdzie": "Do ZUS.",
+      "terminy": [],
+      "uwagi": ["Osoba prowadząca działalność nie składa dodatkowo zaświadczenia płatnika składek – wystarczy ZAM."],
+      "tutorial": [
+        "Masz umowę zlecenia (albo inny tytuł niż umowa o pracę), a zasiłek wypłaca ZUS? Zleceniodawca wystawia Z-3a.",
+        "W Z-3a podaje się przychód stanowiący podstawę wymiaru składek za kolejne miesiące.",
+        "Zleceniodawca przekazuje Z-3a do ZUS razem z Twoim wnioskiem ZAM."
+      ],
+      "pytania": ["F10", "F17"],
+      "zrodla": [{ "typ": "json", "id": "R-WND-03" }, { "typ": "excel", "wiersz": 14, "kol": ["F"] }, { "typ": "excel", "wiersz": 5, "kol": ["F"] }]
+    },
+    {
+      "id": "ZAS-26",
+      "nazwa": "ZAS-26 – Oświadczenie o przyjęciu na wychowanie dziecka",
+      "plik_lokalny": "druki_ZUS/ZAS-26_do pobrania.pdf",
+      "do_czego": "Do ustalenia prawa do zasiłku macierzyńskiego po przyjęciu dziecka na wychowanie: dane wnioskodawcy i płatnika, data przyjęcia dziecka jako rodzina zastępcza albo data wystąpienia do sądu opiekuńczego o przysposobienie, dane dziecka.",
+      "kto_sklada": "Ubezpieczony przyjmujący dziecko na wychowanie (adopcja / rodzina zastępcza niezawodowa).",
+      "gdzie": "Według Excela (zus.pl) dokument składa się w PUE przy wniosku o zasiłek w razie przysposobienia.",
+      "terminy": ["Wniosek o urlop na warunkach urlopu macierzyńskiego: 7 dni od przyjęcia dziecka; urlop rozpoczyna się najpóźniej 21 dni od tej daty."],
+      "uwagi": [],
+      "tutorial": [
+        "Weź datę przyjęcia dziecka na wychowanie (rodzina zastępcza) albo datę wystąpienia do sądu o przysposobienie.",
+        "Wpisz dane swoje, płatnika i dziecka.",
+        "Złóż razem z wnioskiem ZAM."
+      ],
+      "pytania": ["F23"],
+      "zrodla": [{ "typ": "excel", "wiersz": 11, "kol": ["F"] }, { "typ": "json", "id": "R-WND-05" }]
+    },
+    {
+      "id": "ZAS-53",
+      "nazwa": "ZAS-53 – Wniosek o zasiłek chorobowy (osoba prowadząca działalność)",
+      "plik_lokalny": "druki_ZUS/ZAS-53_do wydruku.pdf",
+      "do_czego": "Zasiłek chorobowy dla kobiety w ciąży prowadzącej pozarolniczą działalność (wg treści zadania).",
+      "kto_sklada": "Osoba prowadząca działalność.",
+      "gdzie": "Bezpośrednio do ZUS.",
+      "terminy": [],
+      "uwagi": ["Opis oparty na treści zadania i krótkiej wzmiance w Excelu (wiersz 2, kol. N) – brak szczegółów w bazach."],
+      "tutorial": [
+        "Lekarz wystawia e-ZLA z kodem B.",
+        "Nie wykonuj pracy zawodowej w czasie zwolnienia (zarobkowa praca na zwolnieniu odbiera zasiłek).",
+        "Złóż ZAS-53 do ZUS."
+      ],
+      "pytania": ["F01", "F20"],
+      "zrodla": [{ "typ": "excel", "wiersz": 2, "kol": ["F", "G"] }, { "typ": "zadanie", "sekcja": "Zasiłek chorobowy dla kobiety w ciąży – kobiety prowadzące działalność: wniosek ZAS-53" }]
+    },
+    {
+      "id": "ZAS-12",
+      "nazwa": "ZAS-12 – Zaświadczenie płatnika składek (dalszy okres zasiłku chorobowego)",
+      "plik_lokalny": "druki_ZUS/ZAS-12_pobierz_plik.pdf",
+      "do_czego": "Zasiłek chorobowy za dalszy okres niezdolności do pracy (wg treści zadania). W Excelu: „ZAS-12 w terminie 7 dni”.",
+      "kto_sklada": "Płatnik składek.",
+      "gdzie": "Do ZUS.",
+      "terminy": ["W terminie 7 dni (Excel, wiersz 2, kol. N)."],
+      "uwagi": ["Opis oparty na treści zadania i krótkiej wzmiance w Excelu – brak szczegółów w bazach."],
+      "tutorial": ["Pracodawca składa ZAS-12 do ZUS w terminie 7 dni."],
+      "pytania": ["F01"],
+      "zrodla": [{ "typ": "excel", "wiersz": 2, "kol": ["N"] }, { "typ": "zadanie", "sekcja": "Zasiłek chorobowy dla kobiety w ciąży – zaświadczenie płatnika składek Z-3 lub ZAS-12 (na dalszy okres)" }]
+    }
+  ]
+}

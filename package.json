@@ -7,7 +7,8 @@
     "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start -p 3100",
-    "test": "node --experimental-strip-types test/testy.ts"
+    "test": "node --experimental-strip-types test/testy.ts",
+    "weryfikuj": "node --experimental-strip-types src/content/poradnik/weryfikuj_poradnik.ts"
   },
   "dependencies": {
     "next": "16.4.6",

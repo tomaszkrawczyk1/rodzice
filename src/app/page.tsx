@@ -12,6 +12,9 @@ const ETAPY = [
   ["Adopcja / rodzina zastępcza", "Urlop na warunkach macierzyńskiego, limity wieku dziecka.", "/kalkulator?tryb=adopcja"],
 ] as const;
 const FUNKCJE = [
+  ["/kreator", "Kreator: co mnie dotyczy?", "Kilka pytań i gotowa lista odpowiedzi, druków i właściwy kalkulator."],
+  ["/poradnik", "Poradnik", "28 typowych pytań rodziców z krokami do wykonania."],
+  ["/druki", "Druki", "ZAM, Z-3, Z-3a, ZAS-12, ZAS-26, ZAS-53: do czego, kto składa, do kiedy."],
   ["/ciaza", "Co mi przysługuje", "Zasiłek chorobowy w ciąży, świadczenie rehabilitacyjne, brak uprawnień i co wtedy."],
   ["/kalkulator", "Kalkulator zasiłku", "Matka, ojciec, oboje, łączenie z pracą, adopcja – okres i kwota."],
   ["/dokumenty", "Dokumenty i terminy", "Kto wypłaca (pracodawca czy ZUS), jaki druk i do kiedy."],
@@ -34,7 +37,7 @@ export default function Home() {
       <section className="hero">
         <h1>Wiesz, co Ci przysługuje, zanim urodzi się dziecko</h1>
         <p>Odpowiedz na kilka pytań, a pokażemy zasiłki i urlopy dla Ciebie i drugiego rodzica: <b>ile tygodni, ile pieniędzy, gdzie złożyć dokumenty i czego uważać</b>. Bez szukania po przepisach.</p>
-        <div className="row"><Link href="/kalkulator" className="btn btn-primary">Policz zasiłek</Link>{!sesja && <Link href="/logowanie" className="btn" style={{ background: "#fff", color: "#00416e" }}>Zaloguj przez mObywatela</Link>}</div>
+        <div className="row"><Link href="/kalkulator" className="btn btn-primary">Policz zasiłek</Link><Link href="/kreator" className="btn btn-secondary">Co mnie dotyczy?</Link>{!sesja && <Link href="/logowanie" className="btn btn-login">Zaloguj przez mObywatela</Link>}</div>
       </section>
 
       {sesja && (

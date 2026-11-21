@@ -1,0 +1,33 @@
+{
+  "_jak_wypelnic": "Skopiuj ten plik do ../moje_sprawy/sprawa01.json i zamień dane na dane z przykładowej sprawy ZUS. Usuń pola, których nie masz. Wszystko zostaje na Twoim komputerze.",
+  "nazwa": "Sprawa 01 — pracownica, 1 dziecko",
+
+  "podstawaMatka": {
+    "pelnyWymiarEtatu": true,
+    "miesiace": [
+      { "miesiac": "2026-03", "kwota": 6500 },
+      { "rok": 2026, "miesiac": 4, "dniPrzepracowal": 21, "dniObowiazany": 21, "stale": 6000, "zmiennePomniejszone": 300, "premieFaktyczne": 200 }
+    ],
+    "premieKwartalne4Kw": 0,
+    "premieRoczne": 0,
+    "_uwaga": "Miesiące możesz podać prosto ({miesiac,kwota}) albo tak jak w tabeli 1 druku Z-3 (dni przepracowane/obowiązany, stałe, zmienne, premie). Dla zlecenia/JDG: dodaj \"niepracownik\": true i miesiace jako [{ \"miesiac\": \"2026-03\", \"podstawaSkladek\": 5000 }]."
+  },
+
+  "plan": {
+    "tytul": "porod",
+    "dataZdarzenia": "2027-03-15",
+    "liczbaDzieci": 1,
+    "wariant": "zmienny_100_70",
+    "rodzicielski": [ { "kto": "matka", "tygodnie": 32 } ]
+  },
+
+  "decyzjaZUS": {
+    "podstawaMiesieczna": 5608.85,
+    "kwotaRazem": 55490.22,
+    "okresy": [
+      { "rodzaj": "macierzynski", "kto": "matka", "dni": 140, "kwota": 26174.63 },
+      { "rodzaj": "rodzicielski", "kto": "matka", "dni": 224, "kwota": 29315.59 }
+    ],
+    "_uwaga": "Przepisz z decyzji/zrzutu ZUS to, co jest: podstawę, kwoty, okresy. Nie musisz wszystkiego. Jeśli podasz podstawę ZUS, a nie podasz miesięcy — silnik użyje podstawy ZUS i sprawdzi sam plan."
+  }
+}

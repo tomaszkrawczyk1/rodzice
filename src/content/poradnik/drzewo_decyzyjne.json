@@ -1,0 +1,149 @@
+{
+  "_opis": "Drzewko decyzyjne: prowadzi użytkownika za rączkę od sytuacji do konkretnego wyniku. Węzły typu 'pytanie' mają opcje z odnośnikiem do następnego węzła; węzły typu 'wynik' wskazują pytania z faq.json (pytania[]), druki z druki.json (druki[]) i opcjonalnie tryb kalkulatora. Żadna treść merytoryczna nie jest tu zapisana – wszystko bierze się z faq.json (a ono z JSON/Excela). Węzeł z status 'luka' ma pokazać komunikat o luce w bazie, nie wynik.",
+  "start": "start",
+  "wezly": {
+    "start": {
+      "typ": "pytanie", "tekst": "W jakiej jesteś sytuacji?", "podpowiedz": "Wybierz to, co jest najbliższe. Zawsze możesz wrócić.",
+      "opcje": [
+        { "etykieta": "Planuję dziecko", "nastepny": "plan_tytul" },
+        { "etykieta": "Jestem w ciąży", "nastepny": "ciaza_cel" },
+        { "etykieta": "Dziecko już jest", "nastepny": "po_cel" },
+        { "etykieta": "Adopcja lub rodzina zastępcza", "nastepny": "adopcja_typ" },
+        { "etykieta": "Trudna sytuacja (strata, wcześniak, choroba, śmierć matki)", "nastepny": "trudna_cel" },
+        { "etykieta": "Chcę tylko wiedzieć, jakie złożyć dokumenty", "nastepny": "dok_cel" }
+      ]
+    },
+
+    "plan_tytul": {
+      "typ": "pytanie", "tekst": "Jak jesteś teraz ubezpieczona chorobowo?",
+      "opcje": [
+        { "etykieta": "Mam umowę o pracę", "nastepny": "wynik_plan_praca" },
+        { "etykieta": "Prowadzę działalność lub mam umowę zlecenia", "nastepny": "wynik_plan_firma" },
+        { "etykieta": "Nie mam ubezpieczenia chorobowego", "nastepny": "wynik_plan_brak" }
+      ]
+    },
+    "wynik_plan_praca": { "typ": "wynik", "tytul": "Planujesz dziecko, masz umowę o pracę", "pytania": ["F05", "F06", "F22", "F10"], "druki": ["Z-3"], "kalkulator": { "tryb": "uprawnienia" } },
+    "wynik_plan_firma": { "typ": "wynik", "tytul": "Planujesz dziecko, masz działalność lub zlecenie", "pytania": ["F20", "F22", "F02"], "druki": ["ZAM", "ZAS-53"], "kalkulator": { "tryb": "uprawnienia", "opcja": "dzialalnosc" } },
+    "wynik_plan_brak": { "typ": "wynik", "tytul": "Planujesz dziecko, nie masz ubezpieczenia chorobowego", "pytania": ["F21", "F22"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" } },
+
+    "ciaza_cel": {
+      "typ": "pytanie", "tekst": "Czego dotyczy Twoje pytanie?",
+      "opcje": [
+        { "etykieta": "Zwolnienie lekarskie w ciąży – ile dostanę", "nastepny": "ciaza_zwolnienie_tytul" },
+        { "etykieta": "Zasiłek się kończy, a nadal nie mogę pracować", "nastepny": "wynik_rehab" },
+        { "etykieta": "Straciłam pracę w ciąży", "nastepny": "wynik_strata_pracy" },
+        { "etykieta": "Boję się zwolnienia lub kończy się umowa", "nastepny": "ciaza_ochrona" },
+        { "etykieta": "Zmieniłam pracę lub miałam przerwę w ubezpieczeniu", "nastepny": "wynik_zmiana_pracy" },
+        { "etykieta": "Chcę zaplanować urlop po porodzie", "nastepny": "po_cel" }
+      ]
+    },
+    "ciaza_zwolnienie_tytul": {
+      "typ": "pytanie", "tekst": "Jesteś pracownicą czy prowadzisz firmę?",
+      "opcje": [
+        { "etykieta": "Pracownica (umowa o pracę)", "nastepny": "wynik_chorobowe_praca" },
+        { "etykieta": "Prowadzę działalność / zlecenie z dobrowolnym chorobowym", "nastepny": "wynik_chorobowe_firma" }
+      ]
+    },
+    "wynik_chorobowe_praca": { "typ": "wynik", "tytul": "Zasiłek chorobowy w ciąży – pracownica", "pytania": ["F01", "F02"], "druki": ["ZAS-12"], "kalkulator": { "tryb": "chorobowe_w_ciazy" } },
+    "wynik_chorobowe_firma": { "typ": "wynik", "tytul": "Zasiłek chorobowy w ciąży – własna firma / zlecenie", "pytania": ["F01", "F02", "F20"], "druki": ["ZAS-53"], "kalkulator": { "tryb": "chorobowe_w_ciazy" } },
+    "wynik_rehab": { "typ": "wynik", "tytul": "Świadczenie rehabilitacyjne", "pytania": ["F03"], "druki": [], "kalkulator": { "tryb": "rehabilitacja" } },
+    "wynik_strata_pracy": { "typ": "wynik", "tytul": "Utrata pracy w ciąży", "pytania": ["F04", "F22"], "druki": ["ZAM"], "kalkulator": { "tryb": "uprawnienia" } },
+    "ciaza_ochrona": {
+      "typ": "pytanie", "tekst": "Co dokładnie Cię niepokoi?",
+      "opcje": [
+        { "etykieta": "Czy pracodawca może mnie zwolnić?", "nastepny": "wynik_ochrona" },
+        { "etykieta": "Moja umowa na czas określony się kończy", "nastepny": "wynik_umowa_okreslona" }
+      ]
+    },
+    "wynik_ochrona": { "typ": "wynik", "tytul": "Ochrona przed zwolnieniem", "pytania": ["F05"], "druki": [] },
+    "wynik_umowa_okreslona": { "typ": "wynik", "tytul": "Umowa na czas określony w ciąży", "pytania": ["F06", "F05"], "druki": [] },
+    "wynik_zmiana_pracy": { "typ": "wynik", "tytul": "Zmiana pracy i przerwa w ubezpieczeniu", "pytania": ["F22", "F10"], "druki": ["Z-3"], "kalkulator": { "tryb": "uprawnienia" } },
+
+    "po_cel": {
+      "typ": "pytanie", "tekst": "Co chcesz ustalić?",
+      "opcje": [
+        { "etykieta": "Ile trwa urlop i ile pieniędzy dostanę", "nastepny": "po_ile_zaswiadczenie" },
+        { "etykieta": "Jak podzielić urlop z drugim rodzicem", "nastepny": "po_podzial" },
+        { "etykieta": "Dziecko urodziło się przedwcześnie / leży w szpitalu", "nastepny": "wynik_wczesniak" },
+        { "etykieta": "Gdzie złożyć wniosek i jakie dokumenty", "nastepny": "dok_cel" },
+        { "etykieta": "Jakich terminów nie przegapić", "nastepny": "wynik_terminy" },
+        { "etykieta": "Nie mam prawa do zasiłku macierzyńskiego", "nastepny": "wynik_brak_zasilku" },
+        { "etykieta": "Jestem w kolejnej ciąży zaraz po poprzednim urlopie", "nastepny": "wynik_druga_ciaza" }
+      ]
+    },
+    "po_ile_zaswiadczenie": {
+      "typ": "pytanie", "tekst": "Czy dziecko ma zaświadczenie „Za życiem”?",
+      "opcje": [
+        { "etykieta": "Nie", "nastepny": "wynik_ile_standard" },
+        { "etykieta": "Tak", "nastepny": "wynik_ile_za_zyciem" }
+      ]
+    },
+    "wynik_ile_standard": { "typ": "wynik", "tytul": "Ile trwa urlop i ile wynosi zasiłek", "pytania": ["F07", "F08", "F09", "F10"], "druki": ["ZAM"], "kalkulator": { "tryb": "matka" } },
+    "wynik_ile_za_zyciem": { "typ": "wynik", "tytul": "Urlop i zasiłek – dziecko z zaświadczeniem „Za życiem”", "pytania": ["F16", "F07", "F08"], "druki": ["ZAM"], "kalkulator": { "tryb": "matka", "opcja": "za_zyciem" } },
+    "po_podzial": {
+      "typ": "pytanie", "tekst": "Co chcecie zrobić?",
+      "opcje": [
+        { "etykieta": "Wziąć urlop rodzicielski w tym samym czasie lub po kolei", "nastepny": "wynik_podzial_rodzicielski" },
+        { "etykieta": "Tata ma przejąć część urlopu macierzyńskiego mamy", "nastepny": "wynik_tata_przejmuje" },
+        { "etykieta": "Tata chce wziąć urlop ojcowski", "nastepny": "wynik_ojcowski" },
+        { "etykieta": "Chcę pracować na urlopie rodzicielskim", "nastepny": "wynik_praca_urlop" }
+      ]
+    },
+    "wynik_podzial_rodzicielski": { "typ": "wynik", "tytul": "Podział urlopu rodzicielskiego między rodziców", "pytania": ["F12", "F08"], "druki": ["ZAM"], "kalkulator": { "tryb": "oboje_rodzice" } },
+    "wynik_tata_przejmuje": { "typ": "wynik", "tytul": "Tata przejmuje część urlopu macierzyńskiego", "pytania": ["F11", "F12"], "druki": ["ZAM", "Z-3"], "kalkulator": { "tryb": "oboje_rodzice" } },
+    "wynik_ojcowski": { "typ": "wynik", "tytul": "Urlop ojcowski", "pytania": ["F14"], "druki": ["ZAM"], "kalkulator": { "tryb": "ojciec" } },
+    "wynik_praca_urlop": { "typ": "wynik", "tytul": "Praca w czasie urlopu rodzicielskiego", "pytania": ["F13", "F12"], "druki": [], "kalkulator": { "tryb": "praca_i_urlop" } },
+    "wynik_wczesniak": { "typ": "wynik", "tytul": "Wcześniak lub dziecko w szpitalu – uzupełniający urlop", "pytania": ["F15", "F26"], "druki": ["ZAM"], "kalkulator": { "tryb": "wczesniak" } },
+    "wynik_terminy": { "typ": "wynik", "tytul": "Terminy, których nie można przegapić", "pytania": ["F19", "F09"], "druki": ["ZAM"], "kalkulator": { "tryb": "terminy" } },
+    "wynik_brak_zasilku": { "typ": "wynik", "tytul": "Brak prawa do zasiłku macierzyńskiego", "pytania": ["F21", "F20"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" } },
+    "wynik_druga_ciaza": { "typ": "wynik", "status": "luka", "tytul": "Kolejna ciąża po poprzednim urlopie", "pytania": ["F28", "F07", "F22"], "druki": [], "komunikat_luki": "Tej sytuacji nie opisują nasze źródła. Pokazujemy zasady powiązane i odsyłamy do ZUS – nie podajemy wyniku." },
+
+    "adopcja_typ": {
+      "typ": "pytanie", "tekst": "Kim jesteście wobec dziecka?",
+      "opcje": [
+        { "etykieta": "Przyjęliśmy dziecko i wystąpiliśmy do sądu o przysposobienie", "nastepny": "wynik_adopcja" },
+        { "etykieta": "Jesteśmy rodziną zastępczą (niezawodową)", "nastepny": "wynik_adopcja" },
+        { "etykieta": "Jesteśmy zawodową rodziną zastępczą", "nastepny": "wynik_rz_zawodowa" }
+      ]
+    },
+    "wynik_adopcja": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Adopcja i rodzina zastępcza niezawodowa", "pytania": ["F23", "F09", "F18"], "druki": ["ZAM", "ZAS-26", "Z-3", "Z-3a"], "kalkulator": { "tryb": "adopcja" } },
+    "wynik_rz_zawodowa": { "typ": "wynik", "status": "luka", "tytul": "Zawodowa rodzina zastępcza", "pytania": ["F23"], "druki": [], "komunikat_luki": "Baza zawiera tylko wyłączenie: urlop i zasiłek na warunkach macierzyńskiego dotyczą rodziny zastępczej z wyjątkiem zawodowej. Dalsze informacje – w ZUS." },
+
+    "trudna_cel": {
+      "typ": "pytanie", "tekst": "Napisz delikatnie, co się wydarzyło – wybierz to, co pasuje.",
+      "podpowiedz": "Nie musisz niczego uzasadniać. Pokażemy tylko to, co Ci przysługuje.",
+      "opcje": [
+        { "etykieta": "Dziecko urodziło się martwe albo zmarło", "nastepny": "wynik_martwe" },
+        { "etykieta": "Mama dziecka zmarła, porzuciła dziecko lub nie może się nim zająć", "nastepny": "wynik_smierc_matki" },
+        { "etykieta": "Dziecko urodziło się przedwcześnie", "nastepny": "wynik_wczesniak" },
+        { "etykieta": "Szukam wsparcia (fundacje, stowarzyszenia)", "nastepny": "wynik_wsparcie" },
+        { "etykieta": "Dziecko jest ciężko chore – ma zaświadczenie „Za życiem”", "nastepny": "wynik_ile_za_zyciem" }
+      ]
+    },
+    "wynik_martwe": { "typ": "wynik", "tytul": "Urodzenie martwego dziecka lub zgon dziecka", "pytania": ["F24", "F26", "F27"], "druki": ["ZAM", "Z-3", "Z-3a"], "kalkulator": { "tryb": "martwe_dziecko" }, "ton": "delikatny" },
+    "wynik_smierc_matki": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Śmierć, porzucenie lub niezdolność matki", "pytania": ["F25", "F26", "F27"], "druki": ["ZAM"], "kalkulator": { "tryb": "oboje_rodzice", "opcja": "matka_niedostepna" }, "ton": "delikatny" },
+    "wynik_wsparcie": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Organizacje wsparcia", "pytania": ["F26"], "druki": [], "ton": "delikatny" },
+
+    "dok_cel": {
+      "typ": "pytanie", "tekst": "Co chcesz wiedzieć?",
+      "opcje": [
+        { "etykieta": "Kto wypłaca zasiłek i gdzie składam wniosek", "nastepny": "dok_platnik" },
+        { "etykieta": "Jakie dokumenty dołączyć", "nastepny": "wynik_dokumenty" },
+        { "etykieta": "Jak zdobyć odpis aktu urodzenia", "nastepny": "wynik_odpis" },
+        { "etykieta": "Jakich terminów pilnować", "nastepny": "wynik_terminy" }
+      ]
+    },
+    "dok_platnik": {
+      "typ": "pytanie", "tekst": "Jaki masz tytuł ubezpieczenia?",
+      "opcje": [
+        { "etykieta": "Umowa o pracę", "nastepny": "wynik_platnik" },
+        { "etykieta": "Umowa zlecenia (lub inny niż umowa o pracę)", "nastepny": "wynik_platnik" },
+        { "etykieta": "Prowadzę działalność", "nastepny": "wynik_platnik_firma" }
+      ]
+    },
+    "wynik_platnik": { "typ": "wynik", "tytul": "Kto wypłaca zasiłek i gdzie złożyć wniosek", "pytania": ["F17", "F18"], "druki": ["ZAM", "Z-3", "Z-3a"], "kalkulator": { "tryb": "dokumenty" } },
+    "wynik_platnik_firma": { "typ": "wynik", "tytul": "Zasiłek dla osoby prowadzącej działalność", "pytania": ["F20", "F17"], "druki": ["ZAM"], "kalkulator": { "tryb": "dokumenty" } },
+    "wynik_dokumenty": { "typ": "wynik", "tytul": "Jakie dokumenty dołączyć", "pytania": ["F18", "F17", "F23"], "druki": ["ZAM", "Z-3", "Z-3a", "ZAS-26"] },
+    "wynik_odpis": { "typ": "wynik", "tytul": "Odpis aktu urodzenia", "pytania": ["F27"], "druki": [] }
+  }
+}

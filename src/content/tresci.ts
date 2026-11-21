@@ -39,13 +39,13 @@ export const TRUDNE = [
 ];
 
 export const WSPARCIE = [
-  { nazwa: "Fundacja Gajusz", opis: "Hospicjum domowe i opieka paliatywna nad ciężko chorymi dziećmi, wsparcie rodzin także w żałobie.", dla: ["zgon", "wczesniak", "ciaza"] },
-  { nazwa: "Fundacja Dzieciom „Zdążyć z Pomocą”", opis: "Pomoc w leczeniu i rehabilitacji ciężko chorych dzieci (zbiórki, wsparcie rodzin).", dla: ["wczesniak", "ciaza"] },
-  { nazwa: "Fundacja Rodzin Adopcyjnych", opis: "Wsparcie, szkolenia i poradnictwo dla rodzin adopcyjnych i zastępczych.", dla: ["adopcja"] },
-  { nazwa: "Stowarzyszenie „Dla Dobra Wcześniaków” / organizacje rodziców wcześniaków", opis: "Grupy wsparcia i informacje dla rodziców dzieci urodzonych przedwcześnie – sprawdź lokalne stowarzyszenia przy szpitalu neonatologicznym.", dla: ["wczesniak"] },
-  { nazwa: "Telefon zaufania i poradnie psychologiczne dla osób po stracie", opis: "Całodobowa linia wsparcia w kryzysie: 116 123 (dla dorosłych) oraz bezpłatna pomoc psychologiczna w poradniach i szpitalach.", dla: ["martwe", "zgon", "ciaza", "matka"] },
+  { nazwa: "Fundacja Wcześniak Rodzice-Rodzicom", opis: "Organizacja pożytku publicznego (KRS 0000191989) dla rodziców dzieci urodzonych przed 36. tygodniem ciąży: bezpłatna wypożyczalnia sprzętu, „Niezbędnik rodzica wcześniaka”.", dla: ["wczesniak"] },
+  { nazwa: "Fundacja Medycyny Prenatalnej im. Ernesta Wójcickiego", opis: "Organizacja pożytku publicznego (KRS 0000789473), Warszawa: bezpłatne wsparcie psychologiczne, prawne i diagnostyczne po poronieniu i martwym urodzeniu.", dla: ["martwe", "ciaza"] },
+  { nazwa: "Fundacja Warszawskie Hospicjum dla Dzieci – Hospicjum Perinatalne", opis: "Wsparcie psychologiczne, socjalne i duchowe dla rodziców, także w żałobie.", dla: ["zgon", "martwe", "wczesniak"] },
+  { nazwa: "Fundacja Panda Team im. Michałka Tarachowicza", opis: "Grupy wsparcia dla rodziców po stracie dziecka i terapeutyczne dla dzieci w żałobie.", dla: ["zgon", "martwe"] },
+  { nazwa: "Fundacja Rodzić po Ludzku", opis: "Informator „Poronienie i urodzenie martwego dziecka w szpitalu” (wyd. 2025).", dla: ["martwe", "ciaza"] },
 ];
-export const WSPARCIE_UWAGA = "Lista ma charakter informacyjny i obejmuje wyłącznie organizacje charytatywne. Przed kontaktem sprawdź aktualne dane na oficjalnych stronach organizacji – nazwy i zakres działania mogą się zmieniać.";
+export const WSPARCIE_UWAGA = "Lista ma charakter informacyjny i obejmuje wyłącznie organizacje charytatywne. DO POTWIERDZENIA: nie sprawdzono jeszcze oficjalnych stron, danych kontaktowych ani wyłącznie charytatywnego charakteru każdej organizacji – zweryfikuj je przed kontaktem.";
 
 export const LINKI = [
   ["ZUS – świadczenia dla rodziców", "https://www.zus.pl/swiadczenia/macierzynstwo"],
