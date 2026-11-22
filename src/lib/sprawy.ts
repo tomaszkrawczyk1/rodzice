@@ -613,7 +613,7 @@ export const SPRAWY: Sprawa[] = [
       const f = pyt("F23");
       const mac = wyn.okresy.find((x: any) => x.rodzaj === "na_warunkach_macierzynskiego" || x.rodzaj === "macierzynski");
       return {
-        glowne: `Szacowany zasiłek za urlop na warunkach urlopu macierzyńskiego${rodzicielskiTyg > 0 ? " i rodzicielski" : ""}: ${pln(wyn.sumy.razem)}.`, duza: pln(wyn.sumy.razem), podpis: mac ? `Pierwszy okres: ok. ${pln(miesiecznie(mac))} miesięcznie` : undefined,
+        glowne: `Szacowany zasiłek za urlop na warunkach urlopu macierzyńskiego${rodzicielskiTyg > 0 ? " i rodzicielski" : ""}`, duza: pln(wyn.sumy.razem), podpis: mac ? `Pierwszy okres: ok. ${pln(miesiecznie(mac))} miesięcznie` : undefined,
         szczegoly: [["Limit wieku dziecka", `do ${dataPL(granica)} (${lat} lat)`], ["Podstawa zasiłku", `${pln(podM)} miesięcznie`]],
         ostrzezenia: [...wyn.bledy, ...wyn.ostrzezenia], terminy: terminyDlaRodzica(t),
         zrob: [...kroki("F23").map((x) => ({ tekst: x })), ...terminyDlaRodzica(t).slice(0, 2).map((x) => ({ kiedy: `do ${dataPL(x.do)}`, tekst: x.co }))],

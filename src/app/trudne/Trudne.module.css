@@ -15,9 +15,9 @@
 
 .wstecz {
   font: inherit; font-size: 16px; padding: 10px 14px; min-height: 44px; cursor: pointer;
-  background: transparent; color: var(--zus-navy); border: 1px solid var(--line);
+  background: var(--card); color: var(--zus-green-link); border: 1px solid var(--zus-green-link);
 }
-.wstecz:hover { background: var(--gray); }
+.wstecz:hover { background: var(--zus-green); border-color: var(--zus-green); color: #fff; }
 .wstecz:focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 2px; }
 
 .tytul:focus { outline: none; }

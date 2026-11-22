@@ -64,8 +64,8 @@
         { "etykieta": "Moja umowa na czas określony się kończy", "nastepny": "wynik_umowa_okreslona" }
       ]
     },
-    "wynik_ochrona": { "typ": "wynik", "tytul": "Ochrona przed zwolnieniem", "pytania": ["F05"], "druki": [] },
-    "wynik_umowa_okreslona": { "typ": "wynik", "tytul": "Umowa na czas określony w ciąży", "pytania": ["F06", "F05"], "druki": [] },
+    "wynik_ochrona": { "typ": "wynik", "tytul": "Ochrona przed zwolnieniem", "pytania": ["F05"], "druki": [], "cta": { "href": "/ryzyka", "etykieta": "Sprawdź ochronę w pracy" } },
+    "wynik_umowa_okreslona": { "typ": "wynik", "tytul": "Umowa na czas określony w ciąży", "pytania": ["F06", "F05"], "druki": [], "cta": { "href": "/ryzyka", "etykieta": "Sprawdź ochronę w pracy" } },
     "wynik_zmiana_pracy": { "typ": "wynik", "tytul": "Zmiana pracy i przerwa w ubezpieczeniu", "pytania": ["F22", "F10"], "druki": ["Z-3"], "kalkulator": { "tryb": "uprawnienia" } },
 
     "po_cel": {
@@ -131,7 +131,7 @@
     },
     "wynik_martwe": { "typ": "wynik", "tytul": "Urodzenie martwego dziecka lub zgon dziecka", "pytania": ["F24", "F26", "F27"], "druki": ["ZAM", "Z-3", "Z-3a"], "kalkulator": { "tryb": "martwe_dziecko" }, "ton": "delikatny" },
     "wynik_smierc_matki": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Śmierć, porzucenie lub niezdolność matki", "pytania": ["F25", "F26", "F27"], "druki": ["ZAM"], "kalkulator": { "tryb": "oboje_rodzice", "opcja": "matka_niedostepna" }, "ton": "delikatny" },
-    "wynik_wsparcie": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Organizacje wsparcia", "pytania": ["F26"], "druki": [], "ton": "delikatny" },
+    "wynik_wsparcie": { "typ": "wynik", "status": "do_potwierdzenia", "tytul": "Organizacje wsparcia", "pytania": ["F26"], "druki": [], "ton": "delikatny", "cta": { "href": "/trudne", "etykieta": "Poznaj wsparcie w trudnej sytuacji" } },
 
     "dok_cel": {
       "typ": "pytanie", "tekst": "Co chcesz wiedzieć?",
@@ -152,7 +152,7 @@
     },
     "wynik_platnik": { "typ": "wynik", "tytul": "Kto wypłaca zasiłek i gdzie złożyć wniosek", "pytania": ["F17", "F18"], "druki": ["ZAM", "Z-3", "Z-3a"], "kalkulator": { "tryb": "dokumenty" } },
     "wynik_platnik_firma": { "typ": "wynik", "tytul": "Zasiłek dla osoby prowadzącej działalność", "pytania": ["F20", "F17"], "druki": ["ZAM"], "kalkulator": { "tryb": "dokumenty" } },
-    "wynik_dokumenty": { "typ": "wynik", "tytul": "Jakie dokumenty dołączyć", "pytania": ["F18", "F17", "F23"], "druki": ["ZAM", "Z-3", "Z-3a", "ZAS-26"] },
-    "wynik_odpis": { "typ": "wynik", "tytul": "Odpis aktu urodzenia", "pytania": ["F27"], "druki": [] }
+    "wynik_dokumenty": { "typ": "wynik", "tytul": "Jakie dokumenty dołączyć", "pytania": ["F18", "F17", "F23"], "druki": ["ZAM", "Z-3", "Z-3a", "ZAS-26"], "cta": { "href": "/formularze", "etykieta": "Zobacz wnioski i druki" } },
+    "wynik_odpis": { "typ": "wynik", "tytul": "Odpis aktu urodzenia", "pytania": ["F27"], "druki": [], "cta": { "href": "/odpis", "etykieta": "Jak zdobyć odpis aktu" } }
   }
 }

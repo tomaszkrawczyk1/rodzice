@@ -6,7 +6,7 @@ import { dniMiedzy, dodajMiesiace, type Parametry, type PlanWejscie } from "@/en
 import { dataPL } from "@/lib/format";
 import type { KalendarzWynik } from "@/lib/kalendarz";
 import {
-  ETYKIETY_RODZAJU, kamienieMilowe, pasujeDoFiltra, stanKamienia,
+  ETYKIETY_RODZAJU, czyZadanie, kamienieMilowe, pasujeDoFiltra, stanKamienia,
   type FiltrOsi, type Kamien,
 } from "@/lib/os-kalendarza";
 import style from "./os-kalendarza.module.css";
@@ -58,28 +58,52 @@ function Pasek({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) {
   );
 }
 
-function Pozycja({ k, dzis }: { k: Kamien; dzis: string }) {
+function Pozycja({ k, dzis, zrobione, onZrobione, onOtworz }: {
+  k: Kamien; dzis: string; zrobione: boolean; onZrobione: (id: string) => void; onOtworz: (id: string) => void;
+}) {
   const stan = stanKamienia(k, dzis);
-  const tytul = k.href ? <a href={k.href}>{k.tytul}</a> : k.tytul;
+  const zadanie = czyZadanie(k);
+  const poTerminie = zadanie && !zrobione && stan === "minelo";
+  const tytul = k.href
+    ? <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(k.id)}>{k.tytul}</button>
+    : k.tytul;
+  const klasy = [
+    style.pozycja, style[`r_${k.rodzaj}`],
+    stan === "minelo" ? style.minelo : "", zrobione ? style.jestZrobione : "", poTerminie ? style.poTerminie : "",
+  ].join(" ");
   return (
-    <li className={`${style.pozycja} ${style[`r_${k.rodzaj}`]} ${stan === "minelo" ? style.minelo : ""}`}>
+    <li className={klasy}>
       <span className={style.kropka} aria-hidden="true" />
-      <div className={`${style.tresc} ${stan === "trwa" ? style.trwa : ""}`}>
+      <div className={`${style.tresc} ${stan === "trwa" && !zrobione ? style.trwa : ""}`}>
         <p className={style.data}><Terminy k={k} /></p>
         <p className={style.tytul}>{tytul}</p>
         <p className={style.znaczki}>
           <span className={style.rodzaj}>{ETYKIETY_RODZAJU[k.rodzaj]}</span>
-          {stan === "trwa" && <span className={style.stan}>{k.od === k.do ? "Dziś" : "Trwa teraz"}</span>}
-          {stan === "minelo" && <span className={style.stan}>{k.termin ? "Termin minął" : "Minęło"}</span>}
+          {zrobione ? <span className={style.stan}>Zrobione</span> : <>
+            {stan === "trwa" && <span className={style.stan}>{k.od === k.do ? "Dziś" : "Trwa teraz"}</span>}
+            {poTerminie && <span className={style.stanPo}>Po terminie</span>}
+            {stan === "minelo" && !zadanie && <span className={style.stan}>Minęło</span>}
+          </>}
           {k.szacunkowe && <span className={style.stan}>Orientacyjnie</span>}
         </p>
+        {zadanie && (
+          <label className={style.zrobione}>
+            <input type="checkbox" checked={zrobione} onChange={() => onZrobione(k.id)} />
+            <span>Zrobione<span className={style.tylkoCzytnik}>: {k.tytul}</span></span>
+          </label>
+        )}
       </div>
     </li>
   );
 }
 
-export default function OsKalendarza({ wynik, dzis, plan, parametry }: {
+export default function OsKalendarza({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
   wynik: KalendarzWynik; dzis: string; plan?: PlanWejscie; parametry: Parametry;
+  /** Id pozycji zaznaczonych jako zrobione. */
+  zrobione: ReadonlySet<string>;
+  onZrobione: (id: string) => void;
+  /** Kliknięcie tytułu pozycji: rodzic otwiera panel z boku. */
+  onOtworz: (id: string) => void;
 }) {
   const [filtr, setFiltr] = useState<FiltrOsi>("wszystko");
   const [pokazMinione, setPokazMinione] = useState(false);
@@ -87,8 +111,11 @@ export default function OsKalendarza({ wynik, dzis, plan, parametry }: {
   const { kamienie, pominieteCykliczne, brakPlanuUrlopu } = kamienieMilowe(wynik, parametry, dataPL, plan);
 
   const wFiltrze = kamienie.filter(k => pasujeDoFiltra(k, filtr));
-  const minione = wFiltrze.filter(k => stanKamienia(k, dzis) === "minelo");
-  const widoczne = pokazMinione ? wFiltrze : wFiltrze.filter(k => stanKamienia(k, dzis) !== "minelo");
+  // Domyślnie chowamy tylko minione pozycje, których nie da się „zrobić” (np. skończony urlop).
+  // Zadania zostają widoczne: zrobione są wyszarzone, a minione bez „Zrobione” mają czerwoną etykietę „Po terminie”.
+  const schowane = (k: Kamien) => stanKamienia(k, dzis) === "minelo" && !czyZadanie(k);
+  const minione = wFiltrze.filter(schowane);
+  const widoczne = pokazMinione ? wFiltrze : wFiltrze.filter(k => !schowane(k));
   const indeksDzis = widoczne.findIndex(k => k.od > dzis);
   const miejsceDzis = indeksDzis === -1 ? widoczne.length : indeksDzis;
 
@@ -104,7 +131,7 @@ export default function OsKalendarza({ wynik, dzis, plan, parametry }: {
       <h2 id="kalendarz-os">Oś czasu</h2>
       <p className={style.wstep}>
         Najważniejsze badania, wizyty, urlopy i terminy wniosków w kolejności od najwcześniejszych.
-        Szczegóły każdej pozycji są w opisach etapów poniżej.
+        Kliknij tytuł, żeby zobaczyć krótki opis. Zaznacz „Zrobione”, gdy coś załatwisz.
       </p>
       <Pasek wynik={wynik} dzis={dzis} />
 
@@ -129,7 +156,7 @@ export default function OsKalendarza({ wynik, dzis, plan, parametry }: {
         {widoczne.map((k, i) => (
           <Fragment key={k.id}>
             {i === miejsceDzis && znacznikDzis}
-            <Pozycja k={k} dzis={dzis} />
+            <Pozycja k={k} dzis={dzis} zrobione={zrobione.has(k.id)} onZrobione={onZrobione} onOtworz={onOtworz} />
           </Fragment>
         ))}
         {miejsceDzis === widoczne.length && znacznikDzis}

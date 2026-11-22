@@ -88,7 +88,10 @@ function Wynik({ id, w: wezel, naglowek }: { id: string; w: Extract<Wezel, { typ
   // Świadczenie rodzicielskie liczymy na miejscu – nie odsyłamy rodzica po porodzie na stronę „w ciąży”.
   const kosiniakowe = w.kalkulator?.tryb === "swiadczenie_rodzicielskie";
   const domyslny = kosiniakowe ? null : kalkulatorLink(w.kalkulator);
-  const cta = domyslny && { href: w.cta?.href ?? domyslny.href, etykieta: w.cta?.etykieta ?? domyslny.etykieta };
+  // Wynik bez kalkulatora (np. ochrona w pracy, odpis aktu) może mieć własny przycisk z `cta` w drzewie.
+  const cta = domyslny
+    ? { href: w.cta?.href ?? domyslny.href, etykieta: w.cta?.etykieta ?? domyslny.etykieta }
+    : w.cta?.href ? { href: w.cta.href, etykieta: w.cta.etykieta } : null;
   const opisStatusu = w.status === "luka" ? (w.komunikat_luki ?? STATUS_OPIS.luka) : w.status === "do_potwierdzenia" ? STATUS_OPIS.do_potwierdzenia : "";
   const druki = w.druki.flatMap((d) => DRUKI.filter((k) => k.id === d));
   const inne = (w.inne_swiadczenia ?? []).flatMap((k) => INNE_SWIADCZENIA[k] ? [INNE_SWIADCZENIA[k]] : []);

@@ -32,9 +32,9 @@ button, .btn, .opt, .tile, .chip, .persona, .tab, summary { -webkit-user-select:
   .tile--glowny:hover .tile__ic { background: rgba(255, 255, 255, .2); color: #fff; }
   .tile--glowny:hover::after { color: #fff; }
   .btn-primary:hover { background: var(--zus-green); color: #fff; border-color: var(--zus-green); }
-  .btn-secondary:hover, .btn-ghost:hover { background: transparent; color: var(--zus-navy); border-color: var(--zus-navy); }
+  .btn-secondary:hover, .btn-ghost:hover { background: var(--card); color: var(--zus-green-link); border-color: var(--zus-green-link); }
   .btn-szukaj:hover { background: var(--zus-green); border-color: var(--zus-green); color: #fff; }
-  .chip:hover, .ask .chip:hover { background: #fff; color: var(--zus-navy); }
+  .chip:hover, .ask .chip:hover { background: var(--card); color: var(--zus-green-link); }
 }
 
 /* Obrys fokusu: granat --focus (10,6:1 na bieli; wymagane 3:1) + biała przerwa 2 px, dzięki której widać go też na zielonym tle (biel na #007834 5,6:1). */

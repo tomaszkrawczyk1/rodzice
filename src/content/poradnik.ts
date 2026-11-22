@@ -43,9 +43,11 @@ export function kalkulatorLink(k?: { tryb: string; opcja?: string } | null): { h
     case "chorobowe_w_ciazy": case "rehabilitacja":
       return { href: "/ciaza", etykieta: "Sprawdź świadczenia w ciąży" };
     // F21 i ogólne uprawnienia dotyczą też osób po porodzie, więc nie kierujemy ich do strony „w ciąży”.
+    // Nie odsyłamy też z powrotem do kreatora („Co mnie dotyczy?”) – to kółko; prowadzimy do sprawy „Co mi przysługuje”.
     case "uprawnienia": case "swiadczenie_rodzicielskie":
-      return { href: "/kreator", etykieta: "Sprawdź, co Ci przysługuje" };
-    case "terminy": case "dokumenty": return { href: "/dokumenty", etykieta: "Zobacz dokumenty i terminy" };
+      return { href: "/sprawa/co-przysluguje", etykieta: "Sprawdź, co Ci przysługuje" };
+    case "terminy": return { href: "/terminarz", etykieta: "Zobacz swój Kalendarz w urzędzie" };
+    case "dokumenty": return { href: "/dokumenty", etykieta: "Zobacz, kto wypłaca zasiłek i gdzie złożyć wniosek" };
     case "wczesniak": case "martwe_dziecko": return { href: "/trudne", etykieta: "Poznaj wsparcie w trudnej sytuacji" };
   }
   return null;

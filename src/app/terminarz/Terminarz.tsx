@@ -12,11 +12,14 @@ import reguly from "@/lib/terminarz/rules.json";
 import drukiLinki from "@/lib/terminarz/druki-linki.json";
 import drukiJson from "@/content/poradnik/druki.json";
 import {
-  GRUPY, MAX_DZIECI, OKNO_TERAZ_DNI, PUSTY_FORMULARZ,
-  dniMiedzy, dzisISO, ileDni, kategorieZLiczbami, linkiDoDrukow, pogrupuj,
+  MAX_DZIECI, PUSTY_FORMULARZ,
+  dniMiedzy, dzisISO, ileDni, kategorieZLiczbami, linkiDoDrukow,
   waliduj, wczytajFormularz, wyczyscZapis, zapiszFormularz,
   type Formularz,
 } from "@/lib/terminarz/widok";
+import PanelBoczny from "@/components/PanelBoczny";
+import { useZrobione } from "@/lib/zrobione";
+import OsTerminarza, { Czas, Znacznik } from "./OsTerminarza";
 import style from "./terminarz.module.css";
 
 const etykiety = reguly.labels;
@@ -88,23 +91,13 @@ async function daneZProfilu(sesja: Sesja | null, dzis: string): Promise<Partial<
   return wynik;
 }
 
-function Znacznik({ kind }: { kind: Wydarzenie["kind"] }) {
-  return <span className={`${style.znacznik} ${style[`znacznik_${kind}`]}`}>{etykiety.kind[kind]}</span>;
-}
-
-function Karta({ z, dzis, orientacyjnie }: { z: Wydarzenie; dzis: string; orientacyjnie: boolean }) {
-  const roznica = dniMiedzy(dzis, z.date);
+/** Pełna instrukcja pozycji: treść panelu z boku (dokumenty, linki do druków, źródła). */
+function Szczegoly({ z, dzis, orientacyjnie }: { z: Wydarzenie; dzis: string; orientacyjnie: boolean }) {
   const wszystkieLinki = z.links;
-  const klasa = z.isBirth ? style.porod : style[`karta_${z.kind}`];
   return (
-    <li>
-      <article className={`${style.karta} ${klasa}`} aria-labelledby={`t-${z.id}`}>
-        <p className={style.data}>
-          <time dateTime={z.date}>{dataPL(z.date)}</time>
-          <span className={style.ile}>{ileDni(roznica)}</span>
-          {orientacyjnie && <span className={style.orient}>orientacyjnie</span>}
-        </p>
-        <h3 id={`t-${z.id}`}>{z.title}</h3>
+    <>
+      <div>
+        <Czas z={z} dzis={dzis} orientacyjnie={orientacyjnie} />
         <p className={style.znaczniki}>
           {z.isBirth ? <span className={`${style.znacznik} ${style.znacznik_porod}`}>Punkt odniesienia</span> : <Znacznik kind={z.kind} />}
           {!z.isBirth && <span className={style.kategoria}>{etykiety.category[z.category]}</span>}
@@ -139,8 +132,8 @@ function Karta({ z, dzis, orientacyjnie }: { z: Wydarzenie; dzis: string; orient
             <ul>{z.sources.map((s) => <li key={s}><a href={s} target="_blank" rel="noopener noreferrer">{s}<span className={style.sr}> (otwiera się w nowej karcie)</span></a></li>)}</ul>
           </details>
         )}
-      </article>
-    </li>
+      </div>
+    </>
   );
 }
 
@@ -159,7 +152,7 @@ function pobierzICS(zdarzenia: Wydarzenie[]) {
 export default function Terminarz({ parametry }: { parametry: unknown }) {
   const { sesja, gotowa } = useSesja();
   // Czekamy na sesję, a potem montujemy widok osobno dla każdego profilu (jak w Kalendarzu ciąży).
-  if (!gotowa) return <div className={style.terminarz}><h1>Terminy w urzędach</h1></div>;
+  if (!gotowa) return <div className={style.terminarz}><h1>Kalendarz w urzędzie</h1></div>;
   return <WidokTerminarza key={sesja?.personaId ?? "gosc"} sesja={sesja} parametry={parametry} />;
 }
 
@@ -171,6 +164,9 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
   const [kategoria, setKategoria] = useState<Kategoria | "">("");
   const [odswiez, setOdswiez] = useState(0);
   const [pobrano, setPobrano] = useState(false);
+  // „Zrobione” przy terminach: osobny zapis dla każdego profilu, tylko w przeglądarce.
+  const { zrobione, przelacz } = useZrobione(`rodzice.terminarz.zrobione:${sesja?.personaId ?? "gosc"}`);
+  const [otwarte, setOtwarte] = useState<string | null>(null);
 
   // Zapis formularza zostaje w przeglądarce (localStorage), nic nie jest wysyłane.
   // Zapis formularza zostaje w przeglądarce. Puste pola uzupełniamy danymi z profilu, a to, co już wpisano, zostaje.
@@ -216,16 +212,17 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
   const pokaz = !!dzis && zdarzenia.length > 0;
   const kategorie = useMemo(() => kategorieZLiczbami(zdarzenia), [zdarzenia]);
   const aktywna = kategorie.some((k) => k.kategoria === kategoria) ? kategoria : "";
-  const grupy = useMemo(() => (pokaz ? pogrupuj(zdarzenia, dzis, aktywna) : null), [pokaz, zdarzenia, dzis, aktywna]);
+  // Filtr instytucji zostawia wszystkie terminy tej instytucji i zawsze punkt „poród”.
+  const naOsi = useMemo(() => zdarzenia.filter((z) => z.isBirth || !aktywna || z.category === aktywna), [zdarzenia, aktywna]);
   const porod = zdarzenia.find((z) => z.isBirth);
   const dataPorodu = porod?.date ?? formularz.birthDate;
   const planowany = pokaz && dniMiedzy(dzis, dataPorodu) > 0;
   const zaczeto = !!(formularz.birthDate || formularz.role || formularz.employment || formularz.children);
-  const widocznych = grupy ? GRUPY.reduce((n, g) => n + grupy[g.id].length, 0) : 0;
+  const otwartyTermin = otwarte ? zdarzenia.find((z) => z.id === otwarte) : undefined;
 
   return (
     <div className={style.terminarz}>
-      <h1>Terminy w urzędach</h1>
+      <h1>Kalendarz w urzędzie</h1>
       <p className="lead">
         Pokażemy, co złożyć w ZUS, u pracodawcy, w gminie i w urzędzie stanu cywilnego, i do kiedy, z linkami do druków.
         Terminy możesz pobrać do kalendarza w telefonie. Wizyty lekarskie i badania znajdziesz w <Link href="/kalendarz">kalendarzu ciąży</Link>.
@@ -315,7 +312,7 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
         )}
         {wynik.blad && <p className="alert err" role="alert">{wynik.blad}</p>}
 
-        {pokaz && grupy && (
+        {pokaz && (
           <>
             <div className={`card ${style.podsumowanie}`}>
               <p className={style.podsumowanieTytul}>
@@ -356,34 +353,15 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
               </div>
             )}
 
-            {widocznych === 0 && <p className="alert info">Brak terminów w wybranej kategorii.</p>}
+            {naOsi.length === 0 && <p className="alert info">Brak terminów w wybranej kategorii.</p>}
+            <OsTerminarza zdarzenia={naOsi} dzis={dzis} orientacyjnie={planowany}
+              zrobione={zrobione} onZrobione={przelacz} onOtworz={setOtwarte} />
 
-            {GRUPY.map((g) => {
-              const lista = grupy[g.id];
-              if (lista.length === 0) {
-                return g.id === "teraz" ? (
-                  <section key={g.id} className={style.grupaListy} aria-labelledby={`g-${g.id}`}>
-                    <h2 id={`g-${g.id}`}>{g.tytul}</h2>
-                    <p className={style.meta}>Nie ma terminów w najbliższych {OKNO_TERAZ_DNI} dniach.</p>
-                  </section>
-                ) : null;
-              }
-              const karty = <ol className={style.lista}>{lista.map((z) => <Karta key={z.id} z={z} dzis={dzis} orientacyjnie={planowany} />)}</ol>;
-              if (g.id === "minelo") {
-                return (
-                  <details key={g.id} className={style.grupaListy}>
-                    <summary><h2 id={`g-${g.id}`}>{g.tytul} ({lista.length})</h2></summary>
-                    {karty}
-                  </details>
-                );
-              }
-              return (
-                <section key={g.id} className={style.grupaListy} aria-labelledby={`g-${g.id}`}>
-                  <h2 id={`g-${g.id}`}>{g.tytul} ({lista.length})</h2>
-                  {karty}
-                </section>
-              );
-            })}
+            {otwartyTermin && (
+              <PanelBoczny tytul={otwartyTermin.title} onZamknij={() => setOtwarte(null)}>
+                <Szczegoly z={otwartyTermin} dzis={dzis} orientacyjnie={planowany} />
+              </PanelBoczny>
+            )}
 
             <p className={style.meta}>
               Terminarz ma charakter informacyjny i nie zastępuje porady ZUS, gminy ani prawnika. Zasady i terminy zmieniają się,
