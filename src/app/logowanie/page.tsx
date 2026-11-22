@@ -1,7 +1,7 @@
 import Logowanie from "./Logowanie";
 
-// Odczyt searchParams włącza renderowanie na żądanie: krok „potwierdź wybór" (`?profil=…`) działa po odświeżeniu i z linku.
-export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  await searchParams;
+// Logowanie jednym kliknięciem: nie ma już kroku „potwierdź wybór" (`?profil=…`). Stare linki z tym parametrem
+// po prostu pokazują listę profili. Parametr `?powrot=pue` jest czytany w przeglądarce w chwili logowania.
+export default function Page() {
   return <Logowanie />;
 }

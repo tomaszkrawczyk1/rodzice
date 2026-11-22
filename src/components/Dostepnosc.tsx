@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useT } from "@/lib/jezyk";
 
 const KLUCZ = "rodzice.dostepnosc";
 const ZDARZENIE = "rodzice:dostepnosc";
@@ -43,7 +42,6 @@ function zastosuj(s: Stan) {
  * Każdy przycisk ma widoczny podpis (nie tylko ikonę). wariant "menu": dłuższe podpisy, do panelu menu na telefonie.
  */
 export default function Dostepnosc({ wariant = "pasek" }: { wariant?: "pasek" | "menu" }) {
-  const t = useT();
   const [stan, setStan] = useState<Stan>({ rozm: 0, hc: false });
   const [noc, setNoc] = useState(false);
   useEffect(() => {
@@ -72,23 +70,23 @@ export default function Dostepnosc({ wariant = "pasek" }: { wariant?: "pasek" | 
   const { rozm, hc } = stan;
   const naMenu = wariant === "menu";
   const nastepny = (rozm + 1) % 3;
-  const podpisRozmiaru = naMenu ? `${t("Rozmiar tekstu:")} ${ROZMIAR[rozm]}` : `${t("Tekst")} ${ROZMIAR[rozm]}`;
-  const podpisNocy = t(naMenu ? "Tryb nocny" : "Nocny");
-  const podpisKontrastu = t(naMenu ? "Wysoki kontrast" : "Kontrast");
+  const podpisRozmiaru = naMenu ? `Rozmiar tekstu: ${ROZMIAR[rozm]}` : `Tekst ${ROZMIAR[rozm]}`;
+  const podpisNocy = naMenu ? "Tryb nocny" : "Nocny";
+  const podpisKontrastu = naMenu ? "Wysoki kontrast" : "Kontrast";
   return (
-    <span className={"a11y" + (naMenu ? " a11y--menu" : "")} role="group" aria-label={t("Ustawienia czytelności")}>
+    <span className={"a11y" + (naMenu ? " a11y--menu" : "")} role="group" aria-label="Ustawienia czytelności">
       <button type="button" onClick={() => zmien({ ...stan, rozm: nastepny })}
-        aria-label={`${podpisRozmiaru}. ${t("Kliknij, żeby ustawić")} ${ROZMIAR[nastepny]}.`} title={`${t("Zmień rozmiar tekstu na")} ${ROZMIAR[nastepny]}`}>
+        aria-label={`${podpisRozmiaru}. Kliknij, żeby ustawić ${ROZMIAR[nastepny]}.`} title={`Zmień rozmiar tekstu na ${ROZMIAR[nastepny]}`}>
         <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><text x="2" y="22" fontSize="22" fontWeight="700" fill="currentColor">A</text><path d="M19 8h7M22.5 4.5v7" stroke="currentColor" strokeWidth="2.4" fill="none" /></svg>
         <span className="a11y__txt">{podpisRozmiaru}</span>
       </button>
       <button type="button" onClick={() => zmien({ ...stan, noc: !noc, hc: false })} aria-pressed={noc}
-        aria-label={podpisNocy} title={t(noc ? "Wyłącz tryb nocny" : "Włącz tryb nocny: ciemne, łagodne kolory")}>
+        aria-label={podpisNocy} title={noc ? "Wyłącz tryb nocny" : "Włącz tryb nocny: ciemne, łagodne kolory"}>
         <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M22.5 17.5A9.5 9.5 0 0 1 11 5.5a10 10 0 1 0 11.5 12z" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" /></svg>
         <span className="a11y__txt">{podpisNocy}</span>
       </button>
       <button type="button" onClick={() => zmien({ ...stan, hc: !hc })} aria-pressed={hc}
-        aria-label={podpisKontrastu} title={t(hc ? "Wyłącz wysoki kontrast" : "Włącz wysoki kontrast")}>
+        aria-label={podpisKontrastu} title={hc ? "Wyłącz wysoki kontrast" : "Włącz wysoki kontrast"}>
         <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><circle cx="14" cy="14" r="10.5" fill="none" stroke="currentColor" strokeWidth="2.4" /><path d="M14 3.5a10.5 10.5 0 0 1 0 21z" fill="currentColor" /></svg>
         <span className="a11y__txt">{podpisKontrastu}</span>
       </button>

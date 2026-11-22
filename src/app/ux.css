@@ -231,25 +231,3 @@ html.noc .zus-nav__sub li, html.noc .zus-nav ul.zus-nav__drop li { border-top-co
 @media (max-width: 600px) {
   .field input[type="file"] { min-height: 44px; padding: 10px 0; box-sizing: border-box; }
 }
-
-/* Wybór języka (PL / EN / UA): przyciski w pasku nagłówka na komputerze, pełne nazwy w menu na telefonie. */
-.lang { display: flex; gap: 4px; align-items: center; min-width: 0; }
-.lang button {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 44px; min-height: 44px; padding: 0 8px; border: 2px solid var(--zus-navy); border-radius: 3px;
-  background: #fff; color: var(--zus-navy); font: inherit; font-weight: 700; font-size: 15px; line-height: 1.15; cursor: pointer;
-}
-.lang button:hover { background: var(--gray); }
-.lang button[aria-pressed="true"] { background: var(--zus-navy); color: #fff; }
-.lang--menu { flex-direction: column; align-items: stretch; gap: 8px; }
-.lang--menu button { min-height: 48px; justify-content: flex-start; padding: 8px 14px; font-size: 16px; }
-/* Komputer: przełącznik stoi pod przyciskiem „Zaloguj”, więc nie zmienia wysokości ani szerokości nagłówka. */
-.logowanie-jezyk { position: relative; display: flex; }
-.logowanie-jezyk > .lang { position: absolute; top: calc(100% + 4px); right: 0; z-index: 2; }
-.logowanie-jezyk .lang button { min-width: 34px; min-height: 28px; padding: 0 6px; font-size: 13px; border-width: 1px; }
-@media (max-width: 1099px) { .logowanie-jezyk { display: contents; } .logowanie-jezyk > .lang { display: none; } }
-html.hc .lang button { background: var(--hc-accent) !important; color: #000 !important; border-color: #000 !important; }
-html.hc .lang button[aria-pressed="true"] { background: #fff !important; text-decoration: underline; }
-html.noc .lang button { background: var(--card); color: var(--ink); border-color: var(--zus-green-link); }
-html.noc .lang button[aria-pressed="true"] { background: var(--zus-green); color: var(--na-zieleni); border-color: var(--zus-green); }
-@media print { .lang { display: none !important; } }

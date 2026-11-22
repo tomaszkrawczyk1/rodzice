@@ -2,7 +2,6 @@
 import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { przejdzDoKroku } from "@/lib/ekran";
-import { useT } from "@/lib/jezyk";
 import { parametrZywy, przejdz, wroc, zastap, zbudujAdres } from "./adres";
 import css from "./kalkulator.module.css";
 
@@ -84,7 +83,6 @@ export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, d
   uwaga?: ReactNode;
   children: ReactNode;
 }) {
-  const t = useT();
   const id = useId();
   const blok = useRef<HTMLDivElement>(null);
   const tytul = useRef<HTMLHeadingElement>(null);
@@ -102,13 +100,13 @@ export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, d
 
   return (
     <div className={css.kreator} ref={blok}>
-      <nav aria-label={t("Postęp kalkulatora")} className={css.postep}>
+      <nav aria-label="Postęp kalkulatora" className={css.postep}>
         <p className={css.licznik}>Krok {krok + 1} z {kroki.length}: <b>{aktualny.nazwa}</b></p>
         {uwaga && <p className={css.uwagaKrokow}>{uwaga}</p>}
         <div className={css.pasek} aria-hidden="true"><div className={css.wypelnienie} style={{ width: `${((krok + 1) / kroki.length) * 100}%` }} /></div>
         <ol className={css.kroki}>
           {kroki.map((k, i) => {
-            const tresc = <><span className={css.numer} aria-hidden="true">{i + 1}</span><span className={css.nazwa}><span className="vh">{t("Krok {n}:", { n: i + 1 })} </span>{t(k.nazwa)}</span></>;
+            const tresc = <><span className={css.numer} aria-hidden="true">{i + 1}</span><span className={css.nazwa}><span className="vh">Krok {i + 1}: </span>{k.nazwa}</span></>;
             return (
               <li key={k.id} className={css.krok}>
                 {i === krok
@@ -123,12 +121,12 @@ export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, d
       </nav>
 
       <form className={css.panel} aria-labelledby={`${id}-tytul`} noValidate onSubmit={(e) => { e.preventDefault(); if (!ostatni) onDalej(); }}>
-        <h2 id={`${id}-tytul`} ref={tytul} tabIndex={-1} className={css.tytul}>{t(aktualny.tytul ?? aktualny.nazwa)}</h2>
+        <h2 id={`${id}-tytul`} ref={tytul} tabIndex={-1} className={css.tytul}>{aktualny.tytul ?? aktualny.nazwa}</h2>
         {children}
         {podglad}
         <div className={css.nawigacja}>
-          {krok > 0 && <button type="button" className="btn btn-ghost" onClick={onWstecz}>{t("Wstecz")}</button>}
-          {!ostatni && <button type="submit" className="btn btn-primary" disabled={dalejZablokowany}>{t(dalejEtykieta)}</button>}
+          {krok > 0 && <button type="button" className="btn btn-ghost" onClick={onWstecz}>Wstecz</button>}
+          {!ostatni && <button type="submit" className="btn btn-primary" disabled={dalejZablokowany}>{dalejEtykieta}</button>}
         </div>
       </form>
     </div>

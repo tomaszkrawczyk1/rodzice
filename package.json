@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start -p 3100",
     "test:parser": "node --experimental-strip-types test/parser.ts",
-    "test": "node --experimental-strip-types test/i18n.ts && node --experimental-strip-types test/testy.ts && node --experimental-strip-types test/kalendarz.ts && node --experimental-strip-types test/ux.ts && node --experimental-strip-types test/zadluzenie.ts && node test/terminarz.mjs && node --experimental-strip-types test/terminarz-widok.ts",
+    "test": "node --experimental-strip-types test/testy.ts && node --experimental-strip-types test/kalendarz.ts && node --experimental-strip-types test/ux.ts && node --experimental-strip-types test/zadluzenie.ts && node test/terminarz.mjs && node --experimental-strip-types test/terminarz-widok.ts && node --experimental-strip-types test/szukaj.ts",
     "weryfikuj": "node --experimental-strip-types src/content/poradnik/weryfikuj_poradnik.ts"
   },
   "dependencies": {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { DataPole } from "@/components/DataPole";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/sesja";
-import { useFormaty, useT } from "@/lib/jezyk";
+import { dataPL, liczba, pln, tygodnie, opisObliczenia } from "@/lib/format";
 import { Alert } from "@/components/ui";
 import type { PlanWejscie, PlanWynik, OkresZNetto, PodstawaWynik } from "@/engine/kalkulator";
 import { Pole } from "@/components/Pole";
@@ -25,8 +25,6 @@ const K = { sytuacja: 0, dziecko: 1, urlopy: 2, wynik: 3 };
 type Zapisany = { klucz: string; okresy: OkresZNetto[]; sprawdz: boolean };
 
 export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => void }) {
-  const { opisObliczenia, tygodnie, pln, dataPL, liczba } = useFormaty();
-  const t = useT();
   const [data, setData] = useState("");
   const [dzieci, setDzieci] = useState(1);
   const [podstawa, setPodstawa] = useState("");   // opcja zaawansowana: gotowa podstawa zasiłku
@@ -40,7 +38,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
   const [odRodz, setOdRodz] = useState("");
   const [busy, setBusy] = useState(false);
   const [zapisany, setZapisany] = useState<Zapisany | null>(null);
-  const [blad, setBlad] = useState<string[]>([]);
+  const [blad, setBlad] = useState("");
   const [pokazBledy, setPokazBledy] = useState(false);
   const [fokusBledu, setFokusBledu] = useState(0);
   const tresc = useRef<HTMLDivElement>(null);
@@ -66,12 +64,12 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
   const kwota = maReczna ? podstawaReczna : pods?.podstawaMiesieczna ?? NaN;
 
   // Błędy pól liczone na bieżąco; pokazujemy je dopiero po kliknięciu „Dalej".
-  const nieWczesniej = t("Urlop zaplanuj na dzień narodzin dziecka lub później.");
+  const nieWczesniej = "Urlop zaplanuj na dzień narodzin dziecka lub później.";
   const bl = {
-    data: !data ? t("Podaj datę urodzenia lub przewidywaną datę porodu.") : "",
+    data: !data ? "Podaj datę urodzenia lub przewidywaną datę porodu." : "",
     podstawa: !maReczna && !(Number.isFinite(kwotaZarobkow) && kwotaZarobkow > 0) ? "Wpisz kwotę zarobków albo gotową podstawę zasiłku." : "",
     rodz: !Number.isInteger(rodzicielski) || rodzicielski < 0 || rodzicielski > limit ? `Wpisz od 0 do ${limit} tygodni urlopu rodzicielskiego.` : "",
-    okres: !rodzicielski && !ojcowski ? t("Wybierz co najmniej jeden okres do obliczenia.") : "",
+    okres: !rodzicielski && !ojcowski ? "Wybierz co najmniej jeden okres do obliczenia." : "",
     odRodz: Boolean(rodzicielski && odRodz && data && odRodz < data) ? nieWczesniej : "",
     od: Boolean(ojcowski && od && data && od < data) ? nieWczesniej : "",
   };
@@ -88,7 +86,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
   useEffect(() => { if (fokusBledu) tresc.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(); }, [fokusBledu]);
 
   async function policz() {
-    setBlad([]);
+    setBlad("");
     setBusy(true);
     try {
       // Podstawa z kwoty zarobków liczy się z opóźnieniem; jeśli jeszcze jej nie ma, liczymy ją teraz.
@@ -102,14 +100,14 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
       };
       const plan = await api<Omit<PlanWynik, "okresy"> & { okresy: OkresZNetto[] }>("/api/oblicz/plan", wejscie);
       if (plan.bledy.length) {
-        setBlad(plan.bledy);
+        setBlad(plan.bledy.map(opisObliczenia).join(" "));
         return;
       }
       setZapisany({ klucz, okresy: plan.okresy.filter((o) => o.kto === "ojciec"), sprawdz: plan.okresy.some((o) => o.kto === "ojciec" && o.podwyzszoneDoSwiadczeniaRodzicielskiego) });
       setPokazBledy(false);
       if (parametrZywy("krok") === KROKI[K.urlopy].id) idz(K.wynik);   // nie przerzucamy do wyniku, jeśli w trakcie liczenia ktoś cofnął się lub wyszedł
     } catch {
-      setBlad(["Nie udało się policzyć zasiłku. Spróbuj ponownie."]);
+      setBlad("Nie udało się policzyć zasiłku. Spróbuj ponownie.");
     } finally {
       setBusy(false);
     }
@@ -130,10 +128,10 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
 
         {krok === K.dziecko && (
           <>
-            <p className={css.mala}>{t("Do obliczenia wystarczą dane taty albo drugiego rodzica, który korzysta z urlopu.")}</p>
+            <p className={css.mala}>Do obliczenia wystarczą dane taty albo drugiego rodzica, który korzysta z urlopu.</p>
             <DataPole label="Data urodzenia lub przewidywana data porodu" value={data} onChange={setData} error={pokaz("data")} />
-            <Pole label={t("Liczba dzieci przy jednym porodzie")}><select value={dzieci} onChange={(e) => setDzieci(+e.target.value)}>
-              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? t("5 lub więcej") : n}</option>)}
+            <Pole label="Liczba dzieci przy jednym porodzie"><select value={dzieci} onChange={(e) => setDzieci(+e.target.value)}>
+              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? "5 lub więcej" : n}</option>)}
             </select></Pole>
             {mnogi && <p className={css.mala} role="status">{mnogi}</p>}
             <PoleRodzaju label="Twój rodzaj zatrudnienia" rodzaj={rodzaj} onZmiana={(r) => { setRodzaj(r); setRodzajReczny(true); }} zProfilu={!rodzajReczny && !!profil?.rodzaj} />
@@ -155,22 +153,22 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
 
         {krok === K.urlopy && (
           <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
-            <Pole label={t("Liczba tygodni urlopu rodzicielskiego")} hint={t("Każdy rodzic ma {tyg} wyłącznie dla siebie. Podaj, ile tygodni chcesz wykorzystać.", { tyg: tygodnie(niezbywalne) })} error={pokaz("rodz")}><input type="number" min={0} max={limit} value={rodzicielski} onChange={(e) => setRodzicielski(+e.target.value)} /></Pole>
+            <Pole label="Liczba tygodni urlopu rodzicielskiego" hint={`Każdy rodzic ma ${tygodnie(niezbywalne)} wyłącznie dla siebie. Podaj, ile tygodni chcesz wykorzystać.`} error={pokaz("rodz")}><input type="number" min={0} max={limit} value={rodzicielski} onChange={(e) => setRodzicielski(+e.target.value)} /></Pole>
             {rodzicielski > 0 && <DataPole label="Początek urlopu rodzicielskiego" hint="Bez daty przyjmiemy początek po zakończeniu urlopu macierzyńskiego." value={odRodz} onChange={setOdRodz} error={pokaz("odRodz")} />}
-            <Pole label={t("Urlop ojcowski")} hint={t("Wybierz okres, który chcesz uwzględnić w wyliczeniu.")} error={pokaz("okres")}><select value={ojcowski} onChange={(e) => setOjcowski(+e.target.value)}>
-              <option value={0}>{t("Nie uwzględniaj")}</option>
+            <Pole label="Urlop ojcowski" hint="Wybierz okres, który chcesz uwzględnić w wyliczeniu." error={pokaz("okres")}><select value={ojcowski} onChange={(e) => setOjcowski(+e.target.value)}>
+              <option value={0}>Nie uwzględniaj</option>
               <option value={L.urlop_ojcowski_min_czesc_dni}>{tygodnie(L.urlop_ojcowski_min_czesc_dni / 7)}</option>
               <option value={L.urlop_ojcowski_dni}>{tygodnie(L.urlop_ojcowski_dni / 7)}</option>
             </select></Pole>
             {ojcowski > 0 && <DataPole label="Początek urlopu ojcowskiego" hint="Bez daty przyjmiemy dzień narodzin dziecka." value={od} onChange={setOd} error={pokaz("od")} />}
-            {blad.length > 0 && <Alert t="err">{blad.map((b) => t(opisObliczenia(b))).join(" ")}</Alert>}
+            {blad && <Alert t="err">{blad}</Alert>}
           </fieldset>
         )}
 
         {krok === K.wynik && (
           <>
             <div role="status">
-              {busy && <div className={css.kwota}><p className={css.statusLadowania}><span className="spin" aria-hidden="true" /> {t("Liczymy zasiłek…")}</p></div>}
+              {busy && <div className={css.kwota}><p className={css.statusLadowania}><span className="spin" aria-hidden="true" /> Liczymy zasiłek…</p></div>}
               {!busy && wynik && (
                 <div className={css.kwota}>
                   <p className={css.kwotaOpis}>Łącznie: brutto (przed zaliczką na podatek)</p>
@@ -179,31 +177,31 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
                 </div>
               )}
             </div>
-            {blad.length > 0 && <Alert t="err">{blad.map((b) => t(opisObliczenia(b))).join(" ")}</Alert>}
+            {blad && <Alert t="err">{blad}</Alert>}
             {!busy && !wynik && (
               <div className={css.kwota}>
-                <p className={css.kwotaOpis}>{t("Łącznie przed zaliczką na podatek")}</p>
-                <p className={`${css.kwotaWartosc} ${css.pusta}`}>{pln(null)}</p>
-                <p className={css.mala}>{t("Dane zmieniły się od ostatniego wyliczenia.")}</p>
-                <button type="button" className="btn btn-primary" onClick={() => void policz()}>{t("Policz zasiłek")}</button>
+                <p className={css.kwotaOpis}>Łącznie przed zaliczką na podatek</p>
+                <p className={`${css.kwotaWartosc} ${css.pusta}`}>— zł</p>
+                <p className={css.mala}>Dane zmieniły się od ostatniego wyliczenia.</p>
+                <button type="button" className="btn btn-primary" onClick={() => void policz()}>Policz zasiłek</button>
               </div>
             )}
             {wynik && (
               <>
                 <ul className={css.lista}>{wynik.okresy.map((o, i) => <li key={i}>
                   <b>{o.rodzaj === "ojcowski" ? "Urlop ojcowski" : "Urlop rodzicielski"}</b>
-                  <div>{dataPL(o.od)} {t("do")} {dataPL(o.do)}</div>
+                  <div>{dataPL(o.od)} do {dataPL(o.do)}</div>
                   <div>{pln(o.kwota)} brutto ({liczba(o.procent)}% podstawy){o.kwotaNetto != null && <>, na rękę ok. {pln(o.kwotaNetto)}</>}</div>
                   <div className={css.mala}>Miesięcznie: {pln(o.miesiecznieBrutto)} brutto{o.miesiecznieNetto != null && <>, {pln(o.miesiecznieNetto)} na rękę (szacunkowo)</>}</div>
                 </li>)}</ul>
                 {mnogi && <Alert t="info">{mnogi}</Alert>}
                 <OstrzezenieZadluzenia kwota={zadluzenie} dzien={data} zProfilu={zadl === null && zadlProfil != null} />
                 {wynik.okresy.some((o) => o.kwotaNetto != null) && <p className={css.mala}>{OPIS_NETTO}</p>}
-                {wynik.sprawdz && <Alert t="warn">{t("Wyliczenie uwzględnia podwyższenie do kwoty świadczenia rodzicielskiego. Sprawdź w ZUS, czy dotyczy Twojej sytuacji.")}</Alert>}
-                {ojcowski > 0 && <p className="mt"><Link href="/wnioski?urlop=ojcowski" className="btn btn-secondary">{t("Przygotuj wniosek o urlop ojcowski")}</Link></p>}
+                {wynik.sprawdz && <Alert t="warn">Wyliczenie uwzględnia podwyższenie do kwoty świadczenia rodzicielskiego. Sprawdź w ZUS, czy dotyczy Twojej sytuacji.</Alert>}
+                {ojcowski > 0 && <p className="mt"><Link href="/wnioski?urlop=ojcowski" className="btn btn-secondary">Przygotuj wniosek o urlop ojcowski</Link></p>}
               </>
             )}
-            <p className={css.mala}>{t("Urlop ojcowski: {a}% podstawy zasiłku. Urlop rodzicielski w tym wyliczeniu: {b}% podstawy.", { a: liczba(P.zasilek_za_urlop_ojcowski), b: liczba(P.zasilek_za_urlop_rodzicielski) })}</p>
+            <p className={css.mala}>Urlop ojcowski: {liczba(P.zasilek_za_urlop_ojcowski)}% podstawy zasiłku. Urlop rodzicielski w tym wyliczeniu: {liczba(P.zasilek_za_urlop_rodzicielski)}% podstawy.</p>
           </>
         )}
       </div>

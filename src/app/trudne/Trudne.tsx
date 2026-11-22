@@ -8,7 +8,6 @@ import { KONTAKTY_DLA_SYTUACJI, POMOC_TERAZ, krotkiAdres, telLink } from "@/lib/
 import { dataPL } from "@/lib/format";
 import { przejdzKrok } from "@/lib/adres-kroku";
 import css from "./Trudne.module.css";
-import { useFormaty, useT } from "@/lib/jezyk";
 
 // Stan domyślny (bez parametru) jest neutralny: powitanie i lista sytuacji, nic nie jest rozwinięte.
 // Wybrana sytuacja jest w adresie (`?sytuacja=zgon`), więc można do niej podlinkować, a „Wstecz” wraca do listy.
@@ -34,8 +33,6 @@ const SYTUACJE = [...TRUDNE, { id: "chore", t: "Dziecko jest ciężko chore", d:
 type Sytuacja = (typeof SYTUACJE)[number];
 
 export default function Trudne() {
-  const t = useT();
-  const { dataPL } = useFormaty();
   const zAdresu = useSearchParams().get("sytuacja");
   const idZAdresu = SYTUACJE.some((x) => x.id === zAdresu) ? zAdresu : null;
   // Lokalna kopia, żeby widok zmieniał się od razu (adres odświeża się chwilę później); „Wstecz” ją synchronizuje.
@@ -61,7 +58,7 @@ export default function Trudne() {
 
   return (
     <>
-      <h1>{t("Pomoc w trudnej sytuacji")}</h1>
+      <h1>Pomoc w trudnej sytuacji</h1>
       <p className="lead">Jeśli tu jesteś, być może przechodzisz przez coś bardzo trudnego. Nie musisz niczego załatwiać od razu. Wybierz sytuację, która Cię dotyczy, a pokażemy, co Ci przysługuje i gdzie znaleźć wsparcie.</p>
 
       <aside className={`card ${css.teraz}`} aria-labelledby="pomoc-teraz">
@@ -78,7 +75,7 @@ export default function Trudne() {
       <div className="mt" aria-live="polite">
         {!sytuacja ? (
           <section className="card">
-            <h2 ref={lista} tabIndex={-1} className={css.tytul}>{t("Wybierz sytuację")}</h2>
+            <h2 ref={lista} tabIndex={-1} className={css.tytul}>Wybierz sytuację</h2>
             <p className="muted">Możesz wrócić do tej listy w każdej chwili.</p>
             <ul className={`${css.lista} mt`}>
               {SYTUACJE.map((x) => (
@@ -103,7 +100,6 @@ function Szczegoly({ sytuacja, tytul, wstecz }: {
   tytul: React.RefObject<HTMLHeadingElement | null>;
   wstecz: () => void;
 }) {
-  const t = useT();
   const organizacje = podmiotyDla(sytuacja.id);
   const dodatkowe = KONTAKTY_DLA_SYTUACJI[sytuacja.id] ?? [];
   return (
@@ -112,29 +108,29 @@ function Szczegoly({ sytuacja, tytul, wstecz }: {
       <section className="card navy mt">
         <h2 ref={tytul} tabIndex={-1} className={css.tytul}>{sytuacja.t}</h2>
         {sytuacja.d.length > 0 && <ul className="clean">{sytuacja.d.map((x) => <li key={x}>{x}</li>)}</ul>}
-          <p className="mt"><Link href="/sprawa/trudna-sytuacja">{t("Sprawdź, co załatwić krok po kroku")}</Link></p>
-        </section>
+        <p className="mt"><Link href="/sprawa/trudna-sytuacja">Sprawdź, co załatwić krok po kroku</Link></p>
+      </section>
       {(organizacje.length > 0 || dodatkowe.length > 0) && <section className="card accent mt">
-          <h2>{t("Gdzie szukać wsparcia")}</h2>
+        <h2>Gdzie szukać wsparcia</h2>
         <ul className="clean">
           {organizacje.map((o) => (
             <li key={o.id}>
               <b>{o.nazwa}</b><br />{o.opis}
-              <br />{o.telefon && <>{t("Telefon: ")}<a href={telHref(o.telefon)}>{o.telefon}</a>{o.godziny ? ` (${o.godziny})` : ""}. </>}
-              {o.email && <>{t("E-mail: ")}<a href={`mailto:${o.email}`}>{o.email}</a>. </>}Strona: <a href={o.www} {...NOWA_KARTA}>{krotkiAdres(o.www)}</a>
-              <br /><span className="muted">{o.zakres}{o.uwaga ? ` ${o.uwaga}` : ""} Sprawdzone {dataPL(o.dataSprawdzenia)}, <a href={o.zrodlo} {...NOWA_KARTA}>{t("źródło")}</a>.{o.pewnosc === "do_potwierdzenia" ? " Do potwierdzenia: zadzwoń lub napisz, zanim na tym polegasz." : ""}</span>
+              <br />{o.telefon && <>Telefon: <a href={telHref(o.telefon)}>{o.telefon}</a>{o.godziny ? ` (${o.godziny})` : ""}. </>}
+              {o.email && <>E-mail: <a href={`mailto:${o.email}`}>{o.email}</a>. </>}Strona: <a href={o.www} {...NOWA_KARTA}>{krotkiAdres(o.www)}</a>
+              <br /><span className="muted">{o.zakres}{o.uwaga ? ` ${o.uwaga}` : ""} Sprawdzone {dataPL(o.dataSprawdzenia)}, <a href={o.zrodlo} {...NOWA_KARTA}>źródło</a>.{o.pewnosc === "do_potwierdzenia" ? " Do potwierdzenia: zadzwoń lub napisz, zanim na tym polegasz." : ""}</span>
             </li>
           ))}
           {dodatkowe.map((k) => (
             <li key={k.id}>
               <b>{k.nazwa}</b><br />{k.opis}
-              <br />{k.telefon && <>{t("Telefon: ")}<a href={telLink(k.telefon)}>{k.telefon}</a>{k.godziny ? ` (${k.godziny})` : ""}. </>}
+              <br />{k.telefon && <>Telefon: <a href={telLink(k.telefon)}>{k.telefon}</a>{k.godziny ? ` (${k.godziny})` : ""}. </>}
               {k.www && <>Strona: <a href={k.www} {...NOWA_KARTA}>{krotkiAdres(k.www)}</a></>}
             </li>
           ))}
         </ul>
         <p className="muted mt">{WSPARCIE_UWAGA}</p>
-        </section>}
+      </section>}
     </>
   );
 }

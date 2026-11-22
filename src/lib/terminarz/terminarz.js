@@ -151,21 +151,15 @@ function icsFold(line) {
 export function toICS(events, options = {}) {
   const prodId = options.prodId || '-//Terminarz rodzica//PL';
   const stamp = (options.now || new Date()).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
-  const labels = {
-    where: 'Gdzie:',
-    documents: 'Dokumenty:',
-    verify: 'Zasada do weryfikacji w ZUS lub gminie.',
-    ...(options.labels || {}),
-  };
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:' + prodId, 'CALSCALE:GREGORIAN'];
   for (const ev of events) {
     const start = ev.date.replace(/-/g, '');
     const end = toISO(addDays(parseISO(ev.date), 1)).replace(/-/g, '');
     const details = [ev.description];
-    if (ev.institution) details.push(labels.where + ' ' + ev.institution);
-    if (ev.forms.length) details.push(labels.documents + ' ' + ev.forms.join(', '));
+    if (ev.institution) details.push('Gdzie: ' + ev.institution);
+    if (ev.forms.length) details.push('Dokumenty: ' + ev.forms.join(', '));
     for (const l of ev.links || []) details.push(l.title + ': ' + l.url);
-    if (ev.verify) details.push(labels.verify);
+    if (ev.verify) details.push('Zasada do weryfikacji w ZUS lub gminie.');
     lines.push(
       'BEGIN:VEVENT',
       'UID:' + ev.id + '-' + start + '@terminarz',

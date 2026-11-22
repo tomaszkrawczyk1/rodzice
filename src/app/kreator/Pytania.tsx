@@ -8,7 +8,6 @@ import { przejdzKrok, wrocDoKroku } from "@/lib/adres-kroku";
 import { przejdzDoKroku } from "@/lib/ekran";
 import SwiadczenieRodzicielskie from "./SwiadczenieRodzicielskie";
 import { INNE_SWIADCZENIA } from "./inne-swiadczenia";
-import { useJezyk } from "@/lib/jezyk";
 
 // Pola wyniku z drzewa, których nie opisuje wspólny typ Wezel w src/content/poradnik.ts.
 type Odnosnik = { href?: string; etykieta: string };
@@ -22,7 +21,6 @@ type WezelWynik = Extract<Wezel, { typ: "wynik" }> & DodatkiWyniku;
 // Każda odpowiedź to osobny wpis historii, więc „Wstecz" przeglądarki cofa o jedno pytanie,
 // a adres można odświeżyć i podlinkować.
 export default function Pytania() {
-  const { t, jezyk } = useJezyk();
   const params = useSearchParams();
   const start = params.get("sciezka") === "ojciec" ? "po_podzial" : DRZEWO_START;
   const postep = odczytajKrokiZAdresu(params.get("krok"), start, DRZEWO);
@@ -66,9 +64,9 @@ export default function Pytania() {
 
       {postep.length > 0 && <div className="kreator-nawigacja no-print">
         <button type="button" className="btn btn-ghost kreator-duzy" onClick={() => wrocDoKroku({ krok: kodujKroki(postep.slice(0, -1)) })}>‹ Wróć</button>
-        <button type="button" className="btn btn-ghost kreator-duzy" onClick={() => przejdzKrok({ krok: null })}>{t("Zacznij od nowa")}</button>
+        <button type="button" className="btn btn-ghost kreator-duzy" onClick={() => przejdzKrok({ krok: null })}>Zacznij od nowa</button>
       </div>}
-      {start !== DRZEWO_START && <p className="mt"><Link href="/kreator">{t("Zobacz wszystkie sytuacje")}</Link></p>}
+      {start !== DRZEWO_START && <p className="mt"><Link href="/kreator">Zobacz wszystkie sytuacje</Link></p>}
       {postep.length > 0 && <p className="small muted mt">Możesz zapisać lub wysłać komuś link do tej strony – otworzy się w tym samym miejscu.</p>}
     </>
   );

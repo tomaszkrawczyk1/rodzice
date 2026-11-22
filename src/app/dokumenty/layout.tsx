@@ -1,9 +1,9 @@
-import { metadane } from "@/i18n/metadane";
+import type { Metadata } from "next";
 
-export const generateMetadata = () => metadane(
-  "Dokumenty i terminy",
-  "Lista dokumentów i terminów, o których warto pamiętać przed urodzeniem dziecka i po nim."
-);
+export const metadata: Metadata = {
+  title: "Kto wypłaca zasiłek – Przewodnik Przyszłego Rodzica",
+  description: "Sprawdź, czy zasiłek wypłaca ZUS, czy pracodawca, gdzie złożyć wniosek i ile masz na to czasu.",
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

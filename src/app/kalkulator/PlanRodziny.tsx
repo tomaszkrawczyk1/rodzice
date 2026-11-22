@@ -4,8 +4,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { DataPole } from "@/components/DataPole";
 import { api } from "@/lib/sesja";
-import { useFormaty, useT } from "@/lib/jezyk";
-import { Wstaw } from "@/components/Wstaw";
+import { pln, tygodnie, liczba, opisObliczenia } from "@/lib/format";
 import { Alert, Kroki, Lista } from "@/components/ui";
 import { Pole as Field } from "@/components/Pole";
 import { Kreator, useKreator, type KrokDef } from "./Kreator";
@@ -55,8 +54,6 @@ function stanPoczatkowy(tryb: Tryb): F {
 
 /** `poczatkowy` to tryb z adresu (?tryb=…): ustala stan startowy, a potem to wybór użytkownika jest źródłem prawdy, a adres za nim podąża. */
 export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatkowy: Tryb; onOjciec: () => void; wstepne?: (DaneWstepne & { nr: number }) | null }) {
-  const t = useT();
-  const { liczba, opisObliczenia, pln, tygodnie } = useFormaty();
   const [f, setF] = useState<F>(() => stanPoczatkowy(poczatkowy));
   const [wyn, setWyn] = useState<any>(null);
   const [por, setPor] = useState<any>(null);
@@ -90,7 +87,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
       const pre = JSON.parse(localStorage.getItem("rodzice.prefill") || "null");
       if (pre?.podstawaM) {
         setF((x) => ({ ...x, podstawaM: String(pre.podstawaM), bruttoM: "", tryb: "wlasne", ...(pre.data ? { data: pre.data } : {}), ...(pre.dzieci ? { dzieci: Math.min(pre.dzieci, 5) } : {}) }));
-        setWczytano(t("Wczytano dane z wgranego dokumentu: podstawa zasiłku {kwota}.", { kwota: pln(Number(pre.podstawaM)) }));
+        setWczytano(`Wczytano dane z wgranego dokumentu: podstawa zasiłku ${pln(Number(pre.podstawaM))}.`);
         localStorage.removeItem("rodzice.prefill");
       }
     } catch {}
@@ -286,7 +283,6 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
     try { setUzupWyn(await api("/api/oblicz/uzupelniajacy", { dataPorodu: f.data, tydzienCiazyUkonczone: uzupForm.tc, masaUrodzeniowaG: uzupForm.masa, pobytySzpital: uzupForm.od && uzupForm.do ? [{ od: uzupForm.od, do: uzupForm.do }] : [] })); } catch (e: any) { setUzupWyn({ error: e.message }); }
   }
 
-
   // --- kroki: walidacja i nawigacja ---
   const komunikatData = przyjecie ? "Podaj datę przyjęcia dziecka na wychowanie." : "Podaj datę urodzenia dziecka lub przewidywaną datę porodu.";
   const komunikatPodstawy = "Wpisz kwotę zarobków albo gotową podstawę zasiłku.";
@@ -304,7 +300,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
 
   const podglad = krok >= K.zarobki && krok <= K.wariant ? (
     <p className={css.podglad}>
-      {busy ? t("Liczymy wstępny wynik…") : wyn ? <Wstaw tekst={t("Wstępny wynik: {kwota} razem. Pełny wynik zobaczysz w ostatnim kroku.")} wartosci={{ kwota: <b>{pln(wyn.sumy.razem)}</b> }} /> : t("Wstępny wynik pojawi się, gdy podasz datę i zarobki.")}
+      {busy ? "Liczymy wstępny wynik…" : wyn ? <>Wstępny wynik: <b>{pln(wyn.sumy.razem)}</b> razem. Pełny wynik zobaczysz w ostatnim kroku.</> : "Wstępny wynik pojawi się, gdy podasz datę i zarobki."}
     </p>
   ) : null;
 
@@ -315,8 +311,8 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
           <WyborSytuacji wartosc={f.tryb} onZmiana={sytuacja}>
             {f.tryb === "wlasne" && (
               <div className={css.sekcja}>
-                <p className={css.mala}><Wstaw tekst={t("Wczytaj gotowy scenariusz (fikcyjna osoba) albo {link}: podstawa wymiaru zostanie odczytana z dokumentu.")} wartosci={{ link: <Link href="/wgraj">{t("wgraj skan wniosku")}</Link> }} /></p>
-                <Field label={t("Scenariusz")}><select defaultValue="" onChange={(e) => e.target.value && wczytaj(e.target.value)}><option value="">{t("— wybierz —")}</option>{scen.map((c) => <option key={c.id} value={c.id}>{c.osoba}</option>)}</select></Field>
+                <p className={css.mala}>Wczytaj gotowy scenariusz (fikcyjna osoba) albo <Link href="/wgraj">wgraj skan wniosku</Link>: podstawa wymiaru zostanie odczytana z dokumentu.</p>
+                <Field label="Scenariusz"><select defaultValue="" onChange={(e) => e.target.value && wczytaj(e.target.value)}><option value="">— wybierz —</option>{scen.map((c) => <option key={c.id} value={c.id}>{c.osoba}</option>)}</select></Field>
               </div>
             )}
             <div role="status">{wczytano && <Alert t="ok">{wczytano}</Alert>}</div>
@@ -325,15 +321,15 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
 
         {krok === K.dziecko && (
           <>
-            <Field label={t("Co się wydarzyło / wydarzy?")}><select value={f.tytul} onChange={(e) => set({ tytul: e.target.value, ...(e.target.value !== "porod" ? { martwe: false, ojcowski: false, ojciecPrzejmuje: 0, uzup: 0 } : {}) })}>
-              <option value="porod">{t("Poród (urodzenie dziecka)")}</option><option value="przysposobienie">{t("Przysposobienie (adopcja)")}</option><option value="rodzina_zastepcza">{t("Rodzina zastępcza niezawodowa")}</option></select></Field>
+            <Field label="Co się wydarzyło / wydarzy?"><select value={f.tytul} onChange={(e) => set({ tytul: e.target.value, ...(e.target.value !== "porod" ? { martwe: false, ojcowski: false, ojciecPrzejmuje: 0, uzup: 0 } : {}) })}>
+              <option value="porod">Poród (urodzenie dziecka)</option><option value="przysposobienie">Przysposobienie (adopcja)</option><option value="rodzina_zastepcza">Rodzina zastępcza niezawodowa</option></select></Field>
             <DataPole label={f.tytul === "porod" ? "Data urodzenia lub przewidywana data porodu" : "Data przyjęcia dziecka na wychowanie"} value={f.data} onChange={(iso) => set({ data: iso })} error={pokazBledy && brakData ? komunikatData : undefined} />
             <div className="grid g2">
-              <Field label={t(f.tytul === "porod" ? "Liczba dzieci przy jednym porodzie" : "Liczba dzieci przyjmowanych jednocześnie")}><select value={f.dzieci} onChange={(e) => set({ dzieci: +e.target.value })}>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? t("5 lub więcej") : n}</option>)}</select></Field>
+              <Field label={f.tytul === "porod" ? "Liczba dzieci przy jednym porodzie" : "Liczba dzieci przyjmowanych jednocześnie"}><select value={f.dzieci} onChange={(e) => set({ dzieci: +e.target.value })}>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? "5 lub więcej" : n}</option>)}</select></Field>
               {f.tytul !== "porod" && <DataPole label="Data urodzenia dziecka" hint="Do limitu wieku (7/10 lat – rodzina zastępcza, 14 lat – adopcja)" value={f.dataUrDziecka} onChange={(iso) => set({ dataUrDziecka: iso })} />}
             </div>
             {mnogi && <p className={css.mala} role="status">{mnogi}</p>}
-            <label className="check"><input type="checkbox" checked={f.zaZyciem} onChange={(e) => set({ zaZyciem: e.target.checked })} />{t("Dziecko ma zaświadczenie „Za życiem” (dłuższy urlop rodzicielski)")}</label>
+            <label className="check"><input type="checkbox" checked={f.zaZyciem} onChange={(e) => set({ zaZyciem: e.target.checked })} />Dziecko ma zaświadczenie „Za życiem” (dłuższy urlop rodzicielski)</label>
             {f.tytul === "porod" && <label className="check"><input type="checkbox" checked={f.martwe} onChange={(e) => set({ martwe: e.target.checked })} />{f.dzieci > 1 ? "Jedno z dzieci urodziło się martwe" : "Dziecko urodziło się martwe"}</label>}
           </>
         )}
@@ -385,19 +381,19 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
         )}
 
         {krok === K.urlopy && (
-          bezZywych ? <p>{t("Przy urodzeniu martwego dziecka nie planujemy urlopu rodzicielskiego. Przejdź dalej.")}</p> : (
+          bezZywych ? <p>Przy urodzeniu martwego dziecka nie planujemy urlopu rodzicielskiego. Przejdź dalej.</p> : (
             <>
               {f.tytul === "porod" && <Field label={`Urlop macierzyński przed porodem: ${f.przedPorodem} dni`} hint={`Urlop można rozpocząć do ${tygodnie(W.macierzynski_przed_porodem_max)} przed porodem.`}><input type="range" min={0} max={W.macierzynski_przed_porodem_max * 7} value={f.przedPorodem} aria-valuetext={`${f.przedPorodem} dni`} onChange={(e) => { const p = +e.target.value; set({ przedPorodem: p, ojciecPrzejmuje: Math.min(f.ojciecPrzejmuje, maxPrzejmuje(p)) }); }} /></Field>}
               <Field label={`${rodzicPierwszy}: urlop rodzicielski ${tygodnie(f.rodzM)}`} hint={`Wspólna pula dla obojga rodziców: ${tygodnie(limit)}. Wykorzystano ${tygodnie(sumaRodz)}, zostało ${tygodnie(zostaloRodz)}.${powodM ? " " + powodM : ""}`}><input type="range" min={0} max={maxRodzM} value={Math.min(f.rodzM, maxRodzM)} aria-valuetext={tygodnie(f.rodzM)} onChange={(e) => set({ rodzM: +e.target.value })} /></Field>
               {dwoje && <Field label={`${rodzicDrugi}: urlop rodzicielski ${tygodnie(f.rodzO)}`} hint={`Każdy rodzic ma ${tygodnie(niezbywalne)} wyłącznie dla siebie.${powodO ? " " + powodO : ""}`}><input type="range" min={0} max={maxRodzO} value={Math.min(f.rodzO, maxRodzO)} aria-valuetext={tygodnie(f.rodzO)} onChange={(e) => set({ rodzO: +e.target.value })} /></Field>}
               {dwoje && <button type="button" className="btn btn-ghost btn-sm" onClick={podzial}>Ustaw {tygodnie(niezbywalne)} dla drugiego rodzica</button>}
               <details className="dl mt" open={laczOtwarte} onToggle={(e) => setLaczReczne(e.currentTarget.open)}>
-                <summary>{t("Łączenie pracy z urlopem rodzicielskim")}</summary>
-                <p className={css.mala}>{t("Można pracować do ½ etatu u pracodawcy, który udziela urlopu. Urlop wydłuża się proporcjonalnie, a zasiłek maleje proporcjonalnie.")}</p>
+                <summary>Łączenie pracy z urlopem rodzicielskim</summary>
+                <p className={css.mala}>Można pracować do ½ etatu u pracodawcy, który udziela urlopu. Urlop wydłuża się proporcjonalnie, a zasiłek maleje proporcjonalnie.</p>
                 <Field label={`${rodzicPierwszy}: tygodnie urlopu połączone z pracą ${f.laczTyg}`} hint={`Te tygodnie też zużywają wspólną pulę ${tygodnie(limit)}.${powodLacz ? " " + powodLacz : ""}`}><input type="range" min={0} max={maxLacz} value={Math.min(f.laczTyg, maxLacz)} aria-valuetext={tygodnie(f.laczTyg)} onChange={(e) => set({ laczTyg: +e.target.value })} /></Field>
                 {f.laczTyg > 0 && <Field label={`Wymiar etatu w pracy: ${f.etat}`}><input type="range" min={0.1} max={L.laczenie_z_praca_max_wymiar_etatu} step={0.05} value={f.etat} onChange={(e) => set({ etat: +e.target.value })} /></Field>}
               </details>
-              {dwoje && f.tytul === "porod" && <label className="check mt"><input type="checkbox" checked={f.ojcowski} onChange={(e) => set({ ojcowski: e.target.checked })} />{t("Uwzględnij urlop ojcowski ({tyg})", { tyg: tygodnie(L.urlop_ojcowski_dni / 7) })}</label>}
+              {dwoje && f.tytul === "porod" && <label className="check mt"><input type="checkbox" checked={f.ojcowski} onChange={(e) => set({ ojcowski: e.target.checked })} />Uwzględnij urlop ojcowski ({tygodnie(L.urlop_ojcowski_dni / 7)})</label>}
               {dwoje && f.tytul === "porod" && f.ojcowski && <DataPole label="Początek urlopu ojcowskiego" hint="Domyślnie dzień porodu" value={f.ojcowskiOd} onChange={(iso) => set({ ojcowskiOd: iso })} />}
               {dwoje && !przyjecie && (
                 <>
@@ -418,15 +414,15 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
                     <div className={css.sekcja}>
                       <p className={css.mala}>Uzupełniający urlop przysługuje tylko za dni pobytu dziecka w szpitalu. Jego długość zależy od tygodnia porodu: wpisz dane, a policzymy, ile przysługuje.</p>
                       <div className="grid g2">
-                        <Field label={t("Tydzień ciąży w dniu porodu")}><input type="number" inputMode="numeric" value={uzupForm.tc} onChange={(e) => zmienUzupForm({ tc: +e.target.value })} /></Field>
-                        <Field label={t("Masa urodzeniowa (g)")}><input type="number" inputMode="numeric" value={uzupForm.masa} onChange={(e) => zmienUzupForm({ masa: +e.target.value })} /></Field>
-                        <DataPole label={t("Pobyt w szpitalu – od")} value={uzupForm.od} onChange={(iso) => zmienUzupForm({ od: iso })} />
-                        <DataPole label={t("Pobyt w szpitalu – do")} value={uzupForm.do} onChange={(iso) => zmienUzupForm({ do: iso })} />
+                        <Field label="Tydzień ciąży w dniu porodu"><input type="number" inputMode="numeric" value={uzupForm.tc} onChange={(e) => zmienUzupForm({ tc: +e.target.value })} /></Field>
+                        <Field label="Masa urodzeniowa (g)"><input type="number" inputMode="numeric" value={uzupForm.masa} onChange={(e) => zmienUzupForm({ masa: +e.target.value })} /></Field>
+                        <DataPole label="Pobyt w szpitalu – od" value={uzupForm.od} onChange={(iso) => zmienUzupForm({ od: iso })} />
+                        <DataPole label="Pobyt w szpitalu – do" value={uzupForm.do} onChange={(iso) => zmienUzupForm({ do: iso })} />
                       </div>
                       <button type="button" className="btn btn-secondary btn-sm" onClick={liczUzup}>Policz, ile przysługuje</button>
                       <div role="status">{uzupWyn && (uzupWyn.error ? <Alert t="err">{uzupWyn.error}</Alert>
                         : uzupWyn.tygodnie > 0
-                          ? <Alert t="ok">{t("Przysługuje ")}<b>{tygodnie(uzupWyn.tygodnie)}</b> (uwzględnione dni pobytu: {uzupWyn.dniWOknie}). <button type="button" className="btn btn-sm btn-ghost" onClick={() => set({ uzup: uzupWyn.tygodnie })}>{t("Dodaj urlop do planu")}</button></Alert>
+                          ? <Alert t="ok">Przysługuje <b>{tygodnie(uzupWyn.tygodnie)}</b> (uwzględnione dni pobytu: {uzupWyn.dniWOknie}). <button type="button" className="btn btn-sm btn-ghost" onClick={() => set({ uzup: uzupWyn.tygodnie })}>Dodaj urlop do planu</button></Alert>
                           : <Alert t="info">Przy tych danych uzupełniający urlop nie przysługuje. Sprawdź daty pobytu w szpitalu.</Alert>)}</div>
                       {maxUzup > 0 && <Field label={`Uzupełniający urlop w planie: ${f.uzup} tyg.`} hint={`Najwyżej ${tygodnie(maxUzup)}: tyle wynika z Twoich danych.`}><input type="range" min={0} max={maxUzup} value={Math.min(f.uzup, maxUzup)} aria-valuetext={`${f.uzup} tygodni`} onChange={(e) => set({ uzup: +e.target.value })} /></Field>}
                     </div>
@@ -439,10 +435,10 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
 
         {krok === K.wariant && (
           <fieldset className={css.zestaw}>
-            <legend>{t("Jak ma być liczona wysokość zasiłku?")}</legend>
+            <legend>Jak ma być liczona wysokość zasiłku?</legend>
             <div className={`${css.opcje} ${css.pelne}`}>
-              <label className={css.opcja}><input type="radio" name={wariantNazwa} checked={f.wariant === "zmienny_100_70"} onChange={() => set({ wariant: "zmienny_100_70" })} /><span><b>Standardowy ({standard(liczba)})</b><span className={css.opis}>Dostajesz więcej na początku, mniej później. Nic nie musisz zgłaszać: to wariant domyślny.</span>{kwotyWariantu(por?.zmienny_100_70)}</span></label>
-              <label className={css.opcja}><input type="radio" name={wariantNazwa} checked={f.wariant === "usredniony_81_5"} onChange={() => set({ wariant: "usredniony_81_5" })} /><span><b>Uśredniony ({usredniony(liczba)})</b><span className={css.opis}>Cały czas dostajesz tyle samo. Trzeba to wybrać we wniosku w ciągu {przyjecie ? T.adopcja_wniosek_81_5_po_przyjeciu : T.wniosek_pelny_wymiar_81_5_po_porodzie} dni {przyjecie ? "od przyjęcia dziecka" : "od porodu"}. Wyłączne tygodnie drugiego rodzica zachowują stawkę {liczba(P.zasilek_za_9_tyg_drugiego_rodzica)}%.</span>{kwotyWariantu(por?.usredniony_81_5)}</span></label>
+              <label className={css.opcja}><input type="radio" name={wariantNazwa} checked={f.wariant === "zmienny_100_70"} onChange={() => set({ wariant: "zmienny_100_70" })} /><span><b>Standardowy ({standard})</b><span className={css.opis}>Dostajesz więcej na początku, mniej później. Nic nie musisz zgłaszać: to wariant domyślny.</span>{kwotyWariantu(por?.zmienny_100_70)}</span></label>
+              <label className={css.opcja}><input type="radio" name={wariantNazwa} checked={f.wariant === "usredniony_81_5"} onChange={() => set({ wariant: "usredniony_81_5" })} /><span><b>Uśredniony ({usredniony})</b><span className={css.opis}>Cały czas dostajesz tyle samo. Trzeba to wybrać we wniosku w ciągu {przyjecie ? T.adopcja_wniosek_81_5_po_przyjeciu : T.wniosek_pelny_wymiar_81_5_po_porodzie} dni {przyjecie ? "od przyjęcia dziecka" : "od porodu"}. Wyłączne tygodnie drugiego rodzica zachowują stawkę {liczba(P.zasilek_za_9_tyg_drugiego_rodzica)}%.</span>{kwotyWariantu(por?.usredniony_81_5)}</span></label>
             </div>
             <p className={css.mala}>
               <b>Nie wiesz, który wybrać?</b> Wybierz standardowy: nic nie trzeba zgłaszać.
@@ -458,16 +454,16 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
             <div role="status">
               {(brakData || brakPodstawy) && (
                 <div className={css.kwota}>
-                  <p className={css.kwotaOpis}>{t("Zasiłki razem (przed zaliczką na podatek)")}</p>
-                  <p className={`${css.kwotaWartosc} ${css.pusta}`}>{pln(null)}</p>
-                  <p className={css.mala}>{t("Żeby policzyć zasiłek, uzupełnij:")}</p>
+                  <p className={css.kwotaOpis}>Zasiłki razem (przed zaliczką na podatek)</p>
+                  <p className={`${css.kwotaWartosc} ${css.pusta}`}>— zł</p>
+                  <p className={css.mala}>Żeby policzyć zasiłek, uzupełnij:</p>
                   <ul className={css.braki}>
-                    {brakData && <li><button type="button" className="btn btn-ghost btn-sm" onClick={() => idzDo(K.dziecko)}>{t("Datę zdarzenia")}</button></li>}
-                    {brakPodstawy && <li><button type="button" className="btn btn-ghost btn-sm" onClick={() => idzDo(K.zarobki)}>{t("Zarobki lub podstawę zasiłku")}</button></li>}
+                    {brakData && <li><button type="button" className="btn btn-ghost btn-sm" onClick={() => idzDo(K.dziecko)}>Datę zdarzenia</button></li>}
+                    {brakPodstawy && <li><button type="button" className="btn btn-ghost btn-sm" onClick={() => idzDo(K.zarobki)}>Zarobki lub podstawę zasiłku</button></li>}
                   </ul>
                 </div>
               )}
-              {!brakData && !brakPodstawy && busy && !wyn && <div className={css.kwota}><p className={css.statusLadowania}><span className="spin" aria-hidden="true" /> {t("Liczymy zasiłek…")}</p></div>}
+              {!brakData && !brakPodstawy && busy && !wyn && <div className={css.kwota}><p className={css.statusLadowania}><span className="spin" aria-hidden="true" /> Liczymy zasiłek…</p></div>}
               {wyn && (
                 <div className={css.kwota}>
                   <p className={css.kwotaOpis}>Zasiłki razem: brutto (przed zaliczką na podatek)</p>
@@ -481,7 +477,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
                 </div>
               )}
             </div>
-            {blad && <Alert t="err">{t(blad)}</Alert>}
+            {blad && <Alert t="err">{blad}</Alert>}
             {wyn && (
               <>
                 <p className={css.mala}>Wymiar: {przyjecie ? "urlop na warunkach macierzyńskiego" : "urlop macierzyński"} <b>{tygodnie(wyn.wymiary.macierzynskiTyg)}</b>, rodzicielski <b>{tygodnie(wyn.wymiary.rodzicielskiTyg)}</b> (wykorzystano {tygodnie(wyn.wymiary.rodzicielskiWykorzystaneTyg)}; przy łączeniu z pracą maks. {tygodnie(wyn.wymiary.rodzicielskiMaxPrzyLaczeniuTyg)}).</p>

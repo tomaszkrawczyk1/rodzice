@@ -1,9 +1,9 @@
-import { metadane } from "@/i18n/metadane";
+import type { Metadata } from "next";
 
-export const generateMetadata = () => metadane(
-  "Kalendarz w urzędzie",
-  "Kalendarz ważnych dat i terminów w sprawach rodzicielskich."
-);
+export const metadata: Metadata = {
+  title: "Kalendarz w urzędzie – Przewodnik Przyszłego Rodzica",
+  description: "Co złożyć w ZUS, u pracodawcy, w gminie i w USC po porodzie i do kiedy. Terminy liczone od daty porodu, plik do kalendarza.",
+};
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

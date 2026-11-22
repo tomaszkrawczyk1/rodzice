@@ -9,7 +9,6 @@
 import { DRZEWO, DRUKI, PYTANIA } from "@/content/poradnik";
 import { SPRAWY } from "./sprawy";
 import { pojecia, jednaRoznica } from "./szukaj";
-import type { Jezyk } from "@/i18n/jezyki";
 
 export type Rodzaj = "druk" | "wynik" | "sprawa" | "faq" | "strona";
 
@@ -31,8 +30,8 @@ export const ETYKIETA_RODZAJU: Record<Rodzaj, string> = {
 };
 
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "").replace(/ł/g, "l");
-const slowaZ = (s: string) => norm(s).match(/[\p{L}\p{N}]+(?:[,.]\p{N}+)?%?/gu) ?? [];
-const zwarte = (s: string) => norm(s).replace(/[^\p{L}\p{N}]/gu, "");
+const slowaZ = (s: string) => norm(s).match(/[a-z0-9]+(?:[,.][0-9]+)?%?/g) ?? [];
+const zwarte = (s: string) => norm(s).replace(/[^a-z0-9]/g, "");
 
 /**
  * Wyniki drzewka, które do policzenia czegokolwiek potrzebują liczby dzieci i daty: klik prowadzi od razu do tego kroku
@@ -113,24 +112,14 @@ function ocena(w: Wpis, q: string, tokeny: string[], zQ: Set<string>): number {
   return 0;
 }
 
-/**
- * Najlepsze trafienia dla wpisanego tekstu (od jednej litery). `rodzaje` zawęża typy rekordów.
- * W EN i UK rekord można znaleźć też po przetłumaczonym tytule (`tlumacz` to `t()` z wybranego języka).
- */
-export function trafienia(q: string, ile = 3, rodzaje?: readonly Rodzaj[], jezyk: Jezyk = "pl", tlumacz?: (pl: string) => string): Rekord[] {
+/** Najlepsze trafienia dla wpisanego tekstu (od jednej litery). `rodzaje` zawęża typy rekordów. */
+export function trafienia(q: string, ile = 3, rodzaje?: readonly Rodzaj[]): Rekord[] {
   const tokeny = slowaZ(q);
   if (!tokeny.length) return [];
   const zQ = tokeny.join("").length >= 3 ? pojecia(q) : new Set<string>();
   return indeks()
     .filter((w) => !rodzaje || rodzaje.includes(w.r.rodzaj))
-    .map((w) => {
-      let o = ocena(w, q, tokeny, zQ);
-      if (jezyk !== "pl" && tlumacz) {
-        const alt = slowaZ(tlumacz(w.r.tytul));
-        o = Math.max(o, ocena({ ...w, tytul: alt, tytulCiagly: alt.join(" "), tytulZwarty: alt.join("") }, q, tokeny, zQ));
-      }
-      return { w, o };
-    })
+    .map((w) => ({ w, o: ocena(w, q, tokeny, zQ) }))
     .filter((x) => x.o > 0)
     // Kod druku to konkretne polecenie: wtedy pomijamy rekordy dopasowane tylko pojęciem lub literówką.
     .filter((x, _, wszystkie) => !wszystkie.some((y) => y.o >= 900) || x.o >= 400)

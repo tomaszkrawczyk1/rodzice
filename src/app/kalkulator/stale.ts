@@ -1,13 +1,13 @@
 import parametry from "../../../data/parametry.json";
-type Liczba = (n: number, d?: number) => string;
+import { liczba } from "@/lib/format";
 
 export const P = parametry.procenty;
 export const L = parametry.limity_dni;
 export const W = parametry.wymiary_tygodnie;
 export const T = parametry.terminy_dni;
 export const niezbywalne = W.niezbywalne_prawo_kazdego_rodzica_rodzicielski;
-export const standard = (liczba: Liczba) => `${liczba(P.zasilek_za_urlop_macierzynski)}% / ${liczba(P.zasilek_za_urlop_rodzicielski)}%`;
-export const usredniony = (liczba: Liczba) => `${liczba(P.wariant_pelny_wymiar_81_5)}%`;
+export const standard = `${liczba(P.zasilek_za_urlop_macierzynski)}% / ${liczba(P.zasilek_za_urlop_rodzicielski)}%`;
+export const usredniony = `${liczba(P.wariant_pelny_wymiar_81_5)}%`;
 
 /** Tryby planu rodziny. „ojciec" to osobna, krótsza ścieżka (sam urlop ojcowski i rodzicielski jednego rodzica). */
 export type Tryb = "matka" | "oboje" | "laczenie" | "adopcja" | "wlasne";

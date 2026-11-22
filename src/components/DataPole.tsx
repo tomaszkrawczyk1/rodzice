@@ -1,7 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
 import { Pole } from "./Pole";
-import { useT } from "@/lib/jezyk";
 
 const MIN = "1900-01-01";
 const MAX = "2100-12-31";
@@ -22,7 +21,6 @@ export function DataPole({ id, label, hint, error, required, value, onChange }: 
   value: string;
   onChange: (iso: string) => void;
 }) {
-  const t = useT();
   const pole = useRef<HTMLInputElement>(null);
   const [wlasny, setWlasny] = useState("");
 
