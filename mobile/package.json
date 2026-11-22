@@ -1,0 +1,11 @@
+{
+  "name": "przewodnik-mobile",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Aplikacja Android (APK): powłoka Capacitor ładująca https://zxcvbnms.dev",
+  "dependencies": {
+    "@capacitor/android": "^6.2.3",
+    "@capacitor/cli": "^6.2.3",
+    "@capacitor/core": "^6.2.3"
+  }
+}

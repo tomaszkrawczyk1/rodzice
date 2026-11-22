@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Przewodnik Przyszłego Rodzica</string>
+    <string name="title_activity_main">Przewodnik Przyszłego Rodzica</string>
+    <string name="package_name">pl.hacknation.przewodnik</string>
+    <string name="custom_url_scheme">pl.hacknation.przewodnik</string>
+</resources>

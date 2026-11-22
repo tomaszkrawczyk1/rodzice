@@ -1,0 +1,15 @@
+{
+  "appId": "pl.hacknation.przewodnik",
+  "appName": "Przewodnik Przyszłego Rodzica",
+  "webDir": "www",
+  "server": {
+    "url": "https://zxcvbnms.dev",
+    "cleartext": false,
+    "allowNavigation": ["zxcvbnms.dev"],
+    "errorPath": "offline.html"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#ffffff"
+  }
+}

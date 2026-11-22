@@ -226,3 +226,8 @@ html.noc .zus-nav__sub li, html.noc .zus-nav ul.zus-nav__drop li { border-top-co
   html.noc .opt:hover:not(.sel), html.noc .persona:hover, html.noc .zus-nav li:hover:not(.selected) { border-top-color: var(--line); }
 }
 .druk-akcje { margin: 4px 0 8px; }
+
+/* Telefon: pole wyboru pliku (np. /wgraj) ma cel dotykowy co najmniej 44 px. Tylko do 600 px, komputer bez zmian. */
+@media (max-width: 600px) {
+  .field input[type="file"] { min-height: 44px; padding: 10px 0; box-sizing: border-box; }
+}
