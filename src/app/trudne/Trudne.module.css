@@ -1,0 +1,23 @@
+.teraz { border-left: 4px solid var(--zus-red); background: #fff; }
+.teraz h2 { margin-top: 0; font-size: 20px; }
+.teraz ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 8px; }
+.teraz li { line-height: 1.4; }
+.numer { font-weight: 700; font-size: 18px; white-space: nowrap; }
+
+.lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.opcja {
+  display: block; width: 100%; text-align: left; font: inherit; font-size: 17px; line-height: 1.4;
+  padding: 14px 16px; min-height: 48px; cursor: pointer;
+  background: var(--card); color: inherit; border: 1px solid var(--line); border-left: 4px solid var(--zus-navy);
+}
+.opcja:hover { background: var(--gray); }
+.opcja:focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 2px; }
+
+.wstecz {
+  font: inherit; font-size: 16px; padding: 10px 14px; min-height: 44px; cursor: pointer;
+  background: transparent; color: var(--zus-navy); border: 1px solid var(--line);
+}
+.wstecz:hover { background: var(--gray); }
+.wstecz:focus-visible { outline: 3px solid var(--zus-navy); outline-offset: 2px; }
+
+.tytul:focus { outline: none; }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import Link from "next/link";
 import dane from "../../data/kalendarz_medyczny.json";
 import { dniMiedzy, type Parametry, type PlanWejscie } from "@/engine/kalkulator";
@@ -8,8 +8,8 @@ import { DataPole } from "@/components/DataPole";
 import OsKalendarza from "@/components/OsKalendarza";
 import { dataPL, liczba, tygodnie } from "@/lib/format";
 import {
-  kalendarz, poprawnaData, terminyKalendarza,
-  type BazaKalendarza, type Informacja, type KalendarzWynik, type WydarzenieNaOsi,
+  kalendarz, najblizszeZadania, poprawnaData, terminyKalendarza,
+  type BazaKalendarza, type Informacja, type KalendarzWynik, type Trymestr, type WydarzenieNaOsi,
 } from "@/lib/kalendarz";
 import { api, useSesja } from "@/lib/sesja";
 import style from "./kalendarz.module.css";
@@ -102,6 +102,66 @@ function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) 
 
 function trwa(e: WydarzenieNaOsi, dzis: string) {
   return e.od <= dzis && dzis <= e.do;
+}
+
+const ileDni = (n: number) => `${n} ${n === 1 ? "dzień" : "dni"}`;
+const ileTerminow = (n: number) =>
+  `${n} ${n === 1 ? "termin" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? "terminy" : "terminów"}`;
+
+function rozwinDo(id: string) {
+  let d = id ? document.getElementById(id)?.closest("details") ?? null : null;
+  while (d) {
+    d.open = true;
+    d = d.parentElement?.closest("details") ?? null;
+  }
+}
+
+/**
+ * Kliknięcie dowolnego linku „#…” w kalendarzu (ramka zadań, lista „Teraz”, oś czasu): przed przewinięciem
+ * rozwijamy zwinięte grupy, w których leży cel. Obsługa w fazie przechwytywania, więc działa dla linków z każdego komponentu.
+ */
+function odslon(e: MouseEvent<HTMLElement>) {
+  const a = (e.target as Element).closest?.("a[href^='#']") as HTMLAnchorElement | null;
+  if (a) rozwinDo(decodeURIComponent(a.hash.slice(1)));
+}
+
+const ID_ZUS = "kalendarz-zus";
+
+function Najblizsze({ wynik, dzis, plan, parametry }: {
+  wynik: KalendarzWynik; dzis: string; plan?: PlanWejscie; parametry: Parametry;
+}) {
+  const { wniosek } = terminyKalendarza(wynik, parametry, plan);
+  const zus = {
+    id: ID_ZUS, nazwa: "Wniosek do ZUS o zasiłek macierzyński",
+    od: wynik.dataPorodu ?? wynik.terminPorodu, do: wniosek, szacunkowe: !wynik.dataPorodu,
+  };
+  const zadania = najblizszeZadania([...wynik.oś, zus], dzis, 2);
+  return (
+    <section className={`card ${style.najblizsze}`} aria-labelledby="kalendarz-najblizsze">
+      <h2 id="kalendarz-najblizsze">Najbliższe zadania dla Ciebie</h2>
+      {zadania.length ? (
+        <ol className={style.zadania}>
+          {zadania.map(z => (
+            <li key={z.id}>
+              <span className={style.ile}>
+                {z.trwa
+                  ? z.dni === 0 ? "Ostatni dzień: dziś" : `Zostało ${ileDni(z.dni)}`
+                  : z.dni === 0 ? "Zaczyna się dziś" : `Za ${ileDni(z.dni)}`}
+              </span>
+              <a href={z.id === ID_ZUS ? `#${ID_ZUS}` : `#kalendarz-w-${z.id}`}>{z.nazwa}</a>
+              <span className={style.kiedyZadanie}>
+                {z.trwa ? <>Do <Data value={z.do} /></>
+                  : z.od === z.do ? <Data value={z.od} />
+                  : <>Od <Data value={z.od} />, najpóźniej do <Data value={z.do} /></>}
+                {z.szacunkowe && " · orientacyjnie"}
+              </span>
+            </li>
+          ))}
+        </ol>
+      ) : <p>Na razie nie masz zbliżających się terminów.</p>}
+      <p className={style.reszta}>Pozostałe terminy są niżej, pogrupowane według etapów. Rozwiń etap, żeby je zobaczyć.</p>
+    </section>
+  );
 }
 
 function Lista({ pozycje }: { pozycje: string[] }) {
@@ -259,6 +319,10 @@ function Os({ wynik, dzis, plan, parametry }: {
   const etapy = wynik.wgTrymestrow;
   const zus = <Zus wynik={wynik} plan={plan} parametry={parametry} />;
   const zusPrzyPologu = etapy.some(e => e.trymestr === "polog");
+  // Rozwinięty jest tylko etap, w którym jesteś teraz (coś trwa albo zaraz się zacznie). Pozostałe są zwinięte.
+  const aktywny: Trymestr | undefined =
+    etapy.find(e => e.wydarzenia.some(w => trwa(w, dzis)))?.trymestr ??
+    etapy.find(e => e.wydarzenia.some(w => w.do >= dzis))?.trymestr;
   return (
     <>
       <Podsumowanie wynik={wynik} dzis={dzis} />
@@ -266,14 +330,17 @@ function Os({ wynik, dzis, plan, parametry }: {
       <section className={`card ${style.teraz}`} aria-labelledby="kalendarz-teraz">
         <h2 id="kalendarz-teraz">Teraz warto zrobić</h2>
         {teraz.length ? (
-          <ul>
-            {teraz.map(e => (
-              <li key={e.id}>
-                <a href={`#kalendarz-w-${e.id}`}>{e.nazwa}</a>
-                <div>Do <Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
-              </li>
-            ))}
-          </ul>
+          <details>
+            <summary>Pokaż wszystko, co trwa teraz ({ileTerminow(teraz.length)})</summary>
+            <ul>
+              {teraz.map(e => (
+                <li key={e.id}>
+                  <a href={`#kalendarz-w-${e.id}`}>{e.nazwa}</a>
+                  <div>Do <Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
+                </li>
+              ))}
+            </ul>
+          </details>
         ) : <p>Na dziś w kalendarzu nie ma zaplanowanych wizyt ani badań.</p>}
       </section>
       <OsKalendarza wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />
@@ -291,10 +358,16 @@ function Os({ wynik, dzis, plan, parametry }: {
       {etapy.map(e => (
         <Fragment key={e.trymestr}>
           <section className={style.etap} aria-labelledby={`kalendarz-etap-${e.trymestr}`}>
-            <h2 id={`kalendarz-etap-${e.trymestr}`}>{e.nazwa}</h2>
+            <h2 id={`kalendarz-etap-${e.trymestr}`}>
+              {e.nazwa}
+              {e.trymestr === aktywny && <span className={`badge ok ${style.etapTeraz}`}>Teraz</span>}
+            </h2>
             {e.opis && <p className={style.opisEtapu}>{e.opis}</p>}
-            {e.wydarzenia.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
-            <Informacje informacje={wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === e.trymestr)} />
+            <details className={style.zwijane} open={e.trymestr === aktywny}>
+              <summary>Terminy na tym etapie ({ileTerminow(e.wydarzenia.length)})</summary>
+              {e.wydarzenia.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
+              <Informacje informacje={wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === e.trymestr)} />
+            </details>
           </section>
           {e.trymestr === "polog" && zus}
         </Fragment>
@@ -364,9 +437,11 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
   const ustawDate = (pole: Daty, value: string) => aktualizuj({ ...stan, [pole]: value });
   const plan = czyPlanPorodu(scenariusz) ? scenariusz : zapisanyPlan;
   const pobyt = baza.zalozenia?.pobyt_w_szpitalu_dni ?? 0;
+  const dzis = dzisLokalnie();
 
   return (
     <>
+      {wynik && <Najblizsze wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />}
       <form className={`card ${style.formularz}`} aria-labelledby="kalendarz-dane" onSubmit={e => e.preventDefault()}>
         <h2 id="kalendarz-dane">Twoje dane</h2>
         <div className={style.glownaData}>
@@ -406,7 +481,7 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
         <button type="button" className={`btn btn-ghost ${style.wyczysc}`}
           onClick={() => aktualizuj({ terminPorodu: "", warunki: [] })}>Wyczyść formularz</button>
       </form>
-      {wynik && <Os wynik={wynik} dzis={dzisLokalnie()} plan={plan} parametry={parametry} />}
+      {wynik && <Os wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />}
       {!terminPorodu && <p className={style.start} role="status">Wpisz termin porodu, aby zobaczyć swój kalendarz.</p>}
     </>
   );
@@ -416,12 +491,14 @@ export default function Kalendarz({ parametry }: { parametry: Parametry }) {
   const pobytZalozony = baza.zalozenia?.pobyt_w_szpitalu_dni ?? 0;
   const { sesja, gotowa } = useSesja();
   return (
-    <div className={style.kalendarz}>
+    <div className={style.kalendarz} onClickCapture={odslon}>
       <h1>Kalendarz ciąży i połogu</h1>
       <p className={style.wstep}>Informacje są ogólne i nie zastępują wizyty u lekarza lub położnej.</p>
       {gotowa && <FormularzKalendarza key={sesja?.personaId ?? "gosc"} personaId={sesja?.personaId} parametry={parametry} />}
       <section className={style.ograniczenia} aria-labelledby="kalendarz-ograniczenia">
         <h2 id="kalendarz-ograniczenia">Podstawa i ograniczenia</h2>
+        <details className={style.zwijane}>
+        <summary>Pokaż, na czym opiera się kalendarz</summary>
         <ul>
           <li>Wizyta położnej po wypisie ze szpitala: przepis liczy 48 godzin bez sobót, niedziel i świąt. Kalendarz liczy zwykłe dni, więc koniec tego terminu może wypaść wcześniej.</li>
           <li>Zdanie „Gdy pominiesz termin” to ogólne wyjaśnienie, a nie zapis przepisu. Co w Twoim przypadku oznacza pominięcie badania, sprawdź u lekarza prowadzącego.</li>
@@ -430,6 +507,7 @@ export default function Kalendarz({ parametry }: { parametry: Parametry }) {
           <li>Standard opieki okołoporodowej w obecnym brzmieniu obowiązuje od 7 maja 2026. Przy ciąży prowadzonej wcześniej część badań mogła być inna, na przykład różyczka, konsultacja lekarza, cytologia i test cukru między 24. a 26. tygodniem.</li>
           <li>Test potrójny (badanie krwi między 14. a 20. tygodniem) opisujemy na podstawie opracowań. Sam standard każe poinformować o badaniach genetycznych.</li>
         </ul>
+        </details>
       </section>
     </div>
   );

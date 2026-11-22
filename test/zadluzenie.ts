@@ -3,6 +3,7 @@
 //   480 zł (wrzesień 2026, termin 15.10.2026, spłacone 20.01.2027), 300 zł (styczeń 2027, termin 15.02.2027), 900 zł (luty 2027, termin 15.03.2027).
 import { registerHooks } from "node:module";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 let bledy = 0, razem = 0;
 const rowne = (nazwa: string, got: unknown, exp: unknown) => {
@@ -28,7 +29,7 @@ const parametry = JSON.parse(readFileSync(new URL("../data/parametry.json", impo
 const prog = progZadluzenia(parametry);
 rowne("próg = 1 % płacy minimalnej", prog, 48.06);
 
-process.env.DATA_DIR = new URL("../data", import.meta.url).pathname;
+process.env.DATA_DIR = fileURLToPath(new URL("../data", import.meta.url));
 const marek = znajdzPersone("00000000002")!;
 const stan = (d: string) => { const s = stanZadluzenia(marek, d, prog); return [s.kwota, s.wynik]; };
 

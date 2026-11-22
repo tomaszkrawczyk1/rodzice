@@ -8,6 +8,7 @@ import { testyRodziceUI } from "./rodzice-ui.ts";
 import {
   podstawaPracownik, podstawaNiepracownik, wierszZ3NaMiesiac, swiadczenieRehabilitacyjne, swiadczenieRodzicielskie, zasilekChorobowyWCiazy, wymiarMacierzynski, wymiarRodzicielski, maxRodzicielskiPrzyLaczeniu,
   wymiarUzupelniajacy, planZasilku, porownajWarianty, uprawnienia, minPodstawaZasilkuPracownik, maxPodstawaZasilkuNiepracownik, r2,
+  nettoMiesieczne, planZNetto, szybkiePorownanie, podstawaZKwoty,
 } from "../src/engine/kalkulator.ts";
 
 const p = JSON.parse(readFileSync(new URL("../data/parametry.json", import.meta.url), "utf8"));
@@ -154,6 +155,29 @@ const ch50 = zasilekChorobowyWCiazy({ podstawaMiesieczna: 6000, dniNiezdolnosci:
 rowne("chorobowe w ciąży >= 50 lat: 14 dni pracodawca", ch50.dniPracodawca, 14);
 const chJdg = zasilekChorobowyWCiazy({ podstawaMiesieczna: 6000, dniNiezdolnosci: 10, pracownik: false }, p);
 rowne("chorobowe niepracownika: ZUS od 1. dnia", [chJdg.dniPracodawca, chJdg.dniZUS], [0, 10]);
+
+// ---- orientacyjne netto i szybkie porównanie (policzone ręcznie) ----
+// 5608,85 zł brutto: zaliczka = round(5609 * 12 % - 300) = round(373,08) = 373 zł => 5235,85 zł na rękę
+rowne("netto: zaliczka PIT 12 % minus kwota zmniejszająca 300 zł", nettoMiesieczne(5608.85, p), { brutto: 5608.85, zaliczka: 373, netto: 5235.85 });
+rowne("netto: niski zasiłek (1000 zł) bez zaliczki", nettoMiesieczne(1000, p)?.netto, 1000);
+rowne("netto: bez sekcji podatek nie liczymy", nettoMiesieczne(5000, { ...p, podatek: undefined }), null);
+rowne("podstawa z kwoty: umowa o pracę = 6500 * 0,8629", podstawaZKwoty(6500, "umowa_o_prace", p).podstawaMiesieczna, 5608.85);
+rowne("podstawa z kwoty: JDG 10 000 zł zadeklarowane = 8629", podstawaZKwoty(10000, "dzialalnosc", p).podstawaMiesieczna, 8629);
+rowne("podstawa z kwoty: zlecenie 3000 zł bez minimum = 2588,70", podstawaZKwoty(3000, "zlecenie", p).podstawaMiesieczna, 2588.70);
+const sz = szybkiePorownanie({ podstawaMiesieczna: 5608.85, liczbaDzieci: 1 }, p);
+rowne("szybkie: macierzyński 20 tyg. + rodzicielski mamy 32 tyg.", [sz.etapy[0].tygodnie, sz.etapy[1].tygodnie, sz.tygodnieRazem], [20, 32, 52]);
+rowne("szybkie: miesięcznie 100 % (5608,85)", sz.etapy[0].standard.brutto, 5608.85, 0.02);
+rowne("szybkie: miesięcznie 70 % (3926,20)", sz.etapy[1].standard.brutto, 3926.20, 0.02);
+rowne("szybkie: miesięcznie 81,5 % (4571,21)", sz.etapy[0].usredniony.brutto, 4571.21, 0.02);
+// sumy szybkiego porównania = plan silnika dla mamy biorącej macierzyński i 32 tyg. rodzicielskiego
+const planMamy = (wariant: "zmienny_100_70" | "usredniony_81_5") => planZasilku({ tytul: "porod", dataZdarzenia: "2027-03-01", liczbaDzieci: 1, wariant, podstawy: { matka: 5608.85 }, rodzicielski: [{ kto: "matka", tygodnie: 32 }] }, p).sumy.razem;
+rowne("szybkie = plan silnika (wariant standardowy)", sz.razem.standard, planMamy("zmienny_100_70"), 0.02);
+rowne("szybkie = plan silnika (wariant uśredniony)", sz.razem.usredniony, planMamy("usredniony_81_5"), 0.02);
+rowne("szybkie: bliźnięta => macierzyński 31 tyg., rodzicielski mamy 34 tyg.", szybkiePorownanie({ podstawaMiesieczna: 5000, liczbaDzieci: 2 }, p).etapy.map((e) => e.tygodnie), [31, 34]);
+const zN = planZNetto(planZasilku({ tytul: "porod", dataZdarzenia: "2027-03-01", liczbaDzieci: 1, wariant: "zmienny_100_70", podstawy: { matka: 5608.85 }, rodzicielski: [] }, p), p);
+// macierzyński 140 dni: brutto 26 174,63; zaliczka 373 zł/mies. * 140/30 = 1740,67 => 24 433,96
+rowne("plan z netto: macierzyński 140 dni na rękę", zN.okresy[0].kwotaNetto, 24433.96, 0.02);
+rowne("plan z netto: suma netto = suma okresów", zN.sumyNetto?.razem, zN.okresy[0].kwotaNetto);
 
 await testySpraw(rowne);
 testyWsparcie(rowne);

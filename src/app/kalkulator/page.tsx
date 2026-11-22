@@ -9,7 +9,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ [
   return (
     <>
       <h1>Kalkulator zasiłku macierzyńskiego</h1>
-      <p className="lead">Odpowiedz na kilka pytań, a pokażemy szacunkową kwotę zasiłku i podział urlopów. Zasiłek pokazujemy przed zaliczką na podatek.</p>
+      <p className="lead">Sprawdź, ile zasiłku dostaniesz co miesiąc. Na szybko wystarczy pensja. Dokładny plan z datami i podziałem urlopu policzysz krok po kroku niżej. Pokazujemy kwoty brutto i szacunkowo na rękę.</p>
       <Kalkulator />
     </>
   );

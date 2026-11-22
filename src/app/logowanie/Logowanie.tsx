@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { api, useSesja, type Sesja } from "@/lib/sesja";
-import { przejdzKrok, wrocDoKroku } from "@/lib/adres-kroku";
 import { nazwaUbezpieczenia } from "@/lib/dane-profilu";
 import { PERSONA_OPIS } from "@/content/tresci";
 import { Alert } from "@/components/ui";
@@ -13,53 +12,39 @@ type Profil = { id: string; osoba: string; pesel: string; tytul?: string };
 
 const opisProfilu = (p: Profil) => PERSONA_OPIS[p.id] ?? (p.tytul ? nazwaUbezpieczenia(p.tytul) : "Profil testowy");
 
+/** Logowanie jednym kliknięciem: kliknięcie karty profilu od razu loguje (bez osobnego ekranu potwierdzenia). */
 export default function Logowanie() {
   const router = useRouter();
-  const { zaloguj } = useSesja();
+  const { sesja, gotowa, zaloguj } = useSesja();
   const [persony, setPersony] = useState<Profil[] | null>(null);
-  // Krok „potwierdź wybór" to ten sam adres z parametrem `?profil=<id>` (zachowuje np. `?powrot=pue`).
-  // Wybór profilu dodaje wpis historii, więc „Wstecz" wraca z potwierdzenia do listy profili.
-  const profilId = useSearchParams().get("profil");
   const [bladListy, setBladListy] = useState(false);
-  const [bladLogowania, setBladLogowania] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const potwierdzRef = useRef<HTMLElement>(null);
-  const tytulRef = useRef<HTMLHeadingElement>(null);
-  const poprzedniProfil = useRef(profilId);
-  const wybrany = persony?.find((p) => p.id === profilId) ?? null;
-  const czekaNaProfil = !!profilId && !persony && !bladListy;
+  const [bladLogowania, setBladLogowania] = useState<string | null>(null);
+  const [loguje, setLoguje] = useState<string | null>(null);
+  const bladRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api<Profil[]>("/api/personas").then(setPersony).catch(() => setBladListy(true));
   }, []);
 
-  // Po przejściu między krokami (kliknięcie albo „Wstecz"/„Dalej" przeglądarki) przenosimy fokus na nowy nagłówek
-  // (czytniki ekranu i klawiatura). Przy pierwszym wejściu na stronę fokusu nie ruszamy.
-  useEffect(() => {
-    if (poprzedniProfil.current === profilId) return;
-    poprzedniProfil.current = profilId;
-    if (profilId) potwierdzRef.current?.focus();
-    else tytulRef.current?.focus();
-  }, [profilId]);
+  useEffect(() => { if (bladLogowania) bladRef.current?.focus(); }, [bladLogowania]);
 
-  async function potwierdz() {
-    if (!wybrany) return;
-    setBusy(true);
-    setBladLogowania(false);
+  async function zalogujJako(p: Profil) {
+    setLoguje(p.id);
+    setBladLogowania(null);
     try {
-      const sesja = await api<Sesja>("/api/auth/mobywatel", { personaId: wybrany.id });
-      zaloguj(sesja);
+      const nowa = await api<Sesja>("/api/auth/mobywatel", { personaId: p.id });
+      zaloguj(nowa);
       router.push(new URLSearchParams(location.search).get("powrot") === "pue" ? "/pue" : "/");
     } catch {
-      setBladLogowania(true);
-      setBusy(false);
+      setBladLogowania(p.osoba);
+      setLoguje(null);
     }
   }
 
   return (
     <div className={s.wrap}>
-      <h1 ref={tytulRef} tabIndex={-1} className={s.tytul}>Logowanie testowe</h1>
-      <p className={s.lead}>Wypróbuj logowanie przez mObywatela na gotowym profilu. Nie wpisujesz żadnych własnych danych.</p>
+      <h1 className={s.tytul}>Logowanie testowe</h1>
+      <p className={s.lead}>Wypróbuj logowanie przez mObywatela na gotowym profilu. Kliknij profil, a od razu się zalogujesz. Nie wpisujesz żadnych własnych danych.</p>
       <div className={s.fikcja} role="note">
         <div>
           <span className={s.znacznik}>Fikcyjne dane testowe</span>
@@ -67,38 +52,28 @@ export default function Logowanie() {
         </div>
       </div>
 
-      {czekaNaProfil && <p role="status">Wczytujemy profil…</p>}
+      {gotowa && sesja && <Alert t="info">Jesteś zalogowany jako <b>{sesja.osoba}</b>. Kliknij inny profil, żeby się przełączyć.</Alert>}
 
-      {!wybrany && !czekaNaProfil && <section aria-labelledby="profile-h">
+      <section aria-labelledby="profile-h">
         <h2 id="profile-h">Wybierz profil testowy</h2>
         {bladListy && <Alert t="err">Nie udało się wczytać profili. Odśwież stronę i spróbuj ponownie.</Alert>}
+        {bladLogowania && <div ref={bladRef} tabIndex={-1}><Alert t="err">Nie udało się zalogować jako {bladLogowania}. Spróbuj ponownie.</Alert></div>}
+        {loguje && <p role="status">Logujemy…</p>}
         {!persony && !bladListy && <p role="status">Wczytujemy profile…</p>}
         {persony && <ul className={s.lista}>
           {persony.map((p) => (
             <li key={p.id}>
-              <button type="button" className={s.karta} onClick={() => { setBladLogowania(false); przejdzKrok({ profil: p.id }); }}>
+              <button type="button" className={s.karta} disabled={!!loguje} aria-busy={loguje === p.id || undefined} onClick={() => zalogujJako(p)}>
                 <span className={s.imie}>{p.osoba}</span>
                 <span className={s.opis}>{opisProfilu(p)}</span>
                 <span className={s.meta}>{p.tytul ? `${nazwaUbezpieczenia(p.tytul)} · ` : ""}fikcyjny PESEL {p.pesel}</span>
-                <span className={s.wybierz} aria-hidden="true">Wybierz ten profil →</span>
+                <span className={s.wybierz} aria-hidden="true">{loguje === p.id ? "Logujemy…" : "Zaloguj się na ten profil →"}</span>
               </button>
             </li>
           ))}
         </ul>}
         <p className={s.stopka}><Link href="/sprawy">Wybierz sprawę bez logowania</Link></p>
-      </section>}
-
-      {wybrany && <section ref={potwierdzRef} tabIndex={-1} aria-labelledby="potwierdz-h" className={s.potwierdz}>
-        <h2 id="potwierdz-h">Potwierdź wybór profilu</h2>
-        <p><span className={s.znacznik}>Fikcyjne dane testowe</span></p>
-        <p><b>{wybrany.osoba}</b>: {opisProfilu(wybrany)}.</p>
-        <p>Profil ma fikcyjny PESEL {wybrany.pesel} oraz przykładowe dane o ubezpieczeniu, zwolnieniach i składkach.</p>
-        {bladLogowania && <Alert t="err">Nie udało się zalogować. Spróbuj ponownie.</Alert>}
-        <div className={s.rzad}>
-          <button type="button" className="btn btn-primary" onClick={potwierdz} disabled={busy}>{busy ? "Logujemy…" : `Zaloguj się jako ${wybrany.osoba}`}</button>
-          <button type="button" className="btn btn-ghost" disabled={busy} onClick={() => wrocDoKroku({ profil: null })}>Wróć do listy profili</button>
-        </div>
-      </section>}
+      </section>
     </div>
   );
 }

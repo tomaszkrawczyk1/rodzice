@@ -8,6 +8,7 @@ import { dataPL } from "@/lib/format";
 import { ekranDotykowy, przejdzDoKroku } from "@/lib/ekran";
 import { kluczPostepu, odczytajPostep, odczytajWpis, polaczPrzyPowrocie, stanHistorii, usunPostep, zapiszPostep, type Migawka } from "@/lib/stan-sprawy";
 import { Alert, Kroki } from "./ui";
+import { zPojeciami } from "./Pojecie";
 import Szkielet from "./Szkielet";
 import st from "./Sprawa.module.css";
 
@@ -228,7 +229,7 @@ function KrokiSprawy({ s, c, token, podglad, wstepny }: { s: Sprawa; c: Ctx; tok
       <div className="prog" role="progressbar" aria-valuenow={postep} aria-valuemin={0} aria-valuemax={100} aria-label="Postęp wypełniania sprawy"><i style={{ width: `${postep}%` }} /></div>
 
       {faza === "dane" && (
-        <div className="card" ref={blok}>
+        <div className={"card " + st.krok} ref={blok}>
           {wznowienie}
           {przyciskWstecz}
           <span className="lab" data-fokus tabIndex={-1}>Krok 1 · Sprawdź swoje dane</span>
@@ -270,8 +271,8 @@ function KrokiSprawy({ s, c, token, podglad, wstepny }: { s: Sprawa; c: Ctx; tok
               </div>
             </form>
           )}
-          <details className="dl mt"><summary>Po co o to pytamy?</summary><p className="small">{q.poCo}</p></details>
-          {q.skad && <details className="dl"><summary>Skąd to wziąć?</summary><p className="small">{q.skad}</p></details>}
+          <details className="dl mt"><summary>Po co o to pytamy?</summary><p className="small">{zPojeciami(q.poCo)}</p></details>
+          {q.skad && <details className="dl"><summary>Skąd to wziąć?</summary><p className="small">{zPojeciami(q.skad)}</p></details>}
         </div>
       )}
 
@@ -316,6 +317,9 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
     a.remove();
     setTimeout(() => URL.revokeObjectURL(adres), 1000);
   }
+  // Trudne pojęcia objaśniamy raz na cały wynik – przy pierwszym użyciu (kolejność jak na ekranie).
+  const uzyte = new Set<string>();
+  const objasnij = (t?: string) => zPojeciami(t, uzyte);
   const druki = (w.druki ?? []).filter((d, i, a) => a.indexOf(d) === i);
   const powiazane = (w.nastepne ?? []).map((id) => sprawa(id)).filter(Boolean);
   const infoOtwarte = (w.info ?? []).filter((x) => !x.zwiniete);
@@ -342,7 +346,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
         {w.duza && <div className="big">{w.duza}</div>}
         {w.podpis && <p className="muted">{w.podpis}</p>}
         {w.szczegoly && <dl className="kv mt" style={kolumnyDanych}>{w.szczegoly.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}
-        {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{x}</Alert>)}
+        {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{objasnij(x)}</Alert>)}
         {w.status === "do_potwierdzenia" && (
           <Alert t="warn">
             <b>Do sprawdzenia.</b>{" "}
@@ -362,7 +366,7 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
 
       {w.zrob.length > 0 && (
         <div className="card mt" id="w-zrob"><h2>Co teraz zrobić</h2>
-          <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{z.tekst}{z.uwaga && <div className="small muted">{z.uwaga}</div>}</li>)}</ol>
+          <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{objasnij(z.tekst)}{z.uwaga && <div className="small muted">{objasnij(z.uwaga)}</div>}</li>)}</ol>
           {!w.pilne && w.terminy && w.terminy.length > 0 && <><h3 className="mt">Ważne terminy</h3><ul className="clean warnlist">{w.terminy.map((t, i) => <li key={i}><b>{dataPL(t.do)}</b> ({zaIle(t.do)}): {t.co}</li>)}</ul></>}
         </div>
       )}
@@ -386,8 +390,8 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
         ? <details className="dl mt" id="w-tabela"><summary>Pokaż tabelę z wyliczeniem</summary><div className="card mt">{tabela}</div></details>
         : <div className="card mt" id="w-tabela">{tabela}</div>)}
 
-      {infoOtwarte.map((x, i) => <div key={x.tytul} id={`w-info-${i}`} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{x.tresc}</p></div>)}
-      {infoZwiniete.map((x) => <details key={x.tytul} className="dl mt"><summary>{x.tytul}</summary><p className="small" style={{ whiteSpace: "pre-line" }}>{x.tresc}</p></details>)}
+      {infoOtwarte.map((x, i) => <div key={x.tytul} id={`w-info-${i}`} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{objasnij(x.tresc)}</p></div>)}
+      {infoZwiniete.map((x) => <details key={x.tytul} className="dl mt"><summary>{x.tytul}</summary><p className="small" style={{ whiteSpace: "pre-line" }}>{objasnij(x.tresc)}</p></details>)}
 
       {w.tekstDoKopii && (
         <div className="card mt" id="w-tekst"><h2>{w.tekstDoKopii.tytul}</h2><pre className="wniosek" style={{ overflowWrap: "anywhere" }}>{w.tekstDoKopii.tresc}</pre>

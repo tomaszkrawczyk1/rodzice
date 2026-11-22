@@ -11,6 +11,8 @@ import { Kreator, useKreator, type KrokDef } from "./Kreator";
 import { WyborSytuacji } from "./WyborSytuacji";
 import { P, L, W, T, niezbywalne, standard, usredniony, num, czySytuacja, type Tryb, type Sytuacja } from "./stale";
 import { parametrZywy, zastap } from "./adres";
+import type { DaneWstepne } from "./SzybkiePorownanie";
+import { etykietaKwoty, podpowiedzKwoty, PoleRodzaju, PoleZadluzenia, OstrzezenieZadluzenia, usePodstawa, useProfilZus, opisPoroduMnogiego, OPIS_NETTO, type Rodzaj } from "./zarobki";
 import css from "./kalkulator.module.css";
 
 // Oś czasu, tabela i porównanie wariantów ładują się dopiero przy ostatnim kroku.
@@ -32,6 +34,8 @@ const K = { sytuacja: 0, dziecko: 1, zarobki: 2, urlopy: 3, wariant: 4, wynik: 5
 const START = {
   tryb: "oboje" as Tryb, tytul: "porod", data: "", dzieci: 1, zaZyciem: false, martwe: false,
   bruttoM: "6500", bruttoO: "7000", podstawaM: "", podstawaO: "",
+  // Rodzaj zatrudnienia każdego rodzica. Zaległe składki (tylko JDG): null = nie wpisano ręcznie (bierzemy z profilu, jeśli jest).
+  rodzajM: "umowa_o_prace" as Rodzaj, rodzajO: "umowa_o_prace" as Rodzaj, zadlM: null as string | null, zadlO: null as string | null,
   przedPorodem: 0, ojciecPrzejmuje: 0, rodzM: 32, rodzO: niezbywalne, laczTyg: 0, etat: 0.5,
   ojcowski: true, ojcowskiOd: "", uzup: 0, wariant: "zmienny_100_70",
   dataUrDziecka: "", extra: {} as Record<string, any>,
@@ -49,10 +53,8 @@ function stanPoczatkowy(tryb: Tryb): F {
 }
 
 /** `poczatkowy` to tryb z adresu (?tryb=…): ustala stan startowy, a potem to wybór użytkownika jest źródłem prawdy, a adres za nim podąża. */
-export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb; onOjciec: () => void }) {
+export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatkowy: Tryb; onOjciec: () => void; wstepne?: (DaneWstepne & { nr: number }) | null }) {
   const [f, setF] = useState<F>(() => stanPoczatkowy(poczatkowy));
-  const [podM, setPodM] = useState<any>(null);
-  const [podO, setPodO] = useState<any>(null);
   const [wyn, setWyn] = useState<any>(null);
   const [por, setPor] = useState<any>(null);
   const [wym, setWym] = useState<any>(null);
@@ -87,12 +89,43 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
     } catch {}
   }, []);
 
-  // podstawa wymiaru z wynagrodzenia brutto
-  useEffect(() => { const b = num(f.bruttoM); if (!(b >= 0)) return setPodM(null); const t = setTimeout(() => api("/api/oblicz/podstawa", { typ: "pracownik", sredniaBrutto: b }).then(setPodM).catch(() => setPodM(null)), 250); return () => clearTimeout(t); }, [f.bruttoM]);
-  useEffect(() => { const b = num(f.bruttoO); if (!(b >= 0) || !dwoje) return setPodO(null); const t = setTimeout(() => api("/api/oblicz/podstawa", { typ: "pracownik", sredniaBrutto: b }).then(setPodO).catch(() => setPodO(null)), 250); return () => clearTimeout(t); }, [f.bruttoO, dwoje]);
+  // Dane przeniesione z szybkiego porównania (nad kreatorem).
+  useEffect(() => {
+    if (!wstepne) return;
+    setF((x) => ({ ...x, rodzajM: wstepne.rodzaj, bruttoM: wstepne.kwota || x.bruttoM, podstawaM: wstepne.podstawa, dzieci: wstepne.dzieci }));
+  }, [wstepne?.nr]);
 
-  const podstawaM = !Number.isNaN(num(f.podstawaM)) ? num(f.podstawaM) : podM?.podstawaMiesieczna;
-  const podstawaO = !Number.isNaN(num(f.podstawaO)) ? num(f.podstawaO) : podO?.podstawaMiesieczna;
+  // Profil ZUS zalogowanej osoby: domyślny rodzaj zatrudnienia i zaległe składki na dzień porodu.
+  // Profil przypisujemy rodzicowi zgadniętemu z imienia (można zmienić w kroku „Zarobki").
+  const profil = useProfilZus(f.data);
+  const [profilDla, setProfilDla] = useState<"matka" | "ojciec">("matka");
+  const zastosowany = useRef("");
+  function przypiszProfil(kto: "matka" | "ojciec") {
+    setProfilDla(kto);
+    if (!profil?.rodzaj) return;
+    const r = profil.rodzaj, kw = profil.zadeklarowanaPodstawa;
+    setF((x) => kto === "matka"
+      ? { ...x, rodzajM: r, ...(r === "dzialalnosc" && kw && (x.bruttoM === START.bruttoM || !x.bruttoM) ? { bruttoM: String(kw), podstawaM: "" } : {}) }
+      : { ...x, rodzajO: r, ...(r === "dzialalnosc" && kw && (x.bruttoO === START.bruttoO || !x.bruttoO) ? { bruttoO: String(kw), podstawaO: "" } : {}) });
+  }
+  useEffect(() => {
+    if (!profil || zastosowany.current === profil.osoba) return;
+    zastosowany.current = profil.osoba;
+    przypiszProfil(!dwoje || /a$/i.test(profil.osoba.split(" ")[0] ?? "") ? "matka" : "ojciec");
+  }, [profil]);
+  const zadlZProfilu = (kto: "matka" | "ojciec") => (profil && profilDla === kto && (dwoje || kto === "matka") ? profil.zadluzenie?.kwotaZadluzenia ?? null : null);
+  const zadluzenie = (kto: "matka" | "ojciec") => {
+    if ((kto === "matka" ? f.rodzajM : f.rodzajO) !== "dzialalnosc") return 0;
+    const reczne = kto === "matka" ? f.zadlM : f.zadlO;
+    return reczne !== null ? (num(reczne) || 0) : (zadlZProfilu(kto) ?? 0);
+  };
+
+  // podstawa wymiaru z kwoty i rodzaju zatrudnienia
+  const podM = usePodstawa(f.rodzajM, f.bruttoM);
+  const podO = usePodstawa(f.rodzajO, f.bruttoO, dwoje);
+
+  const podstawaM = !Number.isNaN(num(f.podstawaM)) ? num(f.podstawaM) : (podM?.podstawaMiesieczna ?? NaN);
+  const podstawaO = !Number.isNaN(num(f.podstawaO)) ? num(f.podstawaO) : (podO?.podstawaMiesieczna ?? NaN);
 
   // --- krok z adresu (?krok=…) ---
   // Najdalszy krok, do którego wystarczą wpisane dane. Adres z dalszym krokiem (odświeżenie, link) prowadzi do pierwszego braku.
@@ -197,7 +230,8 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
 
   // --- kroki: walidacja i nawigacja ---
   const komunikatData = przyjecie ? "Podaj datę przyjęcia dziecka na wychowanie." : "Podaj datę urodzenia dziecka lub przewidywaną datę porodu.";
-  const komunikatPodstawy = "Podaj średnie wynagrodzenie brutto albo gotową podstawę zasiłku.";
+  const komunikatPodstawy = "Wpisz kwotę zarobków albo gotową podstawę zasiłku.";
+  const mnogi = opisPoroduMnogiego(f.dzieci, f.tytul, f.zaZyciem);
   useEffect(() => { if (fokusBledu) tresc.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(); }, [fokusBledu]);
 
   function idzDo(k: number) { setPokazBledy(false); idz(k); }   // nowy krok = nowy wpis historii (adres ?krok=…)
@@ -239,6 +273,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
               <Field label={f.tytul === "porod" ? "Liczba dzieci przy jednym porodzie" : "Liczba dzieci przyjmowanych jednocześnie"}><select value={f.dzieci} onChange={(e) => set({ dzieci: +e.target.value })}>{[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? "5 lub więcej" : n}</option>)}</select></Field>
               {f.tytul !== "porod" && <DataPole label="Data urodzenia dziecka" hint="Do limitu wieku (7/10 lat – rodzina zastępcza, 14 lat – adopcja)" value={f.dataUrDziecka} onChange={(iso) => set({ dataUrDziecka: iso })} />}
             </div>
+            {mnogi && <p className={css.mala} role="status">{mnogi}</p>}
             <label className="check"><input type="checkbox" checked={f.zaZyciem} onChange={(e) => set({ zaZyciem: e.target.checked })} />Dziecko ma zaświadczenie „Za życiem” (dłuższy urlop rodzicielski)</label>
             {f.tytul === "porod" && <label className="check"><input type="checkbox" checked={f.martwe} onChange={(e) => set({ martwe: e.target.checked })} />{f.dzieci > 1 ? "Jedno z dzieci urodziło się martwe" : "Dziecko urodziło się martwe"}</label>}
           </>
@@ -246,19 +281,47 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
 
         {krok === K.zarobki && (
           <>
-            <div className="grid g2">
-              <Field label={dwoje ? `${rodzicPierwszy}: średnie wynagrodzenie brutto (zł)` : "Średnie wynagrodzenie brutto (zł)"}
-                hint={`Średnie miesięczne wynagrodzenie przed potrąceniami. ${f.bruttoM === START.bruttoM ? "Podana kwota jest przykładowa, wpisz własną. " : ""}Jeśli znasz podstawę zasiłku, możesz podać ją niżej.`}
-                error={pokazBledy && brakPodstawy ? komunikatPodstawy : undefined}>
-                <input type="number" inputMode="decimal" min={0} value={f.bruttoM} onChange={(e) => set({ bruttoM: e.target.value, podstawaM: "" })} /></Field>
-              {dwoje && <Field label={`${rodzicDrugi}: średnie wynagrodzenie brutto (zł)`}><input type="number" inputMode="decimal" min={0} value={f.bruttoO} onChange={(e) => set({ bruttoO: e.target.value, podstawaO: "" })} /></Field>}
+            {profil && dwoje && (
+              <Field label={`Dane z Twojego profilu ZUS (${profil.osoba}) dotyczą`} hint="Z profilu bierzemy rodzaj zatrudnienia i zaległe składki. Wybierz, czyje to dane.">
+                <select value={profilDla} onChange={(e) => przypiszProfil(e.target.value === "ojciec" ? "ojciec" : "matka")}>
+                  <option value="matka">{rodzicPierwszy}</option><option value="ojciec">{rodzicDrugi}</option>
+                </select></Field>
+            )}
+            <div className={dwoje ? "grid g2" : undefined}>
+              {(["matka", ...(dwoje ? ["ojciec"] : [])] as ("matka" | "ojciec")[]).map((kto) => {
+                const m = kto === "matka";
+                const rodzaj = m ? f.rodzajM : f.rodzajO;
+                const kwota = m ? f.bruttoM : f.bruttoO;
+                const pods = m ? podstawaM : podstawaO;
+                const reczne = m ? f.zadlM : f.zadlO;
+                const zProf = zadlZProfilu(kto);
+                const przyklad = kwota === (m ? START.bruttoM : START.bruttoO);
+                return (
+                  <fieldset key={kto} className={css.zestawRodzica}>
+                    {dwoje && <legend>{m ? rodzicPierwszy : rodzicDrugi}</legend>}
+                    <PoleRodzaju rodzaj={rodzaj} zProfilu={!!profil?.rodzaj && profilDla === kto && rodzaj === profil.rodzaj}
+                      onZmiana={(r) => set(m ? { rodzajM: r } : { rodzajO: r })} />
+                    <Field label={etykietaKwoty(rodzaj)} hint={`${podpowiedzKwoty(rodzaj)}${przyklad ? " Podana kwota jest przykładowa, wpisz własną." : ""}`}
+                      error={m && pokazBledy && brakPodstawy ? komunikatPodstawy : undefined}>
+                      <input type="number" inputMode="decimal" min={0} value={kwota} onChange={(e) => set(m ? { bruttoM: e.target.value, podstawaM: "" } : { bruttoO: e.target.value, podstawaO: "" })} /></Field>
+                    {pods > 0 && <p className={css.mala}>Podstawa zasiłku: <b>{pln(pods)}</b> miesięcznie.</p>}
+                    {rodzaj === "dzialalnosc" && (
+                      <>
+                        <PoleZadluzenia wartosc={reczne ?? (zProf != null ? String(zProf) : "")} zProfilu={reczne === null && zProf != null}
+                          onZmiana={(s) => set(m ? { zadlM: s } : { zadlO: s })} />
+                        <OstrzezenieZadluzenia kwota={zadluzenie(kto)} dzien={f.data || undefined} zProfilu={reczne === null && zProf != null} />
+                      </>
+                    )}
+                  </fieldset>
+                );
+              })}
             </div>
-            <p className={css.mala}>Przy umowie o pracę od średniej odejmujemy składki ({liczba(P.skladki_odliczane_od_podstawy)}%). {podstawaM > 0 && <>{rodzicPierwszy}: <b>{pln(podstawaM)}</b></>}{dwoje && podstawaO > 0 && <> · {rodzicDrugi}: <b>{pln(podstawaO)}</b></>}</p>
-            <details className="dl"><summary>Znam gotową podstawę wymiaru (np. z decyzji lub Z-3)</summary>
+            <details className="dl"><summary>Znam gotową podstawę zasiłku (dla zaawansowanych, np. z decyzji ZUS lub druku Z-3)</summary>
+              <p className={css.mala}>Podstawa to kwota po odjęciu składek, od której ZUS liczy zasiłek. Jeśli ją wpiszesz, kwotę powyżej pomijamy.</p>
               <div className="grid g2 mt"><Field label={`${rodzicPierwszy}: podstawa zasiłku (zł)`}><input type="number" inputMode="decimal" min={0} value={f.podstawaM} onChange={(e) => set({ podstawaM: e.target.value })} /></Field>
                 {dwoje && <Field label={`${rodzicDrugi}: podstawa zasiłku (zł)`}><input type="number" inputMode="decimal" min={0} value={f.podstawaO} onChange={(e) => set({ podstawaO: e.target.value })} /></Field>}</div></details>
             <Kroki kroki={podM?.kroki?.map(opisObliczenia)} tytul="Jak policzono podstawę zasiłku" />
-            {podM?.ostrzezenia?.length > 0 && <Lista items={podM.ostrzezenia.map(opisObliczenia)} warn />}
+            {podM && podM.ostrzezenia.length > 0 && <Lista items={podM.ostrzezenia.map(opisObliczenia)} warn />}
           </>
         )}
 
@@ -318,12 +381,14 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
               {!brakData && !brakPodstawy && busy && !wyn && <div className={css.kwota}><p className={css.statusLadowania}><span className="spin" aria-hidden="true" /> Liczymy zasiłek…</p></div>}
               {wyn && (
                 <div className={css.kwota}>
-                  <p className={css.kwotaOpis}>Zasiłki razem (przed zaliczką na podatek)</p>
+                  <p className={css.kwotaOpis}>Zasiłki razem: brutto (przed zaliczką na podatek)</p>
                   <p className={css.kwotaWartosc}>{pln(wyn.sumy.razem)}</p>
+                  {wyn.sumyNetto && <p className={css.kwotaNettoDuza}>Na rękę (szacunkowo): <b>{pln(wyn.sumyNetto.razem)}</b></p>}
                   <dl className={css.podzial}>
-                    <div><dt>{rodzicPierwszy}</dt><dd>{pln(wyn.sumy.matka)}</dd></div>
-                    {dwoje && <div><dt>{rodzicDrugi}</dt><dd>{pln(wyn.sumy.ojciec)}</dd></div>}
+                    <div><dt>{rodzicPierwszy}</dt><dd>{pln(wyn.sumy.matka)}{wyn.sumyNetto && <span className={css.dopisekBlok}>na rękę ok. {pln(wyn.sumyNetto.matka)}</span>}</dd></div>
+                    {dwoje && <div><dt>{rodzicDrugi}</dt><dd>{pln(wyn.sumy.ojciec)}{wyn.sumyNetto && <span className={css.dopisekBlok}>na rękę ok. {pln(wyn.sumyNetto.ojciec)}</span>}</dd></div>}
                   </dl>
+                  {wyn.sumyNetto && <p className={css.mala}>{OPIS_NETTO}</p>}
                 </div>
               )}
             </div>
@@ -331,6 +396,9 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
             {wyn && (
               <>
                 <p className={css.mala}>Wymiar: {przyjecie ? "urlop na warunkach macierzyńskiego" : "urlop macierzyński"} <b>{tygodnie(wyn.wymiary.macierzynskiTyg)}</b>, rodzicielski <b>{tygodnie(wyn.wymiary.rodzicielskiTyg)}</b> (wykorzystano {tygodnie(wyn.wymiary.rodzicielskiWykorzystaneTyg)}; przy łączeniu z pracą maks. {tygodnie(wyn.wymiary.rodzicielskiMaxPrzyLaczeniuTyg)}).</p>
+                {mnogi && !f.martwe && <Alert t="info"><b>Dlaczego urlop jest dłuższy?</b> {mnogi}</Alert>}
+                <OstrzezenieZadluzenia kwota={zadluzenie("matka")} dzien={f.data} kto={dwoje ? rodzicPierwszy : undefined} zProfilu={f.zadlM === null && zadlZProfilu("matka") != null} />
+                {dwoje && <OstrzezenieZadluzenia kwota={zadluzenie("ojciec")} dzien={f.data} kto={rodzicDrugi} zProfilu={f.zadlO === null && zadlZProfilu("ojciec") != null} />}
                 {wyn.bledy?.map((b: string, i: number) => <Alert key={i} t="err">{opisObliczenia(b)}</Alert>)}
                 {wyn.ostrzezenia?.map((b: string, i: number) => <Alert key={i} t="warn">{opisObliczenia(b)}</Alert>)}
                 <WynikSzczegoly wyn={wyn} por={por} start={f.data} rodzic1={rodzicPierwszy} rodzic2={rodzicDrugi} />

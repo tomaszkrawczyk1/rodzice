@@ -3,18 +3,49 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { KATEGORIE, PYTANIA, kalkulatorLink, pytanie, type Pytanie } from "@/content/poradnik";
 import { Alert } from "@/components/ui";
+import { zPojeciami } from "@/components/Pojecie";
+import { PODMIOTY_WSPARCIA, telHref } from "@/lib/wsparcie";
+import { RODZIC_PO_LUDZKU, krotkiAdres } from "@/lib/kontakty";
+
+/** Pytanie F26 („Gdzie szukać wsparcia”): zamiast samych nazw pokazujemy sprawdzone telefony i strony. */
+function KontaktyWsparcia() {
+  return (
+    <>
+      <h4>Telefony i strony organizacji</h4>
+      <ul className="clean">
+        {PODMIOTY_WSPARCIA.map((x) => (
+          <li key={x.id} className="mt">
+            <b>{x.nazwa}</b>{x.opis ? <> – {x.opis}</> : null}<br />
+            {x.telefon && <><a href={telHref(x.telefon)}>tel. {x.telefon}</a>{x.godziny ? ` (${x.godziny})` : ""} · </>}
+            <a href={x.www} target="_blank" rel="noopener noreferrer">{krotkiAdres(x.www)}</a>
+            {x.pewnosc === "do_potwierdzenia" && <span className="small muted"> · numer do potwierdzenia przed telefonem</span>}
+          </li>
+        ))}
+        {RODZIC_PO_LUDZKU.www && (
+          <li className="mt"><b>{RODZIC_PO_LUDZKU.nazwa}</b> – {RODZIC_PO_LUDZKU.opis}<br />
+            <a href={RODZIC_PO_LUDZKU.www} target="_blank" rel="noopener noreferrer">{krotkiAdres(RODZIC_PO_LUDZKU.www)}</a></li>
+        )}
+      </ul>
+      <p className="small muted mt">Więcej, także o tym, co przysługuje w trudnej sytuacji: <Link href="/trudne">Pomoc w trudnej sytuacji</Link>.</p>
+    </>
+  );
+}
 
 function Karta({ p, open, onToggle, przepisy, pokaz }: { p: Pytanie; open: boolean; onToggle: (o: boolean) => void; przepisy: string[]; pokaz: (id: string) => void }) {
   const k = kalkulatorLink(p.kalkulator);
   const luka = p.status === "luka";
+  // Każde trudne pojęcie objaśniamy raz na kartę – przy pierwszym użyciu.
+  const uzyte = new Set<string>();
   return (
     <details id={p.id} className="dl faq" open={open} onToggle={(e) => onToggle((e.target as HTMLDetailsElement).open)}>
       <summary>{p.pytanie}</summary>
       {p.status !== "ok" && <Alert t="warn">
-        {p.id === "F26" ? "Sprawdź aktualne informacje bezpośrednio w wybranej organizacji." : <>Sprawdź szczegóły w ZUS. <Link href="/pue">Zobacz, jak zadać pytanie</Link></>}
+        {p.id === "F26" ? "Dane kontaktowe sprawdziliśmy na stronach organizacji. Zanim zadzwonisz, upewnij się, że numer i godziny się nie zmieniły." : <>Sprawdź szczegóły w ZUS. <Link href="/pue">Zobacz, jak zadać pytanie</Link></>}
       </Alert>}
-      {!luka && <p className="mt">{p.odpowiedz}</p>}
-      {!luka && p.kroki && p.kroki.length > 0 && (<><h4>Co zrobić krok po kroku</h4><ol className="steps">{p.kroki.map((s, i) => <li key={i}>{s}</li>)}</ol></>)}
+      {!luka && <p className="mt">{zPojeciami(p.odpowiedz, uzyte)}</p>}
+      {!luka && p.kroki && p.kroki.length > 0 && (<><h4>Co zrobić krok po kroku</h4><ol className="steps">{p.kroki.map((s, i) => <li key={i}>{zPojeciami(s, uzyte)}</li>)}</ol></>)}
+      {!luka && p.id === "F26" && <KontaktyWsparcia />}
+      {!luka && p.uwaga && p.id !== "F26" && <p className="small muted mt">{zPojeciami(p.uwaga, uzyte)}</p>}
       <div className="row mt no-print">
         {!luka && p.druki?.map((d) => <Link key={d} className="btn btn-secondary btn-sm" href={`/druki#${d}`}>Formularz {d}</Link>)}
         {!luka && k && <Link className="btn btn-primary btn-sm" href={k.href}>{k.etykieta}</Link>}
@@ -50,8 +81,8 @@ export default function Pytania({ przepisy }: { przepisy: Record<string, string[
   }, [kat, q]);
   return (
     <>
-      <h1>Poradnik rodzica: pytania i odpowiedzi</h1>
-      <p className="lead">Proste odpowiedzi, instrukcje krok po kroku i potrzebne formularze. Nie wiesz, od czego zacząć? <Link href="/kreator">Uruchom kreator spraw</Link> – odpowiesz na kilka prostych pytań i dowiesz się, co przysługuje w Twojej sytuacji.</p>
+      <h1>Pytania i odpowiedzi (FAQ)</h1>
+      <p className="lead">Najczęstsze pytania rodziców o zasiłki, urlopy i wnioski – z prostymi odpowiedziami, instrukcjami krok po kroku i potrzebnymi formularzami. Trudne słowa z przepisów są <b>podkreślone</b> – kliknij je, a wyjaśnimy je prościej. Nie wiesz, od czego zacząć? <Link href="/kreator">Uruchom kreator spraw</Link> – odpowiesz na kilka prostych pytań i dowiesz się, co przysługuje w Twojej sytuacji.</p>
       <div className="card">
         <div className="field"><label htmlFor="szukaj">Wyszukaj w poradniku</label><input id="szukaj" type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="np. urlop ojcowski, 81,5%, zwolnienie lekarskie" /></div>
         <div className="tabs" role="group" aria-label="Kategorie">

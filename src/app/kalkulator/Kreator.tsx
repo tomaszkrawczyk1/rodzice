@@ -68,7 +68,7 @@ function przejdzLinkiem(e: MouseEvent, idz: () => void) {
  * Powłoka kreatora: pasek postępu, lista kroków (aria-current="step"), nagłówek kroku i przyciski.
  * Treść kroku przychodzi jako `children`; walidację robi wywołujący w `onDalej`.
  */
-export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, dalejEtykieta = "Dalej", dalejZablokowany = false, podglad, children }: {
+export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, dalejEtykieta = "Dalej", dalejZablokowany = false, podglad, uwaga, children }: {
   kroki: KrokDef[];
   krok: number;
   maks: number;
@@ -79,6 +79,8 @@ export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, d
   dalejEtykieta?: string;
   dalejZablokowany?: boolean;
   podglad?: ReactNode;
+  /** Krótkie wyjaśnienie pod licznikiem kroków (np. dlaczego ta ścieżka ma mniej kroków). */
+  uwaga?: ReactNode;
   children: ReactNode;
 }) {
   const id = useId();
@@ -100,6 +102,7 @@ export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, d
     <div className={css.kreator} ref={blok}>
       <nav aria-label="Postęp kalkulatora" className={css.postep}>
         <p className={css.licznik}>Krok {krok + 1} z {kroki.length}: <b>{aktualny.nazwa}</b></p>
+        {uwaga && <p className={css.uwagaKrokow}>{uwaga}</p>}
         <div className={css.pasek} aria-hidden="true"><div className={css.wypelnienie} style={{ width: `${((krok + 1) / kroki.length) * 100}%` }} /></div>
         <ol className={css.kroki}>
           {kroki.map((k, i) => {

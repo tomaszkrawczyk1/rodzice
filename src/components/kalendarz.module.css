@@ -4,9 +4,9 @@
   overflow-wrap: anywhere;
 }
 
-.kalendarz h2 { font-size: 23px; }
-.kalendarz h3 { font-size: 18px; }
-.kalendarz h4 { font-size: 16px; }
+.kalendarz h2 { font-size: 1.4375rem; }
+.kalendarz h3 { font-size: 1.125rem; }
+.kalendarz h4 { font-size: 1rem; }
 .kalendarz small { display: block; color: var(--muted); font-size: .875em; }
 .kalendarz ul { padding-inline-start: 1.35em; }
 .kalendarz li + li { margin-top: .25em; }
@@ -16,7 +16,7 @@
 .kalendarz :focus-visible { outline-color: var(--zus-navy); }
 
 .wstep { max-width: 65ch; }
-.formularz { margin-block: 1.25rem 1.5rem; background: #f3f3f3; border: 0; border-top: 7px solid var(--zus-green); }
+.formularz { margin-block: 1.25rem 1.5rem; background: var(--gray); border: 0; border-top: 7px solid var(--zus-green); }
 .formularz :is(details, .wyczysc) { margin-top: .75rem; }
 .formularz details {
   padding-inline: .75rem;
@@ -114,3 +114,29 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
   .dwieDaty { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .kalendarz :global(.card) { padding-inline: .75rem; }
 }
+
+/* Ramka „Najbliższe zadania dla Ciebie”: na samej górze, 1–2 terminy z datą i liczbą dni */
+.najblizsze { margin-block: 1rem 1.25rem; border: 1px solid var(--zus-green-line); border-left: 6px solid var(--zus-green); background: var(--zus-green-tint); }
+.najblizsze h2 { margin-bottom: .75rem; }
+ol.zadania { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
+.zadania li { margin: 0; padding: .75rem 1rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+.zadania li + li { margin-top: 0; }
+.zadania a { display: inline-block; align-content: center; min-height: 44px; font-size: 1.125em; font-weight: 700; }
+.ile { display: block; font-weight: 700; color: var(--zus-navy); font-size: 1.0625em; }
+.kiedyZadanie { display: block; color: var(--muted); }
+.najblizsze .reszta { margin: .75rem 0 0; color: var(--muted); }
+
+/* Zwijane grupy: tylko bieżący etap jest rozwinięty, reszta czeka pod przyciskiem */
+.zwijane { margin-top: .5rem; }
+.zwijane > summary {
+  display: flex; align-items: center; min-height: 48px; padding: .5em .75em;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--gray);
+}
+.zwijane[open] > summary { margin-bottom: .75rem; }
+.etapTeraz { margin-left: .5rem; vertical-align: middle; }
+.teraz details > summary { padding-block: .35em; }
+.teraz details ul { margin-top: .5rem; }
+
+:global(html.noc) .kalendarz :global(.badge.ok) { background: var(--zus-green-soft); color: var(--zus-green-link); }
+:global(html.hc) .najblizsze, :global(html.hc) .zadania li, :global(html.hc) .zwijane > summary { background: #000; border-color: #fff; }
+:global(html.hc) .ile { color: var(--hc-accent); }

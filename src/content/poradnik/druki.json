@@ -10,18 +10,18 @@
       "do_czego": "Zasiłek macierzyński za okres urlopu macierzyńskiego, na warunkach macierzyńskiego, rodzicielskiego, uzupełniającego i ojcowskiego.",
       "kto_sklada": "Ubezpieczony rodzic ubiegający się o zasiłek. Jeśli prowadzisz działalność gospodarczą, składasz go bezpośrednio do ZUS.",
       "gdzie": "Do płatnika zasiłku: pracodawca zgłaszający powyżej 20 ubezpieczonych sam ustala i wypłaca zasiłek; w pozostałych przypadkach ZUS.",
-      "terminy": ["Wariant 81,5%: najpóźniej 21 dni po porodzie (adopcja: 21 dni od przyjęcia dziecka).", "Przedawnienie: 6 miesięcy od ostatniego dnia okresu zasiłku."],
+      "terminy": ["Wariant 81,5%: najpóźniej 21 dni po porodzie (adopcja: 21 dni od przyjęcia dziecka).", "Przedawnienie (potem nie można już upomnieć się o wypłatę): 6 miesięcy od ostatniego dnia okresu zasiłku."],
       "uwagi": ["Od 24.10.2026 ZAM zastępuje ZUR i ZAO.", "W druku ZAM podaje się datę przyjęcia dziecka na wychowanie (adopcja / rodzina zastępcza)."],
       "tutorial": [
         "Ustal, kto wypłaca zasiłek: pracodawca z powyżej 20 ubezpieczonymi albo ZUS.",
         "Wskaż, za jakie okresy wnioskujesz (macierzyński, na warunkach macierzyńskiego, rodzicielski, uzupełniający, ojcowski).",
-        "Chcesz wariant 81,5%? Złóż wniosek w ciągu 21 dni po porodzie.",
+        "Chcesz wariant 81,5%? Złóż wniosek w ciągu 21 dni po porodzie. Jeśli ten termin minął, zasiłek nie przepada – dostaniesz wariant 100% za urlop macierzyński i 70% za rodzicielski.",
         "Dołącz dokumenty właściwe dla Twojej sytuacji (lista w pytaniu o dokumenty).",
-        "Złóż wniosek: do pracodawcy (duży płatnik) albo do ZUS (papierowo lub elektronicznie, np. przez eZUS).",
+        "Złóż wniosek: do pracodawcy (gdy zgłasza powyżej 20 osób) albo do ZUS (papierowo lub elektronicznie, np. przez eZUS).",
         "ZUS wypłaca zasiłek najpóźniej w 30 dni od wyjaśnienia ostatniej okoliczności niezbędnej do ustalenia prawa."
       ],
       "pytania": ["F07", "F08", "F09", "F17", "F18"],
-      "zrodla": [{ "typ": "excel", "wiersz": 5, "kol": ["F"] }, { "typ": "excel", "wiersz": 11, "kol": ["F"] }, { "typ": "excel", "wiersz": 20, "kol": ["F"] }, { "typ": "json", "id": "R-WND-01" }, { "typ": "json", "id": "R-WND-17" }, { "typ": "json", "id": "T-WND-01" }]
+      "zrodla": [{ "typ": "excel", "wiersz": 5, "kol": ["F"] }, { "typ": "excel", "wiersz": 11, "kol": ["F"] }, { "typ": "excel", "wiersz": 20, "kol": ["F"] }, { "typ": "json", "id": "R-WND-01" }, { "typ": "json", "id": "R-WND-17" }, { "typ": "json", "id": "T-WND-01" }, { "typ": "excel", "wiersz": 11, "kol": ["G"] }]
     },
     {
       "id": "Z-3",
@@ -80,7 +80,7 @@
       "id": "ZAS-53",
       "nazwa": "ZAS-53 – Wniosek o zasiłek chorobowy (osoba prowadząca działalność)",
       "plik_lokalny": "druki_ZUS/ZAS-53_do wydruku.pdf",
-      "do_czego": "Zasiłek chorobowy dla kobiety w ciąży prowadzącej pozarolniczą działalność (wg treści zadania).",
+      "do_czego": "Zasiłek chorobowy dla kobiety w ciąży prowadzącej pozarolniczą działalność .",
       "kto_sklada": "Osoba prowadząca działalność.",
       "gdzie": "Bezpośrednio do ZUS.",
       "terminy": [],

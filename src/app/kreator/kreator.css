@@ -1,0 +1,29 @@
+/* Kreator spraw: duże, wygodne pola do kliknięcia kciukiem i pasek postępu. Tylko klasy .kreator-*. */
+.kreator-pasek { margin: 8px 0 16px; }
+.kreator-pasek-tekst { margin: 0 0 6px; font-weight: 700; font-size: 18px; color: var(--zus-navy); }
+.kreator-pasek-tlo { height: 10px; background: var(--gray); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+.kreator-pasek-wypelnienie { height: 100%; background: var(--zus-green); border-radius: 5px; transition: width .25s ease; }
+@media (prefers-reduced-motion: reduce) { .kreator-pasek-wypelnienie { transition: none; } }
+
+.kreator-wybory { margin-top: 0; }
+.kreator-opcje { display: grid; gap: 10px; margin-top: 12px; }
+.kreator-opcja.persona {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 0; min-height: 60px; padding: 14px 16px; font-size: 18px; font-weight: 600; line-height: 1.35;
+  border-radius: 6px; border-top-width: 1px; border-left: 6px solid var(--line);
+}
+.kreator-opcja.persona:hover, .kreator-opcja.persona:focus-visible { border-left-color: var(--zus-green); border-top-color: var(--line); }
+.kreator-strzalka { font-size: 28px; line-height: 1; color: var(--zus-green); flex: none; }
+
+.kreator-duzy.btn { min-height: 56px; padding: 12px 20px; font-size: 18px; }
+.kreator-nawigacja { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
+@media (max-width: 600px) {
+  .kreator-duzy.btn, a.kreator-duzy.btn { display: flex; width: 100%; }
+}
+
+.kreator-blok { border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin: 14px 0; background: var(--gray); }
+.kreator-blok h3, .kreator-blok h4 { margin-top: 0; }
+.kreator-kroki { padding-left: 1.4em; }
+.kreator-kroki li { margin: 6px 0; }
+.kreator-formularz { margin-top: 12px; }
+.kreator-formularz .btn { margin-top: 8px; }

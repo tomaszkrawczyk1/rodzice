@@ -7,8 +7,8 @@ export default async function Kreator({ searchParams }: { searchParams: Promise<
   await searchParams;
   return (
     <>
-      <h1>Kreator spraw</h1>
-      <p className="lead">Odpowiedz na kilka pytań, żeby znaleźć potrzebne informacje i formularze.</p>
+      <h1>Co mnie dotyczy?</h1>
+      <p className="lead">Odpowiedz na kilka krótkich pytań. Pokażemy, co Ci przysługuje i co warto załatwić.</p>
       <Pytania />
     </>
   );
