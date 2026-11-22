@@ -65,7 +65,6 @@ const STRONY: { id: string; tytul: string; opis: string; href: string; slowa: st
   { id: "odpis", tytul: "Odpis aktu urodzenia", opis: "Jak zdobyć odpis aktu", href: "/odpis", slowa: "akt usc urzad stanu cywilnego" },
   { id: "trudne", tytul: "Pomoc w trudnej sytuacji", opis: "Strata, wcześniactwo, choroba, wsparcie", href: "/trudne", slowa: "strata poronienie wczesniak psycholog wsparcie" },
   { id: "pue", tytul: "Konto w ZUS (symulacja)", opis: "Zaloguj się i zobacz swoje dane", href: "/pue", slowa: "pue ezus logowanie konto profil" },
-  { id: "wnioski", tytul: "Napisz wniosek", opis: "Przygotuj pismo do pracodawcy lub ZUS", href: "/wnioski", slowa: "wniosek pismo formularz urlop" },
   { id: "wgraj", tytul: "Odczyt ze skanu (przykłady)", opis: "Wgraj Z-3 albo ZAM i przelicz podstawę", href: "/wgraj", slowa: "skan pdf ocr zaswiadczenie wgraj podstawa" },
   { id: "poradnik", tytul: "Pomoc / FAQ", opis: "Odpowiedzi na częste pytania", href: "/poradnik", slowa: "pytania odpowiedzi faq" },
 ];

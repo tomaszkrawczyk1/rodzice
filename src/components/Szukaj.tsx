@@ -15,7 +15,7 @@ import { StatusBadge } from "./StatusPytania";
 import { Plakietka, Lupa, ikonaSprawy } from "./Ikony";
 
 const PRZYKLADY = ["urodziły nam się bliźniaki", "ile dostanę po porodzie", "urlop dla taty", "szef nie chce dać urlopu", "mam firmę (JDG)"];
-const IKONY_STRON: Record<string, string> = { kalkulator: "plan", kalendarz: "kalendarz", terminarz: "zegar", ryzyka: "tarcza", trudne: "trudne", pue: "budynek", wnioski: "formularz" };
+const IKONY_STRON: Record<string, string> = { kalkulator: "plan", kalendarz: "kalendarz", terminarz: "zegar", ryzyka: "tarcza", trudne: "trudne", pue: "budynek" };
 const ikonaRekordu = (r: Rekord) => r.rodzaj === "sprawa" ? ikonaSprawy(r.id) : r.rodzaj === "druk" ? "formularz" : r.rodzaj === "wynik" ? "plan" : r.rodzaj === "strona" ? (IKONY_STRON[r.id] ?? "dokument") : "dokument";
 const PODPOWIEDZ_PUSTE = "Wpisz kilka słów opisujących sprawę, np. „zasiłek po porodzie” albo „urlop ojcowski”.";
 const PODPOWIEDZ_BEZ_SLOW = "Nie rozpoznaliśmy w tym tekście słów do wyszukania. Wpisz kilka słów opisujących sprawę, np. „urlop ojcowski”.";

@@ -6,12 +6,11 @@ import { tZSerwera } from "@/i18n/serwer";
 // /formularze („Wnioski i druki") to strona wyboru (kafelki); sama instrukcja wypełniania druków jest pod /druki, więc to nie duplikaty.
 export const metadata: Metadata = {
   title: "Wnioski i druki – Przewodnik Przyszłego Rodzica",
-  description: "Napisz wniosek, sprawdź jak wypełnić druk ZUS, zobacz odczyt danych ze skanu i konto w ZUS (symulacja).",
+  description: "Sprawdź, jak wypełnić druk ZUS, zobacz odczyt danych ze skanu i konto w ZUS (symulacja).",
   alternates: { canonical: kanoniczny("/formularze") },
 };
 
 const POZYCJE = [
-  { href: "/wnioski", tytul: "Napisz wniosek", opis: "Odpowiesz na kilka pytań, a my przygotujemy tekst wniosku do wydruku." },
   { href: "/druki", tytul: "Jak wypełnić druk ZUS", opis: "Kto składa który formularz i jak go wypełnić, pole po polu." },
   { href: "/wgraj", tytul: "Odczyt ze skanu (przykłady)", opis: "Pokaz: odczytujemy dane z przykładowego skanu Z-3 lub ZAM i liczymy zasiłek." },
   { href: "/pue", tytul: "Konto w ZUS (symulacja)", opis: "Tak mogłyby wyglądać dane o ubezpieczeniu i zwolnieniach w eZUS. Dane są fikcyjne." },

@@ -100,7 +100,7 @@
     },
     "wynik_podzial_rodzicielski": { "typ": "wynik", "tytul": "Podział urlopu rodzicielskiego między rodziców", "pytania": ["F12", "F08"], "druki": ["ZAM"], "kalkulator": { "tryb": "oboje_rodzice" } },
     "wynik_tata_przejmuje": { "typ": "wynik", "tytul": "Tata przejmuje część urlopu macierzyńskiego", "pytania": ["F11", "F12"], "druki": ["ZAM", "Z-3"], "kalkulator": { "tryb": "oboje_rodzice" } },
-    "wynik_ojcowski": { "typ": "wynik", "tytul": "Urlop ojcowski", "pytania": ["F14"], "druki": ["ZAM"], "kalkulator": { "tryb": "ojciec" }, "cta": { "etykieta": "Policz zasiłek dla taty" }, "link": { "href": "/wnioski?urlop=ojcowski", "etykieta": "Przygotuj wniosek do pracodawcy" } },
+    "wynik_ojcowski": { "typ": "wynik", "tytul": "Urlop ojcowski", "pytania": ["F14"], "druki": ["ZAM"], "kalkulator": { "tryb": "ojciec" }, "cta": { "etykieta": "Policz zasiłek dla taty" } },
     "wynik_praca_urlop": { "typ": "wynik", "tytul": "Praca w czasie urlopu rodzicielskiego", "pytania": ["F13", "F12"], "druki": [], "kalkulator": { "tryb": "praca_i_urlop" } },
     "wynik_wczesniak": { "typ": "wynik", "tytul": "Wcześniak lub dziecko w szpitalu – uzupełniający urlop", "pytania": ["F15", "F26"], "druki": ["ZAM"], "kalkulator": { "tryb": "wczesniak" } },
     "wynik_terminy": { "typ": "wynik", "tytul": "Terminy, których nie można przegapić", "pytania": ["F19", "F09"], "druki": ["ZAM"], "kalkulator": { "tryb": "terminy" } },

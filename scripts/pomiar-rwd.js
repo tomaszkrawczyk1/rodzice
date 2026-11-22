@@ -8,7 +8,7 @@
 const TRASY = ['/', '/sprawy', '/sprawa/co-przysluguje', '/sprawa/wniosek-zasilek',
   '/kalkulator?tryb=matka', '/kalkulator?tryb=oboje', '/kalkulator?tryb=laczenie', '/kalkulator?tryb=adopcja',
   '/kalkulator?tryb=wlasne', '/kalkulator?tryb=ojciec', '/kalendarz', '/poradnik', '/formularze', '/dokumenty',
-  '/ciaza', '/pue', '/wnioski', '/odpis', '/druki', '/ryzyka', '/trudne', '/wgraj', '/logowanie', '/admin',
+  '/ciaza', '/pue', '/odpis', '/druki', '/ryzyka', '/trudne', '/wgraj', '/logowanie', '/admin',
   '/kreator', '/o-projekcie'];
 
 async function mierzRwd(szerokosci, trasy = TRASY) {

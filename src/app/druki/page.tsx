@@ -4,6 +4,7 @@ import { DRUKI, LINK_WZORY, pytanie } from "@/content/poradnik";
 import { kanoniczny } from "@/lib/adres-serwisu";
 import drukiLinki from "@/lib/terminarz/druki-linki.json";
 import { tlumaczDla } from "@/i18n/jezyki";
+import { metadane } from "@/i18n/metadane";
 import { jezykZSerwera } from "@/i18n/serwer";
 
 // Tytuł i nagłówek odróżnione od /formularze (strony wyboru): tu są same instrukcje do druków ZUS.
@@ -16,12 +17,7 @@ export const generateMetadata = (): Promise<Metadata> => metadane(
 /** Adresy pustych wzorów na zus.pl (PDF albo strona druku). Pustych PDF-ów nie ma w public/, więc linkujemy do ZUS. */
 const LINKI = drukiLinki.druki as Record<string, { url_zus?: string; pdf_zus?: string }>;
 
-/** Druki, dla których w aplikacji jest kreator wypełnienia. */
-const KREATOR: Record<string, { href: string; etykieta: string }> = {
-  ZAM: { href: "/wnioski?druk=ZAM", etykieta: "Wypełnij ten druk" },
-};
-
-/** Druki wypełniane przez pracodawcę: zamiast kreatora pomagamy przygotować dane do wniosku. */
+/** Druki wypełniane przez pracodawcę: pomagamy przygotować dane do wniosku. */
 const PRZYGOTUJ: Record<string, { href: string; etykieta: string }> = {
   "Z-3": { href: "/sprawa/wniosek-zasilek", etykieta: "Przygotuj dane do wniosku" },
   "Z-3a": { href: "/sprawa/wniosek-zasilek", etykieta: "Przygotuj dane do wniosku" },
@@ -37,14 +33,14 @@ const NOWA_KARTA = <span className="vh"> (otwiera się w nowej karcie)</span>;
 
 function Akcje({ id }: { id: string }) {
   const link = LINKI[id];
-  const kreator = KREATOR[id] ?? PRZYGOTUJ[id];
+  const kreator = PRZYGOTUJ[id];
   const przyklad = PRZYKLAD[id];
   return (
     <div className="row no-print druk-akcje">
       {link?.pdf_zus
         ? <a className="btn btn-primary" href={link.pdf_zus} target="_blank" rel="noopener noreferrer">Pobierz PDF{NOWA_KARTA}</a>
         : <a className="btn btn-primary" href={link?.url_zus ?? LINK_WZORY} target="_blank" rel="noopener noreferrer">Pobierz druk ze strony ZUS{NOWA_KARTA}</a>}
-      {kreator && <Link className={"btn " + (KREATOR[id] ? "btn-primary" : "btn-secondary")} href={kreator.href}>{kreator.etykieta}</Link>}
+      {kreator && <Link className="btn btn-secondary" href={kreator.href}>{kreator.etykieta}</Link>}
       {przyklad && <a className="btn btn-ghost" href={przyklad} target="_blank" rel="noopener">Zobacz przykład wypełnienia (PDF){NOWA_KARTA}</a>}
     </div>
 );
@@ -56,13 +52,12 @@ export default async function Druki() {
   return (
     <>
       <h1>{t("Druki ZUS: kto składa i jak wypełnić")}</h1>
-      <p className="lead">Przy każdym druku możesz go od razu pobrać, a jeśli mamy kreator, wypełnić go razem z nami. Niżej jest instrukcja krok po kroku.</p>
+      <p className="lead">Przy każdym druku możesz go od razu pobrać. Niżej jest instrukcja krok po kroku.</p>
       <nav className="tabs" aria-label={t("Wybierz formularz")}>{DRUKI.map((d) => <a key={d.id} className="tab" href={`#${d.id}`}>{d.id}</a>)}</nav>
       {DRUKI.map((d) => (
         <section key={d.id} id={d.id} className="card accent mt" aria-labelledby={`h-${d.id}`}>
           <h2 id={`h-${d.id}`}>{d.nazwa}</h2>
           <Akcje id={d.id} />
-          {!KREATOR[d.id] && !PRZYGOTUJ[d.id] && <p className="small muted mt">Dla tego druku nie mamy jeszcze kreatora. Pomoże Ci instrukcja poniżej.</p>}
           <dl className="kv mt">
             <dt>{t("Do czego służy")}</dt><dd>{d.do_czego}</dd>
             <dt>{t("Kto składa")}</dt><dd>{d.kto_sklada}</dd>

@@ -116,7 +116,6 @@ export default function Dokumenty() {
         <ul className="clean">
           {DRUKI.map((d) => <li key={d.id}><Link href={`/druki#${d.id}`}>{t(d.nazwa)}</Link></li>)}
         </ul>
-        <p className="mt"><Link href="/wnioski" className="btn btn-primary">{t("Przygotuj wniosek")}</Link></p>
       </section>
     </>
   );

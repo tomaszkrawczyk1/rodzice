@@ -14,7 +14,7 @@ import { useJezyk } from "@/lib/jezyk";
 type Odnosnik = { href?: string; etykieta: string };
 type DodatkiWyniku = {
   status?: Status; komunikat_luki?: string; ton?: "delikatny"; wstep?: string;
-  cta?: Odnosnik; link?: Required<Odnosnik>; inne_swiadczenia?: string[];
+  cta?: Odnosnik; inne_swiadczenia?: string[];
 };
 type WezelWynik = Extract<Wezel, { typ: "wynik" }> & DodatkiWyniku;
 
@@ -107,7 +107,6 @@ function Wynik({ id, w: wezel, naglowek }: { id: string; w: Extract<Wezel, { typ
       {kosiniakowe && <SwiadczenieRodzicielskie planowane={id.startsWith("wynik_plan")} />}
 
       {cta && <p className="mt"><Link className="btn btn-primary kreator-duzy" href={cta.href}>{cta.etykieta}</Link></p>}
-      {w.link && <p><Link className="btn btn-ghost kreator-duzy" href={w.link.href}>{w.link.etykieta}</Link></p>}
 
       <h3 className="mt">Przeczytaj w poradniku</h3>
       <ul className="clean">

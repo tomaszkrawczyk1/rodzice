@@ -200,7 +200,6 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
                 <OstrzezenieZadluzenia kwota={zadluzenie} dzien={data} zProfilu={zadl === null && zadlProfil != null} />
                 {wynik.okresy.some((o) => o.kwotaNetto != null) && <p className={css.mala}>{OPIS_NETTO}</p>}
                 {wynik.sprawdz && <Alert t="warn">{t("Wyliczenie uwzględnia podwyższenie do kwoty świadczenia rodzicielskiego. Sprawdź w ZUS, czy dotyczy Twojej sytuacji.")}</Alert>}
-                {ojcowski > 0 && <p className="mt"><Link href="/wnioski?urlop=ojcowski" className="btn btn-secondary">{t("Przygotuj wniosek o urlop ojcowski")}</Link></p>}
               </>
             )}
             <p className={css.mala}>{t("Urlop ojcowski: {a}% podstawy zasiłku. Urlop rodzicielski w tym wyliczeniu: {b}% podstawy.", { a: liczba(P.zasilek_za_urlop_ojcowski), b: liczba(P.zasilek_za_urlop_rodzicielski) })}</p>

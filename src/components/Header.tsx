@@ -21,7 +21,6 @@ import s from "./Header.module.css";
  *   /terminarz   „Kalendarz w urzędzie"       co złożyć w ZUS, u pracodawcy, w gminie i USC i do kiedy (+ plik .ics)
  *   /dokumenty   „Kto wypłaca zasiłek"          ZUS czy pracodawca, ile masz czasu na wniosek
  *   /formularze  „Wnioski i druki"              strona wyboru, pod nią:
- *   /wnioski     „Napisz wniosek"               kreator tekstu wniosku do wydruku
  *   /druki       „Jak wypełnić druk ZUS"        instrukcje do pustych formularzy
  *   /wgraj       „Odczyt ze skanu (przykłady)"  demonstracja odczytu danych ze skanu Z-3 / ZAM
  *   /pue         „Konto w ZUS (symulacja)"
@@ -39,7 +38,6 @@ const P: Record<string, Pozycja> = {
   kalendarz: { href: "/kalendarz", nazwa: "Kalendarz ciąży", opis: "Wizyty i badania, termin porodu z profilu" },
   terminarz: { href: "/terminarz", nazwa: "Kalendarz w urzędzie", opis: "Co złożyć i do kiedy: ZUS, praca, gmina" },
   formularze: { href: "/formularze", nazwa: "Wnioski i druki", opis: "Wszystkie formularze w jednym miejscu" },
-  wnioski: { href: "/wnioski", nazwa: "Napisz wniosek" },
   druki: { href: "/druki", nazwa: "Jak wypełnić druk ZUS" },
   wgraj: { href: "/wgraj", nazwa: "Odczyt ze skanu (przykłady)" },
   pue: { href: "/pue", nazwa: "Konto w ZUS (symulacja)" },
@@ -52,13 +50,13 @@ const P: Record<string, Pozycja> = {
 
 // Komputer: jeden rząd (logo prowadzi na start), reszta w „Więcej".
 const NAV: Pozycja[] = [P.sprawy, P.kreator, P.ciaza, P.kalkulator, P.kalendarz, P.terminarz, P.formularze, P.poradnik, P.trudne];
-const FORMULARZE: Pozycja[] = [P.wnioski, P.druki, P.wgraj, P.pue];
+const FORMULARZE: Pozycja[] = [P.druki, P.wgraj, P.pue];
 const WIECEJ: Pozycja[] = [P.dokumenty, P.ryzyka, P.oProjekcie];
 // Telefon: grupy z nagłówkami, mniej pozycji na wierzchu, rzadziej używane w „Więcej".
 const GRUPY_MENU: { tytul: string; pozycje: Pozycja[] }[] = [
   { tytul: "Sprawdź", pozycje: [P.sprawy, P.kreator, P.ciaza, P.kalkulator] },
   { tytul: "Terminy", pozycje: [P.kalendarz, P.terminarz] },
-  { tytul: "Wnioski i druki", pozycje: [P.formularze, P.wnioski, P.druki] },
+  { tytul: "Wnioski i druki", pozycje: [P.formularze, P.druki] },
   { tytul: "Pomoc", pozycje: [P.poradnik, P.trudne] },
 ];
 const WIECEJ_MENU: Pozycja[] = [P.dokumenty, P.ryzyka, P.wgraj, P.pue, P.oProjekcie];
