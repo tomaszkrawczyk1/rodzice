@@ -30,10 +30,8 @@
   --zus-warn: #b36b00;
   --zus-warn-bg: #fff4d1;
   --zus-warn-text: #3d2c00;
-  /* wysoki kontrast: akcent na czerni. Przygaszona mięta zamiast neonu: 12,1:1 na czerni (AAA), czerń na niej tyle samo */
-  --hc-accent: #8fd4a4;
-  /* podpowiedź w pustym polu (placeholder): 6,7:1 na bieli, 6,1:1 na #f3f3f3 */
-  --placeholder: #5c5c5c;
+  /* wysoki kontrast: akcent na czerni (jasna zieleń, 16,7:1) */
+  --hc-accent: #7dffa0;
   --radius: 3px;
   --shadow: none;
   /* fokus: granat (10,6:1 na bieli) + biała przerwa z ux.css, więc widać go też na zielonym tle */
@@ -545,7 +543,14 @@ details.faq > summary { font-size: 18px; }
 details.faq[open] { border-color: var(--zus-green); }
 details.faq h4 { margin: 12px 0 4px; font-size: 16px; }
 
-/* Rozmiar tekstu: reguły są na końcu pliku (sekcja „Rozmiar tekstu: 100% / 115% / 130%"), żeby wygrały z późniejszymi px. */
+html.fs-l body { font-size: 18px; }
+html.fs-xl body { font-size: 20px; }
+html.fs-l .small, html.fs-l .hint, html.fs-l .lab, html.fs-l .tile .time, html.fs-l .stat .l, html.fs-l .zus-product span { font-size: 18px; }
+html.fs-xl .small, html.fs-xl .hint, html.fs-xl .lab, html.fs-xl .tile .time, html.fs-xl .stat .l, html.fs-xl .zus-product span,
+html.fs-xl .btn, html.fs-xl .chip, html.fs-xl .tab, html.fs-xl input, html.fs-xl select, html.fs-xl textarea { font-size: 20px; }
+html.fs-l h1, html.fs-xl h1 { font-size: 34px; }
+html.fs-xl h2 { font-size: 26px; }
+html.fs-xl .tile span, html.fs-xl .lead, html.fs-xl .hero p { font-size: 20px; }
 
 .prog { height: 7px; background: #ececec; border-radius: 0; margin: 10px 0 18px; overflow: hidden; }
 .prog i { display: block; height: 100%; background: var(--zus-green); }
@@ -923,7 +928,7 @@ button.tile { appearance: none; }
 .sprawy-wybor a:hover { background: #f3f3f3; }
 .sprawy-wybor a[aria-current="page"] { background: var(--zus-green); color: #fff; }
 
-/* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (przygaszona mięta #8fd4a4 na czerni ≈ 12,1:1, czerń na niej tyle samo).
+/* Wysoki kontrast: pary tekst/tło co najmniej 7:1 (jasna zieleń #7dffa0 na czerni ≈ 16,7:1, czerń na niej tyle samo).
    Cały akcent trybu jest w jednym tokenie --hc-accent (w :root). */
 html.hc {
   --ink: #fff;
@@ -1071,168 +1076,3 @@ html.hc .menu-btn svg { color: #000; }
 html.hc .sprawy-wybor__btn, html.hc .sprawy-wybor ul { background: #000; color: #fff; border-color: #fff; }
 html.hc .sprawy-wybor a[aria-current="page"] { background: var(--hc-accent); color: #000 !important; }
 html.hc .zus-header__bar { border-bottom-color: #fff; }
-
-/* ===== Podpowiedzi w polach (placeholder): ten sam czytelny kolor we wszystkich motywach ===== */
-::placeholder { color: var(--placeholder); opacity: 1; }
-html.hc { --placeholder: #c8c8c8; }          /* 12,5:1 na czerni */
-
-/* ===== Rozmiar tekstu: 100% / 115% / 130% =====
-   Wcześniej rósł tylko tekst akapitów (16 -> 18 -> 20 px), a przyciski, pola, etykiety i nagłówki miały stałe piksele,
-   więc zmiana była prawie niewidoczna. Teraz skaluje się html (rem), tekst treści i elementy z ustalonym rozmiarem w px. */
-html.fs-l { font-size: 18.4px; }
-html.fs-xl { font-size: 20.8px; }
-html.fs-l body { font-size: 18.4px; }
-html.fs-xl body { font-size: 20.8px; }
-html:is(.fs-l, .fs-xl) :is(
-  .small, .hint, .field .hint, .lab, .tile .time, .stat .l, .zus-product span, .btn, .btn-sm, .chip, .ask .chip, .tab,
-  input, select, textarea, .field > label, .lbl, .alert, .badge, table.tbl, .tbl th, .opt, .persona, .tile span, .lead,
-  .hero p, details.dl summary, .zus-nav a, .zus-side a, .zus-side__h, .crumbs__list li, .footer, .footer__note, .a11y--menu button,
-  .pue-login, .btn-szukaj, .sprawy-wybor a, .sprawy-wybor__btn, .zus-nav__more-btn, .zus-subnav a, .kv, .todo, .check, .ask__nota
-) { font-size: 1rem; }
-html:is(.fs-l, .fs-xl) :is(.sim-banner, .zus-search, .tl-axis, .tl-bar, .tl-row-label, .leg, .sprawy-wybor__etykieta) { font-size: .875rem; }
-html:is(.fs-l, .fs-xl) :is(h1, .hero h1) { font-size: 2.25rem; line-height: 1.2; }
-html:is(.fs-l, .fs-xl) h2 { font-size: 1.45rem; line-height: 1.25; }
-html:is(.fs-l, .fs-xl) :is(h3, .tile b, details.faq > summary) { font-size: 1.15rem; line-height: 1.3; }
-html:is(.fs-l, .fs-xl) h4 { font-size: 1rem; }
-html:is(.fs-l, .fs-xl) .tile--glowny b { font-size: 1.375rem; line-height: 1.25; }
-html:is(.fs-l, .fs-xl) .ask--glowny h2 { font-size: 1.5rem; line-height: 1.25; }
-html:is(.fs-l, .fs-xl) .big { font-size: 2.5rem; }
-html:is(.fs-l, .fs-xl) .stat .v { font-size: 1.375rem; }
-html:is(.fs-l, .fs-xl) .search--duze input[type=search] { font-size: 1.125rem; }
-@media (max-width: 600px) { html:is(.fs-l, .fs-xl) :is(h1, .hero h1) { font-size: 2rem; } }
-
-/* ===== Kontrolki dostępności: ikona + widoczny podpis ===== */
-.a11y button { width: auto; gap: 6px; padding: 0 10px; font-size: 14px; font-weight: 700; white-space: nowrap; }
-.a11y button svg { flex: none; width: 22px; height: 22px; }
-.a11y__txt { display: inline; }
-.a11y--menu button { width: auto; padding: 8px 14px; font-size: 16px; white-space: normal; }
-.a11y--menu button svg { width: 26px; height: 26px; }
-
-/* ===== Tryb nocny: ciemny, łagodny (wieczorne i nocne karmienie) =====
-   Bez czystej bieli i bez neonów. Tło #1b1d21, karty #22252a, tekst ciepły jasnoszary.
-   Kontrasty (WCAG): tekst --ink na tle 13:1, na kartach 12:1; --muted na tle 8:1, na --gray 7:1;
-   link --zus-green-link na tle 8,8:1; granat (jasny) na tle 8,8:1; czerwień 6,5:1;
-   przycisk: jasny tekst --na-zieleni na --zus-green 4,9:1, na --zus-green-dark 6,4:1; placeholder 6,9:1. */
-html.noc {
-  color-scheme: dark;
-  --ink: #e6e1d8;
-  --muted: #b8b2a7;
-  --line: #4a4e56;
-  --bg: #1b1d21;
-  --gray: #262930;
-  --card: #22252a;
-  --zus-green: #357552;
-  --zus-green-dark: #2b6244;
-  --zus-green-link: #8cc9a1;
-  --zus-green-soft: #263a2f;
-  --zus-green-tint: #212a25;
-  --zus-green-line: #3a5a48;
-  --zus-navy: #9dbfe0;
-  --zus-navy-dark: #c2d3e4;
-  --zus-navy-soft: #23272e;
-  --zus-red: #f0938a;
-  --zus-red-soft: #2c2122;
-  --zus-warn: #c99a4a;
-  --zus-warn-bg: #2f281c;
-  --zus-warn-text: #eedcb6;
-  --placeholder: #aaa499;
-  --na-zieleni: #f4f1ea;
-  --na-jasnym: #15171a;
-  --focus: #9dbfe0;
-}
-html.noc body { background: var(--bg); color: var(--ink); }
-html.noc :focus-visible { box-shadow: 0 0 0 2px var(--bg); }
-
-/* tła: wszystko, co było białe lub jasnoszare */
-html.noc .site-top, html.noc .header, html.noc .zus-header, html.noc .zus-nav, html.noc .hero { background: var(--bg); }
-html.noc .card, html.noc .card.warn, html.noc .card.danger, html.noc details.dl, html.noc .mobywatel .logo, html.noc .urgent,
-html.noc .persona, html.noc .persona:hover, html.noc .chip, html.noc .ask .chip, html.noc .sprawy-wybor__btn, html.noc .sprawy-wybor ul,
-html.noc .alert.warn, html.noc .alert.err, html.noc .badge.no { background: var(--card); }
-html.noc .alert, html.noc .alert.info, html.noc .alert.ok, html.noc .ask, html.noc .stat, html.noc .tl-row, html.noc .tbl th, html.noc .crumbs,
-html.noc .sim-banner, html.noc .na-stronie, html.noc .zus-subnav, html.noc pre.wniosek { background: var(--gray); }
-html.noc .crumbs, html.noc .ask, html.noc .tbl, html.noc table.tbl, html.noc .card, html.noc .tbl th, html.noc .tbl td { border-color: var(--line); }
-html.noc :is(.zus-nav li, .persona, .tile, .tbl-karty tr) { border-top-color: var(--line); }
-html.noc .tab { border-bottom-color: var(--line); }
-html.noc .tab:hover, html.noc .tab.on { border-bottom-color: var(--zus-green-link); }
-html.noc .zus-nav li.selected, html.noc .zus-nav li:hover { border-top-color: var(--zus-green-link); }
-html.noc .prog, html.noc .szkielet i { background: var(--line); }
-html.noc .zus-header__bar { border-bottom-color: var(--line); }
-html.noc :is(.zus-side__h, .zus-side li, .zus-nav__sub li, .zus-nav ul.zus-nav__drop li, .sprawy-wybor li + li) { border-color: var(--line); }
-
-/* tekst: wszystko, co miało twardą czerń */
-html.noc :is(h1, h2, h3, h4, .hero h1, .hero p, .lead, .field > label, .lbl, .alert, .tbl th, .tl-row-label, .crumbs__list li,
-  .crumbs__list a, .crumbs__list a:hover, .zus-nav a, .zus-nav a:hover, .zus-nav a[aria-current="page"], .zus-product span, .sim-banner,
-  .tab, a.tab, .tab:hover, .tab.on, .persona, details.dl summary, .opt, .tile, .tile:hover, .tile b, .tile span, .sprawy-wybor__btn,
-  .zus-subnav a, .hero) { color: var(--ink); }
-html.noc :is(.tile .time, .muted, .hint, .field .hint, .kv dt, .stat .l, .sprawy-wybor__etykieta) { color: var(--muted); }
-html.noc :is(.big, .stat .v, .lab, .crumbs__home, .search__icon, .zus-product b, .menu-btn) { color: var(--zus-green-link); }
-html.noc .todo .when { color: var(--zus-navy); }
-html.noc a:hover, html.noc .zus-search:hover { color: var(--ink); }
-html.noc .ask--glowny h2 { color: var(--ink); }
-html.noc .badge.ok { background: var(--zus-green-soft); color: var(--zus-green-link); }
-html.noc .badge.sim { background: var(--gray); color: var(--ink); border: 1px solid var(--line); }
-html.noc .badge.no { color: var(--zus-red); border-color: var(--zus-red); }
-html.noc ul.clean li::before { background: var(--zus-green-link); }
-html.noc ul.warnlist li::before { background: var(--zus-warn); }
-
-/* pola formularzy */
-html.noc :is(input, select, textarea), html.noc .search input[type=search] { background: #15171a; color: var(--ink); border-color: #8a8f98; }
-html.noc .search input[type=search] { border-color: var(--zus-green-link); }
-html.noc :is(input[type=checkbox], input[type=radio], input[type=range]) { accent-color: var(--zus-green-link); }
-
-/* przyciski: przygaszona zieleń z ciepłym jasnym tekstem; granatowe hovery: ciemny tekst na jasnym granacie (9,4:1) */
-html.noc :is(.btn-primary, .btn-login, a.btn-login, .btn-szukaj, .mobywatel .btn-primary, .pue-login, a.pue-login, button.pue-login, .skip) {
-  background: var(--zus-green) !important; color: var(--na-zieleni) !important; border-color: var(--zus-green) !important;
-}
-html.noc :is(.btn-primary, .btn-login, .btn-szukaj, .pue-login):is(:hover, :focus-visible, :active) {
-  background: var(--zus-green-dark) !important; border-color: var(--zus-green-dark) !important; color: var(--na-zieleni) !important;
-}
-html.noc .btn { box-shadow: none; }
-html.noc .btn-secondary { background: #2c3036; color: var(--zus-green-link); border-color: #2c3036; }
-html.noc .btn-ghost { background: transparent; color: var(--zus-green-link); border-color: var(--zus-green-link); }
-html.noc .chip, html.noc .ask .chip { color: var(--zus-green-link); border-color: var(--zus-green-link); }
-html.noc .menu-btn { background: var(--card); border-color: var(--zus-green-link); }
-@media (hover: hover) { html.noc :is(.btn-secondary, .btn-ghost, .chip, .ask .chip, .menu-btn):hover { background: var(--zus-navy); color: var(--na-jasnym); border-color: var(--zus-navy); } }
-html.noc :is(.btn-secondary, .btn-ghost, .chip, .ask .chip, .menu-btn):focus-visible { background: var(--zus-navy); color: var(--na-jasnym); border-color: var(--zus-navy); }
-html.noc .btn-danger { background: #8f2f2a; color: var(--na-zieleni); border-color: #8f2f2a; }
-html.noc .btn[disabled] { background: #33363c; color: var(--muted); border-color: var(--line); }
-html.noc .linkbar { background: #2a3448; color: var(--ink); border-color: var(--line); }
-html.noc .linkbar:is(:hover, :focus-visible) { background: var(--zus-navy); color: var(--na-jasnym); border-color: var(--zus-navy); }
-
-/* opcje odpowiedzi i kafle */
-html.noc .opt { background: var(--card); border-color: #6b7078; }
-html.noc .opt:is(:hover, :focus-visible), html.noc .opt.sel { background: var(--gray); border-color: var(--zus-green-link); box-shadow: inset 4px 0 0 var(--zus-green-link); }
-html.noc .opt::before { background: var(--card); border-color: var(--muted); }
-html.noc .opt.sel::before { border-color: var(--zus-green-link); background: radial-gradient(circle, var(--zus-green-link) 0 4px, var(--card) 5px); }
-html.noc .grid:has(> .tile) { background: transparent; }
-html.noc .tile { background: var(--card); border-color: var(--line); box-shadow: none; }
-html.noc .tile:is(:hover, :focus-visible) { background: #262d29; border-color: var(--zus-green-link); box-shadow: none; }
-html.noc .tile::after, html.noc .tile:hover::after { color: var(--muted); }
-html.noc .tile .tile__ic { background: var(--zus-green-soft); color: var(--zus-green-link); }
-html.noc .tile:is(:hover, :focus-visible) .tile__ic { background: var(--zus-green); color: var(--na-zieleni); }
-html.noc .tile--glowny { background: var(--zus-green); border-color: var(--zus-green); }
-html.noc .tile--glowny:is(:hover, :focus-visible) { background: var(--zus-green-dark); border-color: var(--zus-green-dark); }
-html.noc .tile--glowny :is(b, span), html.noc .tile--glowny::after, html.noc .tile--glowny:hover::after { color: var(--na-zieleni); }
-html.noc .tile--glowny .tile__ic { background: rgba(255, 255, 255, .14); color: var(--na-zieleni); }
-html.noc .ask--glowny { background: var(--zus-green-tint); border-color: var(--zus-green-line); }
-
-/* menu, ścieżka, wybór sprawy */
-html.noc .zus-side li.on { background: var(--zus-green); }
-html.noc .zus-side li.on a { color: var(--na-zieleni); }
-html.noc .sprawy-wybor a:hover, html.noc .zus-nav ul.zus-nav__drop a:hover { background: var(--gray); }
-html.noc .sprawy-wybor a[aria-current="page"] { background: var(--zus-green); color: var(--na-zieleni); }
-html.noc .zus-nav ul.zus-nav__drop { background: var(--card); border-color: var(--line); box-shadow: 0 6px 14px rgba(0, 0, 0, .45); }
-
-/* stopka: zamiast dużej zielonej płaszczyzny spokojny, ciemniejszy pas */
-html.noc .footer { background: #15171a; color: var(--ink); border-top-color: var(--line); }
-html.noc .footer :is(a, a:hover, .footer__h, .footer__note, .to-top, .to-top:hover) { color: var(--ink); }
-html.noc .footer__links li { border-color: var(--line); }
-html.noc .to-top__circle, html.noc .to-top__circle::before { border-color: var(--ink); }
-
-/* logo ZUS ma ciemny napis: kładziemy je na łagodnej jasnej plakietce zamiast odwracać kolory */
-html.noc .zus-logo__img { background: #e6e1d8; border-radius: 4px; padding: 4px 6px; }
-
-/* kontrolki dostępności w trybie nocnym */
-html.noc .a11y button { background: #2a3448; color: var(--ink); }
-html.noc .a11y button:hover { background: #34405a; }
-html.noc .a11y button[aria-pressed="true"] { background: var(--zus-green); color: var(--na-zieleni); }

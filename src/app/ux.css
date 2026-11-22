@@ -204,25 +204,3 @@ html.hc .pilne__lab { color: var(--hc-accent); }
 .zabierz label { display: flex; align-items: flex-start; gap: 14px; padding: 14px 2px; min-height: 52px; cursor: pointer; }
 .zabierz input { flex: none; width: 26px; height: 26px; margin: 0; accent-color: var(--zus-green); }
 .zabierz input:checked + span { color: var(--muted); text-decoration: line-through; }
-
-/* --- Dolne przyciski w kartach (np. Krok 1 w sprawie) ----------------------------------------
-   Przyciski na dole karty nie mogą być przycinane: karta nie ucina zawartości, przyciski mogą się zawijać i zwężać,
-   a pod treścią strony jest zapas na pasek gestów i dolny pasek przeglądarki w telefonie. */
-.card { overflow: visible; }
-.card > .row:last-child { padding-bottom: 2px; }
-.row > .btn { min-width: 0; }
-.site-main { padding-bottom: max(32px, calc(24px + env(safe-area-inset-bottom, 0px))); }
-
-/* Tryb nocny: elementy z tego pliku, które mają twarde jasne kolory */
-html.noc .na-stronie { background: var(--gray); border-color: var(--line); }
-html.noc .zus-subnav { background: var(--gray); border-color: var(--line); }
-html.noc .zus-subnav a { color: var(--ink); }
-html.noc .opt::before { background: var(--card); }
-html.noc .zus-nav__sub li, html.noc .zus-nav ul.zus-nav__drop li { border-top-color: var(--line); }
-@media (hover: none) {
-  html.noc .tile:hover { background: var(--card); border-color: var(--line); box-shadow: none; }
-  html.noc .tile:hover .tile__ic { background: var(--zus-green-soft); color: var(--zus-green-link); }
-  html.noc .chip:hover, html.noc .ask .chip:hover, html.noc .btn-secondary:hover, html.noc .btn-ghost:hover { background: transparent; color: var(--zus-green-link); }
-  html.noc .opt:hover:not(.sel), html.noc .persona:hover, html.noc .zus-nav li:hover:not(.selected) { border-top-color: var(--line); }
-}
-.druk-akcje { margin: 4px 0 8px; }
