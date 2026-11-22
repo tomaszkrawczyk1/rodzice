@@ -8,13 +8,15 @@ import { DataPole } from "@/components/DataPole";
 import OsKalendarza from "@/components/OsKalendarza";
 import PanelBoczny from "@/components/PanelBoczny";
 import { useZrobione } from "@/lib/zrobione";
-import { dataPL, liczba, tygodnie } from "@/lib/format";
+import { dataPL, formaty, liczba, tygodnie } from "@/lib/format";
 import {
   kalendarz, najblizszeZadania, poprawnaData, terminyKalendarza,
   type BazaKalendarza, type Informacja, type KalendarzWynik, type Trymestr, type WydarzenieNaOsi,
 } from "@/lib/kalendarz";
 import { api, useSesja } from "@/lib/sesja";
 import style from "./kalendarz.module.css";
+import { useFormaty, useT } from "@/lib/jezyk";
+import { wstaw } from "@/i18n/bogaty";
 
 const baza: BazaKalendarza = dane as BazaKalendarza;
 const warunkiBazy = baza.warunki ?? [];
@@ -78,27 +80,30 @@ function dzisLokalnie() {
 }
 
 function Data({ value }: { value: string }) {
+  const { dataPL } = useFormaty();
   return <time dateTime={value}>{dataPL(value)}</time>;
 }
 
 function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) {
+  const t = useT();
+  const { tygodnie, dni: dniF } = useFormaty();
   const dni = dniMiedzy(wynik.dataPorodu ?? wynik.poczatekCiazy, dzis);
   const pozostalo = dniMiedzy(dzis, wynik.terminPorodu);
-  const czas = `${tygodnie(Math.floor(dni / 7))} i ${dni % 7} ${dni % 7 === 1 ? "dzień" : "dni"}`;
+  const czas = t("{tyg} i {dni}", { tyg: tygodnie(Math.floor(dni / 7)), dni: dniF(dni % 7) });
   return (
     <section className={`card ${style.podsumowanie}`} aria-labelledby="kalendarz-podsumowanie">
       <h2 id="kalendarz-podsumowanie">
         {wynik.dataPorodu
-          ? dni >= 0 ? `Dziecko ma ${czas}` : <>Wpisana data porodu to <Data value={wynik.dataPorodu} /></>
-          : dni < 0 ? "Sprawdź planowany termin porodu"
-          : pozostalo >= 0 ? `Ciąża trwa ${czas}`
-          : "Planowany termin porodu już minął"}
+          ? dni >= 0 ? t("Dziecko ma {czas}", { czas }) : wstaw(t("Wpisana data porodu to {data}"), { data: <Data value={wynik.dataPorodu} /> })
+          : dni < 0 ? t("Sprawdź planowany termin porodu")
+          : pozostalo >= 0 ? t("Ciąża trwa {czas}", { czas })
+          : t("Planowany termin porodu już minął")}
       </h2>
       {!wynik.dataPorodu && dni >= 0 && pozostalo > 0 && (
-        <p>Planowany termin porodu to <Data value={wynik.terminPorodu} />. Pozostało {pozostalo} {pozostalo === 1 ? "dzień" : "dni"}.</p>
+        <p>{wstaw(t("Planowany termin porodu to {data}. Pozostało {dni}."), { data: <Data value={wynik.terminPorodu} />, dni: dniF(pozostalo) })}</p>
       )}
-      {!wynik.dataPorodu && pozostalo === 0 && <p>Planowany termin porodu wypada dziś.</p>}
-      {!wynik.dataPorodu && dni < 0 && <p>Według wpisanego terminu początek ciąży wypada po dzisiejszej dacie.</p>}
+      {!wynik.dataPorodu && pozostalo === 0 && <p>{t("Planowany termin porodu wypada dziś.")}</p>}
+      {!wynik.dataPorodu && dni < 0 && <p>{t("Według wpisanego terminu początek ciąży wypada po dzisiejszej dacie.")}</p>}
       {!wynik.dataPorodu && (
         <p>Terminy po porodzie są orientacyjne. Gdy dziecko się urodzi, wybierz „Dziecko już się urodziło” i wpisz datę porodu, a przeliczymy je dokładnie.</p>
       )}
@@ -178,15 +183,18 @@ function Najblizsze({ wynik, dzis, plan, parametry, zrobione, onOtworz }: {
 }
 
 function Lista({ pozycje }: { pozycje: string[] }) {
-  return <ul>{pozycje.map((p, i) => <li key={i}>{p}</li>)}</ul>;
+  const t = useT();
+  return <ul>{pozycje.map((p, i) => <li key={i}>{t(p)}</li>)}</ul>;
 }
 
 function Czestotliwosc({ wartosc }: { wartosc?: string }) {
+  const t = useT();
   if (typeof wartosc !== "string" || !wartosc.trim()) return null;
-  return <span>Jak często? {wartosc.trim()}</span>;
+  return <span>{t("Jak często?")} {t(wartosc.trim())}</span>;
 }
 
 function TekstZeZrodlami({ tekst }: { tekst: string }) {
+  const t = useT();
   const wezly: ReactNode[] = [];
   const re = /https?:\/\/[^\s<>"']+/g;
   let last = 0;
@@ -203,7 +211,7 @@ function TekstZeZrodlami({ tekst }: { tekst: string }) {
       wezly.push(
         <a key={`a${m.index}`} href={url} target="_blank" rel="noopener noreferrer">
           {url}
-          <span className={style.tylkoCzytnik}> (otwiera się w nowej karcie)</span>
+          <span className={style.tylkoCzytnik}> ({t("otwiera się w nowej karcie")})</span>
         </a>,
       );
     }
@@ -215,26 +223,29 @@ function TekstZeZrodlami({ tekst }: { tekst: string }) {
 }
 
 function Zrodla({ tekst, nazwa }: { tekst?: string; nazwa: string }) {
+  const t = useT();
   if (typeof tekst !== "string" || !tekst.trim()) return null;
   return (
     <details className={style.zrodla}>
-      <summary>Źródła <span className={style.tylkoCzytnik}>pozycji „{nazwa}”</span></summary>
-      <p><TekstZeZrodlami tekst={tekst} /></p>
+      <summary>{t("Źródła")} <span className={style.tylkoCzytnik}>{t("pozycji „{nazwa}”", { nazwa: t(nazwa) })}</span></summary>
+      <p lang="pl"><TekstZeZrodlami tekst={tekst} /></p>
     </details>
   );
 }
 
 function Niepotwierdzone({ wynik }: { wynik: KalendarzWynik }) {
+  const t = useT();
   const lista = wynik.ostrzezenia.map(o => o.trim()).filter(o => o.includes("do potwierdzenia"));
   if (lista.length === 0) return null;
   return (
     <div className={style.ostrzezenie} role="status">
-      {lista.map(o => <p key={o}>{o}</p>)}
+      {lista.map(o => <p key={o}>{t(o)}</p>)}
     </div>
   );
 }
 
 function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi; dzis: string; poczatek: string }) {
+  const t = useT();
   const teraz = trwa(e, dzis);
   const odznaki = [
     teraz ? "Teraz" : "",
@@ -245,37 +256,37 @@ function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi;
   ].filter(Boolean);
   return (
     <article id={`kalendarz-w-${e.id}`} tabIndex={-1} className={`card ${style.wydarzenie} ${teraz ? style.trwa : ""}`}>
-      <h3>{e.nazwa}</h3>
+      <h3>{t(e.nazwa)}</h3>
       {odznaki.length > 0 && (
         <div className={style.odznaki}>
           {odznaki.map(nazwa => (
-            <span key={nazwa} className={nazwa === "Teraz" || nazwa === "Dotyczy Twojej sytuacji" ? "badge ok" : "badge sim"}>{nazwa}</span>
+            <span key={nazwa} className={nazwa === "Teraz" || nazwa === "Dotyczy Twojej sytuacji" ? "badge ok" : "badge sim"}>{t(nazwa)}</span>
           ))}
         </div>
       )}
       <p className={style.daty}>
         <strong>
           {e.od === e.do ? <Data value={e.od} />
-            : e.od === poczatek ? <>Do <Data value={e.do} /></>
+            : e.od === poczatek ? <>{wstaw(t("Do {data}"), { data: <Data value={e.do} /> })}</>
             : <><Data value={e.od} /> – <Data value={e.do} /></>}
         </strong>
-        {e.kiedy && <span>{e.kiedy}</span>}
-        {e.najpozniej && <span>Najpóźniej <Data value={e.najpozniej} /></span>}
+        {e.kiedy && <span>{t(e.kiedy)}</span>}
+        {e.najpozniej && <span>{wstaw(t("Najpóźniej {data}"), { data: <Data value={e.najpozniej} /> })}</span>}
         <Czestotliwosc wartosc={e.czestotliwosc} />
       </p>
-      {e.opis && <p>{e.opis}</p>}
+      {e.opis && <p>{t(e.opis)}</p>}
       {e.skutek && (
         <p className={style.skutek}>
-          <strong>Gdy pominiesz termin</strong>
-          {e.skutek}
-          <span className={style.porada}>Sprawdź u lekarza prowadzącego, co to oznacza w Twoim przypadku.</span>
+          <strong>{t("Gdy pominiesz termin")}</strong>
+          {t(e.skutek)}
+          <span className={style.porada}>{t("Sprawdź u lekarza prowadzącego, co to oznacza w Twoim przypadku.")}</span>
         </p>
       )}
       {(!!e.pozycje?.length || !!e.uwagi?.length) && (
         <details>
-          <summary>Szczegóły <span className={style.tylkoCzytnik}>pozycji „{e.nazwa}”</span></summary>
-          {!!e.pozycje?.length && <><h4>Co obejmuje</h4><Lista pozycje={e.pozycje} /></>}
-          {!!e.uwagi?.length && <><h4>Warto wiedzieć</h4><Lista pozycje={e.uwagi} /></>}
+          <summary>{t("Szczegóły")} <span className={style.tylkoCzytnik}>{t("pozycji „{nazwa}”", { nazwa: t(e.nazwa) })}</span></summary>
+          {!!e.pozycje?.length && <><h4>{t("Co obejmuje")}</h4><Lista pozycje={e.pozycje} /></>}
+          {!!e.uwagi?.length && <><h4>{t("Warto wiedzieć")}</h4><Lista pozycje={e.uwagi} /></>}
         </details>
       )}
       <Zrodla tekst={e.zrodlo} nazwa={e.nazwa} />
@@ -284,9 +295,10 @@ function Karta({ wydarzenie: e, dzis, poczatek }: { wydarzenie: WydarzenieNaOsi;
 }
 
 function Informacje({ informacje }: { informacje: Informacja[] }) {
+  const t = useT();
   return informacje.map(i => (
     <article className={`card ${style.informacja}`} key={i.id}>
-      <h3>{i.temat}</h3>
+      <h3>{t(i.temat)}</h3>
       <Lista pozycje={i.tresc} />
       <Zrodla tekst={i.zrodlo} nazwa={i.temat} />
     </article>
@@ -294,31 +306,34 @@ function Informacje({ informacje }: { informacje: Informacja[] }) {
 }
 
 function Zus({ wynik, plan, parametry }: { wynik: KalendarzWynik; plan?: PlanWejscie; parametry: Parametry }) {
+  const t = useT();
+  const { liczba, dni } = useFormaty();
+  const dataPolska = formaty("pl").dataPL; // zdania z silnika są po polsku: daty wstawiamy po polsku i dopiero tłumaczymy całe zdanie
   const { wniosek, doPracodawcy } = terminyKalendarza(wynik, parametry, plan);
   const procent = liczba(parametry.procenty.wariant_pelny_wymiar_81_5);
   const terminy = parametry.terminy_dni;
   return (
     <section id="kalendarz-zus" className={`card ${style.zus}`} aria-labelledby="kalendarz-zus-tytul">
-      <h2 id="kalendarz-zus-tytul">W ZUS</h2>
-      <h3>Wniosek o zasiłek macierzyński w wariancie {procent}%</h3>
-      <p><strong>Do <Data value={wniosek} /></strong></p>
-      <p>{wynik.dataPorodu ? "Termin liczony od wpisanej daty porodu." : "Termin orientacyjny. Liczymy od planowanego terminu porodu."}</p>
-      <h3>Wnioski o urlop do pracodawcy</h3>
+      <h2 id="kalendarz-zus-tytul">{t("W ZUS")}</h2>
+      <h3>{t("Wniosek o zasiłek macierzyński w wariancie {procent}%", { procent })}</h3>
+      <p><strong>{wstaw(t("Do {data}"), { data: <Data value={wniosek} /> })}</strong></p>
+      <p>{t(wynik.dataPorodu ? "Termin liczony od wpisanej daty porodu." : "Termin orientacyjny. Liczymy od planowanego terminu porodu.")}</p>
+      <h3>{t("Wnioski o urlop do pracodawcy")}</h3>
       {doPracodawcy.length > 0 ? (
         <ul>
-          {doPracodawcy.map((t, i) => (
+          {doPracodawcy.map((w, i) => (
             <li key={i}>
-              {t.co.replace(/\d{4}-\d{2}-\d{2}/g, dataPL)}. Złóż do <Data value={t.do!} />.
+              {wstaw(t("{co}. Złóż do {data}."), { co: t(w.co.replace(/\d{4}-\d{2}-\d{2}/g, dataPolska)), data: <Data value={w.do!} /> })}
             </li>
           ))}
         </ul>
       ) : (
         <ul>
-          <li>Wniosek o urlop rodzicielski złóż {terminy.wniosek_urlop_rodzicielski_przed_startem} dni przed rozpoczęciem urlopu.</li>
-          <li>Wniosek o urlop ojcowski złóż {terminy.wniosek_urlop_ojcowski_przed_startem} dni przed rozpoczęciem urlopu.</li>
+          <li>{t("Wniosek o urlop rodzicielski złóż {dni} przed rozpoczęciem urlopu.", { dni: dni(terminy.wniosek_urlop_rodzicielski_przed_startem) })}</li>
+          <li>{t("Wniosek o urlop ojcowski złóż {dni} przed rozpoczęciem urlopu.", { dni: dni(terminy.wniosek_urlop_ojcowski_przed_startem) })}</li>
         </ul>
       )}
-      <Link href="/sprawa/urlop-pracodawca">Sprawdź termin dla wybranej daty urlopu</Link>
+      <Link href="/sprawa/urlop-pracodawca">{t("Sprawdź termin dla wybranej daty urlopu")}</Link>
     </section>
   );
 }
@@ -377,6 +392,7 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
   wynik: KalendarzWynik; dzis: string; plan?: PlanWejscie; parametry: Parametry;
   zrobione: ReadonlySet<string>; onZrobione: (id: string) => void; onOtworz: (id: string) => void;
 }) {
+  const t = useT();
   const teraz = wynik.oś.filter(e => trwa(e, dzis)).sort((a, b) => a.do.localeCompare(b.do));
   const sytuacje = wynik.informacje.filter(i => i.rodzaj === "sytuacja_szczegolna");
   const ogolne = wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === undefined);
@@ -392,32 +408,32 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
       <Podsumowanie wynik={wynik} dzis={dzis} />
       <Niepotwierdzone wynik={wynik} />
       <section className={`card ${style.teraz}`} aria-labelledby="kalendarz-teraz">
-        <h2 id="kalendarz-teraz">Teraz warto zrobić</h2>
+        <h2 id="kalendarz-teraz">{t("Teraz warto zrobić")}</h2>
         {teraz.length ? (
           <details>
             <summary>Pokaż wszystko, co trwa teraz ({ileTerminow(teraz.length)})</summary>
-            <ul>
-              {teraz.map(e => (
-                <li key={e.id}>
+          <ul>
+            {teraz.map(e => (
+              <li key={e.id}>
                   <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(e.id))}>{e.nazwa}</button>
-                  <div>Do <Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
-                </li>
-              ))}
-            </ul>
+                  <div>{t("Do ")}<Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
+              </li>
+            ))}
+          </ul>
           </details>
-        ) : <p>Na dziś w kalendarzu nie ma zaplanowanych wizyt ani badań.</p>}
+        ) : <p>{t("Na dziś w kalendarzu nie ma zaplanowanych wizyt ani badań.")}</p>}
       </section>
       <OsKalendarza wynik={wynik} dzis={dzis} plan={plan} parametry={parametry}
         zrobione={zrobione} onZrobione={onZrobione} onOtworz={onOtworz} />
-      <nav aria-label="Etapy kalendarza">
+      <nav aria-label={t("Etapy kalendarza")}>
         <ul className={style.nawigacja}>
           {etapy.map(e => (
             <Fragment key={e.trymestr}>
-              <li><a href={`#kalendarz-etap-${e.trymestr}`}>{e.nazwa}</a></li>
-              {e.trymestr === "polog" && <li><a className={style.linkZus} href="#kalendarz-zus">W ZUS</a></li>}
+              <li><a href={`#kalendarz-etap-${e.trymestr}`}>{t(e.nazwa)}</a></li>
+              {e.trymestr === "polog" && <li><a className={style.linkZus} href="#kalendarz-zus">{t("W ZUS")}</a></li>}
             </Fragment>
           ))}
-          {!zusPrzyPologu && <li><a className={style.linkZus} href="#kalendarz-zus">W ZUS</a></li>}
+          {!zusPrzyPologu && <li><a className={style.linkZus} href="#kalendarz-zus">{t("W ZUS")}</a></li>}
         </ul>
       </nav>
       {etapy.map(e => (
@@ -425,13 +441,13 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
           <section className={style.etap} aria-labelledby={`kalendarz-etap-${e.trymestr}`}>
             <h2 id={`kalendarz-etap-${e.trymestr}`}>
               {e.nazwa}
-              {e.trymestr === aktywny && <span className={`badge ok ${style.etapTeraz}`}>Teraz</span>}
+              {e.trymestr === aktywny && <span className={`badge ok ${style.etapTeraz}`}>{t("Teraz")}</span>}
             </h2>
             {e.opis && <p className={style.opisEtapu}>{e.opis}</p>}
             <details className={style.zwijane} open={e.trymestr === aktywny}>
               <summary>Terminy na tym etapie ({ileTerminow(e.wydarzenia.length)})</summary>
-              {e.wydarzenia.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
-              <Informacje informacje={wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === e.trymestr)} />
+            {e.wydarzenia.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
+            <Informacje informacje={wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === e.trymestr)} />
             </details>
           </section>
           {e.trymestr === "polog" && zus}
@@ -441,13 +457,13 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
       {wynik.bezTrymestru.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
       {!!sytuacje.length && (
         <section className={style.etap} aria-labelledby="kalendarz-sytuacje">
-          <h2 id="kalendarz-sytuacje">Twoja sytuacja</h2>
+          <h2 id="kalendarz-sytuacje">{t("Twoja sytuacja")}</h2>
           <Informacje informacje={sytuacje} />
         </section>
       )}
       {!!ogolne.length && (
         <section className={style.etap} aria-labelledby="kalendarz-informacje">
-          <h2 id="kalendarz-informacje">Warto wiedzieć</h2>
+          <h2 id="kalendarz-informacje">{t("Warto wiedzieć")}</h2>
           <Informacje informacje={ogolne} />
         </section>
       )}
@@ -456,6 +472,8 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
 }
 
 function FormularzKalendarza({ personaId, parametry }: { personaId?: string; parametry: Parametry }) {
+  const t = useT();
+  const { dni } = useFormaty();
   const profil = personaId ? `profil:${personaId}` : "gosc";
   const [stan, setStan] = useState<Formularz | null>(null);
   const [pokazWarunki, setPokazWarunki] = useState(false);
@@ -520,21 +538,21 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
         return s && <PanelBoczny key={panel} tytul={s.tytul} onZamknij={() => setPanel(null)}>{s.tresc}</PanelBoczny>;
       })()}
       <form className={`card ${style.formularz}`} aria-labelledby="kalendarz-dane" onSubmit={e => e.preventDefault()}>
-        <h2 id="kalendarz-dane">Twoje dane</h2>
+        <h2 id="kalendarz-dane">{t("Twoje dane")}</h2>
         <fieldset className={style.tryb}>
           <legend>Na jakim jesteś etapie?</legend>
           <div className={style.tryby}>
             <button type="button" className={`btn ${urodzone ? "btn-ghost" : "btn-primary"}`} aria-pressed={!urodzone}
-              onClick={() => ustawTryb("ciaza")}>Jestem w ciąży</button>
+              onClick={() => ustawTryb("ciaza")}>{t("Jestem w ciąży")}</button>
             <button type="button" className={`btn ${urodzone ? "btn-primary" : "btn-ghost"}`} aria-pressed={urodzone}
               onClick={() => ustawTryb("urodzone")}>Dziecko już się urodziło</button>
-          </div>
+        </div>
         </fieldset>
         {urodzone ? (
           <div className={style.dwieDaty}>
-            <DataPole label="Data porodu" value={stan.dataPorodu ?? ""}
-              hint="Terminy po porodzie przeliczą się od tej daty." onChange={value => ustawDate("dataPorodu", value)} />
-            <DataPole label="Data wypisu ze szpitala" value={stan.dataWypisu ?? ""}
+            <DataPole label={t("Data porodu")} value={stan.dataPorodu ?? ""}
+              hint={t("Terminy po porodzie przeliczą się od tej daty.")} onChange={value => ustawDate("dataPorodu", value)} />
+            <DataPole label={t("Data wypisu ze szpitala")} value={stan.dataWypisu ?? ""}
               hint={`Bez tej daty przyjmujemy wypis ${pobyt} ${pobyt === 1 ? "dzień" : "dni"} po porodzie.`}
               onChange={value => ustawDate("dataWypisu", value)} />
           </div>
@@ -546,26 +564,26 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
           </div>
         )}
         <details open={pokazWarunki} onToggle={e => setPokazWarunki(e.currentTarget.open)}>
-          <summary>Czy lekarz powiedział Ci, że…?</summary>
-          <p className="muted">Zaznacz to, co Cię dotyczy, aby zobaczyć dodatkowe pozycje w kalendarzu.</p>
+          <summary>{t("Czy lekarz powiedział Ci, że…?")}</summary>
+          <p className="muted">{t("Zaznacz to, co Cię dotyczy, aby zobaczyć dodatkowe pozycje w kalendarzu.")}</p>
           {warunkiBazy.map(w => (
             <label className={`check ${style.warunek}`} key={w.id}>
               <input type="checkbox" checked={warunki.includes(w.id)} onChange={e => aktualizuj({
                 ...stan, warunki: e.target.checked ? [...warunki, w.id] : warunki.filter(id => id !== w.id),
               })} />
-              <span>{w.etykieta}{w.pomoc && <small>{w.pomoc}</small>}</span>
+              <span>{t(w.etykieta)}{w.pomoc && <small>{t(w.pomoc)}</small>}</span>
             </label>
           ))}
         </details>
         {(niepoprawneDaty.length > 0 || wypisZaWczesnie) && (
           <p id="kalendarz-blad" role="alert" className={style.blad}>
-            {niepoprawneDaty.length ? "Sprawdź rok we wpisanej dacie."
+            {t(niepoprawneDaty.length ? "Sprawdź rok we wpisanej dacie."
               : dataPorodu ? "Data wypisu nie może być wcześniejsza niż data porodu."
-              : "Jeśli dziecko urodziło się przed planowanym terminem, wpisz datę porodu przed datą wypisu."}
+              : "Jeśli dziecko urodziło się przed planowanym terminem, wpisz datę porodu przed datą wypisu.")}
           </p>
         )}
         <button type="button" className={`btn btn-ghost ${style.wyczysc}`}
-          onClick={() => aktualizuj({ tryb, terminPorodu: "", warunki: [] })}>Wyczyść formularz</button>
+          onClick={() => aktualizuj({ tryb, terminPorodu: "", warunki: [] })}>{t("Wyczyść formularz")}</button>
       </form>
       {wynik && <Os wynik={wynik} dzis={dzis} plan={plan} parametry={parametry}
         zrobione={zrobione} onZrobione={przelacz} onOtworz={setPanel} />}
@@ -575,24 +593,26 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
 }
 
 export default function Kalendarz({ parametry }: { parametry: Parametry }) {
+  const t = useT();
+  const { dni } = useFormaty();
   const pobytZalozony = baza.zalozenia?.pobyt_w_szpitalu_dni ?? 0;
   const { sesja, gotowa } = useSesja();
   return (
     <div className={style.kalendarz} onClickCapture={odslon}>
-      <h1>Kalendarz ciąży i połogu</h1>
-      <p className={style.wstep}>Informacje są ogólne i nie zastępują wizyty u lekarza lub położnej.</p>
+      <h1>{t("Kalendarz ciąży i połogu")}</h1>
+      <p className={style.wstep}>{t("Informacje są ogólne i nie zastępują wizyty u lekarza lub położnej.")}</p>
       {gotowa && <FormularzKalendarza key={sesja?.personaId ?? "gosc"} personaId={sesja?.personaId} parametry={parametry} />}
       <section className={style.ograniczenia} aria-labelledby="kalendarz-ograniczenia">
-        <h2 id="kalendarz-ograniczenia">Podstawa i ograniczenia</h2>
+        <h2 id="kalendarz-ograniczenia">{t("Podstawa i ograniczenia")}</h2>
         <details className={style.zwijane}>
         <summary>Pokaż, na czym opiera się kalendarz</summary>
         <ul>
-          <li>Wizyta położnej po wypisie ze szpitala: przepis liczy 48 godzin bez sobót, niedziel i świąt. Kalendarz liczy zwykłe dni, więc koniec tego terminu może wypaść wcześniej.</li>
-          <li>Zdanie „Gdy pominiesz termin” to ogólne wyjaśnienie, a nie zapis przepisu. Co w Twoim przypadku oznacza pominięcie badania, sprawdź u lekarza prowadzącego.</li>
-          <li>Gdy nie podasz daty wypisu, przyjmujemy {pobytZalozony} {pobytZalozony === 1 ? "dzień" : "dni"} pobytu w szpitalu. Przepisy nie określają tej wartości, więc wpisz prawdziwą datę wypisu, aby terminy przeliczyły się dokładnie.</li>
-          <li>Szczepienia i bilanse dziecka są według programu szczepień na 2026 i 2027 rok. Program zmienia się co roku.</li>
-          <li>Standard opieki okołoporodowej w obecnym brzmieniu obowiązuje od 7 maja 2026. Przy ciąży prowadzonej wcześniej część badań mogła być inna, na przykład różyczka, konsultacja lekarza, cytologia i test cukru między 24. a 26. tygodniem.</li>
-          <li>Test potrójny (badanie krwi między 14. a 20. tygodniem) opisujemy na podstawie opracowań. Sam standard każe poinformować o badaniach genetycznych.</li>
+          <li>{t("Wizyta położnej po wypisie ze szpitala: przepis liczy 48 godzin bez sobót, niedziel i świąt. Kalendarz liczy zwykłe dni, więc koniec tego terminu może wypaść wcześniej.")}</li>
+          <li>{t("Zdanie „Gdy pominiesz termin” to ogólne wyjaśnienie, a nie zapis przepisu. Co w Twoim przypadku oznacza pominięcie badania, sprawdź u lekarza prowadzącego.")}</li>
+          <li>{t("Gdy nie podasz daty wypisu, przyjmujemy {dni} pobytu w szpitalu. Przepisy nie określają tej wartości, więc wpisz prawdziwą datę wypisu, aby terminy przeliczyły się dokładnie.", { dni: dni(pobytZalozony) })}</li>
+          <li>{t("Szczepienia i bilanse dziecka są według programu szczepień na 2026 i 2027 rok. Program zmienia się co roku.")}</li>
+          <li>{t("Standard opieki okołoporodowej w obecnym brzmieniu obowiązuje od 7 maja 2026. Przy ciąży prowadzonej wcześniej część badań mogła być inna, na przykład różyczka, konsultacja lekarza, cytologia i test cukru między 24. a 26. tygodniem.")}</li>
+          <li>{t("Test potrójny (badanie krwi między 14. a 20. tygodniem) opisujemy na podstawie opracowań. Sam standard każe poinformować o badaniach genetycznych.")}</li>
         </ul>
         </details>
       </section>

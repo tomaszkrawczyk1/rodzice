@@ -1,5 +1,6 @@
 import { KOLORY, RODZAJE, dataPL } from "@/lib/format";
 import css from "./timeline.module.css";
+import { useFormaty, useT } from "@/lib/jezyk";
 
 export interface OkresT { rodzaj: string; kto: string; od: string; do: string; dni: number; kwota?: number }
 const MS = 86400000;
@@ -26,6 +27,11 @@ function tekstNa(tlo: string) {
 const tylkoCzytnik = { position: "absolute", width: 1, height: 1, overflow: "hidden", clipPath: "inset(50%)", margin: 0, padding: 0, listStyle: "none" } as const;
 
 export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]; start?: string; etykiety?: Record<string, string> }) {
+  const { dataPL, dni } = useFormaty();
+  const tr = useT();
+  const nazwaRodzaju = (r: string) => tr(RODZAJE[r] ?? "Okres zasiłku");
+  // Na pasku mieści się tylko krótka nazwa: „Urlop macierzyński" skracamy do „macierzyński".
+  const krotkaNazwa = (r: string) => (RODZAJE[r] ? tr(RODZAJE[r].replace("Urlop ", "")) : undefined);
   if (!okresy.length) return null;
   const min = Math.min(...okresy.map((o) => t(o.od)), start ? t(start) : Infinity);
   const max = Math.max(...okresy.map((o) => t(o.do))) + MS;
@@ -44,9 +50,9 @@ export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]
   return (
     <div className={css.tl}>
       {/* Wersja dla czytników ekranu: lista okresów zamiast grafiki. */}
-      <ul style={tylkoCzytnik} aria-label="Okresy urlopów i zasiłków">
+      <ul style={tylkoCzytnik} aria-label={tr("Okresy urlopów i zasiłków")}>
         {okresy.map((o, i) => (
-          <li key={i}>{nazwaKto(o.kto)}: {RODZAJE[o.rodzaj] ?? "Okres zasiłku"}, {dataPL(o.od)} – {dataPL(o.do)} ({o.dni} dni)</li>
+          <li key={i}>{nazwaKto(o.kto)}: {nazwaRodzaju(o.rodzaj)}, {dataPL(o.od)} – {dataPL(o.do)} ({dni(o.dni)})</li>
         ))}
       </ul>
       <div aria-hidden="true">

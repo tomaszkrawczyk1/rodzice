@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { kanoniczny } from "@/lib/adres-serwisu";
+import { tZSerwera } from "@/i18n/serwer";
 
 // /formularze („Wnioski i druki") to strona wyboru (kafelki); sama instrukcja wypełniania druków jest pod /druki, więc to nie duplikaty.
 export const metadata: Metadata = {
@@ -17,13 +18,14 @@ const POZYCJE = [
   { href: "/dokumenty", tytul: "Kto wypłaca zasiłek", opis: "ZUS czy pracodawca? Gdzie złożyć wniosek i ile masz na to czasu." },
 ];
 
-export default function Formularze() {
+export default async function Formularze() {
+  const t = await tZSerwera();
   return (
     <>
       <h1>Wnioski i druki</h1>
       <p className="lead">Wybierz, co chcesz zrobić z papierami. Nie wiesz, od czego zacząć? Otwórz <Link href="/sprawy">sprawy krok po kroku</Link>: podpowiemy, który formularz będzie Ci potrzebny.</p>
       <div className="grid g2">
-        {POZYCJE.map((p) => <Link key={p.href} href={p.href} className="tile"><b>{p.tytul}</b><span>{p.opis}</span></Link>)}
+        {POZYCJE.map((p) => <Link key={p.href} href={p.href} className="tile"><b>{t(p.tytul)}</b><span>{t(p.opis)}</span></Link>)}
       </div>
     </>
   );

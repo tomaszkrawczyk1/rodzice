@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useJezyk } from "@/lib/jezyk";
+import { pytanieWJezyku } from "@/content/poradnik-i18n";
+import type { Pytanie } from "@/content/poradnik";
+import { naPolskieZapytanie } from "@/lib/szukaj-jezyki";
 import { PYTANIA } from "@/content/poradnik";
 import { szukajLuzno, maSens } from "@/lib/szukaj";
 import { trafienia, type Rekord } from "@/lib/indeks-szukaj";
@@ -24,6 +28,7 @@ const PODPOWIEDZ_BEZ_SLOW = "Nie rozpoznaliśmy w tym tekście słów do wyszuka
  * wariant "glowny": duże pole na górze strony głównej; wejście na `/#zapytaj` przenosi do niego fokus.
  */
 export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "karta" | "glowny"; zapytanie?: string }) {
+  const { t, jezyk } = useJezyk();
   const zAdresem = zapytanie !== undefined;
   const [q, setQ] = useState(zapytanie ?? "");
   const [puste, setPuste] = useState(false);
@@ -74,14 +79,15 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
     setPuste(!fraza);
     // Wpis historii dopiero przy wysłaniu, nie przy każdym znaku. Puste pole zdejmuje `q` z adresu (wyniki znikają, więc „Wstecz" je przywraca).
     if (zAdresem) przejdzKrok({ q: fraza || null });
-    if (!maSens(fraza) && !trafienia(fraza, 1).length) pole.current?.focus();
+    if (!maSens(naPolskieZapytanie(fraza, jezyk)) && !trafienia(fraza, 1, undefined, jezyk, t).length) pole.current?.focus();
   }
 
   // Wyniki liczą się od razu, przy każdym znaku (lokalnie, bez opóźnienia). Enter i przykłady dodatkowo zapisują `?q=` w adresie.
   const tekst = normalizujZapytanie(q);
-  const wyniki = tekst && maSens(tekst) ? szukajLuzno(tekst, PYTANIA) : null;
+  const tekstPL = naPolskieZapytanie(tekst, jezyk);   // w EN i UK słowa kluczowe zamieniamy na polskie, bo silnik spraw zna tylko polski
+  const wyniki = tekst && maSens(tekstPL) ? szukajLuzno(tekstPL, PYTANIA) : null;
   const pewny = !!wyniki && wyniki.sprawy.length > 0;
-  const nowe = tekst ? trafienia(tekst, 3, pewny ? ["wynik", "druk", "strona"] : undefined) : [];
+  const nowe = tekst ? trafienia(tekstPL === tekst ? tekst : `${tekst} ${tekstPL}`, 3, pewny ? ["wynik", "druk", "strona"] : undefined, jezyk, t) : [];
   const brak = !!wyniki && !pewny && !nowe.length;
   const bezSlow = tekst.length >= 2 && !wyniki && !nowe.length;
   const komunikat = puste && !tekst ? PODPOWIEDZ_PUSTE : bezSlow ? PODPOWIEDZ_BEZ_SLOW : "";
@@ -93,8 +99,8 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
   return (
     <section className={"ask " + (glowny ? "ask--glowny" : "mt")} id="zapytaj" aria-labelledby="zq" ref={sekcja}>
       {glowny
-        ? <h2 id="zq">Opisz sprawę własnymi słowami</h2>
-        : <h3 id="zq">Nie widzisz swojej sprawy? Opisz ją własnymi słowami</h3>}
+        ? <h2 id="zq">{t("Opisz sprawę własnymi słowami")}</h2>
+        : <h3 id="zq">{t("Nie widzisz swojej sprawy? Opisz ją własnymi słowami")}</h3>}
       <form className={"row search" + (glowny ? " search--duze" : "")} role="search" onSubmit={(e) => { e.preventDefault(); wyslij(q); }}>
         <div className="search__box">
           <Lupa />
@@ -106,19 +112,19 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
             maxLength={MAKS_ZAPYTANIA}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="np. zasiłek po porodzie, urlop u pracodawcy"
-            aria-label="Opisz, co chcesz załatwić"
+            placeholder={t("np. zasiłek po porodzie, urlop u pracodawcy")}
+            aria-label={t("Opisz, co chcesz załatwić")}
             aria-invalid={komunikat ? true : undefined}
             aria-describedby={komunikat ? "zq-komunikat" : undefined}
           />
         </div>
-        <button className="btn btn-szukaj">Znajdź sprawę</button>
+        <button className="btn btn-szukaj">{t("Znajdź sprawę")}</button>
       </form>
       <p className="small muted ask__przyklady">
-        Przykłady:{" "}
+        {t("Przykłady:")}{" "}
         {PRZYKLADY.map((p) => (
           <button key={p} type="button" className="chip" onClick={() => wyslij(p)}>
-            {p}
+            {t(p)}
           </button>
         ))}
       </p>
@@ -128,12 +134,12 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
         <div className="mt">
           {nowe.length > 0 && (
             <>
-              <b>Najlepsze trafienia:</b>
+              <b>{t("Najlepsze trafienia:")}</b>
               <div className="grid g3 mt">
                 {nowe.map((r) => (
                   <Link key={r.rodzaj + r.id} href={r.href} className="tile tile--ico">
                     <Plakietka nazwa={ikonaRekordu(r)} />
-                    <span className="tile__txt"><b>{r.tytul}</b><span>{r.opis}</span></span>
+                    <span className="tile__txt"><b>{t(r.tytul)}</b><span>{t(r.opis)}</span></span>
                   </Link>
                 ))}
               </div>
@@ -163,12 +169,12 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
           )}
           {wyniki && wyniki.sprawy.length > 0 && (
             <>
-              <b>Pasujące sprawy:</b>
+              <b>{t("Pasujące sprawy:")}</b>
               <div className="grid g3 mt">
                 {wyniki.sprawy.map((s) => (
                   <Link key={s.id} href={`/sprawa/${s.id}`} className="tile tile--ico">
                     <Plakietka nazwa={ikonaSprawy(s.id)} />
-                    <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
+                    <span className="tile__txt"><b>{t(s.tytul)}</b><span>{t(s.krotko)}</span></span>
                   </Link>
                 ))}
               </div>
@@ -176,11 +182,11 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
           )}
           {wyniki && wyniki.faq.length > 0 && (
             <>
-              <p className="mt"><b>Pytania i odpowiedzi z poradnika:</b></p>
+              <p className="mt"><b>{t("Pytania i odpowiedzi z poradnika:")}</b></p>
               <ul className="clean">
                 {wyniki.faq.map((f) => (
                   <li key={f.id}>
-                    <Link href={`/poradnik#${f.id}`}>{f.pytanie}</Link> <StatusBadge s={f.status} />
+                    <Link href={`/poradnik#${f.id}`}>{pytanieWJezyku(f as Pytanie, jezyk).pytanie}</Link> <StatusBadge s={f.status} />
                   </li>
                 ))}
               </ul>
@@ -197,13 +203,13 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
               <p className="small muted mt">
                 Jeśli nic tu nie pasuje, możesz zapytać konsultanta ZUS:{" "}
                 <Link href="/pue">napisz przez konto PUE / eZUS</Link>.
-              </p>
+            </p>
             </>
           )}
         </div>
       )}
       {(wyniki || nowe.length > 0) && <p className="small muted ask__nota">
-        Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.
+        {t("Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.")}
       </p>}
     </section>
   );

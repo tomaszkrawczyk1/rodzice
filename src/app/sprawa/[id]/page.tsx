@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SprawaWidok from "@/components/Sprawa";
 import { SPRAWY, sprawa } from "@/lib/sprawy";
+import { tZSerwera } from "@/i18n/serwer";
 
 export const generateStaticParams = () => SPRAWY.map((s) => ({ id: s.id }));
 
@@ -12,11 +13,13 @@ export const dynamicParams = false;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return { title: `${sprawa(id)?.tytul ?? "Sprawa"} – Przewodnik Przyszłego Rodzica` };
+  const t = await tZSerwera();
+  return { title: `${t(sprawa(id)?.tytul ?? "Sprawa")} – ${t("Przewodnik Przyszłego Rodzica")}` };
 }
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const t = await tZSerwera();
   const s = sprawa(id);
   if (!s) notFound();
   // Treść sprawy (tytuł, wprowadzenie, pierwsze pytanie) renderuje się na serwerze w SprawaWidok, bo dla gościa nie
@@ -24,12 +27,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const wstepny = s.pytania.length ? undefined : await s.licz({}, {}, async () => { throw new Error("Brak API na serwerze"); }).catch(() => undefined);
   return (
     <div className="zus-layout">
-      <nav className="zus-side" aria-label="Sprawy">
-        <p className="zus-side__h">Sprawy</p>
+      <nav className="zus-side" aria-label={t("Sprawy")}>
+        <p className="zus-side__h">{t("Sprawy")}</p>
         <ul>
           {SPRAWY.map((s) => (
             <li key={s.id} className={s.id === id ? "on" : undefined}>
-              <Link href={`/sprawa/${s.id}`} aria-current={s.id === id ? "page" : undefined}>{s.tytul}</Link>
+              <Link href={`/sprawa/${s.id}`} aria-current={s.id === id ? "page" : undefined}>{t(s.tytul)}</Link>
             </li>
           ))}
         </ul>

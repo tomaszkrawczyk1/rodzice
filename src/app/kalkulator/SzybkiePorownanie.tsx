@@ -7,6 +7,7 @@ import { Pole } from "@/components/Pole";
 import { num, standard, usredniony, niezbywalne, T } from "./stale";
 import { etykietaKwoty, podpowiedzKwoty, PoleRodzaju, useProfilZus, OPIS_NETTO, opisPoroduMnogiego, type Rodzaj } from "./zarobki";
 import css from "./kalkulator.module.css";
+import { useFormaty } from "@/lib/jezyk";
 
 type Wynik = {
   podstawaMiesieczna: number; tygodnieRazem: number; etapy: EtapPorownania[];
@@ -30,6 +31,7 @@ function Kwoty({ brutto, netto }: { brutto: number; netto: number | null }) {
  * Bez dat i bez kreatora. Przycisk przenosi wpisane dane do pełnego kalkulatora.
  */
 export default function SzybkiePorownanie({ onPelny }: { onPelny: (d: DaneWstepne) => void }) {
+  const { liczba } = useFormaty();
   const id = useId();
   const profil = useProfilZus("");
   const [rodzaj, setRodzaj] = useState<Rodzaj>("umowa_o_prace");
@@ -92,7 +94,7 @@ export default function SzybkiePorownanie({ onPelny }: { onPelny: (d: DaneWstepn
           <div className="tbl-wrap">
             <table className={`tbl ${css.tabelaPorownania}`}>
               <caption className="vh">Miesięczne wypłaty zasiłku w dwóch wariantach</caption>
-              <thead><tr><th scope="col">Okres</th><th scope="col">Standardowy ({standard})</th><th scope="col">Uśredniony ({usredniony})</th></tr></thead>
+              <thead><tr><th scope="col">Okres</th><th scope="col">Standardowy ({standard(liczba)})</th><th scope="col">Uśredniony ({usredniony(liczba)})</th></tr></thead>
               <tbody>
                 {wynik.etapy.map((e) => (
                   <tr key={e.etap}>
