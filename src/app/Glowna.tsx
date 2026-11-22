@@ -13,14 +13,38 @@ import { przejdzDoKroku } from "@/lib/ekran";
 import { przejdzKrok, wrocDoKroku } from "@/lib/adres-kroku";
 import { ETAP_W_ADRESIE, etapZAdresu, normalizujZapytanie } from "@/lib/adres-glowna";
 import { najpilniejsze, sprawa, zaIle, type Moment } from "@/lib/sprawy";
+import css from "./glowna.module.css";
 
+// `sprawy` dotyczą każdej rodziny (także samotnych rodziców); `zDrugimRodzicem` są niżej, w osobnej, neutralnie nazwanej sekcji.
 const MOMENTY = {
-  plan: { tytul: "Planuję dziecko", opis: "Ubezpieczenie i urlop", sprawy: ["co-przysluguje", "podzial-urlopu"] },
-  ciaza: { tytul: "Czekamy na dziecko", opis: "Zwolnienie, urlopy, wnioski", sprawy: ["co-przysluguje", "podzial-urlopu", "wniosek-zasilek", "zwolnienie-ciaza"] },
-  dziecko: { tytul: "Dziecko już jest z nami", opis: "Zasiłek, urlopy, terminy", sprawy: ["wniosek-zasilek", "urlop-pracodawca", "podzial-urlopu", "terminy"] },
-} satisfies Record<Moment, { tytul: string; opis: string; sprawy: string[] }>;
-// „Dziecko już jest z nami" jest pierwsze i wyróżnione: kto jest po porodzie, ma najmniej sił i najkrótszy czas na wnioski.
-const KOLEJNOSC: Moment[] = ["dziecko", "ciaza", "plan"];
+  plan: { tytul: "Planuję dziecko", opis: "Ubezpieczenie i urlop", sprawy: ["co-przysluguje"], zDrugimRodzicem: ["podzial-urlopu"] },
+  ciaza: { tytul: "Czekamy na dziecko", opis: "Zwolnienie, urlopy, wnioski", sprawy: ["co-przysluguje", "zwolnienie-ciaza", "wniosek-zasilek"], zDrugimRodzicem: ["podzial-urlopu"] },
+  dziecko: { tytul: "Dziecko już jest z nami", opis: "Zasiłek, urlopy, terminy", sprawy: ["wniosek-zasilek", "terminy", "urlop-pracodawca"], zDrugimRodzicem: ["podzial-urlopu"] },
+} satisfies Record<Moment, { tytul: string; opis: string; sprawy: string[]; zDrugimRodzicem: string[] }>;
+// Dwa główne etapy są równorzędne i stoją obok siebie na pierwszym ekranie (także na telefonie), w kolejności życia.
+const GLOWNE_ETAPY: Moment[] = ["ciaza", "dziecko"];
+
+/** Kafel-link, który od razu po kliknięciu pokazuje „Otwieram…” (nowa strona ładuje się chwilę później). */
+function Kafel({ href, ikona, tytul, opis }: { href: string; ikona: string; tytul: string; opis: string }) {
+  const [otwieram, setOtwieram] = useState(false);
+  return (
+    <Link
+      href={href}
+      className={"tile tile--ico " + css.kafel}
+      aria-busy={otwieram || undefined}
+      onClick={(e) => {
+        // Otwarcie w nowej karcie (Ctrl/Cmd/Shift, środkowy przycisk) nie zmienia tej strony, więc bez „Otwieram…”.
+        if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0)) setOtwieram(true);
+      }}
+    >
+      <Plakietka nazwa={ikona} />
+      <span className="tile__txt">
+        <b>{tytul}</b><span>{opis}</span>
+        {otwieram && <span className={css.otwieram} role="status">Otwieram…</span>}
+      </span>
+    </Link>
+  );
+}
 
 type Dane = {
   u: { dniNieprzerwanegoUbezpieczeniaChorobowego: number; ubezpieczenie: UbezpieczenieProfilu[] };
@@ -86,6 +110,8 @@ export default function Home() {
   const [moment, setMoment] = useState<Moment | null>(etapZAdresuUrl);
   useEffect(() => { setMoment(etapZAdresuUrl); }, [etapZAdresuUrl]);
   const etapy = useRef<HTMLHeadingElement>(null);
+  const gora = useRef<HTMLElement>(null);
+  const widokEtapu = useRef<HTMLDivElement>(null);
   const poprzedni = useRef(moment);
 
   function wybierzEtap(wybrany: Moment) {
@@ -99,10 +125,11 @@ export default function Home() {
   }
 
   // Po każdej zmianie etapu (kliknięcie, „Wróć", „Wstecz" w przeglądarce) fokus ląduje na nagłówku nowego ekranu.
+  // Przewijamy do początku widoku etapu (razem z przyciskiem „Wróć" nad nagłówkiem), a przy powrocie: na górę strony.
   useEffect(() => {
     if (poprzedni.current === moment) return;
     poprzedni.current = moment;
-    przejdzDoKroku(etapy.current, etapy.current);
+    przejdzDoKroku(moment ? widokEtapu.current : gora.current, etapy.current);
   }, [moment]);
   const [pilnaSprawa, setPilnaSprawa] = useState<{ token: string; termin: Awaited<ReturnType<typeof najpilniejsze>> } | null>(null);
   const pilne = sesja && pilnaSprawa?.token === sesja.token ? pilnaSprawa.termin : null;
@@ -116,85 +143,107 @@ export default function Home() {
     return () => { aktualne = false; };
   }, [sesja]);
 
+  const kafleSpraw = (ids: string[]) => ids.map((id) => {
+    const s = sprawa(id);
+    return s && <Kafel key={id} href={`/sprawa/${id}`} ikona={ikonaSprawy(id)} tytul={s.tytul} opis={s.krotko} />;
+  });
+
   return (
     <>
-      <section className="hero">
+      <section className="hero" ref={gora}>
         <h1>Co chcesz dzisiaj załatwić?</h1>
-        <p>Wybierz sytuację albo opisz sprawę swoimi słowami. Bez logowania.</p>
+        <p className={css.podtytul}><b>Dla osób w ciąży i rodziców po porodzie.</b> Bezpłatnie, bez logowania.</p>
       </section>
-
-      {/* Wyszukiwarka jest pierwszą rzeczą po tytule: kto wie, czego szuka, nie musi przechodzić przez kafle. */}
-      <Szukaj wariant="glowny" zapytanie={zapytanie} />
-
-      {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
-      {(
-        <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
-          {sesja && (pilne ? (
-            <section className="card urgent mb" style={{ overflowWrap: "anywhere" }}>
-              <h2>Najbliższy termin z profilu</h2>
-              <p>{opisTerminu(pilne.co)}</p>
-              <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
-              <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
-            </section>
-          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
-        </div>
-      )}
 
       {!moment ? (
         <>
-          <h2 ref={etapy} tabIndex={-1}>Na jakim jesteście etapie?</h2>
-          <div className="grid g3 grid--etapy">
-            {KOLEJNOSC.map((id) => (
-              <button key={id} type="button" className={"tile tile--ico" + (id === "dziecko" ? " tile--glowny" : "")} onClick={() => wybierzEtap(id)}>
+          {/* Oba etapy na pierwszym ekranie, równorzędne; pod nimi dyskretne skróty, a wyszukiwarka niżej. */}
+          <h2 ref={etapy} tabIndex={-1} className={css.etapyNaglowek}>Na jakim jesteście etapie?</h2>
+          <div className={css.etapy}>
+            {GLOWNE_ETAPY.map((id) => (
+              <button key={id} type="button" className={"tile " + css.etap} onClick={() => wybierzEtap(id)}>
                 <Plakietka nazwa={id} />
-                <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span>{MOMENTY[id].opis}</span></span>
+                <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span className={css.etapOpis}>{MOMENTY[id].opis}</span></span>
               </button>
             ))}
-            <Link href="/kalendarz" className="tile tile--ico">
-              <Plakietka nazwa="kalendarz" />
-              <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania i terminy ZUS w jednym miejscu</span></span>
-            </Link>
-            <Link href="/sprawa/adopcja" className="tile tile--ico">
-              <Plakietka nazwa="adopcja" />
-              <span className="tile__txt"><b>Adopcja lub rodzina zastępcza</b><span>Urlopy i zasiłek po przyjęciu dziecka</span></span>
-            </Link>
-            <Link href="/trudne" className="tile tile--ico tile--szeroki">
-              <Plakietka nazwa="trudne" />
-              <span className="tile__txt"><b>Trudna sytuacja</b><span>Strata, wcześniactwo, choroba</span></span>
-            </Link>
           </div>
+          <ul className={css.skroty} aria-label="Na skróty">
+            <li><Link href="/kalkulator" className={css.skrot}>Kalkulator zasiłku</Link></li>
+            <li><Link href="/trudne" className={css.skrot}>Pomoc w trudnej sytuacji</Link></li>
+          </ul>
         </>
       ) : (
-        <>
-          <button type="button" className="btn btn-ghost" onClick={wrocDoWyboru}>Wróć do wyboru etapu</button>
-          <h2 className="mt" ref={etapy} tabIndex={-1}>{MOMENTY[moment].tytul}</h2>
+        <div ref={widokEtapu}>
+          {/* Pasek przyklejony pod nagłówkiem strony: „Wróć" jest pod ręką także po przewinięciu listy spraw. */}
+          <div className={css.pasekWroc}>
+            <button type="button" className={"btn btn-ghost " + css.wroc} onClick={wrocDoWyboru}>← Wróć do wyboru etapu</button>
+          </div>
+          <h2 ref={etapy} tabIndex={-1}>{MOMENTY[moment].tytul}</h2>
+
+          {moment === "dziecko" && (
+            <section className={"card urgent " + css.pilne} aria-labelledby="pilne-po-porodzie">
+              <h3 id="pilne-po-porodzie">Pilne po porodzie: wniosek o zasiłek macierzyński</h3>
+              <p>
+                Jeśli chcesz dostawać <b>co miesiąc tyle samo (81,5%)</b> przez cały urlop macierzyński i rodzicielski,
+                złóż wniosek o oba urlopy <b>w ciągu 21 dni od porodu</b>.
+              </p>
+              <p className={css.uspokojenie}>
+                Minęło już 21 dni? Spokojnie, zasiłek nie przepada. Dostaniesz wtedy 100% za urlop macierzyński
+                i 70% za urlop rodzicielski.
+              </p>
+              <Link href="/sprawa/wniosek-zasilek" className="btn btn-primary">Złóż wniosek krok po kroku</Link>
+            </section>
+          )}
+
           <div className="grid g3">
-            {MOMENTY[moment].sprawy.map((id) => {
-              const s = sprawa(id);
-              return s && <Link key={id} href={`/sprawa/${id}`} className="tile tile--ico">
-                <Plakietka nazwa={ikonaSprawy(id)} />
-                <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
-              </Link>;
-            })}
-            <Link href="/kreator?sciezka=ojciec" className="tile tile--ico">
-              <Plakietka nazwa="rodzina" />
-              <span className="tile__txt"><b>Urlopy dla taty i drugiego rodzica</b><span>Urlop ojcowski i podział urlopu</span></span>
-            </Link>
+            {kafleSpraw(MOMENTY[moment].sprawy)}
             {(moment === "ciaza" || moment === "dziecko") && (
-              <Link href="/kalendarz" className="tile tile--ico">
-                <Plakietka nazwa="kalendarz" />
-                <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania i terminy ZUS w jednym miejscu</span></span>
-              </Link>
+              <Kafel href="/kalendarz" ikona="kalendarz" tytul="Kalendarz ciąży i połogu" opis="Badania i terminy ZUS w jednym miejscu" />
             )}
             {moment === "plan" && (
-              <Link href="/ryzyka" className="tile tile--ico">
-                <Plakietka nazwa="praca" />
-                <span className="tile__txt"><b>Ubezpieczenie i ochrona w pracy</b><span>Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę</span></span>
-              </Link>
+              <Kafel href="/ryzyka" ikona="praca" tytul="Ubezpieczenie i ochrona w pracy" opis="Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę" />
             )}
           </div>
+
+          <h3 className={css.podsekcja}>Jeśli wychowujesz dziecko z drugim rodzicem</h3>
+          <p className={"muted " + css.podsekcjaOpis}>Urlop ojcowski, część urlopu rodzicielskiego dla drugiego rodzica i to, jak go podzielić.</p>
+          <div className="grid g3">
+            <Kafel href="/kreator?sciezka=ojciec" ikona="rodzina" tytul="Urlopy dla taty i drugiego rodzica" opis="Urlop ojcowski i podział urlopu" />
+            {kafleSpraw(MOMENTY[moment].zDrugimRodzicem)}
+          </div>
+
           <p className="mt"><Link href="/sprawy" className="btn btn-secondary">Zobacz wszystkie sprawy</Link></p>
-        </>
+        </div>
+      )}
+
+      {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
+      <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
+        {sesja && (pilne ? (
+          <section className="card urgent mb mt" style={{ overflowWrap: "anywhere" }}>
+            <h2>Najbliższy termin z profilu</h2>
+            <p>{opisTerminu(pilne.co)}</p>
+            <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
+            <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
+          </section>
+        ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
+      </div>
+
+      {/* Kto wie, czego szuka, wpisuje to swoimi słowami; wyszukiwarka nie wypycha już etapów poza pierwszy ekran. */}
+      <Szukaj wariant="glowny" zapytanie={zapytanie} />
+
+      {!moment && (
+        <section className={css.inne} aria-labelledby="inne-sytuacje">
+          <h2 id="inne-sytuacje" className={css.inneNaglowek}>Inne sytuacje</h2>
+          <div className="grid g3">
+            <button type="button" className={"tile tile--ico " + css.kafel} onClick={() => wybierzEtap("plan")}>
+              <Plakietka nazwa="plan" />
+              <span className="tile__txt"><b>{MOMENTY.plan.tytul}</b><span>{MOMENTY.plan.opis}</span></span>
+            </button>
+            <Kafel href="/kalendarz" ikona="kalendarz" tytul="Kalendarz ciąży i połogu" opis="Badania i terminy ZUS w jednym miejscu" />
+            <Kafel href="/sprawa/adopcja" ikona="adopcja" tytul="Adopcja lub rodzina zastępcza" opis="Urlopy i zasiłek po przyjęciu dziecka" />
+            <Kafel href="/trudne" ikona="trudne" tytul="Trudna sytuacja" opis="Strata, wcześniactwo, choroba" />
+          </div>
+        </section>
       )}
 
       {sesja && <PodgladProfilu key={sesja.token} pesel={sesja.pesel} />}
