@@ -112,7 +112,7 @@ export default function Wgraj() {
     <>
       <h1>{t("Przetestuj odczyt ze skanu (przykłady)")}</h1>
       <p className="lead">{tb("Tu sprawdzisz, jak aplikacja odczytuje dane z zaświadczenia Z-3 i wniosku ZAM. Najprościej: kliknij **„Odczytaj przykład”** przy jednym z trzech gotowych dokumentów. Mają **fikcyjne dane**. To nie jest składanie wniosku: nic nie trafia do ZUS ani do pracodawcy.")}</p>
-      <Alert t="warn">{tb("**Nie wgrywaj prawdziwych dokumentów.** Możesz też wybrać własny plik, ale to wersja testowa: użyj tylko przykładu albo dokumentu bez prawdziwego numeru PESEL, imienia i nazwiska. Odczyt odbywa się na naszym serwerze, bez zewnętrznych usług. Dokument nie jest zapisywany.")}</Alert>
+      <Alert t="warn">{tb("**Nie wgrywaj prawdziwych dokumentów.** Możesz też wybrać własny plik, ale to wersja testowa: użyj tylko przykładu albo dokumentu bez prawdziwego numeru PESEL, imienia i nazwiska. Odczyt wykonuje zewnętrzny model językowy (DeepSeek V4.1 Flash), do którego wysyłamy treść pliku. Dokument nie jest zapisywany u nas.")}</Alert>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
           <h2>{t("Przykładowe dokumenty")}</h2>
@@ -136,7 +136,7 @@ export default function Wgraj() {
           {err && <Alert t="err">{err}</Alert>}
           {wyn && d && <>
             <div className="card accent"><h2>{t("Dane odczytane z dokumentu")}</h2>
-              <p className="small muted">{t("Źródło odczytu: {zrodla}. Sprawdź pola oznaczone „sprawdź” i popraw, jeśli odczyt jest błędny.", { zrodla: wyn.zrodla?.join(", ") ?? "" })}</p>
+              <p className="small muted">{t("Źródło odczytu: {zrodla}. Sprawdź pola oznaczone „sprawdź” i popraw, jeśli odczyt jest błędny.", { zrodla: wyn.zrodla?.map((z: string) => t(z)).join(", ") ?? "" })}</p>
               {wyn.ostrzezenia?.length > 0 && <Alert t="warn"><ul className="clean">{wyn.ostrzezenia.map((o: string, i: number) => <li key={i}>{t(o)}</li>)}</ul></Alert>}
               <dl className="kv mt">
                 <dt>{t("Rodzaj dokumentu")}</dt><dd>{d.typ_dokumentu === "mieszany" ? t("Kilka rodzajów dokumentów") : d.typ_dokumentu ?? t("nie rozpoznano")}</dd>
@@ -149,7 +149,7 @@ export default function Wgraj() {
                 <Field label="Liczba dzieci"><input inputMode="numeric" autoComplete="off" value={dzieci} onChange={(e) => setDzieci(e.target.value.replace(/\D/g, "").slice(0, 1))} /></Field>
                 <Field label={t("Data porodu lub przyjęcia dziecka")}><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
               </div>
-              {(() => { const brakDaty = wyn.ostrzezenia?.some((o: string) => /daty porodu/.test(o)); const pola = [slabo(p.pesel) && "PESEL", slabo(p.data_zdarzenia) && !brakDaty && "data"].filter(Boolean); return pola.length > 0 && <p className="small muted">Niska pewność odczytu: {pola.join(", ")}. Porównaj z dokumentem.</p>; })()}
+              {(() => { const brakDaty = wyn.ostrzezenia?.some((o: string) => /daty porodu/.test(o)); const pola = [slabo(p.pesel) && "PESEL", slabo(p.data_zdarzenia) && !brakDaty && "data"].filter(Boolean); return pola.length > 0 && <p className="small muted">{t("Niska pewność odczytu: {pola}. Porównaj z dokumentem.", { pola: pola.map((x) => t(String(x))).join(", ") })}</p>; })()}
               <div className="row mt"><button className="btn btn-secondary" onClick={sprawdzUb}>{t("Sprawdź ubezpieczenie (symulacja ZUS)")}</button></div>
             </div>
 

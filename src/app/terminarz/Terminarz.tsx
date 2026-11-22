@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { DataPole } from "@/components/DataPole";
-import { dataPL } from "@/lib/format";
+import { dataPL as dataPLPolska } from "@/lib/format";
 import { api, useSesja, type Sesja } from "@/lib/sesja";
 import type { UbezpieczenieProfilu } from "@/lib/dane-profilu";
 import { buildCalendar, toICS, ROLES, EMPLOYMENT } from "@/lib/terminarz/terminarz.js";
@@ -176,7 +176,7 @@ export default function Terminarz({ parametry }: { parametry: unknown }) {
 }
 
 function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry: unknown }) {
-  const { dni } = useFormaty();
+  const { dni, dataPL } = useFormaty();
   const t = useT();
   const { jezyk } = useJezyk();
   const [zProfilu, setZProfilu] = useState<Partial<Formularz>>({});
@@ -223,13 +223,13 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
     if (!walidacja.wejscie) return { zdarzenia: [] as Wydarzenie[], blad: "" };
     try {
       // Linki z reguł plus puste wzory druków z druki.json (url_zus), gdy reguła nie podaje własnego linku. Trafiają też do pliku .ics.
-      const zdarzenia = buildCalendar(regulyJezyka, walidacja.wejscie, { params: parametry, formatDate: (d: Date) => dataPL(d.toISOString().slice(0, 10)) })
+      const zdarzenia = buildCalendar(regulyJezyka, walidacja.wejscie, { params: parametry, formatDate: (d: Date) => dataPLPolska(d.toISOString().slice(0, 10)) })
         .map((z) => ({ ...z, links: [...z.links, ...linkiDoDrukow(z.forms, z.links, druki, zapasowe).map((l) => ({ ...l, title: t(l.title) }))] }));
       return { zdarzenia, blad: "" };
     } catch {
       return { zdarzenia: [] as Wydarzenie[], blad: t("Nie udało się policzyć terminów. Sprawdź wpisane dane.") };
     }
-  }, [walidacja.wejscie, parametry, regulyJezyka, dataPL, t]);
+  }, [walidacja.wejscie, parametry, regulyJezyka, dataPLPolska, t]);
 
   const zmien = (cz: Partial<Formularz>) => { setFormularz((f) => ({ ...f, ...cz })); setPobrano(false); };
   const zdarzenia = wynik.zdarzenia;
@@ -307,7 +307,7 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
             onClick={() => { wyczyscZapis(magazynProfilu(sesja?.personaId)); setZProfilu({}); setFormularz({ ...PUSTY_FORMULARZ }); setKategoria(""); setOdswiez((n) => n + 1); setPobrano(false); }}>
             {t("Wyczyść dane")}
           </button>
-          <span className={style.prywatnosc}>Dane zostają w tej przeglądarce. Nie wysyłamy ich nigdzie.</span>
+          <span className={style.prywatnosc}>{t("Dane zostają w tej przeglądarce. Nie wysyłamy ich nigdzie.")}</span>
         </div>
       </form>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useT } from "@/lib/jezyk";
 import style from "./panel-boczny.module.css";
 
 /**
@@ -11,6 +12,7 @@ import style from "./panel-boczny.module.css";
 export default function PanelBoczny({ tytul, onZamknij, children }: {
   tytul: string; onZamknij: () => void; children: ReactNode;
 }) {
+  const t = useT();
   const ref = useRef<HTMLDialogElement>(null);
   const idTytulu = useId();
 
@@ -25,7 +27,7 @@ export default function PanelBoczny({ tytul, onZamknij, children }: {
       <div className={style.wnetrze}>
         <div className={style.gora}>
           <h2 id={idTytulu}>{tytul}</h2>
-          <button type="button" className="btn btn-ghost" onClick={() => ref.current?.close()}>Zamknij</button>
+          <button type="button" className="btn btn-ghost" onClick={() => ref.current?.close()}>{t("Zamknij")}</button>
         </div>
         <div className={style.tresc}>{children}</div>
       </div>

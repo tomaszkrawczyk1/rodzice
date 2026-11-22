@@ -103,7 +103,7 @@ export function Kreator({ kroki, krok, maks, onKrok, onWstecz, adres, onDalej, d
   return (
     <div className={css.kreator} ref={blok}>
       <nav aria-label={t("Postęp kalkulatora")} className={css.postep}>
-        <p className={css.licznik}>Krok {krok + 1} z {kroki.length}: <b>{aktualny.nazwa}</b></p>
+        <p className={css.licznik}>{t("Krok {n} z {z}:", { n: krok + 1, z: kroki.length })} <b>{t(aktualny.nazwa)}</b></p>
         {uwaga && <p className={css.uwagaKrokow}>{uwaga}</p>}
         <div className={css.pasek} aria-hidden="true"><div className={css.wypelnienie} style={{ width: `${((krok + 1) / kroki.length) * 100}%` }} /></div>
         <ol className={css.kroki}>

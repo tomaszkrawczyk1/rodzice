@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/sesja";
 import { useFormaty, useT } from "@/lib/jezyk";
 import { Alert } from "@/components/ui";
+import { Wstaw } from "@/components/Wstaw";
 import type { PlanWejscie, PlanWynik, OkresZNetto, PodstawaWynik } from "@/engine/kalkulator";
 import { Pole } from "@/components/Pole";
 import { Kreator, useKreator, type KrokDef } from "./Kreator";
@@ -124,7 +125,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
 
   return (
     <Kreator kroki={KROKI} krok={krok} maks={maks} onKrok={idzDo} onWstecz={wstecz} adres={adres} onDalej={dalej} dalejEtykieta={krok === K.urlopy ? (busy ? "Liczymy zasiłek…" : "Policz zasiłek") : "Dalej"} dalejZablokowany={busy}
-      uwaga="Ta ścieżka ma 4 kroki zamiast 6. Pominęliśmy pytania o urlop mamy i wybór wariantu zasiłku, bo nie dotyczą Twojej sytuacji.">
+      uwaga={t("Ta ścieżka ma 4 kroki zamiast 6. Pominęliśmy pytania o urlop mamy i wybór wariantu zasiłku, bo nie dotyczą Twojej sytuacji.")}>
       <div ref={tresc}>
         {krok === K.sytuacja && <WyborSytuacji wartosc="ojciec" onZmiana={onSytuacja} />}
 
@@ -135,19 +136,19 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
             <Pole label={t("Liczba dzieci przy jednym porodzie")}><select value={dzieci} onChange={(e) => setDzieci(+e.target.value)}>
               {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 5 ? t("5 lub więcej") : n}</option>)}
             </select></Pole>
-            {mnogi && <p className={css.mala} role="status">{mnogi}</p>}
-            <PoleRodzaju label="Twój rodzaj zatrudnienia" rodzaj={rodzaj} onZmiana={(r) => { setRodzaj(r); setRodzajReczny(true); }} zProfilu={!rodzajReczny && !!profil?.rodzaj} />
+            {mnogi && <p className={css.mala} role="status">{t(mnogi)}</p>}
+            <PoleRodzaju label={t("Twój rodzaj zatrudnienia")} rodzaj={rodzaj} onZmiana={(r) => { setRodzaj(r); setRodzajReczny(true); }} zProfilu={!rodzajReczny && !!profil?.rodzaj} />
             <Pole label={etykietaKwoty(rodzaj)} hint={podpowiedzKwoty(rodzaj)} error={maReczna ? undefined : pokaz("podstawa")}>
               <input type="number" inputMode="decimal" min={0} value={brutto} onChange={(e) => setBrutto(e.target.value)} /></Pole>
-            {!maReczna && kwota > 0 && <p className={css.mala}>Podstawa zasiłku: <b>{pln(kwota)}</b> miesięcznie.</p>}
+            {!maReczna && kwota > 0 && <p className={css.mala}><Wstaw tekst={t("Podstawa zasiłku: {kwota} miesięcznie.")} wartosci={{ kwota: <b>{pln(kwota)}</b> }} /></p>}
             {rodzaj === "dzialalnosc" && (
               <>
                 <PoleZadluzenia wartosc={zadl ?? (zadlProfil != null ? String(zadlProfil) : "")} onZmiana={setZadl} zProfilu={zadl === null && zadlProfil != null} />
                 <OstrzezenieZadluzenia kwota={zadluzenie} dzien={data || undefined} zProfilu={zadl === null && zadlProfil != null} />
               </>
             )}
-            <details className="dl" open={maReczna || undefined}><summary>Znam gotową podstawę zasiłku</summary>
-              <p className={css.mala}>Podstawa to kwota po odjęciu składek, od której ZUS liczy zasiłek. Znajdziesz ją w decyzji ZUS albo zapytasz w kadrach. Jeśli ją wpiszesz, kwotę zarobków pomijamy.</p>
+            <details className="dl" open={maReczna || undefined}><summary>{t("Znam gotową podstawę zasiłku")}</summary>
+              <p className={css.mala}>{t("Podstawa to kwota po odjęciu składek, od której ZUS liczy zasiłek. Znajdziesz ją w decyzji ZUS albo zapytasz w kadrach. Jeśli ją wpiszesz, kwotę zarobków pomijamy.")}</p>
               <Pole label="Miesięczna podstawa zasiłku (zł)"><input inputMode="decimal" value={podstawa} onChange={(e) => setPodstawa(e.target.value)} /></Pole>
             </details>
           </>
@@ -173,9 +174,9 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
               {busy && <div className={css.kwota}><p className={css.statusLadowania}><span className="spin" aria-hidden="true" /> {t("Liczymy zasiłek…")}</p></div>}
               {!busy && wynik && (
                 <div className={css.kwota}>
-                  <p className={css.kwotaOpis}>Łącznie: brutto (przed zaliczką na podatek)</p>
+                  <p className={css.kwotaOpis}>{t("Łącznie: brutto (przed zaliczką na podatek)")}</p>
                   <p className={css.kwotaWartosc}>{pln(wynik.okresy.reduce((s, o) => s + o.kwota, 0))}</p>
-                  {wynik.okresy.every((o) => o.kwotaNetto != null) && <p className={css.kwotaNettoDuza}>Na rękę (szacunkowo): <b>{pln(wynik.okresy.reduce((s, o) => s + (o.kwotaNetto ?? 0), 0))}</b></p>}
+                  {wynik.okresy.every((o) => o.kwotaNetto != null) && <p className={css.kwotaNettoDuza}><Wstaw tekst={t("Na rękę (szacunkowo): {kwota}")} wartosci={{ kwota: <b>{pln(wynik.okresy.reduce((s, o) => s + (o.kwotaNetto ?? 0), 0))}</b> }} /></p>}
                 </div>
               )}
             </div>
@@ -191,14 +192,14 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
             {wynik && (
               <>
                 <ul className={css.lista}>{wynik.okresy.map((o, i) => <li key={i}>
-                  <b>{o.rodzaj === "ojcowski" ? "Urlop ojcowski" : "Urlop rodzicielski"}</b>
+                  <b>{t(o.rodzaj === "ojcowski" ? "Urlop ojcowski" : "Urlop rodzicielski")}</b>
                   <div>{dataPL(o.od)} {t("do")} {dataPL(o.do)}</div>
-                  <div>{pln(o.kwota)} brutto ({liczba(o.procent)}% podstawy){o.kwotaNetto != null && <>, na rękę ok. {pln(o.kwotaNetto)}</>}</div>
-                  <div className={css.mala}>Miesięcznie: {pln(o.miesiecznieBrutto)} brutto{o.miesiecznieNetto != null && <>, {pln(o.miesiecznieNetto)} na rękę (szacunkowo)</>}</div>
+                  <div>{t("{kwota} brutto ({proc}% podstawy)", { kwota: pln(o.kwota), proc: liczba(o.procent) })}{o.kwotaNetto != null && <>, {t("na rękę ok. {kwota}", { kwota: pln(o.kwotaNetto) })}</>}</div>
+                  <div className={css.mala}>{t("Miesięcznie: {kwota} brutto", { kwota: pln(o.miesiecznieBrutto) })}{o.miesiecznieNetto != null && <>, {t("{kwota} na rękę (szacunkowo)", { kwota: pln(o.miesiecznieNetto) })}</>}</div>
                 </li>)}</ul>
-                {mnogi && <Alert t="info">{mnogi}</Alert>}
+                {mnogi && <Alert t="info">{t(mnogi)}</Alert>}
                 <OstrzezenieZadluzenia kwota={zadluzenie} dzien={data} zProfilu={zadl === null && zadlProfil != null} />
-                {wynik.okresy.some((o) => o.kwotaNetto != null) && <p className={css.mala}>{OPIS_NETTO}</p>}
+                {wynik.okresy.some((o) => o.kwotaNetto != null) && <p className={css.mala}>{t(OPIS_NETTO)}</p>}
                 {wynik.sprawdz && <Alert t="warn">{t("Wyliczenie uwzględnia podwyższenie do kwoty świadczenia rodzicielskiego. Sprawdź w ZUS, czy dotyczy Twojej sytuacji.")}</Alert>}
               </>
             )}

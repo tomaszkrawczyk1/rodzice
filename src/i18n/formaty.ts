@@ -101,7 +101,8 @@ export function lokalizujZapisy(jezyk: KodJezyka, tekst: string): string {
     .replace(RE_KWOTA, (_, k) => ukryj(f.pln(num(k))))
     .replace(RE_TYGODNIE, (_, n) => ukryj(f.tygodnie(num(n))))
     .replace(RE_DNI, (_, n) => ukryj(f.dni(num(n))));
-  if (jezyk === "en") wynik = wynik.replace(/(?<=\d),(?=\d)/g, ".");
+  // Przecinek tysięcy w gotowej kwocie („6,500.00”) zostaje: ten sam tekst bywa tłumaczony drugi raz.
+  if (jezyk === "en") wynik = wynik.replace(/(?<=\d),(?=\d)(?!\d{3}\.\d)/g, ".");
   return wynik.replace(/\u0000(\d+)\u0000/g, (_, i) => skrytki[+i]);
 }
 

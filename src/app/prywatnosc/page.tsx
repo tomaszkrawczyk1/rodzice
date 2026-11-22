@@ -15,7 +15,7 @@ export default async function Prywatnosc() {
   return (
     <div style={{ maxWidth: 820 }}>
       <h1>{t("Polityka prywatności")}</h1>
-      <p className="lead">{t("W skrócie: nie prosimy o konto, nie śledzimy Cię i nie wysyłamy Twoich danych do firm zewnętrznych. To wersja demonstracyjna z hackathonu HackNation 2026 – działa na danych fikcyjnych.")}</p>
+      <p className="lead">{t("W skrócie: nie prosimy o konto i nie śledzimy Cię. Jedyny wyjątek to odczyt wgranego skanu, który wykonuje zewnętrzny model językowy. To wersja demonstracyjna z hackathonu HackNation 2026 – działa na danych fikcyjnych.")}</p>
 
       <div className="card accent"><h2>{t("Najważniejsze: nie wgrywaj prawdziwych dokumentów")}</h2>
         <p>{tb("To prototyp, a nie usługa ZUS. **Nie wgrywaj prawdziwych zaświadczeń ani wniosków z PESEL-em, adresem czy danymi o zarobkach.** Do sprawdzenia działania użyj przykładowych plików dostępnych na stronie „Odczyt ze skanu (przykłady)”.")}</p></div>
@@ -30,8 +30,8 @@ export default async function Prywatnosc() {
       <div className="card mt"><h2>{t("Gdzie są przetwarzane")}</h2>
         <ul className="clean">
           <li>{tb("**Obliczenia** wykonuje serwer tej aplikacji. Wynik wraca do Twojej przeglądarki. Serwer go nie zapisuje.")}</li>
-          <li>{tb("**Odczyt pliku** też odbywa się na serwerze tej aplikacji – lokalnymi bibliotekami (mupdf i tesseract.js), bez sztucznej inteligencji i bez zewnętrznych usług. Plik nie jest zapisywany na dysku. Po odczycie zostaje odrzucony.")}</li>
-          <li>{tb("**Nie przekazujemy danych** firmom zewnętrznym, reklamodawcom ani ZUS.")}</li>
+          <li>{tb("**Odczyt pliku** wykonuje model językowy z funkcją rozpoznawania obrazu (DeepSeek V4.1 Flash), czyli usługa zewnętrzna. Treść wgranego pliku jest do niej wysyłana tylko po to, żeby odczytać pola dokumentu. U siebie pliku nie zapisujemy, a wynik odczytu zawsze potwierdzasz Ty.")}</li>
+          <li>{tb("**Poza odczytem pliku nie przekazujemy danych** firmom zewnętrznym, reklamodawcom ani ZUS.")}</li>
         </ul></div>
 
       <div className="card mt"><h2>{t("Co zostaje w Twojej przeglądarce")}</h2>

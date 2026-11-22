@@ -44,7 +44,7 @@ export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]
   for (let k = 0; k < 40; k++) { const dt = Date.UTC(y + Math.floor(m / 12), m % 12, 1); if (dt > max) break; ticks.push({ l: `${String((m % 12) + 1).padStart(2, "0")}.${y + Math.floor(m / 12)}`, p: pct(dt) }); m += stepM; }
   const kto = ["matka", "ojciec"].filter((k) => okresy.some((o) => o.kto === k));
   const uzyte = Array.from(new Set(okresy.map((o) => o.rodzaj)));
-  const nazwaKto = (k: string) => etykiety?.[k] ?? (k === "matka" ? "Matka" : "Ojciec");
+  const nazwaKto = (k: string) => etykiety?.[k] ?? tr(k === "matka" ? "Matka" : "Ojciec");
   // Podpis w pasku tylko wtedy, gdy pasek jest dość szeroki; na węższym kontenerze CSS chowa podpisy w krótszych paskach.
   const klasaPaska = (szer: number) => (szer < 16 ? "" : szer < 30 ? css.waski : szer < 45 ? css.sredni : "");
   return (
@@ -68,8 +68,8 @@ export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]
                 const szer = Math.max(((t(o.do) + MS - t(o.od)) / span) * 100, 0.4);
                 return (
                   <div key={i} className={`${css.pasek} ${klasaPaska(szer)}`} style={{ left: `${pct(t(o.od))}%`, width: `${szer}%`, background: tlo, color: tekstNa(tlo) }}
-                    title={`${RODZAJE[o.rodzaj] ?? "Okres zasiłku"}: ${dataPL(o.od)} – ${dataPL(o.do)} (${o.dni} dni)`}>
-                    {szer >= 16 && <span className={css.podpis}>{KROTKIE[o.rodzaj] ?? ""}</span>}
+                    title={`${nazwaRodzaju(o.rodzaj)}: ${dataPL(o.od)} – ${dataPL(o.do)} (${dni(o.dni)})`}>
+                    {szer >= 16 && <span className={css.podpis}>{KROTKIE[o.rodzaj] ? tr(KROTKIE[o.rodzaj]) : ""}</span>}
                   </div>
                 );
               })}
@@ -77,7 +77,7 @@ export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]
           </div>
         ))}
       </div>
-      <div className={css.legenda}>{uzyte.map((r) => <span key={r}><i style={{ background: KOLORY[r] ?? "#555" }} />{RODZAJE[r] ?? "Okres zasiłku"}</span>)}</div>
+      <div className={css.legenda}>{uzyte.map((r) => <span key={r}><i style={{ background: KOLORY[r] ?? "#555" }} />{nazwaRodzaju(r)}</span>)}</div>
     </div>
   );
 }

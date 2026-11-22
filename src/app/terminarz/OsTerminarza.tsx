@@ -1,16 +1,24 @@
 "use client";
 
 import { Fragment, useId, useState } from "react";
-import { dataPL } from "@/lib/format";
 import type { Wydarzenie } from "@/lib/terminarz/terminarz.js";
 import reguly from "@/lib/terminarz/rules.json";
-import { OKNO_TERAZ_DNI, dniMiedzy, ileDni } from "@/lib/terminarz/widok";
+import { OKNO_TERAZ_DNI, dniMiedzy } from "@/lib/terminarz/widok";
+import { useFormaty, useT } from "@/lib/jezyk";
 import style from "./terminarz.module.css";
 
 const etykiety = reguly.labels;
 
+/** „za 3 dni”, „5 dni temu”, „dziś”: zapis względem dzisiejszej daty w wybranym języku. */
+function useIle() {
+  const t = useT();
+  const { dni } = useFormaty();
+  return (n: number) => n === 0 ? t("dziś") : n === 1 ? t("jutro") : n === -1 ? t("wczoraj") : n > 0 ? t("za {dni}", { dni: dni(n) }) : t("{dni} temu", { dni: dni(-n) });
+}
+
 export function Znacznik({ kind }: { kind: Wydarzenie["kind"] }) {
-  return <span className={`${style.znacznik} ${style[`znacznik_${kind}`]}`}>{etykiety.kind[kind]}</span>;
+  const t = useT();
+  return <span className={`${style.znacznik} ${style[`znacznik_${kind}`]}`}>{t(etykiety.kind[kind])}</span>;
 }
 
 type StanPozycji = "punkt" | "zrobione" | "po_terminie" | "teraz" | "pozniej" | "minelo";
@@ -25,11 +33,14 @@ function stanPozycji(z: Wydarzenie, dzis: string, zrobione: ReadonlySet<string>)
 }
 
 function Czas({ z, dzis, orientacyjnie }: { z: Wydarzenie; dzis: string; orientacyjnie: boolean }) {
+  const t = useT();
+  const { dataPL } = useFormaty();
+  const ile = useIle();
   return (
     <p className={style.data}>
       <time dateTime={z.date}>{dataPL(z.date)}</time>
-      <span className={style.ile}>{ileDni(dniMiedzy(dzis, z.date))}</span>
-      {orientacyjnie && !z.isBirth && <span className={style.orient}>orientacyjnie</span>}
+      <span className={style.ile}>{ile(dniMiedzy(dzis, z.date))}</span>
+      {orientacyjnie && !z.isBirth && <span className={style.orient}>{t("orientacyjnie")}</span>}
     </p>
   );
 }
@@ -38,30 +49,31 @@ function Pozycja({ z, dzis, stan, orientacyjnie, jestZrobione, onZrobione, onOtw
   z: Wydarzenie; dzis: string; stan: StanPozycji; orientacyjnie: boolean;
   jestZrobione: boolean; onZrobione: (id: string) => void; onOtworz: (id: string) => void;
 }) {
+  const t = useT();
   return (
     <li className={`${style.pozycjaOsi} ${style[`os_${stan}`]}`}>
       <span className={style.kropkaOsi} aria-hidden="true" />
       <div className={style.trescOsi}>
         <Czas z={z} dzis={dzis} orientacyjnie={orientacyjnie} />
         <p className={style.tytulOsi}>
-          <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(z.id)}>{z.title}</button>
+          <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(z.id)}>{t(z.title)}</button>
         </p>
-        {z.institution && <p className={style.gdzie}><b>Gdzie:</b> {z.institution}</p>}
+        {z.institution && <p className={style.gdzie}><b>{t("Gdzie:")}</b> {t(z.institution)}</p>}
         <p className={style.znaczniki}>
           {z.isBirth
-            ? <span className={`${style.znacznik} ${style.znacznik_porod}`}>Punkt odniesienia</span>
+            ? <span className={`${style.znacznik} ${style.znacznik_porod}`}>{t("Punkt odniesienia")}</span>
             : <>
               <Znacznik kind={z.kind} />
-              {stan === "zrobione" && <span className={style.stanOsi}>Zrobione</span>}
-              {stan === "teraz" && <span className={style.stanTeraz}>Teraz</span>}
-              {stan === "po_terminie" && <span className={style.stanPo}>Po terminie</span>}
-              {stan === "minelo" && <span className={style.stanOsi}>Minęło</span>}
+              {stan === "zrobione" && <span className={style.stanOsi}>{t("Zrobione")}</span>}
+              {stan === "teraz" && <span className={style.stanTeraz}>{t("Teraz")}</span>}
+              {stan === "po_terminie" && <span className={style.stanPo}>{t("Po terminie")}</span>}
+              {stan === "minelo" && <span className={style.stanOsi}>{t("Minęło")}</span>}
             </>}
         </p>
         {!z.isBirth && (
           <label className={style.zrobioneEtykieta}>
             <input type="checkbox" checked={jestZrobione} onChange={() => onZrobione(z.id)} />
-            <span>Zrobione<span className={style.sr}>: {z.title}</span></span>
+            <span>{t("Zrobione")}<span className={style.sr}>: {t(z.title)}</span></span>
           </label>
         )}
       </div>
@@ -77,6 +89,9 @@ export default function OsTerminarza({ zdarzenia, dzis, orientacyjnie, zrobione,
   zdarzenia: Wydarzenie[]; dzis: string; orientacyjnie: boolean;
   zrobione: ReadonlySet<string>; onZrobione: (id: string) => void; onOtworz: (id: string) => void;
 }) {
+  const t = useT();
+  const { dataPL } = useFormaty();
+  const ile = useIle();
   const [pokazMinione, setPokazMinione] = useState(false);
   const idListy = useId();
 
@@ -93,31 +108,31 @@ export default function OsTerminarza({ zdarzenia, dzis, orientacyjnie, zrobione,
   const znacznikDzis = (
     <li className={style.dzisOsi} aria-current="date">
       <span className={style.kropkaOsi} aria-hidden="true" />
-      <p><strong>Dziś</strong>, <time dateTime={dzis}>{dataPL(dzis)}</time></p>
+      <p><strong>{t("Dziś")}</strong>, <time dateTime={dzis}>{dataPL(dzis)}</time></p>
     </li>
   );
 
   return (
     <section className={style.os} aria-labelledby="tz-os">
-      <h2 id="tz-os">Oś czasu</h2>
+      <h2 id="tz-os">{t("Oś czasu")}</h2>
       <p className={style.meta}>
-        Kliknij nazwę terminu, żeby zobaczyć pełną instrukcję: dokumenty, linki do druków i źródła. Zaznacz „Zrobione”, gdy coś załatwisz.
+        {t("Kliknij nazwę terminu, żeby zobaczyć pełną instrukcję: dokumenty, linki do druków i źródła. Zaznacz „Zrobione”, gdy coś załatwisz.")}
       </p>
 
       <div className={`card ${style.terazBlok}`} role="region" aria-labelledby="tz-teraz">
-        <h3 id="tz-teraz">Co zrobić teraz</h3>
+        <h3 id="tz-teraz">{t("Co zrobić teraz")}</h3>
         {doZrobienia.length === 0
-          ? <p className={style.meta}>Nic pilnego. W najbliższych {OKNO_TERAZ_DNI} dniach nie ma terminów do załatwienia.</p>
+          ? <p className={style.meta}>{t("Nic pilnego. W najbliższych {n} dniach nie ma terminów do załatwienia.", { n: OKNO_TERAZ_DNI })}</p>
           : (
             <ul className={style.terazLista}>
               {doZrobienia.map(z => (
                 <li key={z.id}>
-                  <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(z.id)}>{z.title}</button>
+                  <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(z.id)}>{t(z.title)}</button>
                   <span className={style.terazMeta}>
-                    {" "}<time dateTime={z.date}>{dataPL(z.date)}</time> ({ileDni(dniMiedzy(dzis, z.date))})
-                    {z.institution && <>, {z.institution}</>}
+                    {" "}<time dateTime={z.date}>{dataPL(z.date)}</time> ({ile(dniMiedzy(dzis, z.date))})
+                    {z.institution && <>, {t(z.institution)}</>}
                   </span>
-                  {stanZ(z) === "po_terminie" && <> <span className={style.stanPo}>Po terminie</span></>}
+                  {stanZ(z) === "po_terminie" && <> <span className={style.stanPo}>{t("Po terminie")}</span></>}
                 </li>
               ))}
             </ul>
@@ -127,11 +142,11 @@ export default function OsTerminarza({ zdarzenia, dzis, orientacyjnie, zrobione,
       {minione.length > 0 && (
         <button type="button" className="btn btn-ghost btn-sm" aria-expanded={pokazMinione} aria-controls={idListy}
           onClick={() => setPokazMinione(v => !v)}>
-          {pokazMinione ? "Ukryj zrobione i minione terminy" : `Pokaż zrobione i minione terminy (${minione.length})`}
+          {pokazMinione ? t("Ukryj zrobione i minione terminy") : t("Pokaż zrobione i minione terminy ({n})", { n: minione.length })}
         </button>
       )}
 
-      <ol id={idListy} className={style.osLista} aria-label="Oś czasu: terminy w urzędach">
+      <ol id={idListy} className={style.osLista} aria-label={t("Oś czasu: terminy w urzędach")}>
         {widoczne.map((z, i) => (
           <Fragment key={z.id}>
             {i === miejsceDzis && znacznikDzis}
