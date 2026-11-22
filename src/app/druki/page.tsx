@@ -5,6 +5,7 @@ import { kanoniczny } from "@/lib/adres-serwisu";
 import drukiLinki from "@/lib/terminarz/druki-linki.json";
 import { tlumaczDla } from "@/i18n/jezyki";
 import { metadane } from "@/i18n/metadane";
+import { pytanieWJezyku } from "@/content/poradnik-i18n";
 import { jezykZSerwera } from "@/i18n/serwer";
 
 // Tytuł i nagłówek odróżnione od /formularze (strony wyboru): tu są same instrukcje do druków ZUS.
@@ -29,19 +30,20 @@ const PRZYKLAD: Record<string, string> = {
   "Z-3": "/demo/Z-3_przyklad_Anna_Kowalska.pdf",
 };
 
-const NOWA_KARTA = <span className="vh"> (otwiera się w nowej karcie)</span>;
+const nowaKarta = (t: (s: string) => string) => <span className="vh"> ({t("otwiera się w nowej karcie")})</span>;
 
-function Akcje({ id }: { id: string }) {
+function Akcje({ id, t }: { id: string; t: (s: string) => string }) {
+  const NOWA_KARTA = nowaKarta(t);
   const link = LINKI[id];
   const kreator = PRZYGOTUJ[id];
   const przyklad = PRZYKLAD[id];
   return (
     <div className="row no-print druk-akcje">
       {link?.pdf_zus
-        ? <a className="btn btn-primary" href={link.pdf_zus} target="_blank" rel="noopener noreferrer">Pobierz PDF{NOWA_KARTA}</a>
-        : <a className="btn btn-primary" href={link?.url_zus ?? LINK_WZORY} target="_blank" rel="noopener noreferrer">Pobierz druk ze strony ZUS{NOWA_KARTA}</a>}
-      {kreator && <Link className="btn btn-secondary" href={kreator.href}>{kreator.etykieta}</Link>}
-      {przyklad && <a className="btn btn-ghost" href={przyklad} target="_blank" rel="noopener">Zobacz przykład wypełnienia (PDF){NOWA_KARTA}</a>}
+        ? <a className="btn btn-primary" href={link.pdf_zus} target="_blank" rel="noopener noreferrer">{t("Pobierz PDF")}{NOWA_KARTA}</a>
+        : <a className="btn btn-primary" href={link?.url_zus ?? LINK_WZORY} target="_blank" rel="noopener noreferrer">{t("Pobierz druk ze strony ZUS")}{NOWA_KARTA}</a>}
+      {kreator && <Link className="btn btn-secondary" href={kreator.href}>{t(kreator.etykieta)}</Link>}
+      {przyklad && <a className="btn btn-ghost" href={przyklad} target="_blank" rel="noopener">{t("Zobacz przykład wypełnienia (PDF)")}{NOWA_KARTA}</a>}
     </div>
 );
 }
@@ -49,37 +51,38 @@ function Akcje({ id }: { id: string }) {
 export default async function Druki() {
   const jezyk = await jezykZSerwera();
   const t = tlumaczDla(jezyk);
+  const NOWA_KARTA = nowaKarta(t);
   return (
     <>
       <h1>{t("Druki ZUS: kto składa i jak wypełnić")}</h1>
-      <p className="lead">Przy każdym druku możesz go od razu pobrać. Niżej jest instrukcja krok po kroku.</p>
+      <p className="lead">{t("Przy każdym druku możesz go od razu pobrać. Niżej jest instrukcja krok po kroku.")}</p>
       <nav className="tabs" aria-label={t("Wybierz formularz")}>{DRUKI.map((d) => <a key={d.id} className="tab" href={`#${d.id}`}>{d.id}</a>)}</nav>
       {DRUKI.map((d) => (
         <section key={d.id} id={d.id} className="card accent mt" aria-labelledby={`h-${d.id}`}>
-          <h2 id={`h-${d.id}`}>{d.nazwa}</h2>
-          <Akcje id={d.id} />
+          <h2 id={`h-${d.id}`}>{t(d.nazwa)}</h2>
+          <Akcje id={d.id} t={t} />
           <dl className="kv mt">
-            <dt>{t("Do czego służy")}</dt><dd>{d.do_czego}</dd>
-            <dt>{t("Kto składa")}</dt><dd>{d.kto_sklada}</dd>
-            <dt>{t("Gdzie złożyć")}</dt><dd>{d.gdzie}</dd>
+            <dt>{t("Do czego służy")}</dt><dd>{t(d.do_czego)}</dd>
+            <dt>{t("Kto składa")}</dt><dd>{t(d.kto_sklada)}</dd>
+            <dt>{t("Gdzie złożyć")}</dt><dd>{t(d.gdzie)}</dd>
           </dl>
-          {d.terminy.length > 0 && <><h3 className="mt">{t("Ważne terminy")}</h3><ul className="clean warnlist">{d.terminy.map((t, i) => <li key={i}>{t}</li>)}</ul></>}
+          {d.terminy.length > 0 && <><h3 className="mt">{t("Ważne terminy")}</h3><ul className="clean warnlist">{d.terminy.map((x, i) => <li key={i}>{t(x)}</li>)}</ul></>}
           <details className="dl mt">
-            <summary>Instrukcja krok po kroku ({d.tutorial.length} {d.tutorial.length === 1 ? "krok" : d.tutorial.length < 5 ? "kroki" : "kroków"})</summary>
-            <ol className="steps">{d.tutorial.map((t, i) => <li key={i}>{t}</li>)}</ol>
+            <summary>{t("Instrukcja krok po kroku")} ({d.tutorial.length} {t(d.tutorial.length === 1 ? "krok" : d.tutorial.length < 5 ? "kroki" : "kroków")})</summary>
+            <ol className="steps">{d.tutorial.map((x, i) => <li key={i}>{t(x)}</li>)}</ol>
           </details>
-          {d.uwagi.length > 0 && <div className="alert info"><b>{t("Warto wiedzieć:")}</b> {d.uwagi.join(" ")}</div>}
+          {d.uwagi.length > 0 && <div className="alert info"><b>{t("Warto wiedzieć:")}</b> {d.uwagi.map((x) => t(x)).join(" ")}</div>}
           {d.pytania.length > 0 && (
           <div className="row mt no-print">
             {d.pytania.slice(0, 4).map((q) => {
               const p = pytanie(q);
-                return p && <Link key={q} className="btn btn-ghost" href={`/poradnik#${q}`}>{p.pytanie}</Link>;
+                return p && <Link key={q} className="btn btn-ghost" href={`/poradnik#${q}`}>{pytanieWJezyku(p, jezyk).pytanie}</Link>;
             })}
           </div>
           )}
         </section>
       ))}
-      <p className="small muted mt">Wszystkie wzory druków znajdziesz też na stronie <a href={LINK_WZORY} target="_blank" rel="noopener noreferrer">zus.pl (wzory formularzy){NOWA_KARTA}</a>. W aplikacji prezentujemy wskazówki, jak prawidłowo wypełnić wnioski. Dane w prototypie mają charakter przykładowy.</p>
+      <p className="small muted mt">{t("Wszystkie wzory druków znajdziesz też na stronie")} <a href={LINK_WZORY} target="_blank" rel="noopener noreferrer">{t("zus.pl (wzory formularzy)")}{NOWA_KARTA}</a>. {t("W aplikacji prezentujemy wskazówki, jak prawidłowo wypełnić wnioski. Dane w prototypie mają charakter przykładowy.")}</p>
     </>
   );
 }

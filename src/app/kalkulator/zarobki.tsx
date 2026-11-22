@@ -8,6 +8,7 @@ import { progZadluzenia, wymiarMacierzynski, wymiarRodzicielski, type Parametry,
 import type { StanZadluzeniaNaDzien, UbezpieczenieProfilu } from "@/lib/dane-profilu";
 import { Alert } from "@/components/ui";
 import { Pole } from "@/components/Pole";
+import { useT } from "@/lib/jezyk";
 import { num, P, T } from "./stale";
 import css from "./kalkulator.module.css";
 
@@ -50,10 +51,11 @@ export function usePodstawa(rodzaj: Rodzaj, kwota: string, wlaczone = true) {
 
 /** Wybór rodzaju zatrudnienia: lista rozwijana z etykietą. */
 export function PoleRodzaju({ label = "Rodzaj zatrudnienia", rodzaj, onZmiana, zProfilu }: { label?: string; rodzaj: Rodzaj; onZmiana: (r: Rodzaj) => void; zProfilu?: boolean }) {
+  const t = useT();
   return (
     <Pole label={label} hint={zProfilu ? "Ustawione na podstawie Twojego profilu ZUS. Możesz zmienić." : "Od tego zależy, jak liczymy podstawę zasiłku."}>
       <select value={rodzaj} onChange={(e) => czyRodzaj(e.target.value) && onZmiana(e.target.value)}>
-        {RODZAJE_ZATRUDNIENIA.map((r) => <option key={r.id} value={r.id}>{r.nazwa}</option>)}
+        {RODZAJE_ZATRUDNIENIA.map((r) => <option key={r.id} value={r.id}>{t(r.nazwa)}</option>)}
       </select>
     </Pole>
   );

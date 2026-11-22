@@ -70,8 +70,8 @@ function Pozycja({ k, dzis, zrobione, onZrobione, onOtworz }: {
   const zadanie = czyZadanie(k);
   const poTerminie = zadanie && !zrobione && stan === "minelo";
   const tytul = k.href
-    ? <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(k.id)}>{k.tytul}</button>
-    : k.tytul;
+    ? <button type="button" className={style.tytulPrzycisk} onClick={() => onOtworz(k.id)}>{t(k.tytul)}</button>
+    : t(k.tytul);
   const klasy = [
     style.pozycja, style[`r_${k.rodzaj}`],
     stan === "minelo" ? style.minelo : "", zrobione ? style.jestZrobione : "", poTerminie ? style.poTerminie : "",
@@ -83,10 +83,10 @@ function Pozycja({ k, dzis, zrobione, onZrobione, onOtworz }: {
         <p className={style.data}><Terminy k={k} /></p>
         <p className={style.tytul}>{tytul}</p>
         <p className={style.znaczki}>
-          <span className={style.rodzaj}>{ETYKIETY_RODZAJU[k.rodzaj]}</span>
-          {zrobione ? <span className={style.stan}>Zrobione</span> : <>
-            {stan === "trwa" && <span className={style.stan}>{k.od === k.do ? "Dziś" : "Trwa teraz"}</span>}
-            {poTerminie && <span className={style.stanPo}>Po terminie</span>}
+          <span className={style.rodzaj}>{t(ETYKIETY_RODZAJU[k.rodzaj])}</span>
+          {zrobione ? <span className={style.stan}>{t("Zrobione")}</span> : <>
+            {stan === "trwa" && <span className={style.stan}>{t(k.od === k.do ? "Dziś" : "Trwa teraz")}</span>}
+            {poTerminie && <span className={style.stanPo}>{t("Po terminie")}</span>}
             {stan === "minelo" && !zadanie && <span className={style.stan}>{t("Minęło")}</span>}
           </>}
           {k.szacunkowe && <span className={style.stan}>{t("Orientacyjnie")}</span>}
@@ -94,7 +94,7 @@ function Pozycja({ k, dzis, zrobione, onZrobione, onOtworz }: {
         {zadanie && (
           <label className={style.zrobione}>
             <input type="checkbox" checked={zrobione} onChange={() => onZrobione(k.id)} />
-            <span>Zrobione<span className={style.tylkoCzytnik}>: {k.tytul}</span></span>
+            <span>{t("Zrobione")}<span className={style.tylkoCzytnik}>: {t(k.tytul)}</span></span>
           </label>
         )}
       </div>
@@ -137,8 +137,7 @@ export default function OsKalendarza({ wynik, dzis, plan, parametry, zrobione, o
     <section className={`card ${style.os}`} aria-labelledby="kalendarz-os">
       <h2 id="kalendarz-os">{t("Oś czasu")}</h2>
       <p className={style.wstep}>
-        Najważniejsze badania, wizyty, urlopy i terminy wniosków w kolejności od najwcześniejszych.
-        Kliknij tytuł, żeby zobaczyć krótki opis. Zaznacz „Zrobione”, gdy coś załatwisz.
+        {t("Najważniejsze badania, wizyty, urlopy i terminy wniosków w kolejności od najwcześniejszych. Kliknij tytuł, żeby zobaczyć krótki opis. Zaznacz „Zrobione”, gdy coś załatwisz.")}
       </p>
       <Pasek wynik={wynik} dzis={dzis} />
 

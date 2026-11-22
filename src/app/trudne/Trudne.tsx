@@ -62,14 +62,14 @@ export default function Trudne() {
   return (
     <>
       <h1>{t("Pomoc w trudnej sytuacji")}</h1>
-      <p className="lead">Jeśli tu jesteś, być może przechodzisz przez coś bardzo trudnego. Nie musisz niczego załatwiać od razu. Wybierz sytuację, która Cię dotyczy, a pokażemy, co Ci przysługuje i gdzie znaleźć wsparcie.</p>
+      <p className="lead">{t("Jeśli tu jesteś, być może przechodzisz przez coś bardzo trudnego. Nie musisz niczego załatwiać od razu. Wybierz sytuację, która Cię dotyczy, a pokażemy, co Ci przysługuje i gdzie znaleźć wsparcie.")}</p>
 
       <aside className={`card ${css.teraz}`} aria-labelledby="pomoc-teraz">
-        <h2 id="pomoc-teraz">Potrzebujesz pomocy teraz?</h2>
+        <h2 id="pomoc-teraz">{t("Potrzebujesz pomocy teraz?")}</h2>
         <ul>
           {POMOC_TERAZ.filter((k) => k.telefon).map((k) => (
             <li key={k.id}>
-              <a className={css.numer} href={telLink(k.telefon!)}>{k.telefon}</a> – {k.nazwa}{k.godziny ? `, ${k.godziny}` : ""}. <span className="muted">{k.opis}</span>
+              <a className={css.numer} href={telLink(k.telefon!)}>{k.telefon}</a> – {t(k.nazwa)}{k.godziny ? `, ${t(k.godziny)}` : ""}. <span className="muted">{t(k.opis)}</span>
             </li>
           ))}
         </ul>
@@ -79,11 +79,11 @@ export default function Trudne() {
         {!sytuacja ? (
           <section className="card">
             <h2 ref={lista} tabIndex={-1} className={css.tytul}>{t("Wybierz sytuację")}</h2>
-            <p className="muted">Możesz wrócić do tej listy w każdej chwili.</p>
+            <p className="muted">{t("Możesz wrócić do tej listy w każdej chwili.")}</p>
             <ul className={`${css.lista} mt`}>
               {SYTUACJE.map((x) => (
                 <li key={x.id}>
-                  <button type="button" className={css.opcja} onClick={() => wybierz(x.id)}>{x.t}</button>
+                  <button type="button" className={css.opcja} onClick={() => wybierz(x.id)}>{t(x.t)}</button>
                 </li>
               ))}
             </ul>
@@ -108,10 +108,10 @@ function Szczegoly({ sytuacja, tytul, wstecz }: {
   const dodatkowe = KONTAKTY_DLA_SYTUACJI[sytuacja.id] ?? [];
   return (
     <>
-      <button type="button" className={css.wstecz} onClick={wstecz}>← Wszystkie sytuacje</button>
+      <button type="button" className={css.wstecz} onClick={wstecz}>{t("← Wszystkie sytuacje")}</button>
       <section className="card navy mt">
-        <h2 ref={tytul} tabIndex={-1} className={css.tytul}>{sytuacja.t}</h2>
-        {sytuacja.d.length > 0 && <ul className="clean">{sytuacja.d.map((x) => <li key={x}>{x}</li>)}</ul>}
+        <h2 ref={tytul} tabIndex={-1} className={css.tytul}>{t(sytuacja.t)}</h2>
+        {sytuacja.d.length > 0 && <ul className="clean">{sytuacja.d.map((x) => <li key={x}>{t(x)}</li>)}</ul>}
           <p className="mt"><Link href="/sprawa/trudna-sytuacja">{t("Sprawdź, co załatwić krok po kroku")}</Link></p>
         </section>
       {(organizacje.length > 0 || dodatkowe.length > 0) && <section className="card accent mt">
@@ -119,21 +119,21 @@ function Szczegoly({ sytuacja, tytul, wstecz }: {
         <ul className="clean">
           {organizacje.map((o) => (
             <li key={o.id}>
-              <b>{o.nazwa}</b><br />{o.opis}
-              <br />{o.telefon && <>{t("Telefon: ")}<a href={telHref(o.telefon)}>{o.telefon}</a>{o.godziny ? ` (${o.godziny})` : ""}. </>}
-              {o.email && <>{t("E-mail: ")}<a href={`mailto:${o.email}`}>{o.email}</a>. </>}Strona: <a href={o.www} {...NOWA_KARTA}>{krotkiAdres(o.www)}</a>
-              <br /><span className="muted">{o.zakres}{o.uwaga ? ` ${o.uwaga}` : ""} Sprawdzone {dataPL(o.dataSprawdzenia)}, <a href={o.zrodlo} {...NOWA_KARTA}>{t("źródło")}</a>.{o.pewnosc === "do_potwierdzenia" ? " Do potwierdzenia: zadzwoń lub napisz, zanim na tym polegasz." : ""}</span>
+              <b>{t(o.nazwa)}</b><br />{t(o.opis)}
+              <br />{o.telefon && <>{t("Telefon: ")}<a href={telHref(o.telefon)}>{o.telefon}</a>{o.godziny ? ` (${t(o.godziny)})` : ""}. </>}
+              {o.email && <>{t("E-mail: ")}<a href={`mailto:${o.email}`}>{o.email}</a>. </>}{t("Strona:")} <a href={o.www} {...NOWA_KARTA}>{krotkiAdres(o.www)}</a>
+              <br /><span className="muted">{t(o.zakres)}{o.uwaga ? ` ${t(o.uwaga)}` : ""} {t("Sprawdzone")} {dataPL(o.dataSprawdzenia)}, <a href={o.zrodlo} {...NOWA_KARTA}>{t("źródło")}</a>.{o.pewnosc === "do_potwierdzenia" ? ` ${t("Do potwierdzenia: zadzwoń lub napisz, zanim na tym polegasz.")}` : ""}</span>
             </li>
           ))}
           {dodatkowe.map((k) => (
             <li key={k.id}>
-              <b>{k.nazwa}</b><br />{k.opis}
-              <br />{k.telefon && <>{t("Telefon: ")}<a href={telLink(k.telefon)}>{k.telefon}</a>{k.godziny ? ` (${k.godziny})` : ""}. </>}
-              {k.www && <>Strona: <a href={k.www} {...NOWA_KARTA}>{krotkiAdres(k.www)}</a></>}
+              <b>{t(k.nazwa)}</b><br />{t(k.opis)}
+              <br />{k.telefon && <>{t("Telefon: ")}<a href={telLink(k.telefon)}>{k.telefon}</a>{k.godziny ? ` (${t(k.godziny)})` : ""}. </>}
+              {k.www && <>{t("Strona:")} <a href={k.www} {...NOWA_KARTA}>{krotkiAdres(k.www)}</a></>}
             </li>
           ))}
         </ul>
-        <p className="muted mt">{WSPARCIE_UWAGA}</p>
+        <p className="muted mt">{t(WSPARCIE_UWAGA)}</p>
         </section>}
     </>
   );

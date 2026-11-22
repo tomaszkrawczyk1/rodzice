@@ -63,8 +63,8 @@ export default function Wgraj() {
   function wybranoPlik(f: File | undefined) {
     if (!f) return;
     const odrzuc = (m: string) => { setWyn(null); setPod(null); setUb(null); setUbInfo(""); setWiersze([]); setErr(m); };
-    if (!/\.(pdf|png|jpe?g)$/i.test(f.name)) { odrzuc("Obsługiwane formaty: PDF, JPG i PNG."); return; }
-    if (f.size > MAKS_MB * 1024 * 1024) { odrzuc(`Plik jest za duży (maksymalnie ${MAKS_MB} MB).`); return; }
+    if (!/\.(pdf|png|jpe?g)$/i.test(f.name)) { odrzuc(t("Obsługiwane formaty: PDF, JPG i PNG.")); return; }
+    if (f.size > MAKS_MB * 1024 * 1024) { odrzuc(t("Plik jest za duży (maksymalnie {mb} MB).", { mb: MAKS_MB })); return; }
     odczytaj(f, f.name, f.name);
   }
 
@@ -110,13 +110,13 @@ export default function Wgraj() {
 
   return (
     <>
-      <h1>Przetestuj odczyt ze skanu (przykłady)</h1>
-      <p className="lead">Tu sprawdzisz, jak aplikacja odczytuje dane z zaświadczenia Z-3 i wniosku ZAM. Najprościej: kliknij <b>„Odczytaj przykład”</b> przy jednym z trzech gotowych dokumentów. Mają <b>fikcyjne dane</b>. To nie jest składanie wniosku: nic nie trafia do ZUS ani do pracodawcy.</p>
-      <Alert t="warn"><b>Nie wgrywaj prawdziwych dokumentów.</b> Możesz też wybrać własny plik, ale to wersja testowa: użyj tylko przykładu albo dokumentu bez prawdziwego numeru PESEL, imienia i nazwiska. Odczyt odbywa się na naszym serwerze, bez zewnętrznych usług. Dokument nie jest zapisywany.</Alert>
+      <h1>{t("Przetestuj odczyt ze skanu (przykłady)")}</h1>
+      <p className="lead">{tb("Tu sprawdzisz, jak aplikacja odczytuje dane z zaświadczenia Z-3 i wniosku ZAM. Najprościej: kliknij **„Odczytaj przykład”** przy jednym z trzech gotowych dokumentów. Mają **fikcyjne dane**. To nie jest składanie wniosku: nic nie trafia do ZUS ani do pracodawcy.")}</p>
+      <Alert t="warn">{tb("**Nie wgrywaj prawdziwych dokumentów.** Możesz też wybrać własny plik, ale to wersja testowa: użyj tylko przykładu albo dokumentu bez prawdziwego numeru PESEL, imienia i nazwiska. Odczyt odbywa się na naszym serwerze, bez zewnętrznych usług. Dokument nie jest zapisywany.")}</Alert>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
-          <h2>Przykładowe dokumenty</h2>
-          <p className="small muted">Trzy przykłady z fikcyjnymi danymi. Możesz je też pobrać i obejrzeć.</p>
+          <h2>{t("Przykładowe dokumenty")}</h2>
+          <p className="small muted">{t("Trzy przykłady z fikcyjnymi danymi. Możesz je też pobrać i obejrzeć.")}</p>
           <ul className="clean">{DEMO.map(([plik, etykieta]) => <li key={plik}>
             <b>{t(etykieta)}</b>
             <div className="row">
@@ -124,9 +124,9 @@ export default function Wgraj() {
               <a className="btn btn-ghost" href={`/demo/${plik}`} download>{t("Pobierz przykład")}</a>
             </div>
           </li>)}</ul>
-          <h3 className="mt">Własny plik testowy (dla chętnych)</h3>
-          <p className="small">Tylko plik bez prawdziwych danych osobowych, np. zmieniony przykład. Nie wgrywaj skanu ze swoim numerem PESEL.</p>
-          <Field label={t("Skan lub PDF (Z-3, Z-3a, ZAM)")} hint={`PDF, JPG lub PNG, do ${MAKS_MB} MB. Odczyt skanu może potrwać kilkanaście sekund.`}>
+          <h3 className="mt">{t("Własny plik testowy (dla chętnych)")}</h3>
+          <p className="small">{t("Tylko plik bez prawdziwych danych osobowych, np. zmieniony przykład. Nie wgrywaj skanu ze swoim numerem PESEL.")}</p>
+          <Field label={t("Skan lub PDF (Z-3, Z-3a, ZAM)")} hint={t("PDF, JPG lub PNG, do {mb} MB. Odczyt skanu może potrwać kilkanaście sekund.", { mb: MAKS_MB })}>
             <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" disabled={busy} onChange={(e) => { wybranoPlik(e.target.files?.[0]); e.target.value = ""; }} />
           </Field>
         </section>
@@ -147,7 +147,7 @@ export default function Wgraj() {
               <div className="grid g2 mt">
                 <Field label="PESEL"><input inputMode="numeric" autoComplete="off" value={pesel} onChange={(e) => setPesel(e.target.value)} /></Field>
                 <Field label="Liczba dzieci"><input inputMode="numeric" autoComplete="off" value={dzieci} onChange={(e) => setDzieci(e.target.value.replace(/\D/g, "").slice(0, 1))} /></Field>
-                <Field label="Data porodu lub przyjęcia dziecka"><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
+                <Field label={t("Data porodu lub przyjęcia dziecka")}><input type="date" value={data} onChange={(e) => setData(e.target.value)} /></Field>
               </div>
               {(() => { const brakDaty = wyn.ostrzezenia?.some((o: string) => /daty porodu/.test(o)); const pola = [slabo(p.pesel) && "PESEL", slabo(p.data_zdarzenia) && !brakDaty && "data"].filter(Boolean); return pola.length > 0 && <p className="small muted">Niska pewność odczytu: {pola.join(", ")}. Porównaj z dokumentem.</p>; })()}
               <div className="row mt"><button className="btn btn-secondary" onClick={sprawdzUb}>{t("Sprawdź ubezpieczenie (symulacja ZUS)")}</button></div>
@@ -175,7 +175,7 @@ export default function Wgraj() {
               <Kroki kroki={pod.wynik.kroki?.map(opisObliczenia)} />
               {pod.wynik.ostrzezenia?.length > 0 && <Alert t="warn">{t("Sprawdź dane odczytane z zaświadczenia i skonsultuj wynik z ZUS.")}</Alert>}
               <button className="btn btn-primary mt" onClick={policz}>{t("Policz zasiłek z tą podstawą →")}</button></div>}
-            {!pod?.wynik && <Alert t="info">Z tego dokumentu nie wyliczono podstawy. {wiersze.length > 0 ? "Uzupełnij wynagrodzenia w tabeli powyżej albo wprowadź je ręcznie w" : "Wpisz wynagrodzenia przyciskiem powyżej albo wprowadź je w"} <a href="/kalkulator">kalkulatorze</a>.</Alert>}
+            {!pod?.wynik && <Alert t="info">{tb(wiersze.length > 0 ? "Z tego dokumentu nie wyliczono podstawy. Uzupełnij wynagrodzenia w tabeli powyżej albo wprowadź je ręcznie w [kalkulatorze](/kalkulator)." : "Z tego dokumentu nie wyliczono podstawy. Wpisz wynagrodzenia przyciskiem powyżej albo wprowadź je w [kalkulatorze](/kalkulator).")}</Alert>}
           </>}
         </div>
       </div>

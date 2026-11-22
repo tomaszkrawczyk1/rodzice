@@ -25,11 +25,11 @@ export function Pole({ label, hint, error, required, children }: {
   return (
     <div className={`field ${css.pole}`}>
       <label htmlFor={id}>
-        {label}
-        {required && <><span className={css.gwiazdka} aria-hidden="true"> *</span><span className={css.sr}> (pole wymagane)</span></>}
+        {t(label)}
+        {required && <><span className={css.gwiazdka} aria-hidden="true"> *</span><span className={css.sr}> {t("(pole wymagane)")}</span></>}
       </label>
       {cloneElement(children, { id, "aria-describedby": opis, ...(required ? { "aria-required": true } : {}), ...(error ? { "aria-invalid": true } : {}) })}
-      {hint && <span id={`${id}-wskazowka`} className="hint">{hint}</span>}
+      {hint && <span id={`${id}-wskazowka`} className="hint">{t(hint)}</span>}
       {error && <span id={`${id}-blad`} className={css.blad}><b>{t("Błąd:")}</b> {t(error)}</span>}
     </div>
   );

@@ -25,6 +25,7 @@ const Ojcowski = dynamic(() => import("./Ojcowski"), {
  * Na pierwszym kroku nad kreatorem jest szybkie porównanie wariantów (sama pensja, bez dat).
  */
 export default function Kalkulator() {
+  const t = useT();
   const params = useSearchParams();
   const surowy = params.get("tryb");
   const tryb: Sytuacja = czySytuacja(surowy) ? surowy : "oboje";
@@ -46,7 +47,7 @@ export default function Kalkulator() {
     <>
       {szybkie && <SzybkiePorownanie onPelny={doPelnego} />}
       <div id="pelny-kalkulator">
-        {szybkie && <p className={`section-h`}><b>Albo policz wszystko dokładnie, krok po kroku</b> (daty, podział urlopu między rodziców, łączenie z pracą):</p>}
+        {szybkie && <p className={`section-h`}><b>{t("Albo policz wszystko dokładnie, krok po kroku")}</b> {t("(daty, podział urlopu między rodziców, łączenie z pracą):")}</p>}
         {tryb === "ojciec"
           ? <Ojcowski onSytuacja={(s) => { if (s !== "ojciec") wybierz(s); }} />
           : <PlanRodziny poczatkowy={tryb as Tryb} onOjciec={() => wybierz("ojciec")} wstepne={wstepne} />}

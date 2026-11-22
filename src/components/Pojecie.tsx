@@ -1,6 +1,7 @@
 "use client";
 import { Fragment, useId, useState, type ReactNode } from "react";
 import st from "./Pojecie.module.css";
+import { useT } from "@/lib/jezyk";
 
 /**
  * Słowniczek trudnych pojęć urzędowych. Przy pierwszym użyciu pojęcia w danym bloku tekstu
@@ -42,14 +43,15 @@ export const SLOWNIK: Haslo[] = [
 /** Jedno pojęcie: kliknięcie rozwija wyjaśnienie tuż obok, w tekście (działa też na telefonie i z czytnikiem ekranu). */
 export function Pojecie({ children, wyjasnienie }: { children: ReactNode; wyjasnienie: string }) {
   const [otwarte, setOtwarte] = useState(false);
+  const t = useT();
   const id = useId();
   return (
     <>
       <button type="button" className={st.haslo} aria-expanded={otwarte} aria-controls={id} onClick={() => setOtwarte(!otwarte)}
-        title={otwarte ? "Ukryj wyjaśnienie" : "Co to znaczy?"}>
+        title={t(otwarte ? "Ukryj wyjaśnienie" : "Co to znaczy?")}>
         {children}<span className={st.znak} aria-hidden="true">?</span>
       </button>
-      <span id={id} role="note" className={st.wyjasnienie} hidden={!otwarte}>{wyjasnienie}</span>
+      <span id={id} role="note" className={st.wyjasnienie} hidden={!otwarte}>{t(wyjasnienie)}</span>
     </>
   );
 }

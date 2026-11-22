@@ -105,10 +105,10 @@ function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) 
       {!wynik.dataPorodu && pozostalo === 0 && <p>{t("Planowany termin porodu wypada dziś.")}</p>}
       {!wynik.dataPorodu && dni < 0 && <p>{t("Według wpisanego terminu początek ciąży wypada po dzisiejszej dacie.")}</p>}
       {!wynik.dataPorodu && (
-        <p>Terminy po porodzie są orientacyjne. Gdy dziecko się urodzi, wybierz „Dziecko już się urodziło” i wpisz datę porodu, a przeliczymy je dokładnie.</p>
+        <p>{t("Terminy po porodzie są orientacyjne. Gdy dziecko się urodzi, wybierz „Dziecko już się urodziło” i wpisz datę porodu, a przeliczymy je dokładnie.")}</p>
       )}
       {wynik.dataPorodu && wynik.uzytoZalozonegoWypisu && (
-        <p>Przyjęta data wypisu to <Data value={wynik.wypis.data} />. Możesz wpisać datę wypisu ze szpitala, aby przeliczyć związane z nim terminy.</p>
+        <p>{wstaw(t("Przyjęta data wypisu to {data}. Możesz wpisać datę wypisu ze szpitala, aby przeliczyć związane z nim terminy."), { data: <Data value={wynik.wypis.data} /> })}</p>
       )}
     </section>
   );
@@ -117,10 +117,6 @@ function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) 
 function trwa(e: WydarzenieNaOsi, dzis: string) {
   return e.od <= dzis && dzis <= e.do;
 }
-
-const ileDni = (n: number) => `${n} ${n === 1 ? "dzień" : "dni"}`;
-const ileTerminow = (n: number) =>
-  `${n} ${n === 1 ? "termin" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? "terminy" : "terminów"}`;
 
 function rozwinDo(id: string) {
   let d = id ? document.getElementById(id)?.closest("details") ?? null : null;
@@ -153,31 +149,33 @@ function Najblizsze({ wynik, dzis, plan, parametry, zrobione, onOtworz }: {
     id: ID_ZUS, nazwa: "Wniosek do ZUS o zasiłek macierzyński",
     od: wynik.dataPorodu ?? wynik.terminPorodu, do: wniosek, szacunkowe: !wynik.dataPorodu,
   };
+  const t = useT();
+  const { dni: dniF } = useFormaty();
   const zadania = najblizszeZadania([...wynik.oś, zus].filter(p => !zrobione.has(idPozycji(p.id))), dzis, 2);
   return (
     <section className={`card ${style.najblizsze}`} aria-labelledby="kalendarz-najblizsze">
-      <h2 id="kalendarz-najblizsze">Najbliższe zadania dla Ciebie</h2>
+      <h2 id="kalendarz-najblizsze">{t("Najbliższe zadania dla Ciebie")}</h2>
       {zadania.length ? (
         <ol className={style.zadania}>
           {zadania.map(z => (
             <li key={z.id}>
               <span className={style.ile}>
                 {z.trwa
-                  ? z.dni === 0 ? "Ostatni dzień: dziś" : `Zostało ${ileDni(z.dni)}`
-                  : z.dni === 0 ? "Zaczyna się dziś" : `Za ${ileDni(z.dni)}`}
+                  ? z.dni === 0 ? t("Ostatni dzień: dziś") : t("Zostało {dni}", { dni: dniF(z.dni) })
+                  : z.dni === 0 ? t("Zaczyna się dziś") : t("Za {dni}", { dni: dniF(z.dni) })}
               </span>
-              <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(z.id))}>{z.nazwa}</button>
+              <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(z.id))}>{t(z.nazwa)}</button>
               <span className={style.kiedyZadanie}>
-                {z.trwa ? <>Do <Data value={z.do} /></>
+                {z.trwa ? wstaw(t("Do {data}"), { data: <Data value={z.do} /> })
                   : z.od === z.do ? <Data value={z.od} />
-                  : <>Od <Data value={z.od} />, najpóźniej do <Data value={z.do} /></>}
-                {z.szacunkowe && " · orientacyjnie"}
+                  : wstaw(t("Od {od}, najpóźniej do {do}"), { od: <Data value={z.od} />, do: <Data value={z.do} /> })}
+                {z.szacunkowe && " · " + t("orientacyjnie")}
               </span>
             </li>
           ))}
         </ol>
-      ) : <p>Na razie nie masz zbliżających się terminów.</p>}
-      <p className={style.reszta}>Kliknij tytuł, żeby zobaczyć krótki opis. Pozostałe terminy są niżej, na osi czasu i w etapach.</p>
+      ) : <p>{t("Na razie nie masz zbliżających się terminów.")}</p>}
+      <p className={style.reszta}>{t("Kliknij tytuł, żeby zobaczyć krótki opis. Pozostałe terminy są niżej, na osi czasu i w etapach.")}</p>
     </section>
   );
 }
@@ -339,24 +337,24 @@ function Zus({ wynik, plan, parametry }: { wynik: KalendarzWynik; plan?: PlanWej
 }
 
 /** Krótki opis pozycji do panelu z boku. Zwraca null, gdy pozycja nie ma opisu (np. poród, okres urlopu). */
-function szczegolyPozycji(id: string, wynik: KalendarzWynik, parametry: Parametry, plan?: PlanWejscie): { tytul: string; tresc: ReactNode } | null {
+function szczegolyPozycji(t: (s: string, v?: Record<string, string | number>) => string, id: string, wynik: KalendarzWynik, parametry: Parametry, plan?: PlanWejscie): { tytul: string; tresc: ReactNode } | null {
   if (id.startsWith("w-")) {
     const e = wynik.oś.find(x => x.id === id.slice(2));
     if (!e) return null;
     return {
-      tytul: e.nazwa,
+      tytul: t(e.nazwa),
       tresc: (
         <>
           <p>
             <strong>{e.od === e.do ? <Data value={e.od} /> : <><Data value={e.od} /> – <Data value={e.do} /></>}</strong>
-            {e.szacunkowe && " · orientacyjnie"}
+            {e.szacunkowe && " · " + t("orientacyjnie")}
           </p>
-          {e.kiedy && <p>{e.kiedy}</p>}
-          {e.najpozniej && <p>Najpóźniej <Data value={e.najpozniej} /></p>}
-          {e.opis && <p>{e.opis}</p>}
-          {!!e.pozycje?.length && <><h3>Co obejmuje</h3><Lista pozycje={e.pozycje} /></>}
-          {!!e.uwagi?.length && <><h3>Warto wiedzieć</h3><Lista pozycje={e.uwagi} /></>}
-          {e.skutek && <><h3>Gdy pominiesz termin</h3><p>{e.skutek} Sprawdź u lekarza prowadzącego, co to oznacza w Twoim przypadku.</p></>}
+          {e.kiedy && <p>{t(e.kiedy)}</p>}
+          {e.najpozniej && <p>{wstaw(t("Najpóźniej {data}"), { data: <Data value={e.najpozniej} /> })}</p>}
+          {e.opis && <p>{t(e.opis)}</p>}
+          {!!e.pozycje?.length && <><h3>{t("Co obejmuje")}</h3><Lista pozycje={e.pozycje} /></>}
+          {!!e.uwagi?.length && <><h3>{t("Warto wiedzieć")}</h3><Lista pozycje={e.uwagi} /></>}
+          {e.skutek && <><h3>{t("Gdy pominiesz termin")}</h3><p>{t(e.skutek)} {t("Sprawdź u lekarza prowadzącego, co to oznacza w Twoim przypadku.")}</p></>}
         </>
       ),
     };
@@ -364,25 +362,25 @@ function szczegolyPozycji(id: string, wynik: KalendarzWynik, parametry: Parametr
   const { wniosek, doPracodawcy } = terminyKalendarza(wynik, parametry, plan);
   if (id === "wniosek-zus") {
     return {
-      tytul: "Wniosek o zasiłek macierzyński",
+      tytul: t("Wniosek o zasiłek macierzyński"),
       tresc: (
         <>
-          <p><strong>Do <Data value={wniosek} /></strong>{!wynik.dataPorodu && " · orientacyjnie"}</p>
-          <p>{wynik.dataPorodu ? "Termin liczony od wpisanej daty porodu." : "Termin orientacyjny. Liczymy od planowanego terminu porodu."}</p>
-          <p><Link href="/dokumenty">Sprawdź, kto wypłaca zasiłek i gdzie złożyć wniosek</Link></p>
+          <p><strong>{wstaw(t("Do {data}"), { data: <Data value={wniosek} /> })}</strong>{!wynik.dataPorodu && " · " + t("orientacyjnie")}</p>
+          <p>{t(wynik.dataPorodu ? "Termin liczony od wpisanej daty porodu." : "Termin orientacyjny. Liczymy od planowanego terminu porodu.")}</p>
+          <p><Link href="/dokumenty">{t("Sprawdź, kto wypłaca zasiłek i gdzie złożyć wniosek")}</Link></p>
         </>
       ),
     };
   }
   const m = /^wniosek-pracodawca-(\d+)$/.exec(id);
-  const t = m ? doPracodawcy[+m[1]] : undefined;
-  if (!t?.do) return null;
+  const tm = m ? doPracodawcy[+m[1]] : undefined;
+  if (!tm?.do) return null;
   return {
-    tytul: t.co.replace(/\d{4}-\d{2}-\d{2}/g, dataPL),
+    tytul: t(tm.co.replace(/\d{4}-\d{2}-\d{2}/g, dataPL)),
     tresc: (
       <>
-        <p><strong>Złóż do pracodawcy do <Data value={t.do} /></strong></p>
-        <p><Link href="/sprawa/urlop-pracodawca">Sprawdź termin dla wybranej daty urlopu</Link></p>
+        <p><strong>{wstaw(t("Złóż do pracodawcy do {data}"), { data: <Data value={tm.do} /> })}</strong></p>
+        <p><Link href="/sprawa/urlop-pracodawca">{t("Sprawdź termin dla wybranej daty urlopu")}</Link></p>
       </>
     ),
   };
@@ -393,6 +391,7 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
   zrobione: ReadonlySet<string>; onZrobione: (id: string) => void; onOtworz: (id: string) => void;
 }) {
   const t = useT();
+  const ileTerminow = (n: number) => t(n === 1 ? "{n} termin" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? "{n} terminy" : "{n} terminów", { n });
   const teraz = wynik.oś.filter(e => trwa(e, dzis)).sort((a, b) => a.do.localeCompare(b.do));
   const sytuacje = wynik.informacje.filter(i => i.rodzaj === "sytuacja_szczegolna");
   const ogolne = wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === undefined);
@@ -411,11 +410,11 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
         <h2 id="kalendarz-teraz">{t("Teraz warto zrobić")}</h2>
         {teraz.length ? (
           <details>
-            <summary>Pokaż wszystko, co trwa teraz ({ileTerminow(teraz.length)})</summary>
+            <summary>{t("Pokaż wszystko, co trwa teraz")} ({ileTerminow(teraz.length)})</summary>
           <ul>
             {teraz.map(e => (
               <li key={e.id}>
-                  <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(e.id))}>{e.nazwa}</button>
+                  <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(e.id))}>{t(e.nazwa)}</button>
                   <div>{t("Do ")}<Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
               </li>
             ))}
@@ -440,12 +439,12 @@ function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
         <Fragment key={e.trymestr}>
           <section className={style.etap} aria-labelledby={`kalendarz-etap-${e.trymestr}`}>
             <h2 id={`kalendarz-etap-${e.trymestr}`}>
-              {e.nazwa}
+              {t(e.nazwa)}
               {e.trymestr === aktywny && <span className={`badge ok ${style.etapTeraz}`}>{t("Teraz")}</span>}
             </h2>
-            {e.opis && <p className={style.opisEtapu}>{e.opis}</p>}
+            {e.opis && <p className={style.opisEtapu}>{t(e.opis)}</p>}
             <details className={style.zwijane} open={e.trymestr === aktywny}>
-              <summary>Terminy na tym etapie ({ileTerminow(e.wydarzenia.length)})</summary>
+              <summary>{t("Terminy na tym etapie")} ({ileTerminow(e.wydarzenia.length)})</summary>
             {e.wydarzenia.map(w => <Karta key={w.id} wydarzenie={w} dzis={dzis} poczatek={wynik.poczatekCiazy} />)}
             <Informacje informacje={wynik.informacje.filter(i => i.rodzaj !== "sytuacja_szczegolna" && i.trymestr === e.trymestr)} />
             </details>
@@ -534,18 +533,18 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
     <>
       {wynik && <Najblizsze wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} zrobione={zrobione} onOtworz={setPanel} />}
       {wynik && panel && (() => {
-        const s = szczegolyPozycji(panel, wynik, parametry, plan);
+        const s = szczegolyPozycji(t, panel, wynik, parametry, plan);
         return s && <PanelBoczny key={panel} tytul={s.tytul} onZamknij={() => setPanel(null)}>{s.tresc}</PanelBoczny>;
       })()}
       <form className={`card ${style.formularz}`} aria-labelledby="kalendarz-dane" onSubmit={e => e.preventDefault()}>
         <h2 id="kalendarz-dane">{t("Twoje dane")}</h2>
         <fieldset className={style.tryb}>
-          <legend>Na jakim jesteś etapie?</legend>
+          <legend>{t("Na jakim jesteś etapie?")}</legend>
           <div className={style.tryby}>
             <button type="button" className={`btn ${urodzone ? "btn-ghost" : "btn-primary"}`} aria-pressed={!urodzone}
               onClick={() => ustawTryb("ciaza")}>{t("Jestem w ciąży")}</button>
             <button type="button" className={`btn ${urodzone ? "btn-primary" : "btn-ghost"}`} aria-pressed={urodzone}
-              onClick={() => ustawTryb("urodzone")}>Dziecko już się urodziło</button>
+              onClick={() => ustawTryb("urodzone")}>{t("Dziecko już się urodziło")}</button>
         </div>
         </fieldset>
         {urodzone ? (
@@ -553,13 +552,13 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
             <DataPole label={t("Data porodu")} value={stan.dataPorodu ?? ""}
               hint={t("Terminy po porodzie przeliczą się od tej daty.")} onChange={value => ustawDate("dataPorodu", value)} />
             <DataPole label={t("Data wypisu ze szpitala")} value={stan.dataWypisu ?? ""}
-              hint={`Bez tej daty przyjmujemy wypis ${pobyt} ${pobyt === 1 ? "dzień" : "dni"} po porodzie.`}
+              hint={t("Bez tej daty przyjmujemy wypis {dni} po porodzie.", { dni: dni(pobyt) })}
               onChange={value => ustawDate("dataWypisu", value)} />
           </div>
         ) : (
           <div className={style.glownaData}>
             <DataPole label="Planowany termin porodu" value={terminWpisany}
-              hint={terminProfilu && stan.terminPorodu === undefined ? "Termin z profilu testowego. Możesz go zmienić." : "Znajdziesz go w karcie ciąży."}
+              hint={t(terminProfilu && stan.terminPorodu === undefined ? "Termin z profilu testowego. Możesz go zmienić." : "Znajdziesz go w karcie ciąży.")}
               onChange={value => ustawDate("terminPorodu", value)} />
           </div>
         )}
@@ -587,7 +586,7 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
       </form>
       {wynik && <Os wynik={wynik} dzis={dzis} plan={plan} parametry={parametry}
         zrobione={zrobione} onZrobione={przelacz} onOtworz={setPanel} />}
-      {!terminPorodu && <p className={style.start} role="status">{urodzone ? "Wpisz datę porodu, aby zobaczyć swój kalendarz." : "Wpisz termin porodu, aby zobaczyć swój kalendarz."}</p>}
+      {!terminPorodu && <p className={style.start} role="status">{t(urodzone ? "Wpisz datę porodu, aby zobaczyć swój kalendarz." : "Wpisz termin porodu, aby zobaczyć swój kalendarz.")}</p>}
     </>
   );
 }
@@ -605,7 +604,7 @@ export default function Kalendarz({ parametry }: { parametry: Parametry }) {
       <section className={style.ograniczenia} aria-labelledby="kalendarz-ograniczenia">
         <h2 id="kalendarz-ograniczenia">{t("Podstawa i ograniczenia")}</h2>
         <details className={style.zwijane}>
-        <summary>Pokaż, na czym opiera się kalendarz</summary>
+        <summary>{t("Pokaż, na czym opiera się kalendarz")}</summary>
         <ul>
           <li>{t("Wizyta położnej po wypisie ze szpitala: przepis liczy 48 godzin bez sobót, niedziel i świąt. Kalendarz liczy zwykłe dni, więc koniec tego terminu może wypaść wcześniej.")}</li>
           <li>{t("Zdanie „Gdy pominiesz termin” to ogólne wyjaśnienie, a nie zapis przepisu. Co w Twoim przypadku oznacza pominięcie badania, sprawdź u lekarza prowadzącego.")}</li>

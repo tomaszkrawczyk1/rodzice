@@ -9,6 +9,7 @@ import { przejdzDoKroku } from "@/lib/ekran";
 import SwiadczenieRodzicielskie from "./SwiadczenieRodzicielskie";
 import { INNE_SWIADCZENIA } from "./inne-swiadczenia";
 import { useJezyk } from "@/lib/jezyk";
+import { pytanieWJezyku } from "@/content/poradnik-i18n";
 
 // Pola wyniku z drzewa, których nie opisuje wspólny typ Wezel w src/content/poradnik.ts.
 type Odnosnik = { href?: string; etykieta: string };
@@ -46,18 +47,18 @@ export default function Pytania() {
   return (
     <>
       {w.typ === "pytanie"
-        ? <Pasek tekst={postep.length === 0 ? "Pytanie 1 – całość zajmie około minuty" : `Pytanie ${postep.length + 1} z ${razem}`} procent={(postep.length / razem) * 100} />
-        : <Pasek tekst="Gotowe – oto, co dla Ciebie znaleźliśmy" procent={100} />}
-      {wybory.length > 0 && <p className="small muted kreator-wybory">Twoje odpowiedzi: {wybory.join(" → ")}</p>}
+        ? <Pasek tekst={postep.length === 0 ? t("Pytanie 1 – całość zajmie około minuty") : t("Pytanie {n} z {z}", { n: postep.length + 1, z: razem })} procent={(postep.length / razem) * 100} />
+        : <Pasek tekst={t("Gotowe – oto, co dla Ciebie znaleźliśmy")} procent={100} />}
+      {wybory.length > 0 && <p className="small muted kreator-wybory">{t("Twoje odpowiedzi:")} {wybory.map((x) => t(x)).join(" → ")}</p>}
 
       {w.typ === "pytanie" ? (
         <section className="card navy" aria-labelledby="kq">
-          <h2 id="kq" ref={naglowek} tabIndex={-1}>{w.tekst}</h2>
-          {w.podpowiedz && <p>{w.podpowiedz}</p>}
+          <h2 id="kq" ref={naglowek} tabIndex={-1}>{t(w.tekst)}</h2>
+          {w.podpowiedz && <p>{t(w.podpowiedz)}</p>}
           <div className="kreator-opcje">
             {w.opcje.map((o, i) => (
               <button key={o.nastepny + o.etykieta} type="button" className="persona kreator-opcja" onClick={() => przejdzKrok({ krok: kodujKroki([...postep, i]) })}>
-                <span>{o.etykieta}</span><span aria-hidden="true" className="kreator-strzalka">›</span>
+                <span>{t(o.etykieta)}</span><span aria-hidden="true" className="kreator-strzalka">›</span>
               </button>
             ))}
           </div>
@@ -65,11 +66,11 @@ export default function Pytania() {
       ) : <Wynik id={id} w={w} naglowek={naglowek} />}
 
       {postep.length > 0 && <div className="kreator-nawigacja no-print">
-        <button type="button" className="btn btn-ghost kreator-duzy" onClick={() => wrocDoKroku({ krok: kodujKroki(postep.slice(0, -1)) })}>‹ Wróć</button>
+        <button type="button" className="btn btn-ghost kreator-duzy" onClick={() => wrocDoKroku({ krok: kodujKroki(postep.slice(0, -1)) })}>{t("‹ Wróć")}</button>
         <button type="button" className="btn btn-ghost kreator-duzy" onClick={() => przejdzKrok({ krok: null })}>{t("Zacznij od nowa")}</button>
       </div>}
       {start !== DRZEWO_START && <p className="mt"><Link href="/kreator">{t("Zobacz wszystkie sytuacje")}</Link></p>}
-      {postep.length > 0 && <p className="small muted mt">Możesz zapisać lub wysłać komuś link do tej strony – otworzy się w tym samym miejscu.</p>}
+      {postep.length > 0 && <p className="small muted mt">{t("Możesz zapisać lub wysłać komuś link do tej strony – otworzy się w tym samym miejscu.")}</p>}
     </>
   );
 }
@@ -87,6 +88,7 @@ function Pasek({ tekst, procent }: { tekst: string; procent: number }) {
 
 function Wynik({ id, w: wezel, naglowek }: { id: string; w: Extract<Wezel, { typ: "wynik" }>; naglowek: React.RefObject<HTMLHeadingElement | null> }) {
   const w = wezel as WezelWynik;
+  const { t, jezyk } = useJezyk();
   // Świadczenie rodzicielskie liczymy na miejscu – nie odsyłamy rodzica po porodzie na stronę „w ciąży”.
   const kosiniakowe = w.kalkulator?.tryb === "swiadczenie_rodzicielskie";
   const domyslny = kosiniakowe ? null : kalkulatorLink(w.kalkulator);
@@ -100,39 +102,39 @@ function Wynik({ id, w: wezel, naglowek }: { id: string; w: Extract<Wezel, { typ
 
   return (
     <section className="card accent">
-      <h2 ref={naglowek} tabIndex={-1}>{w.tytul}</h2>
-      {w.wstep && <p className="lead">{w.wstep}</p>}
-      {opisStatusu && <div className="alert warn"><p>{opisStatusu}</p></div>}
+      <h2 ref={naglowek} tabIndex={-1}>{t(w.tytul)}</h2>
+      {w.wstep && <p className="lead">{t(w.wstep)}</p>}
+      {opisStatusu && <div className="alert warn"><p>{t(opisStatusu)}</p></div>}
 
       {kosiniakowe && <SwiadczenieRodzicielskie planowane={id.startsWith("wynik_plan")} />}
 
-      {cta && <p className="mt"><Link className="btn btn-primary kreator-duzy" href={cta.href}>{cta.etykieta}</Link></p>}
+      {cta && <p className="mt"><Link className="btn btn-primary kreator-duzy" href={cta.href}>{t(cta.etykieta)}</Link></p>}
 
-      <h3 className="mt">Przeczytaj w poradniku</h3>
+      <h3 className="mt">{t("Przeczytaj w poradniku")}</h3>
       <ul className="clean">
         {w.pytania.map((q) => {
           const p = pytanie(q);
-          return p && <li key={q}><Link href={`/poradnik#${q}`}>{p.pytanie}</Link>
-            {p.status !== "ok" && <> <span className="badge warn">Sprawdź w ZUS</span></>}
+          return p && <li key={q}><Link href={`/poradnik#${q}`}>{pytanieWJezyku(p, jezyk).pytanie}</Link>
+            {p.status !== "ok" && <> <span className="badge warn">{t("Sprawdź w ZUS")}</span></>}
           </li>;
         })}
       </ul>
 
       {druki.length > 0 && <>
-        <h3 className="mt">Formularze</h3>
-        <ul className="clean">{druki.map((d) => <li key={d.id}><Link href={`/druki#${d.id}`}>{d.nazwa}</Link></li>)}</ul>
+        <h3 className="mt">{t("Formularze")}</h3>
+        <ul className="clean">{druki.map((d) => <li key={d.id}><Link href={`/druki#${d.id}`}>{t(d.nazwa)}</Link></li>)}</ul>
       </>}
 
       {inne.length > 0 && <>
-        <h3 className="mt">Po narodzinach dziecka pamiętaj też o</h3>
+        <h3 className="mt">{t("Po narodzinach dziecka pamiętaj też o")}</h3>
         {inne.map((s) => (
           <div key={s.id} className="kreator-blok">
-            <h4>{s.nazwa}</h4>
-            <p><b>{s.ile}</b> {s.komu}</p>
-            <p>{s.gdzie} {s.termin}</p>
+            <h4>{t(s.nazwa)}</h4>
+            <p><b>{t(s.ile)}</b> {t(s.komu)}</p>
+            <p>{t(s.gdzie)} {t(s.termin)}</p>
           </div>
         ))}
-        <p className="small muted">Kwoty i warunki warto potwierdzić w ZUS lub w urzędzie przed złożeniem wniosku.</p>
+        <p className="small muted">{t("Kwoty i warunki warto potwierdzić w ZUS lub w urzędzie przed złożeniem wniosku.")}</p>
       </>}
     </section>
   );

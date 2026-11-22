@@ -5,6 +5,7 @@ import { KATEGORIE, PYTANIA, kalkulatorLink, pytanie, type Pytanie } from "@/con
 import { pytanieWJezyku } from "@/content/poradnik-i18n";
 import { useJezyk, useT } from "@/lib/jezyk";
 import { Alert } from "@/components/ui";
+import { Wstaw } from "@/components/Wstaw";
 import { zPojeciami } from "@/components/Pojecie";
 import { PODMIOTY_WSPARCIA, telHref } from "@/lib/wsparcie";
 import { RODZIC_PO_LUDZKU, krotkiAdres } from "@/lib/kontakty";
@@ -14,22 +15,22 @@ function KontaktyWsparcia() {
   const t = useT();
   return (
     <>
-      <h4>Telefony i strony organizacji</h4>
+      <h4>{t("Telefony i strony organizacji")}</h4>
       <ul className="clean">
         {PODMIOTY_WSPARCIA.map((x) => (
           <li key={x.id} className="mt">
-            <b>{x.nazwa}</b>{x.opis ? <> – {x.opis}</> : null}<br />
-            {x.telefon && <><a href={telHref(x.telefon)}>tel. {x.telefon}</a>{x.godziny ? ` (${x.godziny})` : ""} · </>}
+            <b>{x.nazwa}</b>{x.opis ? <> – {t(x.opis)}</> : null}<br />
+            {x.telefon && <><a href={telHref(x.telefon)}>{t("tel.")} {x.telefon}</a>{x.godziny ? ` (${t(x.godziny)})` : ""} · </>}
             <a href={x.www} target="_blank" rel="noopener noreferrer">{krotkiAdres(x.www)}</a>
-            {x.pewnosc === "do_potwierdzenia" && <span className="small muted"> · numer do potwierdzenia przed telefonem</span>}
+            {x.pewnosc === "do_potwierdzenia" && <span className="small muted"> · {t("numer do potwierdzenia przed telefonem")}</span>}
           </li>
         ))}
         {RODZIC_PO_LUDZKU.www && (
-          <li className="mt"><b>{RODZIC_PO_LUDZKU.nazwa}</b> – {RODZIC_PO_LUDZKU.opis}<br />
+          <li className="mt"><b>{RODZIC_PO_LUDZKU.nazwa}</b> – {t(RODZIC_PO_LUDZKU.opis)}<br />
             <a href={RODZIC_PO_LUDZKU.www} target="_blank" rel="noopener noreferrer">{krotkiAdres(RODZIC_PO_LUDZKU.www)}</a></li>
         )}
       </ul>
-      <p className="small muted mt">Więcej, także o tym, co przysługuje w trudnej sytuacji: <Link href="/trudne">{t("Pomoc w trudnej sytuacji")}</Link>.</p>
+      <p className="small muted mt">{t("Więcej, także o tym, co przysługuje w trudnej sytuacji:")} <Link href="/trudne">{t("Pomoc w trudnej sytuacji")}</Link>.</p>
     </>
   );
 }
@@ -44,12 +45,12 @@ function Karta({ p, open, onToggle, przepisy, pokaz }: { p: Pytanie; open: boole
     <details id={p.id} className="dl faq" open={open} onToggle={(e) => onToggle((e.target as HTMLDetailsElement).open)}>
       <summary>{p.pytanie}</summary>
       {p.status !== "ok" && <Alert t="warn">
-        {p.id === "F26" ? "Dane kontaktowe sprawdziliśmy na stronach organizacji. Zanim zadzwonisz, upewnij się, że numer i godziny się nie zmieniły." : <>{t("Sprawdź szczegóły w ZUS. ")}<Link href="/pue">{t("Zobacz, jak zadać pytanie")}</Link></>}
+        {p.id === "F26" ? t("Dane kontaktowe sprawdziliśmy na stronach organizacji. Zanim zadzwonisz, upewnij się, że numer i godziny się nie zmieniły.") : <>{t("Sprawdź szczegóły w ZUS.")} <Link href="/pue">{t("Zobacz, jak zadać pytanie")}</Link></>}
       </Alert>}
       {!luka && <p className="mt">{zPojeciami(p.odpowiedz, uzyte)}</p>}
       {!luka && p.kroki && p.kroki.length > 0 && (<><h4>{t("Co zrobić krok po kroku")}</h4><ol className="steps">{p.kroki.map((s, i) => <li key={i}>{zPojeciami(s, uzyte)}</li>)}</ol></>)}
       {!luka && p.id === "F26" && <KontaktyWsparcia />}
-      {!luka && p.uwaga && p.id !== "F26" && <p className="small muted mt">{zPojeciami(p.uwaga, uzyte)}</p>}
+      {!luka && p.uwaga && p.id !== "F26" && <p className="small muted mt">{zPojeciami(t(p.uwaga), uzyte)}</p>}
       <div className="row mt no-print">
         {!luka && p.druki?.map((d) => <Link key={d} className="btn btn-secondary btn-sm" href={`/druki#${d}`}>{t("Formularz {id}", { id: d })}</Link>)}
         {!luka && k && <Link className="btn btn-primary btn-sm" href={k.href}>{t(k.etykieta)}</Link>}
@@ -57,7 +58,7 @@ function Karta({ p, open, onToggle, przepisy, pokaz }: { p: Pytanie; open: boole
       {p.powiazane && p.powiazane.length > 0 && (
         <p className="small mt"><b>{t("Zobacz też powiązane tematy:")}</b> {p.powiazane.map((id) => { const pp = pytanie(id); return pp && <a key={id} href={`#${id}`} onClick={() => pokaz(id)} style={{ marginRight: 10 }}>{pytanieWJezyku(pp, jezyk).pytanie}</a>; })}</p>
       )}
-      {przepisy.length > 0 && <details className="dl"><summary>{t("Zobacz przepisy")}</summary><ul>{przepisy.map((z) => <li key={z}>{z}</li>)}</ul></details>}
+      {przepisy.length > 0 && <details className="dl"><summary>{t("Zobacz przepisy")}</summary><ul>{przepisy.map((z) => <li key={z}>{t(z)}</li>)}</ul></details>}
     </details>
   );
 }
@@ -86,8 +87,8 @@ export default function Pytania({ przepisy }: { przepisy: Record<string, string[
   }, [kat, q, jezyk]);
   return (
     <>
-      <h1>Pytania i odpowiedzi (FAQ)</h1>
-      <p className="lead">Najczęstsze pytania rodziców o zasiłki, urlopy i wnioski – z prostymi odpowiedziami, instrukcjami krok po kroku i potrzebnymi formularzami. Trudne słowa z przepisów są <b>podkreślone</b> – kliknij je, a wyjaśnimy je prościej. Nie wiesz, od czego zacząć? <Link href="/kreator">{t("Uruchom kreator spraw")}</Link> – odpowiesz na kilka prostych pytań i dowiesz się, co przysługuje w Twojej sytuacji.</p>
+      <h1>{t("Pytania i odpowiedzi (FAQ)")}</h1>
+      <p className="lead"><Wstaw tekst={t("Najczęstsze pytania rodziców o zasiłki, urlopy i wnioski – z prostymi odpowiedziami, instrukcjami krok po kroku i potrzebnymi formularzami. Trudne słowa z przepisów są {podkreslone} – kliknij je, a wyjaśnimy je prościej. Nie wiesz, od czego zacząć? {link} – odpowiesz na kilka prostych pytań i dowiesz się, co przysługuje w Twojej sytuacji.")} wartosci={{ podkreslone: <b>{t("podkreślone")}</b>, link: <Link href="/kreator">{t("Uruchom kreator spraw")}</Link> }} /></p>
       <div className="card">
         <div className="field"><label htmlFor="szukaj">{t("Wyszukaj w poradniku")}</label><input id="szukaj" type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("np. urlop ojcowski, 81,5%, zwolnienie lekarskie")} /></div>
         <div className="tabs" role="group" aria-label={t("Kategorie")}>
