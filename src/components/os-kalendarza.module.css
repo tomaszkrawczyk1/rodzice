@@ -122,44 +122,6 @@
 .rodzaj { color: var(--kolor); }
 .stan { color: #222; background: #fff; border-color: #222; }
 
-/* Tytuł otwiera panel z boku, więc to przycisk wyglądający jak zielony link. */
-.tytulPrzycisk {
-  display: inline-block;
-  min-height: 24px;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-weight: 700;
-  color: var(--zus-green-link);
-  text-align: left;
-  text-decoration: underline;
-  cursor: pointer;
-}
-.tytulPrzycisk:hover { text-decoration-thickness: 2px; }
-.tytulPrzycisk:focus-visible { outline: 3px solid var(--zus-green-link); outline-offset: 2px; }
-
-/* „Zrobione”: pole przy każdym zadaniu. Zrobione pozycje są mocno wyszarzone, ale pole zostaje czytelne. */
-.zrobione { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; margin-top: .25rem; cursor: pointer; font-weight: 700; }
-.zrobione input { width: 1.25rem; height: 1.25rem; accent-color: var(--zus-green); }
-.jestZrobione .tresc { background: var(--gray); }
-.jestZrobione .tresc > :not(.zrobione) { opacity: .5; }
-.jestZrobione .kropka { --kolor: #767676; }
-
-/* Po terminie i niezrobione: czerwona ramka i etykieta. */
-.poTerminie .tresc { border: 2px solid #b00020; }
-.stanPo {
-  display: inline-block;
-  padding: .1rem .5rem;
-  border: 1px solid #b00020;
-  border-radius: var(--radius);
-  background: #b00020;
-  color: #fff;
-  font-size: .875rem;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
 /* Znacznik „Dziś” — zieleń z białym tekstem (5,6:1). */
 .lista > li.dzis { padding-bottom: .75rem; }
 .dzis p {
@@ -178,7 +140,6 @@
   .data { grid-column: 1; grid-row: 1 / span 2; }
   .tytul { grid-column: 2; margin-top: 0 !important; }
   .znaczki { grid-column: 2; margin-top: 0 !important; }
-  .zrobione { grid-column: 2; }
 }
 
 :global(html.hc) .ciaza, :global(html.hc) .rok { background: #000; color: var(--hc-accent); border: 2px solid var(--hc-accent); }
@@ -193,11 +154,3 @@
 :global(html.hc) .znacznikDzis { background: var(--hc-accent); border-color: #fff; }
 :global(html.hc) .r_porod .tresc { border-color: var(--hc-accent); }
 :global(html.hc) .tresc.trwa { border-left-color: var(--hc-accent); }
-:global(html.hc) .tytulPrzycisk { color: var(--hc-accent); }
-:global(html.hc) .tytulPrzycisk:focus-visible { outline-color: #fff; }
-:global(html.hc) .poTerminie .tresc { border: 3px dashed #fff; }
-:global(html.hc) .stanPo { background: #fff; color: #000; border-color: #fff; }
-:global(html.hc) .jestZrobione .tresc > :not(.zrobione) { opacity: .65; }
-
-:global(html.noc) .poTerminie .tresc { border-color: #ff8a8a; }
-:global(html.noc) .stanPo { background: #ff8a8a; color: #2a0006; border-color: #ff8a8a; }

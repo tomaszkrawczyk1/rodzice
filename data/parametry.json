@@ -95,12 +95,6 @@
     "prog_liczby_ubezpieczonych_powyzej": 20
   },
 
-  "podatek": {
-    "_opis": "Tylko do ORIENTACYJNEJ kwoty 'na rękę'. Zasiłek macierzyński nie jest oskładkowany (bez składek ZUS i zdrowotnej); płatnik pobiera wyłącznie zaliczkę na PIT. Uproszczenie: pierwszy próg skali (12 %) i kwota zmniejszająca podatek (1/12 z 3600 zł) przy złożonym PIT-2. Silnik liczy zasiłek przed zaliczką, a netto dolicza na końcu.",
-    "zaliczka_pit_proc": 12,
-    "kwota_zmniejszajaca_miesieczna": 300
-  },
-
   "zmiany_od_2026_10_24": {
     "_opis": "ZUR i ZAO włączone do ZAM; Z-3b zlikwidowany. W aplikacji kierować na ZAM; stare druki traktować tylko jako materiał z przykładowych spraw.",
     "formularze_zlikwidowane": ["ZUR", "ZAO", "Z-3b"],

@@ -13,7 +13,7 @@
 //    i oznaczane `szacunkowe: true` (UI ma wtedy pokazać „orientacyjnie”).
 //  - Dzień porodu = dzień 0.
 // =====================================================================
-import { dniMiedzy, dodajDni, dodajMiesiace, planZasilku, terminy, type Parametry, type PlanWejscie } from "../engine/kalkulator.ts";
+import { dodajDni, dodajMiesiace, planZasilku, terminy, type Parametry, type PlanWejscie } from "../engine/kalkulator.ts";
 
 export type Grupa = "przed_porodem" | "po_porodzie";
 /** Etap na osi: 1–3 = trymestry ciąży, "polog" = po porodzie (mama i noworodek), "niemowle" = 1. rok życia dziecka. */
@@ -250,31 +250,4 @@ export function terminyKalendarza(w: KalendarzWejscie, parametry: Parametry, pla
     .filter(t => t.do && t.co.startsWith("Wniosek o urlop"))
     .sort((a, b) => a.do!.localeCompare(b.do!));
   return { wniosek, doPracodawcy };
-}
-
-/** Pozycja ramki „Najbliższe zadania dla Ciebie”: termin z datą i liczbą dni. */
-export interface Zadanie {
-  id: string; nazwa: string;
-  od: string; do: string;          // okno wykonania (włącznie); `do` = twardy termin, jeśli podano „najpóźniej”
-  trwa: boolean;                   // true: okno już otwarte, liczymy dni do końca; false: liczymy dni do początku
-  dni: number;                     // ile dni zostało do końca (trwa) albo do początku (nie trwa)
-  szacunkowe: boolean;
-}
-
-type ZrodloZadania = Pick<WydarzenieNaOsi, "id" | "nazwa" | "od" | "do" | "szacunkowe"> & { najpozniej?: string };
-
-/**
- * 1–`ile` najbliższych terminów od dnia `dzis`: najpierw to, co już trwa (wg końca okna), potem to, co się zaczyna (wg początku).
- * Pomija terminy, które minęły. Funkcja czysta: bez dat systemowych, `dzis` podaje wywołujący.
- */
-export function najblizszeZadania(pozycje: ZrodloZadania[], dzis: string, ile = 2): Zadanie[] {
-  return pozycje
-    .map((p) => {
-      const koniec = p.najpozniej && p.najpozniej < p.do ? p.najpozniej : p.do;
-      const trwa = p.od <= dzis;
-      return { id: p.id, nazwa: p.nazwa, od: p.od, do: koniec, trwa, dni: dniMiedzy(dzis, trwa ? koniec : p.od), szacunkowe: p.szacunkowe };
-    })
-    .filter((z) => z.do >= dzis)
-    .sort((a, b) => (a.trwa ? a.do : a.od).localeCompare(b.trwa ? b.do : b.od) || a.do.localeCompare(b.do))
-    .slice(0, Math.max(0, ile));
 }

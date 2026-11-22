@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import { metadane } from "@/i18n/metadane";
 
-export const metadata: Metadata = {
-  title: "Konto w ZUS (eZUS) – Przewodnik Przyszłego Rodzica",
-  description: "Symulacja konta w ZUS (eZUS): podgląd danych o ubezpieczeniu, zwolnieniach i składkach.",
-};
+export const generateMetadata = () => metadane(
+  "Konto w ZUS (eZUS)",
+  "Symulacja konta w ZUS (eZUS): podgląd danych o ubezpieczeniu, zwolnieniach i składkach."
+);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

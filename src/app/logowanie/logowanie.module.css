@@ -29,7 +29,8 @@
 .opis { color: #333; line-height: 1.45; }
 .meta { color: #4d4d4d; font-size: 15px; line-height: 1.4; }
 .wybierz { margin-top: auto; padding-top: 6px; color: var(--zus-green-dark, #025a28); font-weight: 700; }
-.karta:disabled { cursor: progress; opacity: .75; }
+.potwierdz { background: #fff; border: 1px solid var(--line, #dadada); border-top: 7px solid var(--zus-green, #007834); padding: 16px; max-width: 640px; }
+.potwierdz:focus { outline: none; }
 .rzad { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
 .stopka { margin-top: 20px; }
 .tytul:focus { outline: none; }

@@ -98,22 +98,20 @@ export async function testySpraw(rowne: Rowne) {
   const p03 = await licz(wniosek, profil);
   rowne("Brak chorobowego: brak wyliczeń i link do uprawnień", [p03.duza, p03.nastepne, wywolania.length], [undefined, ["co-przysluguje"], 0]);
   const chorobowe = await licz(chor, { zatrudnienie: "umowa", pelnyEtat: "nie", brutto: "3 450,25", dniNiezd: "23", w50: "tak", dniWykorzystane: "5", platnik: "duzy" });
-  rowne("Chorobowe: część etatu, 23 dni, 9 dni wynagrodzenia i 14 dni zasiłku", [chorobowe.duza, chorobowe.szczegoly?.slice(1).map(([_, v]) => v.split(":")[0])], [pln(2282.54), ["9 dni", "14 dni"]]);
+  rowne("Chorobowe: część etatu, 23 dni, 9 dni wynagrodzenia i 14 dni zasiłku", [chorobowe.duza, chorobowe.szczegoly?.slice(1).map(([_, v]) => v.split(":")[0])], [pln(2282.52), ["9 dni", "14 dni"]]);
 
   const przyszlaData = dodajDni(new Date().toISOString().slice(0, 10), 30);
   const zam = await licz(wniosek, { dataPorodu: przyszlaData, liczbaDzieci: "2", podstawaM: "5522,56", zatrudnienie: "umowa", platnik: "nie_wiem", wariant: "nie_wiem" });
-  rowne("Porównanie ZAM: suma standardowa przy bliźniętach", zam.duza, pln(70615.14));
-  rowne("Porównanie ZAM: pokazuje sumę stawki uśrednionej", zam.info?.[0]?.tresc.includes(pln(68263.44)), true);
+  rowne("Porównanie ZAM: suma standardowa przy bliźniętach", zam.duza, pln(70616.21));
+  rowne("Porównanie ZAM: pokazuje sumę stawki uśrednionej", zam.info?.[0]?.tresc.includes(pln(68263.65)), true);
   rowne("Nieznany płatnik nie daje pewnego adresata", zam.status, "do_potwierdzenia");
   const pozny = await licz(wniosek, { dataPorodu: "2020-06-10", liczbaDzieci: "2", podstawaM: "5522.56", zatrudnienie: "umowa", platnik: "maly", wariant: "usredniony" });
-  rowne("Po terminie 81,5%: kwota w standardowym wariancie i ostrzeżenie", [pozny.duza, pozny.ostrzezenia?.some((w) => w.includes("minął"))], [pln(70615.14), true]);
+  rowne("Po terminie 81,5%: kwota w standardowym wariancie i ostrzeżenie", [pozny.duza, pozny.ostrzezenia?.some((w) => w.includes("minął"))], [pln(70616.21), true]);
 
   // Poprawki UX: najważniejszy termin na górze, lista dokumentów, mniej pytań, kwoty „ok." bez groszy.
   rowne("ZAM: termin 81,5% jest osobno, na górze wyniku", zam.pilne?.do, dodajDni(przyszlaData, parametry.terminy_dni.wniosek_pelny_wymiar_81_5_po_porodzie));
   rowne("ZAM po terminie: brak ramki z terminem", pozny.pilne, undefined);
-  const odpis = async (platnik: string) => (await licz(wniosek, { dataPorodu: przyszlaData, liczbaDzieci: "1", podstawaM: "5522,56", zatrudnienie: "umowa", platnik, wariant: "nie_wiem" })).dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia"));
-  rowne("ZAM: odpis aktu urodzenia tylko gdy wypłaca pracodawca (rozp. § 13 ust. 2): duży / mały / nie wiem", [await odpis("duzy"), await odpis("maly"), await odpis("nie_wiem")], [true, false, true]);
-  rowne("ZAM: lista „Weź ze sobą” zawiera akt urodzenia (płatnik nieznany) i Z-3", [zam.dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia")), zam.dokumenty?.pozycje.some((x) => x.includes("Z-3"))], [true, true]);
+  rowne("ZAM: lista „Weź ze sobą” zawiera akt urodzenia i Z-3", [zam.dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia")), zam.dokumenty?.pozycje.some((x) => x.includes("Z-3"))], [true, true]);
   rowne("ZAM, przyszły poród: jest zaświadczenie lekarskie", zam.dokumenty?.pozycje.some((x) => x.includes("Zaświadczenie lekarskie")), true);
   rowne("ZAM: kwota miesięczna „ok.” bez groszy", /ok\. [\d\s]+zł miesięcznie/.test(zam.podpis ?? ""), true);
   rowne("ZAM nie pyta o wariant wypłaty (zawsze porównanie)", pytania(wniosek).some((q) => q.id === "wariant"), false);
@@ -125,22 +123,22 @@ export async function testySpraw(rowne: Rowne) {
   const p4 = await licz(urlop, { rodzaj: "uzupelniajacy", od: "2027-06-15", do: "2027-06-28", dziecko: "2027-01-02", imie: "Jan Testowy", pracodawca: "Firma testowa" });
   rowne("Uzupełniający: poprawny nagłówek i termin od końca macierzyńskiego", [p4.glowne.includes("o uzupełniający urlop macierzyński"), p4.terminy?.[0]?.do], [true, "2027-05-24"]);
   const p5 = await licz("podzial-urlopu", { dataPorodu: "2027-06-10", liczbaDzieci: "3", podstawaM: "5522.56", zatrudnienieO: "dzialalnosc", bruttoO: "7800", ojcowski: "tak", odOjcowski: "2027-07-02" });
-  rowne("Podział: ojcowski od wybranej daty, własna firma drugiego rodzica", [p5.duza, p5.terminy?.find((t) => /ojcowski/.test(t.co))?.do], [pln(88595.10), "2027-06-25"]);
+  rowne("Podział: ojcowski od wybranej daty, własna firma drugiego rodzica", [p5.duza, p5.terminy?.find((t) => /ojcowski/.test(t.co))?.do], [pln(88596.48), "2027-06-25"]);
   const p6 = await licz(praca, { dataPorodu: "2027-06-10", liczbaDzieci: "2", podstawaM: "5522.56", tygPraca: "34", etat: "0.5" });
   rowne("Praca z bliźniętami: pełne 34 tygodnie puli", p6.glowne.includes("34 tygodnie"), true);
   const p7 = await licz("adopcja", { rodzajAdopcji: "rodzina_zastepcza", dataPorodu: "2027-06-10", dataUr: "2019-06-10", odroczenie: "nie" });
   rowne("Adopcja: przekroczony limit wieku bez pozornej kwoty", [p7.status, p7.duza], ["do_potwierdzenia", undefined]);
   const p7b = await licz("adopcja", { rodzajAdopcji: "rodzina_zastepcza", dataPorodu: "2027-06-10", dataUr: "2019-06-10", odroczenie: "tak", liczbaDzieci: "1", podstawaM: "5522.56" });
-  rowne("Odroczenie szkoły zmienia granicę i daje wyliczenie", p7b.duza, pln(54636.53));
+  rowne("Odroczenie szkoły zmienia granicę i daje wyliczenie", p7b.duza, pln(54637.24));
   const p7c = await licz("adopcja", { rodzajAdopcji: "rodzina_zastepcza", dataPorodu: "2027-01-10", dataUr: "2020-01-11", odroczenie: "nie", liczbaDzieci: "1", podstawaM: "5867.72" });
-  rowne("Przyjęcie dzień przed limitem wieku: 9 tygodni na warunkach macierzyńskiego i 29 rodzicielskiego", p7c.duza, pln(40115.64));
+  rowne("Przyjęcie dzień przed limitem wieku: 9 tygodni na warunkach macierzyńskiego i 29 rodzicielskiego", p7c.duza, pln(40114.90));
   const p9 = await licz("terminy", { rodzajZdarzenia: "przysposobienie", dataPrzyjecia: "2027-06-10", znaKoniec: "tak", koniec: "2028-02-29" });
   rowne("Terminy adopcji liczą przedawnienie od podanego końca", p9.terminy?.map((t) => t.do), ["2027-06-17", "2027-07-01", "2027-07-01", "2028-08-29"]);
   const p9b = await licz("terminy", { rodzajZdarzenia: "porod", dataPorodu: "2027-06-10", znaKoniec: "nie" });
   rowne("Nieznany koniec okresu nie tworzy fikcyjnego terminu przedawnienia", p9b.terminy?.length, 1);
 
   rowne("Kwota dzienna macierzyńskiego ma dwa miejsca po przecinku", kwotaOkresu(5608.85, 100, 140, 1, false, parametry).kwotaDzienna, 186.96);
-  rowne("Zaokrąglenie dzienne nie zmienia kwoty za wyliczony okres", kwotaOkresu(5608.85, 100, 140, 1, false, parametry).kwota, 26174.63);
+  rowne("Kwota za okres = stawka dzienna zaokrąglona do grosza × dni (jak w ZUS)", kwotaOkresu(5608.85, 100, 140, 1, false, parametry).kwota, 26174.40);
 
   const frazy: [string, string | null][] = [
     ["czy dostanę zasiłek bez ubezpieczenia","co-przysluguje"],

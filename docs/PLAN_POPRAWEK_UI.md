@@ -98,19 +98,19 @@ Uwaga: wyszukiwarka na stronie głównej i porządek w repozytorium nadal wymaga
 - To samo dla „Najbliższe zadania dla Ciebie” u góry.
 - Gdzie: `src/components/OsKalendarza.tsx`, `src/components/os-kalendarza.module.css`, `src/components/Kalendarz.tsx`.
 
-## 11. „Kalendarz w urzędzie” (dawne Terminy w urzędach) – oś czasu ✅ WYKONANE (na `wyglad-zus`)
+## 11. „Kalendarz w urzędzie” (dawne Terminy w urzędach) – oś czasu
 - Dodać oś czasu **jak w Kalendarzu ciąży** (ten sam komponent, jeśli się da).
 - Na osi: krótka wersja (data, nazwa, gdzie złożyć). Kliknięcie otwiera panel z boku z pełną instrukcją (dokumenty, linki do druków, źródła).
 - Wyróżnione „Teraz / co zrobić teraz”.
 - Zaznaczanie „Zrobione” + wyszarzenie; po terminie i niezrobione = czerwone (jak w pkt 10).
 - Gdzie: `src/app/terminarz/Terminarz.tsx`, `src/components/OsKalendarza.tsx`.
 
-## 12. Adopcja – podwójna kwota ✅ WYKONANE (zostaje duża zielona kwota, czarna usunięta)
+## 12. Adopcja – podwójna kwota
 - Teraz: „Szacowany zasiłek …: 85 240,71 zł.” w nagłówku (czarne) i drugi raz duża zielona kwota.
 - Ma być: kwota tylko raz, **czarna**. Usuń dużą zieloną.
 - Gdzie: grep „Szacowany zasiłek” (`src/app/trudne/`, `src/app/kalkulator/WynikSzczegoly.tsx`).
 
-## 13. Kolory przycisków ✅ WYKONANE (na `wyglad-zus`)
+## 13. Kolory przycisków
 - Niektóre przyciski są granatowe/niebieskie (np. „Tekst 100%”, „Nocny”, „Kontrast”, „Wstecz”, „Ustaw 9 tygodni…”, filtry w osi czasu „Wszystko / Badania i wizyty…”).
 - Ujednolicić na zielony (główny – pełny zielony, drugorzędny – biały z zieloną ramką).
 - Gdzie: `src/app/globals.css`, `src/app/ux.css`, `src/components/ui.tsx`, `src/components/Dostepnosc.tsx`.

@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import { metadane } from "@/i18n/metadane";
 
-export const metadata: Metadata = {
-  title: "Co mi przysługuje w ciąży – Przewodnik Przyszłego Rodzica",
-  description: "Sprawdź, jakie świadczenia i uprawnienia przysługują w czasie ciąży: zasiłek chorobowy, ochrona w pracy, badania.",
-};
+export const generateMetadata = () => metadane(
+  "Co mi przysługuje w ciąży",
+  "Sprawdź, jakie świadczenia i uprawnienia przysługują w czasie ciąży: zasiłek chorobowy, ochrona w pracy, badania."
+);
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;

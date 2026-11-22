@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useT } from "@/lib/jezyk";
 import type { Sytuacja } from "./stale";
 import css from "./kalkulator.module.css";
 
@@ -8,7 +9,7 @@ const OPCJE: { id: Sytuacja; tytul: string; opis: string }[] = [
   { id: "oboje", tytul: "Oboje rodzice", opis: "Podział urlopu rodzicielskiego, urlop ojcowski i porównanie kwot." },
   { id: "laczenie", tytul: "Praca + urlop rodzicielski", opis: "Łączenie urlopu rodzicielskiego z pracą do połowy etatu." },
   { id: "adopcja", tytul: "Adopcja / rodzina zastępcza", opis: "Dziecko przyjęte na wychowanie." },
-  { id: "ojciec", tytul: "Tata lub drugi rodzic", opis: "Tylko urlop ojcowski i rodzicielski jednej osoby. Krótsza ścieżka: 4 kroki zamiast 6." },
+  { id: "ojciec", tytul: "Tata lub drugi rodzic", opis: "Tylko urlop ojcowski i rodzicielski jednej osoby." },
   { id: "wlasne", tytul: "Moje dane / przykładowa sprawa", opis: "Gotowy scenariusz albo dane z wgranego wniosku." },
 ];
 
@@ -20,6 +21,7 @@ export function przekazFokusWyboru() { fokusNaWyborze = true; }
 
 /** Krok 1 obu ścieżek kalkulatora: jedna grupa przycisków radiowych (ten sam wzorzec ARIA co wariant w kroku 5). */
 export function WyborSytuacji({ wartosc, onZmiana, children }: { wartosc: Sytuacja; onZmiana: (s: Sytuacja) => void; children?: ReactNode }) {
+  const t = useT();
   const nazwa = useId();
   const zestaw = useRef<HTMLFieldSetElement>(null);
   useEffect(() => {
@@ -30,12 +32,12 @@ export function WyborSytuacji({ wartosc, onZmiana, children }: { wartosc: Sytuac
   return (
     <>
       <fieldset className={css.zestaw} ref={zestaw}>
-        <legend>Wybierz, co chcesz policzyć</legend>
+        <legend>{t("Wybierz, co chcesz policzyć")}</legend>
         <div className={css.opcje}>
           {OPCJE.map((o) => (
             <label key={o.id} className={css.opcja}>
               <input type="radio" name={nazwa} value={o.id} checked={wartosc === o.id} onChange={() => onZmiana(o.id)} />
-              <span><b>{o.tytul}</b><span className={css.opis}>{o.opis}</span></span>
+              <span><b>{t(o.tytul)}</b><span className={css.opis}>{t(o.opis)}</span></span>
             </label>
           ))}
         </div>

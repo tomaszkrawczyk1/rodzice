@@ -84,34 +84,3 @@ a.krokEl:hover .nazwa { text-decoration: underline; }
 .lista { margin: 0; padding: 0; list-style: none; }
 .lista li { padding: 8px 0; border-bottom: 1px solid var(--line); }
 .lista li:last-child { border-bottom: 0; }
-
-/* --- wyjaśnienie liczby kroków (ścieżka taty ma 4 kroki zamiast 6) --- */
-.uwagaKrokow { margin: 0 0 8px; font-size: 16px; color: var(--ink); border-left: 4px solid var(--zus-navy); padding: 4px 10px; background: var(--gray); }
-
-/* --- szybkie porównanie nad kreatorem --- */
-.szybkie { max-width: 62rem; margin-bottom: 24px; }
-.szybkieTytul { margin: 0 0 8px; }
-.siatka3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 16px; align-items: start; }
-@media (max-width: 860px) { .siatka3 { grid-template-columns: minmax(0, 1fr); } }
-
-/* tabela: brutto i „na rękę" jedno pod drugim w komórce, żeby mieściła się na 375 px */
-.tabelaPorownania th[scope="row"] { font-weight: 700; }
-.kwotaBrutto { display: block; font-weight: 700; white-space: nowrap; }
-.kwotaNetto { display: block; margin-top: 2px; color: var(--zus-green-dark, var(--ink)); white-space: nowrap; }
-.dopisek { font-weight: 400; font-size: 14px; color: var(--muted); white-space: normal; }
-.dopisekBlok { display: block; font-weight: 400; font-size: 14px; color: var(--muted); }
-.kwotaNettoDuza { margin: 0 0 10px; font-size: 20px; }
-.kwotaNettoDuza b { font-size: 24px; }
-
-/* --- zarobki: osobny blok dla każdego rodzica --- */
-.zestawRodzica { border: 0; margin: 0; padding: 0; min-width: 0; }
-.zestawRodzica legend { padding: 0; margin: 0 0 6px; font-weight: 700; font-size: 18px; }
-
-/* --- ostrzeżenie o zaległych składkach --- */
-.bezMarginesu { margin: 0 0 6px; }
-.listaKrokow { margin: 0; padding-left: 22px; }
-.listaKrokow li { margin: 4px 0; }
-@media (max-width: 479px) {
-  .tabelaPorownania th, .tabelaPorownania td { padding: 8px 6px; }
-  .kwotaBrutto, .kwotaNetto { font-size: 15px; }
-}

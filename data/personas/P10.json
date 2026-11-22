@@ -1,7 +1,7 @@
 {
  "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
  "osoba": "Tomasz Krawczyk",
- "pesel": "00000000010",
+ "pesel": "85030112354",
  "ubezpieczenie": [
   {
    "tytul": "umowa_o_prace",

@@ -1,4 +1,5 @@
 import Kalkulator from "./Kalkulator";
+import { tZSerwera } from "@/i18n/serwer";
 
 // Tytuł i opis strony są w layout.tsx tej trasy.
 // Odczyt searchParams robi z trasy stronę dynamiczną: treść bieżącego kroku (?tryb=…&krok=…) jest renderowana na serwerze
@@ -6,10 +7,11 @@ import Kalkulator from "./Kalkulator";
 // Dalej adres jest stanem widoku po stronie klienta (history.pushState: krok = wpis historii), więc propsa nie przekazujemy.
 export default async function Page({ searchParams }: { searchParams: Promise<{ [klucz: string]: string | string[] | undefined }> }) {
   await searchParams;
+  const t = await tZSerwera();
   return (
     <>
-      <h1>Kalkulator zasiłku macierzyńskiego</h1>
-      <p className="lead">Sprawdź, ile zasiłku dostaniesz co miesiąc. Na szybko wystarczy pensja. Dokładny plan z datami i podziałem urlopu policzysz krok po kroku niżej. Pokazujemy kwoty brutto i szacunkowo na rękę.</p>
+      <h1>{t("Kalkulator zasiłku macierzyńskiego")}</h1>
+      <p className="lead">{t("Odpowiedz na kilka pytań, a pokażemy szacunkową kwotę zasiłku i podział urlopów. Zasiłek pokazujemy przed zaliczką na podatek.")}</p>
       <Kalkulator />
     </>
   );

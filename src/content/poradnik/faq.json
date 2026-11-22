@@ -43,11 +43,11 @@
       "pytanie": "Czy w ciąży należy mi się zasiłek chorobowy i ile wynosi?",
       "odpowiedz": "Tak, jeśli masz ubezpieczenie chorobowe i e-ZLA z kodem B. Zasiłek wynosi 100% podstawy wymiaru (w pozostałych przypadkach 80%). Okres zasiłkowy w ciąży to do 270 dni. Pierwsze 33 dni niezdolności w roku kalendarzowym (14 dni, gdy pracownik ukończył 50 lat – liczy się od roku następującego po roku ukończenia 50 lat) pracownik dostaje od pracodawcy jako wynagrodzenie chorobowe, dalej zasiłek. Okres wyczekiwania to zwykle 30 dni (ubezpieczenie obowiązkowe) lub 90 dni (dobrowolne).",
       "kroki": [
-        "Poproś lekarza o zwolnienie z kodem B – to znak, że zwolnienie wynika z ciąży.",
-        "Nie musisz nigdzie zanosić zwolnienia – lekarz wysyła e-ZLA do ZUS i do pracodawcy.",
-        "Sprawdź, czy jesteś ubezpieczona wystarczająco długo: 30 dni (umowa o pracę) albo 90 dni (dobrowolne ubezpieczenie).",
-        "Przez pierwsze 33 dni zwolnienia w roku płaci pracodawca (14 dni, jeśli masz ukończone 50 lat), potem ZUS.",
-        "Masz własną firmę? Wtedy zasiłek zawsze wypłaca ZUS."
+        "Lekarz wystawia e-ZLA z kodem B (ciąża).",
+        "e-ZLA zwykle trafia elektronicznie do ZUS i pracodawcy – nie trzeba go przynosić.",
+        "Sprawdź, czy upłynął okres wyczekiwania: 30 dni (umowa o pracę) albo 90 dni (ubezpieczenie dobrowolne).",
+        "Pierwsze 33 dni (14 dni po 50. roku życia) wypłaca pracodawca, dalej zasiłek.",
+        "Osobie prowadzącej działalność zawsze wypłaca ZUS."
       ],
       "druki": [
         "ZAS-53",
@@ -80,9 +80,9 @@
       "pytanie": "Kiedy mogę NIE dostać zasiłku chorobowego w ciąży albo dostanę mniej?",
       "odpowiedz": "Zasiłek nie przysługuje m.in.: gdy nie upłynął okres wyczekiwania (30 lub 90 dni), przy zachowaniu prawa do wynagrodzenia, w czasie urlopu bezpłatnego, wychowawczego, aresztu lub kary pozbawienia wolności, przy pracy zarobkowej lub użyciu zwolnienia niezgodnie z jego przeznaczeniem i przy sfałszowanym zaświadczeniu. Osobie prowadzącej działalność zasiłek nie przysługuje przy zadłużeniu składkowym. Na pisemny wniosek ubezpieczonej kod B nie jest wpisywany.",
       "kroki": [
-        "Sprawdź, czy jesteś ubezpieczona wystarczająco długo (okres wyczekiwania).",
-        "Nie pracuj zarobkowo na zwolnieniu – możesz stracić zasiłek.",
-        "Masz własną firmę? Sprawdź, czy nie masz zaległych składek w dniu, od którego należy Ci się zasiłek."
+        "Sprawdź, czy minął okres wyczekiwania.",
+        "Nie wykonuj pracy zarobkowej na zwolnieniu.",
+        "Prowadzisz działalność? Sprawdź zadłużenie składkowe na dzień powstania prawa."
       ],
       "druki": [],
       "zrodla": [
@@ -106,9 +106,9 @@
       "pytanie": "Czy w ciąży należy mi się świadczenie rehabilitacyjne?",
       "odpowiedz": "Świadczenie rehabilitacyjne dostają ubezpieczeni, którzy wyczerpali zasiłek chorobowy i nadal są niezdolni do pracy, ale rokują odzyskanie zdolności. Trwa do 12 miesięcy. Wynosi 90% podstawy wymiaru zasiłku chorobowego za pierwsze trzy miesiące i 75% za pozostały okres, a 100%, gdy niezdolność do pracy przypada w okresie ciąży. O prawie do świadczenia orzeka lekarz orzecznik ZUS.",
       "kroki": [
-        "To świadczenie dostaniesz dopiero wtedy, gdy skończy się zasiłek chorobowy, a Ty nadal nie możesz pracować.",
-        "Decyzję podejmuje lekarz orzecznik ZUS.",
-        "Wniosek składasz tam, skąd dostajesz zasiłek: w ZUS albo u pracodawcy, jeśli zgłasza do ubezpieczenia powyżej 20 osób."
+        "Zasiłek chorobowy musi być wyczerpany, a niezdolność do pracy trwać dalej.",
+        "O prawie orzeka lekarz orzecznik ZUS.",
+        "Wniosek składa się do płatnika zasiłku: ZUS albo płatnik składek zgłaszający powyżej 20 ubezpieczonych."
       ],
       "druki": [],
       "zrodla": [
@@ -138,9 +138,9 @@
       "pytanie": "Straciłam pracę w ciąży (np. upadłość firmy). Co mi przysługuje?",
       "odpowiedz": "Pracownicy, której umowa o pracę wygasła z powodu śmierci pracodawcy albo została rozwiązana w ciąży z powodu upadłości lub likwidacji pracodawcy, i której nie zapewniono innego zatrudnienia, przysługuje do dnia porodu zasiłek w wysokości zasiłku macierzyńskiego. Po porodzie zasiłek macierzyński przysługuje, gdy ubezpieczenie ustało w ciąży z tych powodów albo z naruszeniem prawa stwierdzonym prawomocnym orzeczeniem sądu. Prawo ustala i wypłaca płatnik składek zgłaszający powyżej 20 ubezpieczonych, w pozostałych przypadkach ZUS.",
       "kroki": [
-        "Zachowaj dokumenty: zaświadczenie lekarskie, że byłaś w ciąży w czasie zatrudnienia, oraz świadectwo pracy (albo inny dokument), z którego wynika, że umowa skończyła się z powodu śmierci pracodawcy, upadłości lub likwidacji firmy.",
-        "Złóż wniosek tam, skąd będzie wypłacany zasiłek: w ZUS albo u płatnika składek, który zgłasza powyżej 20 osób.",
-        "Pieniądze powinny przyjść najpóźniej 30 dni od chwili, gdy ZUS lub płatnik ma już wszystkie potrzebne informacje."
+        "Zachowaj dokumenty: zaświadczenie lekarskie o ciąży w okresie zatrudnienia oraz świadectwo pracy lub inny dokument potwierdzający wygaśnięcie umowy z powodu śmierci pracodawcy albo jej rozwiązanie z powodu upadłości/likwidacji.",
+        "Złóż wniosek do płatnika zasiłku (ZUS albo płatnik składek zgłaszający powyżej 20 ubezpieczonych).",
+        "Wypłata najpóźniej w 30 dni od wyjaśnienia ostatniej okoliczności."
       ],
       "druki": [
         "ZAM"
@@ -179,8 +179,8 @@
       "pytanie": "Czy pracodawca może mnie zwolnić, gdy jestem w ciąży lub na urlopie?",
       "odpowiedz": "W ciąży, w czasie urlopu macierzyńskiego i od dnia złożenia wniosku o urlop (macierzyński, na warunkach macierzyńskiego, uzupełniający, ojcowski, rodzicielski) do końca urlopu pracodawca nie może wypowiedzieć ani rozwiązać umowy. Wyjątki: wina pracownicy i zgoda zakładowej organizacji związkowej oraz upadłość lub likwidacja pracodawcy. Pracodawca nie może też prowadzić przygotowań do wypowiedzenia lub rozwiązania umowy. Ciąża musi być potwierdzona zaświadczeniem lekarskim.",
       "kroki": [
-        "Poproś lekarza o zaświadczenie, że jesteś w ciąży, i przekaż je pracodawcy.",
-        "Złóż wniosek o urlop – od dnia złożenia wniosku pracodawca nie może Cię zwolnić."
+        "Zdobądź zaświadczenie lekarskie o ciąży.",
+        "Złóż wniosek o urlop – od tego dnia chroni Cię przepis o zakazie wypowiedzenia."
       ],
       "druki": [],
       "zrodla": [
@@ -209,8 +209,8 @@
       "pytanie": "Moja umowa na czas określony kończy się w ciąży. Co dalej?",
       "odpowiedz": "Umowa o pracę na czas określony albo na okres próbny przekraczający jeden miesiąc, która uległaby rozwiązaniu po upływie 3. miesiąca ciąży, przedłuża się do dnia porodu. Nie dotyczy to umowy na zastępstwo.",
       "kroki": [
-        "Sprawdź, czy w dniu, w którym umowa miała się skończyć, będziesz już po 3. miesiącu ciąży. Jeśli tak – umowa przedłuży się do dnia porodu.",
-        "Sprawdź, czy to nie jest umowa na zastępstwo – takiej umowy się nie przedłuża."
+        "Sprawdź, czy ciąża trwa dłużej niż 3 miesiące w chwili, gdy umowa miała się skończyć.",
+        "Sprawdź rodzaj umowy – umowa na zastępstwo nie jest przedłużana."
       ],
       "druki": [],
       "zrodla": [
@@ -237,9 +237,9 @@
       "pytanie": "Ile trwa urlop macierzyński i zasiłek macierzyński?",
       "odpowiedz": "20 tygodni przy jednym dziecku, 31 przy dwojgu, 33 przy trojgu, 35 przy czworgu i 37 przy pięciorgu i więcej dzieci. Przed przewidywaną datą porodu można wykorzystać nie więcej niż 6 tygodni, resztę po porodzie. Pierwsze 14 tygodni po porodzie przysługuje wyłącznie matce. Jeśli nie korzystasz z urlopu przed porodem, pierwszym dniem urlopu jest dzień porodu. Tydzień urlopu to 7 dni kalendarzowych.",
       "kroki": [
-        "Ile dzieci urodziło się przy tym porodzie? Od tego zależy długość urlopu.",
-        "Zdecyduj, czy chcesz zacząć urlop jeszcze przed porodem (najwyżej 6 tygodni wcześniej). Potrzebne będzie zaświadczenie lekarskie z przewidywaną datą porodu.",
-        "Złóż u pracodawcy wniosek o urlop, a potem wniosek o zasiłek (druk ZAM)."
+        "Ustal liczbę dzieci urodzonych przy jednym porodzie.",
+        "Zdecyduj, czy chcesz wziąć do 6 tygodni przed porodem (potrzebne zaświadczenie lekarskie o przewidywanej dacie porodu).",
+        "Złóż wniosek o urlop u pracodawcy i wniosek o zasiłek ZAM."
       ],
       "druki": [
         "ZAM"
@@ -274,11 +274,11 @@
       "kategoria": "po_urodzeniu",
       "status": "ok",
       "pytanie": "Ile pieniędzy dostanę – 100%, 70% czy 81,5%?",
-      "odpowiedz": "Za urlop macierzyński, uzupełniający i ojcowski zasiłek wynosi 100% podstawy wymiaru. Za urlop rodzicielski – 70%. Jeśli mama złoży wniosek w ciągu 21 dni po porodzie, za cały urlop macierzyński i rodzicielski dostaje równo 81,5% podstawy. Jeśli minęło już 21 dni, zasiłek nie przepada: dostaniesz wariant 100% za urlop macierzyński i 70% za rodzicielski. W sumie to prawie ta sama kwota – inaczej rozłożona w czasie. Część urlopu rodzicielskiego przysługująca drugiemu rodzicowi (9 tygodni) jest zawsze po 70%. Podstawa wymiaru to kwota, od której liczy się zasiłek: przeciętne miesięczne wynagrodzenie z 12 miesięcy pomniejszone o składki (13,71%). Zasiłek za jeden dzień to 1/30 tej kwoty.",
+      "odpowiedz": "Za urlop macierzyński, uzupełniający i ojcowski zasiłek wynosi 100% podstawy wymiaru. Za urlop rodzicielski – 70%. Jeśli matka złoży wniosek w ciągu 21 dni po porodzie, za cały okres macierzyński i rodzicielski dostaje 81,5% podstawy. Część urlopu rodzicielskiego przysługująca drugiemu rodzicowi (9 tygodni) jest zawsze po 70%. Podstawa wymiaru to przeciętne miesięczne wynagrodzenie z 12 miesięcy pomniejszone o 13,71%, a za jeden dzień – 1/30 tej kwoty.",
       "kroki": [
-        "Policz w kalkulatorze, od jakiej kwoty liczy się Twój zasiłek (zarobki z ostatnich 12 miesięcy).",
-        "Porównaj w kalkulatorze oba warianty: 100%, a potem 70% – albo równe 81,5% przez cały czas.",
-        "Chcesz wariant 81,5%? Złóż wniosek najpóźniej 21 dni po porodzie. Jeśli nie zdążysz, nic nie przepada – dostaniesz wariant 100% i 70%."
+        "Policz podstawę wymiaru z zarobków z 12 miesięcy (kalkulator).",
+        "Porównaj wariant 100%/70% z wariantem 81,5% w kalkulatorze.",
+        "Wariant 81,5% wybierasz wnioskiem złożonym najpóźniej 21 dni po porodzie."
       ],
       "druki": [
         "ZAM"
@@ -327,11 +327,11 @@
       "kategoria": "dokumenty",
       "status": "ok",
       "pytanie": "Co to jest wariant 81,5% i co, jeśli spóźnię wniosek?",
-      "odpowiedz": "Wariant 81,5% to równa kwota zasiłku przez cały urlop macierzyński i rodzicielski – zamiast 100% na początku i 70% później. Żeby go wybrać, mama składa jeden „długi wniosek” o zasiłek za cały ten czas, najpóźniej w ciągu 21 dni po porodzie. Jeśli minęło już 21 dni, zasiłek nie przepada: dostaniesz wariant 100% za urlop macierzyński i 70% za rodzicielski. W sumie to prawie ta sama kwota – inaczej rozłożona w czasie. Przy adopcji i rodzinie zastępczej termin to 21 dni od przyjęcia dziecka (i wystąpienia do sądu).",
+      "odpowiedz": "To „długi wniosek” matki o zasiłek za okres urlopu macierzyńskiego i rodzicielskiego w pełnym wymiarze. Składa się go najpóźniej w ciągu 21 dni po porodzie. Brak takiego wniosku w tym terminie oznacza utratę wariantu 81,5% – zasiłek wynosi wtedy 100% za urlop macierzyński i 70% za rodzicielski. Przy adopcji i rodzinie zastępczej termin to 21 dni od przyjęcia dziecka (i wystąpienia do sądu).",
       "kroki": [
-        "Policz oba warianty w kalkulatorze i wybierz ten, który bardziej Ci pasuje.",
-        "Wybierasz 81,5%? Złóż wniosek, zanim minie 21 dni od porodu.",
-        "Nie zdążyłaś? Spokojnie – zasiłek nadal dostaniesz, tylko w wariancie 100% i 70%."
+        "Policz oba warianty w kalkulatorze.",
+        "Jeśli wybierasz 81,5% – złóż wniosek przed upływem 21 dni po porodzie.",
+        "Po terminie wariant 81,5% przepada – zasiłek liczy się po 100% i 70%."
       ],
       "druki": [
         "ZAM"
@@ -369,11 +369,11 @@
       "kategoria": "po_urodzeniu",
       "status": "ok",
       "pytanie": "Jak liczy się podstawę wymiaru zasiłku?",
-      "odpowiedz": "Podstawa wymiaru to kwota, od której ZUS liczy zasiłek. Dla pracownika: przeciętne miesięczne wynagrodzenie brutto za 12 miesięcy kalendarzowych przed miesiącem, w którym urodziło się dziecko (lub zaczęło się zwolnienie), po odliczeniu składek (13,71%). Przy krótszym stażu – z pełnych miesięcy ubezpieczenia. Przy pełnym etacie podstawa nie może być niższa niż płaca minimalna pomniejszona o 13,71%. Przy umowie zlecenia lub własnej firmie: przeciętny przychód (kwota, od której płacisz składki) z 12 miesięcy pomniejszony o 13,71%; w 2026 r. limit podstawy zasiłku wynosi 20 321,30 zł. Zasiłek za jeden dzień to 1/30 miesięcznej podstawy. Zmiana pracy lub przerwa w ubezpieczeniu wpływa na podstawę.",
+      "odpowiedz": "Dla pracownika: przeciętne miesięczne wynagrodzenie za 12 miesięcy kalendarzowych poprzedzających miesiąc zdarzenia, po odliczeniu składek (13,71%). Przy krótszym stażu – z pełnych miesięcy ubezpieczenia. Przy pełnym etacie podstawa nie może być niższa niż płaca minimalna pomniejszona o 13,71%. Dla niebędącego pracownikiem: przeciętny przychód (podstawa składek) z 12 miesięcy pomniejszony o 13,71%; w 2026 r. limit podstawy zasiłku wynosi 20 321,30 zł. Podstawa za jeden dzień to 1/30. Zmiana pracy lub przerwa w ubezpieczeniu wpływa na podstawę.",
       "kroki": [
-        "Przygotuj swoje zarobki z ostatnich 12 miesięcy – pracodawca poda je w zaświadczeniu Z-3.",
-        "Nie pracujesz na etacie (np. masz zlecenie)? Przygotuj kwoty, od których płacono składki – są w zaświadczeniu Z-3a.",
-        "Wpisz dane do kalkulatora – pokaże obliczenia krok po kroku."
+        "Przygotuj zarobki z ostatnich 12 miesięcy (pracodawca poda je w zaświadczeniu Z-3).",
+        "Osoba niebędąca pracownikiem: podaj podstawy składek (zaświadczenie Z-3a).",
+        "Wpisz dane do kalkulatora – pokaże kroki obliczeń."
       ],
       "druki": [
         "Z-3",
@@ -406,12 +406,12 @@
       "kategoria": "podzial_rodzice",
       "status": "ok",
       "pytanie": "Czy tata może przejąć część urlopu macierzyńskiego mamy?",
-      "odpowiedz": "Tak, gdy mama wykorzysta po porodzie co najmniej 14 tygodni urlopu. Może wtedy zrezygnować z reszty urlopu i wrócić do pracy, jeśli resztę wykorzysta tata, który pracuje na etacie i wychowuje dziecko (albo tata, który jest ubezpieczony i na ten czas przerwie pracę zarobkową). Mama składa wniosek do pracodawcy co najmniej 7 dni przed powrotem do pracy, a tata wniosek o część urlopu co najmniej 14 dni przed jego rozpoczęciem.",
+      "odpowiedz": "Tak, po wykorzystaniu przez matkę co najmniej 14 tygodni po porodzie. Matka może wtedy zrezygnować z reszty urlopu i wrócić do pracy, jeśli resztę wykorzysta pracownik-ojciec wychowujący dziecko (albo ubezpieczony ojciec, który przerwał działalność zarobkową). Matka składa wniosek do pracodawcy co najmniej 7 dni przed powrotem do pracy, a ojciec wniosek o część urlopu co najmniej 14 dni przed jego rozpoczęciem.",
       "kroki": [
-        "Mama wykorzystuje po porodzie co najmniej 14 tygodni urlopu.",
-        "Mama składa pracodawcy wniosek o rezygnację z reszty urlopu – co najmniej 7 dni przed powrotem do pracy – i dołącza kopię wniosku taty.",
-        "Tata składa swojemu pracodawcy wniosek o resztę urlopu – co najmniej 14 dni przed jej rozpoczęciem.",
-        "Jeśli zasiłek wypłaca ZUS, potrzebne są też: oświadczenie mamy, od kiedy urlop przejmuje tata, i zaświadczenie od jej pracodawcy, kiedy kończy urlop."
+        "Matka wykorzystuje po porodzie co najmniej 14 tygodni.",
+        "Matka składa wniosek o rezygnację z reszty urlopu (min. 7 dni przed powrotem do pracy), z kopią wniosku ojca.",
+        "Ojciec składa wniosek o część urlopu (min. 14 dni przed startem).",
+        "Przy zasiłku wypłacanym przez ZUS potrzebne są też oświadczenie matki o dacie, od której ojciec korzysta z uprawnień, i zaświadczenie pracodawcy o terminie zaprzestania urlopu."
       ],
       "druki": [
         "ZAM",
@@ -452,7 +452,7 @@
         "Ustalcie, kto ile bierze – każde z Was ma 9 tygodni tylko dla siebie.",
         "Zdecydujcie, czy bierzecie urlop jednocześnie, czy po kolei, i na ile części (maks. 5).",
         "Każde z Was składa wniosek u swojego pracodawcy najpóźniej 21 dni przed startem.",
-        "Do wniosku o zasiłek dołączcie oświadczenia, czy drugie z Was korzysta z urlopu (to rubryki we wniosku)."
+        "Do wniosku o zasiłek dołączcie oświadczenia o korzystaniu / niekorzystaniu przez drugiego rodzica."
       ],
       "druki": [
         "ZAM"
@@ -497,7 +497,7 @@
       "kroki": [
         "Ustal, ile etatu chcesz pracować (maksymalnie połowa).",
         "Złóż wniosek do pracodawcy 21 dni przed podjęciem pracy; określ w nim, jak wykorzystasz wydłużoną część urlopu.",
-        "Jeśli pracodawca odmówi, musi Ci o tym powiedzieć i podać powód w ciągu 7 dni."
+        "Pracodawca ma 7 dni na odpowiedź, gdy odmawia."
       ],
       "druki": [],
       "zrodla": [
@@ -531,9 +531,9 @@
       "pytanie": "Jak działa urlop ojcowski?",
       "odpowiedz": "Do 2 tygodni, najdłużej do ukończenia przez dziecko 12. miesiąca życia (po adopcji – 12 miesięcy od uprawomocnienia postanowienia, nie później niż do 14. roku życia). Można go wykorzystać jednorazowo albo w 2 częściach, każda co najmniej tydzień. Zasiłek wynosi 100% podstawy. Wniosek składa się co najmniej 7 dni przed rozpoczęciem. Po upływie terminu prawo wygasa.",
       "kroki": [
-        "Zaplanuj urlop tak, żeby wykorzystać go, zanim dziecko skończy 12 miesięcy.",
-        "Złóż wniosek u pracodawcy co najmniej 7 dni przed rozpoczęciem urlopu.",
-        "Wniosek o zasiłek: druk ZAM (albo wniosek do pracodawcy). Dołącz skrócony odpis aktu urodzenia i oświadczenie, że nie dostałeś już zasiłku za urlop ojcowski z innego źródła (np. z drugiej pracy)."
+        "Wybierz termin przed ukończeniem przez dziecko 12 miesięcy.",
+        "Złóż wniosek u pracodawcy co najmniej 7 dni przed startem.",
+        "Zasiłek: wniosek ZAM (albo wniosek do pracodawcy) wraz ze skróconym odpisem aktu urodzenia i oświadczeniem, czy zasiłek za urlop ojcowski nie był pobrany z innego tytułu."
       ],
       "druki": [
         "ZAM"
@@ -570,11 +570,11 @@
       "kategoria": "trudne",
       "status": "ok",
       "pytanie": "Dziecko urodziło się przedwcześnie lub długo leży w szpitalu. Co mi przysługuje?",
-      "odpowiedz": "Przysługuje Ci uzupełniający urlop macierzyński, czyli dodatkowy urlop: tydzień za każdy tydzień pobytu dziecka w szpitalu: do 15. tygodnia po porodzie, gdy dziecko urodziło się przed 28. tygodniem ciąży lub ważyło do 1000 g; do 8. tygodnia po porodzie, gdy urodziło się między 28. a 37. tygodniem ciąży i ważyło ponad 1000 g; przy porodzie po 37. tygodniu – gdy pobyt w szpitalu trwał co najmniej 2 kolejne dni, a pierwszy z nich przypadał między 5. a 28. dniem po porodzie. Pobyty sumuje się, a niepełny tydzień zaokrągla w górę. Zasiłek wynosi 100% podstawy. Urlop przysługuje matce albo ojcu bezpośrednio po macierzyńskim i jest udzielany jednorazowo.",
+      "odpowiedz": "Uzupełniający urlop macierzyński – tydzień za każdy tydzień pobytu dziecka w szpitalu: do 15. tygodnia po porodzie, gdy dziecko urodziło się przed 28. tygodniem ciąży lub ważyło do 1000 g; do 8. tygodnia po porodzie, gdy urodziło się między 28. a 37. tygodniem ciąży i ważyło ponad 1000 g; przy porodzie po 37. tygodniu – gdy pobyt w szpitalu trwał co najmniej 2 kolejne dni, a pierwszy z nich przypadał między 5. a 28. dniem po porodzie. Pobyty sumuje się, a niepełny tydzień zaokrągla w górę. Zasiłek wynosi 100% podstawy. Urlop przysługuje matce albo ojcu bezpośrednio po macierzyńskim i jest udzielany jednorazowo.",
       "kroki": [
-        "Poproś szpital o zaświadczenie: jak długo dziecko było w szpitalu oraz w którym tygodniu ciąży się urodziło lub ile ważyło.",
-        "Złóż wniosek u pracodawcy najpóźniej 21 dni przed końcem urlopu macierzyńskiego.",
-        "Dołącz oświadczenie drugiego rodzica, że nie będzie korzystać z tego dodatkowego urlopu ani z zasiłku za ten czas."
+        "Weź ze szpitala zaświadczenie: okres pobytu dziecka oraz tydzień ciąży lub masa urodzeniowa.",
+        "Złóż wniosek do pracodawcy co najmniej 21 dni przed zakończeniem urlopu macierzyńskiego.",
+        "Dołącz oświadczenie drugiego rodzica, że nie zamierza korzystać z uzupełniającego urlopu ani z zasiłku za ten okres."
       ],
       "druki": [
         "ZAM"
@@ -610,7 +610,7 @@
       "pytanie": "Dziecko ma zaświadczenie „Za życiem”. Co się zmienia?",
       "odpowiedz": "Urlop rodzicielski jest dłuższy: 65 tygodni przy jednym dziecku i 67 przy dwojgu i więcej (zamiast 41 i 43). Przy łączeniu z pracą limit to 130 i 134 tygodnie. Zasiłek za urlop rodzicielski wynosi 70% podstawy. Do wniosku o zasiłek dołącza się oświadczenie o posiadaniu przez dziecko zaświadczenia, a do wniosku o urlop – kopię zaświadczenia. Bez zaświadczenia wydłużony wymiar nie przysługuje.",
       "kroki": [
-        "Poproś lekarza o zaświadczenie „Za życiem” (z art. 4 ust. 3 ustawy „Za życiem”).",
+        "Zdobądź zaświadczenie z art. 4 ust. 3 ustawy „Za życiem”.",
         "Dołącz kopię zaświadczenia do wniosku o urlop.",
         "Do wniosku o zasiłek dołącz oświadczenie o posiadaniu przez dziecko zaświadczenia."
       ],
@@ -647,12 +647,12 @@
       "kategoria": "dokumenty",
       "status": "ok",
       "pytanie": "Kto wypłaca zasiłek – pracodawca czy ZUS i gdzie składam wniosek?",
-      "odpowiedz": "Jeśli Twój płatnik składek zgłasza do ubezpieczenia chorobowego powyżej 20 ubezpieczonych (stan na 30 listopada poprzedniego roku), zasiłek ustala i wypłaca pracodawca – wniosek składasz do niego. W pozostałych przypadkach wypłaca ZUS: gdy płatnik zgłasza 20 lub mniej osób, a także osobom prowadzącym własną firmę (pozarolniczą działalność), duchownym i uprawnionym za okres po ustaniu ubezpieczenia. Gdy wypłaca ZUS, pracodawca dodatkowo przekazuje zaświadczenie płatnika składek: Z-3 dla pracownika, Z-3a dla ubezpieczonego z innego tytułu. Osoba prowadząca działalność składa do ZUS wniosek ZAM i nie składa dodatkowo zaświadczenia płatnika.",
+      "odpowiedz": "Jeśli Twój płatnik składek zgłasza do ubezpieczenia chorobowego powyżej 20 ubezpieczonych (stan na 30 listopada poprzedniego roku), zasiłek ustala i wypłaca pracodawca – wniosek składasz do niego. W pozostałych przypadkach wypłaca ZUS: gdy płatnik zgłasza 20 lub mniej osób, a także osobom prowadzącym pozarolniczą działalność, duchownym i uprawnionym za okres po ustaniu ubezpieczenia. Gdy wypłaca ZUS, pracodawca dodatkowo przekazuje zaświadczenie płatnika składek: Z-3 dla pracownika, Z-3a dla ubezpieczonego z innego tytułu. Osoba prowadząca działalność składa do ZUS wniosek ZAM i nie składa dodatkowo zaświadczenia płatnika.",
       "kroki": [
-        "Zapytaj w kadrach, ile osób firma zgłasza do ubezpieczenia chorobowego.",
-        "Więcej niż 20 osób: wniosek o zasiłek składasz u pracodawcy – on też wypłaca pieniądze.",
-        "20 osób lub mniej: zasiłek wypłaca ZUS. Składasz wniosek ZAM, a pracodawca przekazuje do ZUS zaświadczenie Z-3 (etat) lub Z-3a (zlecenie).",
-        "Masz własną firmę: wniosek ZAM składasz bezpośrednio w ZUS."
+        "Sprawdź, ilu ubezpieczonych zgłasza Twój pracodawca (więcej niż 20 – wypłaca pracodawca).",
+        "Pracodawca ma >20: złóż wniosek do pracodawcy.",
+        "Pracodawca ma 20 lub mniej: wniosek ZAM, a pracodawca przekazuje do ZUS Z-3 (pracownik) lub Z-3a (zlecenie).",
+        "Prowadzisz działalność: ZAM bezpośrednio do ZUS."
       ],
       "druki": [
         "ZAM",
@@ -697,9 +697,9 @@
       "pytanie": "Jakie dokumenty muszę dołączyć?",
       "odpowiedz": "Zależy od sytuacji. Urodzenie dziecka: zaświadczenie lekarskie o przewidywanej dacie porodu (za okres przed porodem) oraz odpis skrócony aktu urodzenia (gdy zasiłek wypłaca ZUS, ZUS może sam pozyskać odpis z rejestru stanu cywilnego). Urodzenie martwe: odpis z adnotacją albo zaświadczenie o martwym urodzeniu. Uzupełniający urlop: zaświadczenie ze szpitala i oświadczenie drugiego rodzica. Urlop rodzicielski: oświadczenia o drugim rodzicu. Urlop ojcowski: odpis aktu urodzenia i oświadczenie o zasiłku z innego tytułu. Dziecko z „Za życiem”: oświadczenie o zaświadczeniu. Adopcja i rodzina zastępcza: patrz pytanie o adopcję.",
       "kroki": [
-        "Odpowiedz na kilka pytań w kreatorze spraw – pokaże listę dokumentów dla Twojej sytuacji.",
-        "Dołącz dokumenty do wniosku ZAM (a jeśli wypłaca ZUS – także do zaświadczenia Z-3 lub Z-3a).",
-        "Jeśli ZUS nie znajdzie odpisu aktu urodzenia w rejestrze, poprosi Cię o niego i da na to co najmniej 14 dni."
+        "Wybierz w drzewie decyzyjnym swoją sytuację – pokaże listę dokumentów.",
+        "Dołącz dokumenty do wniosku ZAM (i do zaświadczenia Z-3 / Z-3a, jeśli wypłaca ZUS).",
+        "Jeśli ZUS nie może uzyskać odpisu z rejestru, wzywa do jego przedstawienia w terminie nie krótszym niż 14 dni."
       ],
       "druki": [
         "ZAM",
@@ -749,11 +749,11 @@
       "kategoria": "ryzyka",
       "status": "ok",
       "pytanie": "Jakie terminy mogę przegapić i co mi wtedy grozi?",
-      "odpowiedz": "Wniosek o 81,5%: 21 dni po porodzie. Po tym terminie tracisz tylko ten wariant, a nie zasiłek – dostaniesz 100% za urlop macierzyński i 70% za rodzicielski, w sumie prawie tyle samo. Wniosek o urlop rodzicielski: co najmniej 21 dni przed startem. Wniosek o urlop ojcowski: co najmniej 7 dni przed. Uzupełniający urlop: co najmniej 21 dni przed końcem macierzyńskiego. Przejęcie części urlopu przez tatę: 14 dni przed. Rezygnacja mamy z części urlopu: 7 dni przed powrotem do pracy. O wypłatę zasiłku macierzyńskiego można się upomnieć najpóźniej 6 miesięcy od ostatniego dnia, za który przysługuje – potem roszczenie się przedawnia. Urlop ojcowski trzeba wykorzystać, zanim dziecko skończy 12 miesięcy – potem prawo wygasa.",
+      "odpowiedz": "Wniosek o 81,5%: 21 dni po porodzie (po terminie – tracisz ten wariant). Wniosek o urlop rodzicielski: co najmniej 21 dni przed startem. Wniosek o urlop ojcowski: co najmniej 7 dni przed. Uzupełniający urlop: co najmniej 21 dni przed końcem macierzyńskiego. Przejęcie części urlopu przez ojca: 14 dni przed. Rezygnacja matki z części urlopu: 7 dni przed powrotem do pracy. Roszczenie o zasiłek macierzyński przedawnia się po 6 miesiącach od ostatniego dnia okresu, za który zasiłek przysługuje. Urlop ojcowski trzeba wykorzystać do ukończenia przez dziecko 12 miesięcy – potem prawo wygasa.",
       "kroki": [
         "Zapisz datę porodu – od niej liczą się terminy.",
         "Ustaw sobie przypomnienia: 21 dni po porodzie (81,5%), 21 dni przed urlopem rodzicielskim, 7 dni przed ojcowskim.",
-        "Złóż wniosek o zasiłek najpóźniej 6 miesięcy od ostatniego dnia, za który Ci przysługuje."
+        "Zasiłek składaj tak, by zmieścić się w 6 miesiącach od ostatniego dnia okresu."
       ],
       "druki": [
         "ZAM"
@@ -780,13 +780,6 @@
           "kol": [
             "G"
           ]
-        },
-        {
-          "typ": "excel",
-          "wiersz": 11,
-          "kol": [
-            "G"
-          ]
         }
       ],
       "powiazane": [
@@ -802,12 +795,12 @@
       "kategoria": "ryzyka",
       "status": "ok",
       "pytanie": "Prowadzę działalność. Na co muszę uważać?",
-      "odpowiedz": "Zasiłek macierzyński wymaga ubezpieczenia chorobowego (dobrowolnego) w dniu porodu – trzeba się do niego zgłosić. Jeśli w dniu, od którego należy Ci się zasiłek (zwykle w dniu porodu), masz zaległości składkowe powyżej 1% minimalnego wynagrodzenia, zasiłek nie przysługuje do czasu spłaty całości zadłużenia, a prawo przedawnia się, jeśli dług nie zostanie spłacony w ciągu 6 miesięcy; wypłata następuje najpóźniej w 60 dni od spłaty. Po rozpoczęciu zasiłku zostajesz automatycznie wyrejestrowany z dobrowolnego ubezpieczenia chorobowego i musisz zgłosić się ponownie. Zasiłek zawsze wypłaca ZUS. Podstawą jest przychód, czyli zadeklarowana podstawa składek pomniejszona o 13,71%.",
+      "odpowiedz": "Zasiłek macierzyński wymaga ubezpieczenia chorobowego (dobrowolnego) w dniu porodu – trzeba się do niego zgłosić. Jeśli w dniu powstania prawa masz zaległości składkowe powyżej 1% minimalnego wynagrodzenia, zasiłek nie przysługuje do czasu spłaty całości zadłużenia, a prawo przedawnia się, jeśli dług nie zostanie spłacony w ciągu 6 miesięcy; wypłata następuje najpóźniej w 60 dni od spłaty. Po rozpoczęciu zasiłku zostajesz automatycznie wyrejestrowany z dobrowolnego ubezpieczenia chorobowego i musisz zgłosić się ponownie. Zasiłek zawsze wypłaca ZUS. Podstawą jest przychód, czyli zadeklarowana podstawa składek pomniejszona o 13,71%.",
       "kroki": [
-        "Sprawdź, czy masz dobrowolne ubezpieczenie chorobowe i czy nie masz zaległych składek (możesz to sprawdzić w aplikacji – symulacja).",
-        "Jeśli zaległości przekraczają 1% minimalnego wynagrodzenia, spłać je przed porodem.",
+        "Sprawdź swoje ubezpieczenie chorobowe i zadłużenie składkowe (symulacja w aplikacji).",
+        "Spłać zaległości przed dniem powstania prawa, jeśli przekraczają 1% minimalnego wynagrodzenia.",
         "Złóż wniosek ZAM bezpośrednio do ZUS (najwygodniej przez eZUS).",
-        "Gdy zasiłek się skończy, zgłoś się ponownie do dobrowolnego ubezpieczenia chorobowego."
+        "Po zasiłku zgłoś się ponownie do dobrowolnego ubezpieczenia chorobowego."
       ],
       "druki": [
         "ZAM",
@@ -842,8 +835,8 @@
       "pytanie": "Nie mam prawa do zasiłku macierzyńskiego. Czy coś mi przysługuje?",
       "odpowiedz": "Świadczenie rodzicielskie: 1000 zł miesięcznie, bez kryterium dochodowego, przez 52 tygodnie przy jednym dziecku (65 przy dwojgu, 67 przy trojgu, 69 przy czworgu, 71 przy pięciorgu i więcej). Jest przeznaczone dla osób bez prawa do zasiłku macierzyńskiego (np. bezrobotnych, studentów, osób na umowie o dzieło). Nie przysługuje, jeśli któryś z rodziców pobiera zasiłek macierzyński za okres urlopu. Wniosek składa się w urzędzie gminy lub miasta: złożony w ciągu 3 miesięcy od urodzenia dziecka daje prawo od miesiąca urodzenia, a po terminie – dopiero od miesiąca złożenia wniosku.",
       "kroki": [
-        "Sprawdź, czy żadne z rodziców nie pobiera zasiłku macierzyńskiego za ten sam czas.",
-        "Złóż wniosek w urzędzie gminy lub miasta (można przez internet) w ciągu 3 miesięcy od urodzenia dziecka – wtedy pieniądze należą się od miesiąca urodzenia."
+        "Sprawdź, czy ktokolwiek z rodziców nie pobiera zasiłku macierzyńskiego za ten okres.",
+        "Złóż wniosek w urzędzie gminy lub miasta (także elektronicznie) w ciągu 3 miesięcy od urodzenia."
       ],
       "druki": [],
       "zrodla": [
@@ -875,9 +868,9 @@
       "odpowiedz": "Zasiłek macierzyński wymaga, by ubezpieczenie chorobowe trwało w dniu porodu (wyjątki: poród w okresie urlopu wychowawczego, ustanie ubezpieczenia w ciąży wskutek śmierci, upadłości lub likwidacji pracodawcy albo z naruszeniem prawa stwierdzonym wyrokiem). Prawo do zasiłku chorobowego powstaje po 30 dniach ubezpieczenia (90 – dobrowolnie), a poprzednie okresy wlicza się, gdy przerwa nie przekroczyła 30 dni. Podstawa wymiaru u tego samego pracodawcy nie jest liczona na nowo przy przerwie krótszej niż miesiąc kalendarzowy, a przy przerwie co najmniej miesięcznej ustala się ją od nowa. Zmiana pracy wpływa na podstawę wymiaru.",
       "uwaga": "Kwestia wliczania zarobków od poprzedniego pracodawcy do podstawy zasiłku w nietypowych sytuacjach wymaga indywidualnego sprawdzenia w ZUS.",
       "kroki": [
-        "Sprawdź, kiedy zaczęłaś nową pracę i czy przerwa między pracami była krótsza niż 30 dni.",
+        "Sprawdź, kiedy zaczęła się nowa praca i czy przerwa była krótsza niż 30 dni.",
         "Upewnij się, że w dniu porodu będziesz ubezpieczona chorobowo.",
-        "Zbierz informacje o zarobkach z obu prac – są potrzebne do wyliczenia zasiłku."
+        "Zbierz zarobki z obu miejsc pracy do wyliczenia podstawy."
       ],
       "druki": [
         "Z-3"
@@ -922,13 +915,13 @@
       "kategoria": "adopcja",
       "status": "do_potwierdzenia",
       "pytanie": "Adoptujemy dziecko lub zostajemy rodziną zastępczą. Ile trwa urlop i ile wynosi zasiłek?",
-      "odpowiedz": "Urlop na warunkach urlopu macierzyńskiego: 20 tygodni przy jednym dziecku, 31 przy dwojgu, 33 przy trojgu, 35 przy czworgu, 37 przy pięciorgu i więcej – najdłużej do ukończenia przez dziecko 7. roku życia (10 przy odroczeniu obowiązku szkolnego) w rodzinie zastępczej niezawodowej albo 14. roku życia, gdy wystąpiono do sądu o przysposobienie. Urlop rodzicielski: 41 tygodni (43 przy dwojgu i więcej dzieci, 65/67 przy „Za życiem”). Zasiłek: 100% za urlop na warunkach macierzyńskiego, 70% za rodzicielski, 81,5% przy wniosku w ciągu 21 dni od przyjęcia dziecka (jeśli nie zdążycie, zasiłek nie przepada – będzie 100% i 70%). Wniosek o urlop składa się w ciągu 7 dni od przyjęcia dziecka, a urlop rozpoczyna się najpóźniej 21 dni od tej daty.",
+      "odpowiedz": "Urlop na warunkach urlopu macierzyńskiego: 20 tygodni przy jednym dziecku, 31 przy dwojgu, 33 przy trojgu, 35 przy czworgu, 37 przy pięciorgu i więcej – najdłużej do ukończenia przez dziecko 7. roku życia (10 przy odroczeniu obowiązku szkolnego) w rodzinie zastępczej niezawodowej albo 14. roku życia, gdy wystąpiono do sądu o przysposobienie. Urlop rodzicielski: 41 tygodni (43 przy dwojgu i więcej dzieci, 65/67 przy „Za życiem”). Zasiłek: 100% za urlop na warunkach macierzyńskiego, 70% za rodzicielski, 81,5% przy wniosku w ciągu 21 dni od przyjęcia dziecka. Wniosek o urlop składa się w ciągu 7 dni od przyjęcia dziecka, a urlop rozpoczyna się najpóźniej 21 dni od tej daty.",
       "uwaga": "Zasady dotyczące urlopu na starsze dzieci oraz granice wieku wymagają potwierdzenia bezpośrednio w ZUS ze względu na niejednoznaczne przepisy.",
       "kroki": [
-        "W ciągu 7 dni od przyjęcia dziecka złóż u pracodawcy wniosek o urlop.",
-        "Przygotuj dokumenty: oświadczenie, kiedy przyjęliście dziecko. Przy adopcji – zaświadczenie z sądu opiekuńczego, kiedy złożyliście wniosek o przysposobienie (adopcję). Przy rodzinie zastępczej – orzeczenie sądu o umieszczeniu dziecka albo umowę ze starostą oraz dokument z wiekiem dziecka.",
-        "Złóż wniosek ZAM (z datą przyjęcia dziecka) i oświadczenie ZAS-26.",
-        "Jeśli zasiłek wypłaca ZUS – pracodawca przekazuje jeszcze Z-3 (etat) albo Z-3a."
+        "W ciągu 7 dni od przyjęcia dziecka złóż wniosek o urlop do pracodawcy.",
+        "Przygotuj oświadczenie o dacie przyjęcia dziecka na wychowanie oraz (adopcja) zaświadczenie sądu opiekuńczego o dacie wystąpienia o przysposobienie, a (rodzina zastępcza) orzeczenie sądu o umieszczeniu dziecka albo umowę ze starostą i dokument potwierdzający wiek dziecka.",
+        "Złóż wniosek ZAM (data przyjęcia dziecka na wychowanie) oraz oświadczenie ZAS-26.",
+        "Gdy wypłaca ZUS – dodatkowo Z-3 (pracownik) albo Z-3a."
       ],
       "druki": [
         "ZAM",
@@ -972,9 +965,9 @@
       "pytanie": "Dziecko urodziło się martwe albo zmarło. Co mi przysługuje?",
       "odpowiedz": "Matce przysługuje zasiłek macierzyński za 8 tygodni po porodzie (56 dni), nie krócej niż 7 dni od dnia zgonu dziecka – gdy dziecko urodziło się martwe lub zmarło przed ukończeniem 8. tygodnia życia. Gdy dziecko zmarło po 8. tygodniu życia, prawo przysługuje przez 7 dni od dnia zgonu. Przy porodzie mnogim wymiar jest stosowny do liczby dzieci pozostałych przy życiu. Zasiłek wynosi 100% podstawy. Dodatkowo przysługuje zasiłek pogrzebowy 7000 zł.",
       "kroki": [
-        "Złóż wniosek o zasiłek macierzyński (druk ZAM). Jeśli zasiłek wypłaca ZUS, potrzebne jest też zaświadczenie Z-3 lub Z-3a od pracodawcy.",
-        "Dołącz skrócony odpis aktu urodzenia z adnotacją o martwym urodzeniu. Jeśli akt nie został sporządzony – zaświadczenie o martwym urodzeniu od lekarza położnika-ginekologa (także w trakcie specjalizacji) albo od położnej.",
-        "Jeśli zasiłek wypłaca ZUS, odpisu nie musisz dołączać – ZUS sam pobierze go z rejestru."
+        "Złóż wniosek o zasiłek macierzyński (ZAM); gdy wypłaca ZUS – dodatkowo Z-3 lub Z-3a.",
+        "Dołącz skrócony odpis aktu urodzenia z adnotacją o martwym urodzeniu albo – gdy nie sporządzono aktu – zaświadczenie o martwym urodzeniu wydane przez lekarza specjalistę (lub w trakcie specjalizacji) w dziedzinie położnictwa i ginekologii albo przez położną.",
+        "Gdy płatnikiem jest ZUS, odpisu nie trzeba przedstawiać – ZUS pozyskuje go z rejestru stanu cywilnego."
       ],
       "druki": [
         "ZAM",
@@ -1005,13 +998,13 @@
       "id": "F25",
       "kategoria": "trudne",
       "status": "do_potwierdzenia",
-      "pytanie": "Gdy mamy zabrakło albo nie może zająć się dzieckiem – co przysługuje tacie?",
-      "odpowiedz": "Tata (albo inny ubezpieczony członek najbliższej rodziny) ma prawo do części urlopu macierzyńskiego, która przypada po dniu śmierci mamy albo po tym, jak mama opuściła dziecko (w przepisach: porzucenie). Gdy mama opuściła dziecko – nie wcześniej niż po wykorzystaniu przez nią co najmniej 8 tygodni urlopu lub zasiłku po porodzie. Łączny urlop mamy i taty nie może przekroczyć 20/31/33/35/37 tygodni (zależnie od liczby dzieci). Zasiłek: 100% za urlop macierzyński, 70% za rodzicielski. We wniosku tata podaje w oświadczeniu datę śmierci mamy albo datę opuszczenia dziecka, a dołącza skrócony odpis aktu urodzenia.",
-      "uwaga": "Termin 21 dni na wniosek o wariant 81,5% w tej sytuacji warto potwierdzić w ZUS – ale nawet po tym terminie zasiłek nie przepada. Akt zgonu nie jest wymagany – wystarczy oświadczenie.",
+      "pytanie": "Mama dziecka zmarła, porzuciła dziecko albo nie może się nim zająć. Co przysługuje tacie?",
+      "odpowiedz": "Ojciec (albo inny ubezpieczony członek najbliższej rodziny) ma prawo do części urlopu macierzyńskiego przypadającej po dniu zgonu matki albo po porzuceniu dziecka. Przy porzuceniu – nie wcześniej niż po wykorzystaniu przez matkę co najmniej 8 tygodni urlopu lub zasiłku po porodzie. Łączny wymiar urlopu matki i ojca nie może przekroczyć wymiaru 20/31/33/35/37 tygodni. Zasiłek: 100% za urlop macierzyński, 70% za rodzicielski. Wniosek ojca zawiera oświadczenie o dacie zgonu matki albo o dacie porzucenia dziecka, a załącznikiem jest skrócony odpis aktu urodzenia.",
+      "uwaga": "Termin 21 dni na wniosek o wariant 81,5% w tej sytuacji warto potwierdzić bezpośrednio w ZUS. Akt zgonu nie jest w rozporządzeniach wymieniony jako dokument niezbędny – zastępuje go oświadczenie.",
       "kroki": [
-        "Tata składa u swojego pracodawcy wniosek o część urlopu macierzyńskiego i w oświadczeniu podaje datę śmierci mamy albo datę opuszczenia dziecka.",
-        "Dołącz skrócony odpis aktu urodzenia dziecka.",
-        "Do wniosku o zasiłek dołącz: skrócony odpis aktu urodzenia, zaświadczenie o tym, za jaki okres i w jakiej wysokości mama dostawała zasiłek (wystawia je ten, kto go wypłacał), oraz oświadczenie o sytuacji."
+        "Ojciec składa wniosek do pracodawcy o część urlopu macierzyńskiego z oświadczeniem o dacie zgonu/porzucenia.",
+        "Załącz skrócony odpis aktu urodzenia dziecka.",
+        "Zasiłek: skrócony odpis aktu urodzenia, zaświadczenie płatnika zasiłku o okresie i stawce zasiłku wypłaconego matce oraz oświadczenie o śmierci matki lub porzuceniu dziecka."
       ],
       "druki": [
         "ZAM"
@@ -1052,10 +1045,10 @@
       "status": "do_potwierdzenia",
       "pytanie": "Gdzie szukać wsparcia po stracie dziecka, poronieniu lub przy wcześniaku?",
       "odpowiedz": "Organizacje pozarządowe i grupy wsparcia dla rodziców w trudnych sytuacjach: Fundacja Wcześniak Rodzice-Rodzicom (rodzice dzieci urodzonych przed 36. tygodniem ciąży), Fundacja Medycyny Prenatalnej im. Ernesta Wójcickiego (wsparcie po poronieniu i martwym urodzeniu), Fundacja Warszawskie Hospicjum dla Dzieci – Hospicjum Perinatalne, Fundacja Panda Team im. Michałka Tarachowicza (grupy wsparcia po stracie dziecka), Fundacja Rodzić po Ludzku (informator o poronieniu i martwym urodzeniu w szpitalu).",
-      "uwaga": "Dane kontaktowe sprawdziliśmy na stronach organizacji. Zanim zadzwonisz, upewnij się, że numer i godziny się nie zmieniły.",
+      "uwaga": "Przed kontaktem zweryfikuj aktualne dane kontaktowe bezpośrednio na stronach poszczególnych organizacji.",
       "kroki": [
-        "Skorzystaj z bezpłatnego wsparcia psychologicznego lub grup wsparcia – nie musisz radzić sobie sama.",
-        "Telefony i strony organizacji znajdziesz poniżej. Przed rozmową zajrzyj na ich stronę – godziny dyżurów mogą się zmienić."
+        "Skorzystaj z bezpłatnego wsparcia psychologicznego lub grup wsparcia.",
+        "Zanim skontaktujesz się z organizacją, sprawdź aktualne dane kontaktowe na jej oficjalnej stronie."
       ],
       "druki": [],
       "zrodla": [
@@ -1080,7 +1073,7 @@
       "pytanie": "Jak zdobyć odpis aktu urodzenia dziecka?",
       "odpowiedz": "Skrócony odpis aktu urodzenia dołącza się do wniosków o zasiłek i urlop. Gdy zasiłek wypłaca ZUS, odpisu nie trzeba przedstawiać – ZUS pozyskuje go z rejestru stanu cywilnego. Wniosek o odpis można złożyć w urzędzie stanu cywilnego albo online (profil zaufany, e-usługa „Uzyskaj odpis aktu stanu cywilnego”).",
       "kroki": [
-        "Wybierz rodzaj odpisu – do zasiłku i urlopu dołącza się odpis skrócony.",
+        "Zdecyduj: odpis skrócony czy zupełny.",
         "Złóż wniosek online przez gov.pl albo w urzędzie stanu cywilnego.",
         "Zasiłek wypłaca ZUS? Odpisu nie dołączaj – ZUS pozyska go sam."
       ],

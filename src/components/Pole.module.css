@@ -4,7 +4,3 @@
 .pole :global([aria-invalid="true"]) { border: 2px solid #b00020; }
 :global(html.hc) .blad { color: #ffb3b3; }
 :global(html.hc) .pole :global([aria-invalid="true"]) { border-color: #ffb3b3; }
-/* Gwiazdka przy polu wymaganym: ten sam czerwony co błąd; czytnik ekranu czyta zamiast niej „pole wymagane". */
-.gwiazdka { color: #b00020; font-weight: 700; }
-:global(html.hc) .gwiazdka { color: #ffb3b3; }
-.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

@@ -1,15 +1,9 @@
-import { KOLORY, RODZAJE, dataPL } from "@/lib/format";
-import css from "./timeline.module.css";
+import { KOLORY, RODZAJE } from "@/lib/format";
+import { useFormaty, useT } from "@/lib/jezyk";
 
 export interface OkresT { rodzaj: string; kto: string; od: string; do: string; dni: number; kwota?: number }
 const MS = 86400000;
 const t = (s: string) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
-
-/** Krótkie podpisy w paskach (pełne nazwy są w legendzie). */
-const KROTKIE: Record<string, string> = {
-  macierzynski: "Macierzyński", macierzynski_przed_porodem: "Przed porodem", uzupelniajacy: "Uzupełniający",
-  rodzicielski: "Rodzicielski", rodzicielski_9tyg_drugiego_rodzica: "9 tyg.", ojcowski: "Ojcowski", na_warunkach_macierzynskiego: "Macierzyński",
-};
 
 /** Biały albo czarny tekst — zależnie od tego, który ma większy kontrast z danym tłem (#rrggbb). */
 function tekstNa(tlo: string) {
@@ -26,6 +20,11 @@ function tekstNa(tlo: string) {
 const tylkoCzytnik = { position: "absolute", width: 1, height: 1, overflow: "hidden", clipPath: "inset(50%)", margin: 0, padding: 0, listStyle: "none" } as const;
 
 export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]; start?: string; etykiety?: Record<string, string> }) {
+  const { dataPL, dni } = useFormaty();
+  const tr = useT();
+  const nazwaRodzaju = (r: string) => tr(RODZAJE[r] ?? "Okres zasiłku");
+  // Na pasku mieści się tylko krótka nazwa: „Urlop macierzyński" skracamy do „macierzyński".
+  const krotkaNazwa = (r: string) => (RODZAJE[r] ? tr(RODZAJE[r].replace("Urlop ", "")) : undefined);
   if (!okresy.length) return null;
   const min = Math.min(...okresy.map((o) => t(o.od)), start ? t(start) : Infinity);
   const max = Math.max(...okresy.map((o) => t(o.do))) + MS;
@@ -38,40 +37,33 @@ export default function Timeline({ okresy, start, etykiety }: { okresy: OkresT[]
   for (let k = 0; k < 40; k++) { const dt = Date.UTC(y + Math.floor(m / 12), m % 12, 1); if (dt > max) break; ticks.push({ l: `${String((m % 12) + 1).padStart(2, "0")}.${y + Math.floor(m / 12)}`, p: pct(dt) }); m += stepM; }
   const kto = ["matka", "ojciec"].filter((k) => okresy.some((o) => o.kto === k));
   const uzyte = Array.from(new Set(okresy.map((o) => o.rodzaj)));
-  const nazwaKto = (k: string) => etykiety?.[k] ?? (k === "matka" ? "Matka" : "Ojciec");
-  // Podpis w pasku tylko wtedy, gdy pasek jest dość szeroki; na węższym kontenerze CSS chowa podpisy w krótszych paskach.
-  const klasaPaska = (szer: number) => (szer < 16 ? "" : szer < 30 ? css.waski : szer < 45 ? css.sredni : "");
+  const nazwaKto = (k: string) => etykiety?.[k] ?? tr(k === "matka" ? "Matka" : "Ojciec");
   return (
-    <div className={css.tl}>
+    <div className="tl">
       {/* Wersja dla czytników ekranu: lista okresów zamiast grafiki. */}
-      <ul style={tylkoCzytnik} aria-label="Okresy urlopów i zasiłków">
+      <ul style={tylkoCzytnik} aria-label={tr("Okresy urlopów i zasiłków")}>
         {okresy.map((o, i) => (
-          <li key={i}>{nazwaKto(o.kto)}: {RODZAJE[o.rodzaj] ?? "Okres zasiłku"}, {dataPL(o.od)} – {dataPL(o.do)} ({o.dni} dni)</li>
+          <li key={i}>{nazwaKto(o.kto)}: {nazwaRodzaju(o.rodzaj)}, {dataPL(o.od)} – {dataPL(o.do)} ({dni(o.dni)})</li>
         ))}
       </ul>
       <div aria-hidden="true">
-        <div className={css.os}>{ticks.map((k, i) => (
-          <span key={k.l} className={`${css.znacznik} ${k.p < 8 ? css.znacznikLewy : k.p > 92 ? css.znacznikPrawy : ""} ${i % 2 ? css.co2 : ""}`} style={{ left: `${k.p}%` }}>{k.l}</span>
-        ))}</div>
+        <div className="tl-axis">{ticks.map((k) => <span key={k.l} className="tl-tick" style={{ left: `${k.p}%` }}>{k.l}</span>)}</div>
         {kto.map((k) => (
           <div key={k}>
-            <div className={css.etykietaWiersza}>{nazwaKto(k)}</div>
-            <div className={css.wiersz}>
+            <div className="tl-row-label">{nazwaKto(k)}</div>
+            <div className="tl-row">
               {okresy.filter((o) => o.kto === k).map((o, i) => {
                 const tlo = KOLORY[o.rodzaj] ?? "#555";
-                const szer = Math.max(((t(o.do) + MS - t(o.od)) / span) * 100, 0.4);
                 return (
-                  <div key={i} className={`${css.pasek} ${klasaPaska(szer)}`} style={{ left: `${pct(t(o.od))}%`, width: `${szer}%`, background: tlo, color: tekstNa(tlo) }}
-                    title={`${RODZAJE[o.rodzaj] ?? "Okres zasiłku"}: ${dataPL(o.od)} – ${dataPL(o.do)} (${o.dni} dni)`}>
-                    {szer >= 16 && <span className={css.podpis}>{KROTKIE[o.rodzaj] ?? ""}</span>}
-                  </div>
+                  <div key={i} className="tl-bar" style={{ left: `${pct(t(o.od))}%`, width: `${Math.max(((t(o.do) + MS - t(o.od)) / span) * 100, 0.4)}%`, background: tlo, color: tekstNa(tlo) }}
+                    title={`${nazwaRodzaju(o.rodzaj)}: ${dataPL(o.od)} – ${dataPL(o.do)} (${dni(o.dni)})`}>{krotkaNazwa(o.rodzaj)}</div>
                 );
               })}
             </div>
           </div>
         ))}
       </div>
-      <div className={css.legenda}>{uzyte.map((r) => <span key={r}><i style={{ background: KOLORY[r] ?? "#555" }} />{RODZAJE[r] ?? "Okres zasiłku"}</span>)}</div>
+      <div className="leg">{uzyte.map((r) => <span key={r}><i style={{ background: KOLORY[r] ?? "#555" }} />{nazwaRodzaju(r)}</span>)}</div>
     </div>
   );
 }

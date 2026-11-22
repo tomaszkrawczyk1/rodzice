@@ -13,12 +13,7 @@ export type Druk = {
 };
 export type Wezel =
   | { typ: "pytanie"; tekst: string; podpowiedz?: string; opcje: { etykieta: string; nastepny: string }[] }
-  | {
-      typ: "wynik"; tytul: string; pytania: string[]; druki: string[]; kalkulator?: { tryb: string; opcja?: string };
-      // Pola opcjonalne, które może mieć węzeł wyniku w drzewo_decyzyjne.json.
-      status?: Status; komunikat_luki?: string; ton?: string; wstep?: string;
-      cta?: { href?: string; etykieta?: string }; link?: { href: string; etykieta: string }; inne_swiadczenia?: string[];
-    };
+  | { typ: "wynik"; tytul: string; pytania: string[]; druki: string[]; kalkulator?: { tryb: string; opcja?: string } };
 
 export const KATEGORIE = faqJson.kategorie as { id: string; nazwa: string }[];
 export const PYTANIA = faqJson.pytania as Pytanie[];
@@ -40,14 +35,9 @@ export function kalkulatorLink(k?: { tryb: string; opcja?: string } | null): { h
     case "praca_i_urlop": return kalk("laczenie");
     case "adopcja": return kalk("adopcja");
     case "podstawa": return kalk("wlasne");
-    case "chorobowe_w_ciazy": case "rehabilitacja":
+    case "chorobowe_w_ciazy": case "rehabilitacja": case "uprawnienia": case "swiadczenie_rodzicielskie":
       return { href: "/ciaza", etykieta: "Sprawdź świadczenia w ciąży" };
-    // F21 i ogólne uprawnienia dotyczą też osób po porodzie, więc nie kierujemy ich do strony „w ciąży”.
-    // Nie odsyłamy też z powrotem do kreatora („Co mnie dotyczy?”) – to kółko; prowadzimy do sprawy „Co mi przysługuje”.
-    case "uprawnienia": case "swiadczenie_rodzicielskie":
-      return { href: "/sprawa/co-przysluguje", etykieta: "Sprawdź, co Ci przysługuje" };
-    case "terminy": return { href: "/terminarz", etykieta: "Zobacz swój Kalendarz w urzędzie" };
-    case "dokumenty": return { href: "/dokumenty", etykieta: "Zobacz, kto wypłaca zasiłek i gdzie złożyć wniosek" };
+    case "terminy": case "dokumenty": return { href: "/dokumenty", etykieta: "Zobacz dokumenty i terminy" };
     case "wczesniak": case "martwe_dziecko": return { href: "/trudne", etykieta: "Poznaj wsparcie w trudnej sytuacji" };
   }
   return null;
@@ -55,6 +45,6 @@ export function kalkulatorLink(k?: { tryb: string; opcja?: string } | null): { h
 
 export const STATUS_OPIS: Record<Status, string> = {
   ok: "",
-  do_potwierdzenia: "W tej sprawie przepisy nie są do końca jasne. Warto potwierdzić szczegóły w ZUS.",
-  luka: "To nietypowa sytuacja – przepisy nie opisują jej wprost. Najlepiej zapytaj bezpośrednio w ZUS.",
+  do_potwierdzenia: "W tej sprawie przepisy nie są jednoznaczne. Warto potwierdzić szczegóły bezpośrednio w ZUS.",
+  luka: "Tego nietypowego przypadku nie opisują oficjalne wytyczne. Skonsultuj się bezpośrednio z ZUS.",
 };

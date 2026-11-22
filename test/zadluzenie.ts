@@ -22,15 +22,15 @@ const hook = registerHooks({
     return nextResolve(lokalna && !rozszerzenie ? sciezka + ".ts" : sciezka, context);
   },
 });
-const { GET } = await import("../src/app/api/zus/zadluzenie/route.ts");
+const { POST } = await import("../src/app/api/zus/zadluzenie/route.ts");
 const { stanZadluzenia, numerZaswiadczenia, znajdzPersone } = await import("../src/lib/zus-mock.ts");
 const { progZadluzenia } = await import("../src/engine/kalkulator.ts");
 const parametry = JSON.parse(readFileSync(new URL("../data/parametry.json", import.meta.url), "utf8"));
 const prog = progZadluzenia(parametry);
 rowne("próg = 1 % płacy minimalnej", prog, 48.06);
 
-process.env.DATA_DIR = fileURLToPath(new URL("../data", import.meta.url));
-const marek = znajdzPersone("00000000002")!;
+process.env.DATA_DIR = fileURLToPath(new URL("../data", import.meta.url)); // fileURLToPath: działa też na Windows
+const marek = znajdzPersone("88072212354")!;
 const stan = (d: string) => { const s = stanZadluzenia(marek, d, prog); return [s.kwota, s.wynik]; };
 
 rowne("przed pierwszym terminem: brak zadłużenia", stan("2026-10-01"), [0, "brak_zadluzenia"]);
@@ -47,24 +47,25 @@ rowne("40 zł < próg: prawo zachowane", [stanZadluzenia(maly, "2027-03-01", pro
 const rowny = { ...maly, zadluzenie: { ...maly.zadluzenie, skladniki: [{ ...maly.zadluzenie.skladniki[0], kwota: prog }] } };
 rowne("dokładnie próg nie blokuje (tak jak w silniku: > próg)", stanZadluzenia(rowny, "2027-03-01", prog).przekroczonyProg, false);
 
-const ania = znajdzPersone("00000000001")!;
+const ania = znajdzPersone("92031412345")!;
 rowne("profil bez działalności: nie dotyczy", [stanZadluzenia(ania, "2027-03-15", prog).wynik, stanZadluzenia(ania, "2027-03-15", prog).kwota], ["nie_dotyczy", 0]);
-rowne("numer zaświadczenia stały dla tej samej daty", numerZaswiadczenia("00000000002", "2027-03-01"), numerZaswiadczenia("00000000002", "2027-03-01"));
-rowne("numer zaświadczenia różny dla innej daty", numerZaswiadczenia("00000000002", "2027-03-01") !== numerZaswiadczenia("00000000002", "2027-04-02"), true);
+rowne("numer zaświadczenia stały dla tej samej daty", numerZaswiadczenia("88072212354", "2027-03-01"), numerZaswiadczenia("88072212354", "2027-03-01"));
+rowne("numer zaświadczenia różny dla innej daty", numerZaswiadczenia("88072212354", "2027-03-01") !== numerZaswiadczenia("88072212354", "2027-04-02"), true);
 
 // API: ta sama ścieżka co w aplikacji
 hook.deregister();
-const pobierz = async (query: string) => { const r = await GET(new Request(`http://x/api/zus/zadluzenie?${query}`)); return { status: r.status, body: await r.json() }; };
-const a = await pobierz("pesel=00000000002&naDzien=2026-11-21");
-const b = await pobierz("pesel=00000000002&naDzien=2027-02-01");
-const c = await pobierz("pesel=00000000002&naDzien=2027-04-02");
+// PESEL idzie w treści POST, nie w adresie URL
+const pobierz = async (query: string) => { const r = await POST(new Request("http://x/api/zus/zadluzenie", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.fromEntries(new URLSearchParams(query))) })); return { status: r.status, body: await r.json() }; };
+const a = await pobierz("pesel=88072212354&naDzien=2026-11-21");
+const b = await pobierz("pesel=88072212354&naDzien=2027-02-01");
+const c = await pobierz("pesel=88072212354&naDzien=2027-04-02");
 rowne("API: 3 daty = 3 różne kwoty", [a.body.kwotaZadluzenia, b.body.kwotaZadluzenia, c.body.kwotaZadluzenia], [480, 0, 1200]);
 rowne("API: wynik zależny od daty", [a.body.wynik, b.body.wynik, c.body.wynik], ["powyzej_progu", "brak_zadluzenia", "powyzej_progu"]);
 rowne("API: próg i flaga przekroczenia", [c.body.prog, c.body.przekroczonyProg, b.body.przekroczonyProg], [48.06, true, false]);
 rowne("API: oznaczone jako symulacja, ma numer i datę wystawienia", [c.body.symulacja, /^ZAD\/2027\/\d{6}$/.test(c.body.numerZaswiadczenia), /^\d{4}-\d{2}-\d{2}$/.test(c.body.wystawiono)], [true, true, true]);
-const d = await pobierz("pesel=00000000001&naDzien=2027-03-15");
+const d = await pobierz("pesel=92031412345&naDzien=2027-03-15");
 rowne("API: profil bez działalności", [d.status, d.body.wynik, d.body.kwotaZadluzenia, d.body.komunikat.length > 0], [200, "nie_dotyczy", 0, true]);
-rowne("API: zła data = 400", (await pobierz("pesel=00000000002&naDzien=jutro")).status, 400);
+rowne("API: zła data = 400", (await pobierz("pesel=88072212354&naDzien=jutro")).status, 400);
 rowne("API: nieznany PESEL = 404", (await pobierz("pesel=123&naDzien=2027-03-15")).status, 404);
 
 console.log(bledy ? `Zadłużenie: ${bledy} z ${razem} testów nie przeszło` : `Zadłużenie: ${razem} testów OK`);

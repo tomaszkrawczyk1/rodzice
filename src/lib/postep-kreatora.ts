@@ -33,11 +33,3 @@ export function odczytajKrokiZAdresu(surowy: string | null, start: string, drzew
   if (!surowy || !/^\d{1,3}(\.\d{1,3})*$/.test(surowy)) return [];
   return rozwinPostep(surowy.split(".").map(Number), start, drzewo).zapisane;
 }
-
-/** Ile pytań najwyżej zostało od węzła `id` (wliczając bieżące) – do paska „Pytanie 2 z 4". */
-export function pozostalePytania(id: string, drzewo: Drzewo, odwiedzone: ReadonlySet<string> = new Set()): number {
-  const w = drzewo[id];
-  if (w?.typ !== "pytanie" || odwiedzone.has(id)) return 0;
-  const dalej = new Set(odwiedzone).add(id);
-  return 1 + Math.max(0, ...w.opcje.map((o) => pozostalePytania(o.nastepny, drzewo, dalej)));
-}
