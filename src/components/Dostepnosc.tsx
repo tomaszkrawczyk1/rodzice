@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 
 const KLUCZ = "rodzice.dostepnosc";
 const ZDARZENIE = "rodzice:dostepnosc";
-const CIEMNY = "(prefers-color-scheme: dark)";
 /** Trzy wyraźne kroki powiększenia tekstu (klasy fs-l i fs-xl w globals.css). */
 const ROZMIAR = ["100%", "115%", "130%"] as const;
 
 /**
  * rozm: 0 / 1 / 2 (100% / 115% / 130%), hc: wysoki kontrast,
- * noc: tryb nocny. `undefined` = użytkownik nic nie wybrał, wtedy decyduje ustawienie systemu (prefers-color-scheme).
+ * noc: tryb nocny. `undefined` = użytkownik nic nie wybrał, wtedy zawsze jasny motyw (ustawienie systemu nie ma wpływu).
  * Wysoki kontrast ma pierwszeństwo: gdy jest włączony, tryb nocny się nie nakłada.
  */
 type Stan = { rozm: number; hc: boolean; noc?: boolean };
@@ -23,14 +22,10 @@ function odczytaj(): Stan {
   }
 }
 
-function systemCiemny() {
-  try { return window.matchMedia(CIEMNY).matches; } catch { return false; }
-}
-
-/** Czy tryb nocny jest teraz włączony (wybrany wprost albo z ustawień systemu). */
+/** Tryb nocny włącza się tylko po wyborze użytkownika; ustawienie systemu lub przeglądarki go nie włącza. */
 function nocAktywna({ hc, noc }: Stan) {
   if (hc) return false;
-  return noc ?? systemCiemny();
+  return noc === true;
 }
 
 function zastosuj(s: Stan) {
@@ -58,14 +53,9 @@ export default function Dostepnosc({ wariant = "pasek" }: { wariant?: "pasek" | 
       setNoc(nocAktywna(s));
     };
     synchronizuj();
-    let mq: MediaQueryList | undefined;
-    try { mq = window.matchMedia(CIEMNY); } catch { /* bez śledzenia motywu systemu */ }
-    const zmianaSystemu = () => synchronizuj();
-    mq?.addEventListener?.("change", zmianaSystemu);
     window.addEventListener(ZDARZENIE, synchronizuj);
     window.addEventListener("storage", synchronizuj);
     return () => {
-      mq?.removeEventListener?.("change", zmianaSystemu);
       window.removeEventListener(ZDARZENIE, synchronizuj);
       window.removeEventListener("storage", synchronizuj);
     };
