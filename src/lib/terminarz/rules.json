@@ -347,6 +347,23 @@
       "sources": []
     },
     {
+      "id": "uzup-wniosek",
+      "who": "mama",
+      "employment": ["umowa"],
+      "kind": "deadline",
+      "when": {
+        "type": "offset",
+        "days": [{ "param": "wymiary_tygodnie.urlop_macierzynski_wg_liczby_dzieci.1", "multiply": 7, "fallback": 20 }, -1, -21]
+      },
+      "title": "Wniosek o uzupełniający urlop macierzyński (tylko gdy dziecko urodziło się przedwcześnie lub jest w szpitalu)",
+      "body": "Wniosek składasz do pracodawcy najpóźniej 21 dni przed końcem urlopu macierzyńskiego (data orientacyjna, liczona od porodu bez urlopu przed porodem). Urlop uzupełniający przysługuje bezpośrednio po macierzyńskim, więc po tym terminie możesz go stracić. Zaświadczenie ze szpitala dołącz do wniosku.",
+      "institution": "Pracodawca",
+      "forms": [],
+      "category": "employer",
+      "verify": false,
+      "sources": []
+    },
+    {
       "id": "rodz-koniec",
       "who": "all",
       "employment": ["umowa", "zlecenie", "jdg"],

@@ -111,7 +111,9 @@ export async function testySpraw(rowne: Rowne) {
   // Poprawki UX: najważniejszy termin na górze, lista dokumentów, mniej pytań, kwoty „ok." bez groszy.
   rowne("ZAM: termin 81,5% jest osobno, na górze wyniku", zam.pilne?.do, dodajDni(przyszlaData, parametry.terminy_dni.wniosek_pelny_wymiar_81_5_po_porodzie));
   rowne("ZAM po terminie: brak ramki z terminem", pozny.pilne, undefined);
-  rowne("ZAM: lista „Weź ze sobą” zawiera akt urodzenia i Z-3", [zam.dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia")), zam.dokumenty?.pozycje.some((x) => x.includes("Z-3"))], [true, true]);
+  const odpis = async (platnik: string) => (await licz(wniosek, { dataPorodu: przyszlaData, liczbaDzieci: "1", podstawaM: "5522,56", zatrudnienie: "umowa", platnik, wariant: "nie_wiem" })).dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia"));
+  rowne("ZAM: odpis aktu urodzenia tylko gdy wypłaca pracodawca (rozp. § 13 ust. 2): duży / mały / nie wiem", [await odpis("duzy"), await odpis("maly"), await odpis("nie_wiem")], [true, false, true]);
+  rowne("ZAM: lista „Weź ze sobą” zawiera akt urodzenia (płatnik nieznany) i Z-3", [zam.dokumenty?.pozycje.some((x) => x.includes("aktu urodzenia")), zam.dokumenty?.pozycje.some((x) => x.includes("Z-3"))], [true, true]);
   rowne("ZAM, przyszły poród: jest zaświadczenie lekarskie", zam.dokumenty?.pozycje.some((x) => x.includes("Zaświadczenie lekarskie")), true);
   rowne("ZAM: kwota miesięczna „ok.” bez groszy", /ok\. [\d\s]+zł miesięcznie/.test(zam.podpis ?? ""), true);
   rowne("ZAM nie pyta o wariant wypłaty (zawsze porównanie)", pytania(wniosek).some((q) => q.id === "wariant"), false);

@@ -384,7 +384,8 @@ export const SPRAWY: Sprawa[] = [
       const przyszlyPorod = o.dataPorodu > dzis();
       const dokumenty = [
         "Dowód osobisty (potrzebny do danych we wniosku)",
-        "Odpis skrócony aktu urodzenia dziecka" + (o.platnik === "duzy" ? "" : " (gdy zasiłek wypłaca ZUS, może pobrać go sam z rejestru)"),
+        // gdy zasiłek wypłaca ZUS, odpisu nie przedstawia się (§ 13 ust. 2 rozporządzenia z 27.09.2026); ZUS pobiera go z rejestru
+        ...(o.platnik === "duzy" ? ["Odpis skrócony aktu urodzenia dziecka"] : o.platnik === "maly" ? [] : ["Odpis skrócony aktu urodzenia dziecka (tylko gdy zasiłek wypłaca pracodawca; ZUS pobiera go sam z rejestru)"]),
         ...(przyszlyPorod ? ["Zaświadczenie lekarskie o przewidywanej dacie porodu (przy wniosku za okres przed porodem)"] : []),
         ...(o.zatrudnienie === "umowa" && o.platnik !== "duzy" ? ["Zaświadczenie Z-3: wystawia je pracodawca, gdy zasiłek wypłaca ZUS"] : []),
         ...(o.zatrudnienie === "zlecenie" && o.platnik !== "duzy" ? ["Zaświadczenie Z-3a: wystawia je zleceniodawca, gdy zasiłek wypłaca ZUS"] : []),

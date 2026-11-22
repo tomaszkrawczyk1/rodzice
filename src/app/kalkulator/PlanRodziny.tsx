@@ -108,6 +108,8 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
     if (f.tryb !== (czySytuacja(zAdresu) ? zAdresu : "oboje")) zastap({ tryb: f.tryb });
   }, [f.tryb, poczatkowy]);
 
+  // przy porodzie mnogim jedno dziecko urodzone martwe: urlopy przysługują dla pozostałych przy życiu (art. 180¹ § 1 KP)
+  const bezZywych = f.martwe && f.dzieci <= 1;
   const wiekGranicy = useMemo(() => {
     if (f.tytul === "porod" || !f.dataUrDziecka) return undefined;
     const lat = f.tytul === "przysposobienie" ? 14 : 7; const d = new Date(f.dataUrDziecka + "T00:00:00Z"); d.setUTCFullYear(d.getUTCFullYear() + lat); return d.toISOString().slice(0, 10);
@@ -119,15 +121,15 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
     if (f.laczTyg > 0) rodz.push({ kto: "matka", tygodnie: f.laczTyg, wspolczynnikPracy: f.etat });
     if (dwoje && f.rodzO > 0) rodz.push({ kto: "ojciec", tygodnie: f.rodzO });
     const w: any = { ...f.extra, tytul: f.tytul, dataZdarzenia: f.data, liczbaDzieci: f.dzieci, zaswiadczenieZaZyciem: f.zaZyciem, wariant: f.wariant,
-      podstawy: { matka: podstawaM, ...(dwoje && podstawaO ? { ojciec: podstawaO } : {}) }, rodzicielski: f.martwe ? [] : rodz };
-    if (f.martwe) w.martwe = {}; else delete w.martwe;
+      podstawy: { matka: podstawaM, ...(dwoje && podstawaO ? { ojciec: podstawaO } : {}) }, rodzicielski: bezZywych ? [] : rodz };
+    if (f.martwe) w.martwe = bezZywych ? {} : { liczbaDzieciPozostalychPrzyZyciu: f.dzieci - 1 }; else delete w.martwe;
     if (f.tytul === "porod" && f.przedPorodem > 0) w.przedPorodemDni = f.przedPorodem; else if (f.tytul === "porod") delete w.przedPorodemDni;
     if (dwoje && f.ojciecPrzejmuje > 0) w.macierzynskiOjciecPrzejmujeTyg = f.ojciecPrzejmuje; else if (!f.extra.macierzynskiOjciecPrzejmujeDni) delete w.macierzynskiOjciecPrzejmujeTyg;
-    if (f.uzup > 0 && !f.martwe) w.uzupelniajacy = { kto: "matka", tygodnie: f.uzup }; else delete w.uzupelniajacy;
-    if (dwoje && f.ojcowski && f.tytul === "porod" && !f.martwe) w.ojcowski = [{ od: f.ojcowskiOd || f.data, dni: L.urlop_ojcowski_dni }]; else if (!f.extra.ojcowski) delete w.ojcowski;
+    if (f.uzup > 0 && !bezZywych) w.uzupelniajacy = { kto: "matka", tygodnie: f.uzup }; else delete w.uzupelniajacy;
+    if (dwoje && f.ojcowski && f.tytul === "porod" && !bezZywych) w.ojcowski = [{ od: f.ojcowskiOd || f.data, dni: L.urlop_ojcowski_dni }]; else if (!f.extra.ojcowski) delete w.ojcowski;
     if (wiekGranicy) w.wiekGranicyDzieckaData = wiekGranicy;
     return w;
-  }, [f, podstawaM, podstawaO, dwoje, wiekGranicy]);
+  }, [f, bezZywych, podstawaM, podstawaO, dwoje, wiekGranicy]);
 
   const seq = useRef(0);
   useEffect(() => {
@@ -238,7 +240,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
               {f.tytul !== "porod" && <DataPole label="Data urodzenia dziecka" hint="Do limitu wieku (7/10 lat – rodzina zastępcza, 14 lat – adopcja)" value={f.dataUrDziecka} onChange={(iso) => set({ dataUrDziecka: iso })} />}
             </div>
             <label className="check"><input type="checkbox" checked={f.zaZyciem} onChange={(e) => set({ zaZyciem: e.target.checked })} />Dziecko ma zaświadczenie „Za życiem” (dłuższy urlop rodzicielski)</label>
-            {f.tytul === "porod" && <label className="check"><input type="checkbox" checked={f.martwe} onChange={(e) => set({ martwe: e.target.checked })} />Dziecko urodziło się martwe</label>}
+            {f.tytul === "porod" && <label className="check"><input type="checkbox" checked={f.martwe} onChange={(e) => set({ martwe: e.target.checked })} />{f.dzieci > 1 ? "Jedno z dzieci urodziło się martwe" : "Dziecko urodziło się martwe"}</label>}
           </>
         )}
 
@@ -261,7 +263,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec }: { poczatkowy: Tryb
         )}
 
         {krok === K.urlopy && (
-          f.martwe ? <p>Przy urodzeniu martwego dziecka nie planujemy urlopu rodzicielskiego. Przejdź dalej.</p> : (
+          bezZywych ? <p>Przy urodzeniu martwego dziecka nie planujemy urlopu rodzicielskiego. Przejdź dalej.</p> : (
             <>
               {f.tytul === "porod" && <Field label={`Urlop macierzyński przed porodem: ${f.przedPorodem} dni`} hint={`Urlop można rozpocząć do ${tygodnie(W.macierzynski_przed_porodem_max)} przed porodem.`}><input type="range" min={0} max={W.macierzynski_przed_porodem_max * 7} value={f.przedPorodem} aria-valuetext={`${f.przedPorodem} dni`} onChange={(e) => set({ przedPorodem: +e.target.value })} /></Field>}
               <Field label={`${rodzicPierwszy}: urlop rodzicielski ${tygodnie(f.rodzM)}`} hint={wym ? `Łącznie do ${tygodnie(limit)} dla obojga rodziców` : ""}><input type="range" min={0} max={limit} value={f.rodzM} aria-valuetext={tygodnie(f.rodzM)} onChange={(e) => set({ rodzM: +e.target.value })} /></Field>

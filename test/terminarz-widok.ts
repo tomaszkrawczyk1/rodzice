@@ -26,7 +26,8 @@ const data = (ev: ReturnType<typeof policz>, id: string) => ev.find((e) => e.id 
 
 // ---- dane kontrolne z briefu ----
 const mama = policz({ birthDate: "2027-01-15", role: "mama", employment: "umowa", children: 1 });
-rowne("mama/umowa/1: liczba wydarzeń", mama.length, 18);
+rowne("mama/umowa/1: liczba wydarzeń", mama.length, 19);
+rowne("mama: wniosek o urlop uzupełniający 21 dni przed końcem macierzyńskiego", data(mama, "uzup-wniosek"), "2027-05-13");
 rowne("mama: usc", data(mama, "usc"), "2027-02-05");
 rowne("mama: zam-815", data(mama, "zam-815"), "2027-02-05");
 rowne("mama: plus800", data(mama, "plus800"), "2027-04-15");
