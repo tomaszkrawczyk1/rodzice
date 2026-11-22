@@ -9,7 +9,7 @@ import { EN_KALKULATOR } from "./en.kalkulator";
 import { UK_KALKULATOR } from "./uk.kalkulator";
 import { KALENDARZ_EN, KALENDARZ_UK } from "./kalendarz-reszta";
 import { DODATKI_EN, DODATKI_UK } from "./dodatki";
-import { KOD_LOCALE, czySamZapis, lokalizujZapisy } from "./formaty";
+import { KOD_LOCALE, lokalizujZapisy } from "./formaty";
 
 export const JEZYKI = ["pl", "en", "uk"] as const;
 export type Jezyk = (typeof JEZYKI)[number];
@@ -76,7 +76,7 @@ function przeloz(jezyk: Jezyk, pl: string, glebokosc: number): string {
   const pamiec = (wyniki[jezyk] ??= new Map());
   const stary = pamiec.get(pl);
   if (stary !== undefined) return stary;
-  let wynik = czySamZapis(pl) ? lokalizujZapisy(jezyk, pl) : pl;
+  let wynik = lokalizujZapisy(jezyk, pl);
   for (const w of wzorceDla(jezyk)) {
     const m = w.re.exec(pl);
     if (!m) continue;
@@ -87,7 +87,7 @@ function przeloz(jezyk: Jezyk, pl: string, glebokosc: number): string {
       if (w.swobodne[i] && surowePolskie(m[i + 1], wartosci[n])) odrzuc = true;
     });
     if (odrzuc) continue;
-    wynik = lokalizujZapisy(jezyk, w.cel.replace(/\{(\w+)\}/g, (c, k) => wartosci[k] ?? c));
+    wynik = lokalizujZapisy(jezyk, w.cel).replace(/\{(\w+)\}/g, (c, k) => wartosci[k] ?? c);
     break;
   }
   if (pamiec.size > 3000) pamiec.clear();
