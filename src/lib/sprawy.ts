@@ -820,12 +820,12 @@ function faqOdmowy<T extends { id: string; pytanie: string; odpowiedz: string; k
 export async function zbudujCtx(api: Api, sesja: { osoba: string; pesel: string; personaId: string }): Promise<Ctx> {
   const naDzien = dzis();
   const c: Ctx = { osoba: sesja.osoba, pesel: sesja.pesel };
-  const dane = async (url: string) => api(url).catch(() => null);
-  const pesel = encodeURIComponent(sesja.pesel);
+  const dane = async (url: string, body?: unknown) => api(url, body).catch(() => null);
+  const osoba = { pesel: sesja.pesel, naDzien };
   const [u, e, z, sc] = await Promise.all([
-    dane(`/api/zus/ubezpieczenie?pesel=${pesel}&naDzien=${naDzien}`),
-    dane(`/api/zus/ezla?pesel=${pesel}`),
-    dane(`/api/zus/zadluzenie?pesel=${pesel}&naDzien=${naDzien}`),
+    dane("/api/zus/ubezpieczenie", osoba),
+    dane("/api/zus/ezla", { pesel: sesja.pesel }),
+    dane("/api/zus/zadluzenie", osoba),
     dane("/api/scenariusze"),
   ]);
   type Ubezpieczenie = { od: string; do: string | null; tytul: string; chorobowe: string; platnik?: { nazwa?: string; liczbaUbezpieczonych?: number } };

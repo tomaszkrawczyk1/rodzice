@@ -24,9 +24,9 @@ Mapowanie na pakiet: pkt 3–4 → silnik (`kalkulator.ts`); tryb „własne dan
 | Metoda i ścieżka | Wejście | Wyjście | Silnik |
 |---|---|---|---|
 | `POST /api/auth/mobywatel` | `{ personaId }` | token sesji (symulacja) | — |
-| `GET /api/zus/ubezpieczenie?pesel=` | PESEL (fikcyjny) | `ubezpieczenie[]` z mocka | — |
-| `GET /api/zus/ezla?pesel=` | PESEL | lista e-ZLA (kod B) | — |
-| `GET /api/zus/zadluzenie?pesel=&naDzien=` | PESEL, data | kwota + „zaświadczenie” | `uprawnienia()` próg |
+| `POST /api/zus/ubezpieczenie` | `{pesel, naDzien}` w treści (PESEL nigdy w URL) | `ubezpieczenie[]` z mocka | — |
+| `POST /api/zus/ezla` | `{pesel}` | lista e-ZLA (kod B) | — |
+| `POST /api/zus/zadluzenie` | `{pesel, naDzien}` | kwota + „zaświadczenie” | `uprawnienia()` próg |
 | `POST /api/oblicz/podstawa` | miesiące Z-3/Z-3a | `PodstawaWynik` | `podstawaPracownik/Niepracownik` |
 | `POST /api/oblicz/plan` | `PlanWejscie` | `PlanWynik` | `planZasilku` |
 | `POST /api/oblicz/porownanie` | jak wyżej bez `wariant` | oba warianty + różnica | `porownajWarianty` |
@@ -35,7 +35,7 @@ Mapowanie na pakiet: pkt 3–4 → silnik (`kalkulator.ts`); tryb „własne dan
 | `POST /api/oblicz/rehabilitacja` | `{podstawa, dni, wCiazy}` | kwota | `swiadczenieRehabilitacyjne` |
 | `POST /api/oblicz/swiadczenie-rodzicielskie` | `{liczbaDzieci, odDnia}` | tygodnie, okres, kwota | `swiadczenieRodzicielskie` |
 | `POST /api/terminy` | tytuł, data, plan | lista terminów z podstawą prawną | `terminy` |
-| `GET /api/pue/konto` · `POST /api/pue/pytanie` | PESEL · `{temat, tresc}` | podgląd konta ubezpieczonego (symulacja) · potwierdzenie wysłania pytania z numerem sprawy | — |
+| `POST /api/pue/konto` · `POST /api/pue/pytanie` | PESEL · `{temat, tresc}` | podgląd konta ubezpieczonego (symulacja) · potwierdzenie wysłania pytania z numerem sprawy | — |
 | `POST /api/parser` | PDF | JSON wg `PARSER_SCHEMAT.md` | LLM + walidacja |
 | `POST /api/wniosek/urlop` , `/api/wniosek/zasilek` | dane | PDF/podgląd + „wysłano” (symulacja) | — |
 | `POST /api/usc/odpis` | dane dziecka | potwierdzenie (symulacja wniosku o odpis aktu) | — |

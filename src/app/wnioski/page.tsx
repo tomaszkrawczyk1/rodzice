@@ -2,7 +2,8 @@
 import { DataPole } from "@/components/DataPole";
 import { useEffect, useRef, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
-import { dataPL, dzis, RODZAJE, tygodnie, liczba } from "@/lib/format";
+import { dzis, formaty, RODZAJE } from "@/lib/format";
+import { useFormaty, useT, useTb } from "@/lib/jezyk";
 import { Alert, Sim } from "@/components/ui";
 import { Pole as Field } from "@/components/Pole";
 import { zakresUrlopuOjcowskiego } from "@/lib/urlop-ojcowski";
@@ -211,7 +212,7 @@ export default function Wnioski() {
         : { rodzaj: tab === "laczenie" ? "rodzicielski" : f.rodzaj, od: f.od, do: koniec, pracodawca: f.pracodawca };
       setWyn(await api(url, dane));
     } catch {
-      setErr("Nie udało się zapisać wniosku testowego. Spróbuj ponownie.");
+      setErr(t("Nie udało się zapisać wniosku testowego. Spróbuj ponownie."));
     } finally {
       setBusy(false);
     }
@@ -260,7 +261,7 @@ export default function Wnioski() {
           </>}
           <Field label="Miejscowość" hint="Możesz ją też dopisać ręcznie na wydruku."><input type="text" autoComplete="address-level2" value={f.miasto} onChange={(e) => set({ miasto: e.target.value })} /></Field>
           {tab === "urlop" && <>
-            <Field label="Rodzaj urlopu"><select value={f.rodzaj} onChange={(e) => set({ rodzaj: e.target.value })}>{Object.keys(RODZ_URLOP).map((k) => <option key={k} value={k}>{RODZAJE[k]}</option>)}</select></Field>
+            <Field label={t("Rodzaj urlopu")}><select value={f.rodzaj} onChange={(e) => set({ rodzaj: e.target.value })}>{Object.keys(RODZ_URLOP).map((k) => <option key={k} value={k}>{t(RODZAJE[k])}</option>)}</select></Field>
             {ojcowski ? <>
               <DataPole id={ID.urodzenie} required label="Data urodzenia dziecka" hint="Uzupełnij po narodzinach. Informacje o przysposobieniu znajdziesz w poradniku." error={bladPola("urodzenie")} value={f.urodzenie} onChange={(iso) => set({ urodzenie: iso })} />
               <DataPole id={ID.od} required label="Początek urlopu" error={bladPola("od")} value={f.od} onChange={(iso) => set({ od: iso })} />
@@ -289,9 +290,9 @@ export default function Wnioski() {
                   <DataPole id={ID.drugiOd} required label="Drugi rodzic: od kiedy?" error={bladPola("drugiOd")} value={f.drugiOd} onChange={(iso) => set({ drugiOd: iso })} />
                   <DataPole id={ID.drugiDo} required label="Drugi rodzic: do kiedy?" error={bladPola("drugiDo")} value={f.drugiDo} onChange={(iso) => set({ drugiDo: iso })} />
                 </div>}
-                <Alert>Możecie skorzystać z urlopu rodzicielskiego w tym samym czasie. Oba okresy liczą się do wspólnej puli. Wniosek złóż co najmniej <b>{T.wniosek_urlop_rodzicielski_przed_startem} dni</b> przed rozpoczęciem.</Alert>
+                <Alert>{tb("Możecie skorzystać z urlopu rodzicielskiego w tym samym czasie. Oba okresy liczą się do wspólnej puli. Wniosek złóż co najmniej **{dni}** przed rozpoczęciem.", { dni: dni(T.wniosek_urlop_rodzicielski_przed_startem) })}</Alert>
               </>}
-              {f.rodzaj === "macierzynski" && <Alert>Jeśli zaczynasz urlop macierzyński przed porodem, dołącz zaświadczenie lekarskie o przewidywanej dacie porodu.</Alert>}
+              {f.rodzaj === "macierzynski" && <Alert>{t("Jeśli zaczynasz urlop macierzyński przed porodem, dołącz zaświadczenie lekarskie o przewidywanej dacie porodu.")}</Alert>}
             </>}
           </>}
           {tab === "laczenie" && <>
@@ -349,8 +350,9 @@ export default function Wnioski() {
 
         <div>
           <div className="card" id="podglad" style={{ overflowWrap: "anywhere" }}>
-            <div className="row between no-print"><h2>Podgląd wniosku</h2><Sim /></div>
-            <div style={{ fontFamily: "Georgia, serif", lineHeight: 1.6 }}>
+            <div className="row between no-print"><h2>{t("Podgląd wniosku")}</h2><Sim /></div>
+            {fmt.jezyk !== "pl" && <p className="small muted no-print">{t("Wersja po polsku: wniosek składasz w polskiej firmie lub w ZUS, więc jego tekst zostaje po polsku. Poniżej możesz go sprawdzić i wydrukować.")}</p>}
+            <div lang="pl" style={{ fontFamily: "Georgia, serif", lineHeight: 1.6 }}>
               <p className="right">{f.miasto || "………"}, {dataPL(data)}</p>
               <p><b>{f.imie || "Imię i nazwisko"}</b><br />PESEL: {f.pesel || "…………"}</p>
               {tab === "zas53" ? <p className="right"><b>Zakład Ubezpieczeń Społecznych</b></p> : tab === "zas26" ? <p className="right"><b>{f.pracodawca || "Płatnik składek / ZUS"}</b></p> : tab !== "zam" ? <p className="right"><b>{f.pracodawca || "Pracodawca"}</b></p> : <p className="right"><b>{f.adresat === "ZUS" ? "Zakład Ubezpieczeń Społecznych" : f.pracodawca || "Pracodawca (płatnik składek)"}</b></p>}
@@ -392,12 +394,12 @@ export default function Wnioski() {
                 <p className="right">…………………………<br />(podpis)</p></>}
             </div>
             <div className="row no-print mt">
-              <button className="btn btn-secondary" onClick={() => wykonaj(true)} disabled={busy}>Wydrukuj wniosek</button>
-              <button className="btn btn-primary" onClick={() => wykonaj(false)} disabled={busy}>Wyślij wniosek testowy</button>
+              <button className="btn btn-secondary" onClick={() => wykonaj(true)} disabled={busy}>{t("Wydrukuj wniosek")}</button>
+              <button className="btn btn-primary" onClick={() => wykonaj(false)} disabled={busy}>{t("Wyślij wniosek testowy")}</button>
             </div>
             {lista.length > 0 && <p className={`no-print ${css.przyPrzyciskach}`}>Najpierw uzupełnij pola zaznaczone w formularzu ({lista.length}).</p>}
             {err && <Alert t="err">{err}</Alert>}
-            {wyn && <Alert t="ok">Zapisano wniosek testowy. Numer: <b>{wyn.numerWniosku}</b>. <Sim /></Alert>}
+            {wyn && <Alert t="ok">{tb("Zapisano wniosek testowy. Numer: **{numer}**.", { numer: wyn.numerWniosku })} <Sim /></Alert>}
           </div>
         </div>
       </div>

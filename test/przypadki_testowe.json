@@ -55,9 +55,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 55490.22,
-      "ojciec": 8879.24,
-      "razem": 64369.46
+      "matka": 55489.28,
+      "ojciec": 8879.22,
+      "razem": 64368.5
      },
      "okresy": [
       {
@@ -68,7 +68,7 @@
        "dni": 140,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 26174.63,
+       "kwota": 26174.4,
        "podwyzszone": false
       },
       {
@@ -79,7 +79,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 29315.59,
+       "kwota": 29314.88,
        "podwyzszone": false
       },
       {
@@ -90,7 +90,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 8879.24,
+       "kwota": 8879.22,
        "podwyzszone": false
       }
      ]
@@ -105,9 +105,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 55464.05,
-      "ojciec": 8879.24,
-      "razem": 64343.29
+      "matka": 55462.68,
+      "ojciec": 8879.22,
+      "razem": 64341.9
      },
      "okresy": [
       {
@@ -118,7 +118,7 @@
        "dni": 140,
        "procent": 81.5,
        "wspolczynnikZasilku": 1,
-       "kwota": 21332.33,
+       "kwota": 21331.8,
        "podwyzszone": false
       },
       {
@@ -129,7 +129,7 @@
        "dni": 224,
        "procent": 81.5,
        "wspolczynnikZasilku": 1,
-       "kwota": 34131.72,
+       "kwota": 34130.88,
        "podwyzszone": false
       },
       {
@@ -140,12 +140,12 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 8879.24,
+       "kwota": 8879.22,
        "podwyzszone": false
       }
      ]
     },
-    "roznica_81_5_minus_100_70": -26.17
+    "roznica_81_5_minus_100_70": -26.6
    },
    "uprawnienia": {
     "zasilekChorobowyWCiazy": {
@@ -257,9 +257,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 51221.74,
-      "ojciec": 16711.5,
-      "razem": 67933.24
+      "matka": 51222.64,
+      "ojciec": 16711.24,
+      "razem": 67933.88
      },
      "okresy": [
       {
@@ -281,7 +281,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 27060.54,
+       "kwota": 27061.44,
        "podwyzszone": false
       },
       {
@@ -292,7 +292,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 12684.63,
+       "kwota": 12684.42,
        "podwyzszone": false
       },
       {
@@ -303,7 +303,7 @@
        "dni": 14,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 4026.87,
+       "kwota": 4026.82,
        "podwyzszone": false
       }
      ]
@@ -437,9 +437,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 86
      },
      "sumy": {
-      "matka": 79442.03,
-      "ojciec": 8879.24,
-      "razem": 88321.27
+      "matka": 79442.16,
+      "ojciec": 8879.22,
+      "razem": 88321.38
      },
      "okresy": [
       {
@@ -450,7 +450,7 @@
        "dni": 217,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 44939.83,
+       "kwota": 44940.7,
        "podwyzszone": false
       },
       {
@@ -461,7 +461,7 @@
        "dni": 98,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 14206.79,
+       "kwota": 14207.06,
        "podwyzszone": false
       },
       {
@@ -472,7 +472,7 @@
        "dni": 280,
        "procent": 70,
        "wspolczynnikZasilku": 0.5,
-       "kwota": 20295.41,
+       "kwota": 20294.4,
        "podwyzszone": false
       },
       {
@@ -483,7 +483,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 8879.24,
+       "kwota": 8879.22,
        "podwyzszone": false
       }
      ]
@@ -500,9 +500,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 86
      },
      "sumy": {
-      "matka": 76796.37,
-      "ojciec": 8879.24,
-      "razem": 85675.61
+      "matka": 76794.9,
+      "ojciec": 8879.22,
+      "razem": 85674.12
      },
      "okresy": [
       {
@@ -513,7 +513,7 @@
        "dni": 217,
        "procent": 81.5,
        "wspolczynnikZasilku": 1,
-       "kwota": 36625.96,
+       "kwota": 36625.26,
        "podwyzszone": false
       },
       {
@@ -524,7 +524,7 @@
        "dni": 98,
        "procent": 81.5,
        "wspolczynnikZasilku": 1,
-       "kwota": 16540.76,
+       "kwota": 16540.44,
        "podwyzszone": false
       },
       {
@@ -535,7 +535,7 @@
        "dni": 280,
        "procent": 81.5,
        "wspolczynnikZasilku": 0.5,
-       "kwota": 23629.65,
+       "kwota": 23629.2,
        "podwyzszone": false
       },
       {
@@ -546,7 +546,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 8879.24,
+       "kwota": 8879.22,
        "podwyzszone": false
       }
      ]
@@ -606,9 +606,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 52623.09,
+      "matka": 52623.76,
       "ojciec": 0,
-      "razem": 52623.09
+      "razem": 52623.76
      },
      "okresy": [
       {
@@ -619,7 +619,7 @@
        "dni": 140,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 21745.08,
+       "kwota": 21744.8,
        "podwyzszone": false
       },
       {
@@ -630,7 +630,7 @@
        "dni": 42,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 6523.52,
+       "kwota": 6523.44,
        "podwyzszone": false
       },
       {
@@ -641,7 +641,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 24354.49,
+       "kwota": 24355.52,
        "podwyzszone": false
       }
      ]
@@ -687,9 +687,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 11275.23,
+      "matka": 11275.04,
       "ojciec": 0,
-      "razem": 11275.23
+      "razem": 11275.04
      },
      "okresy": [
       {
@@ -700,7 +700,7 @@
        "dni": 56,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 11275.23,
+       "kwota": 11275.04,
        "podwyzszone": false
       }
      ]
@@ -759,9 +759,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 58051.31,
-      "ojciec": 10781.94,
-      "razem": 68833.25
+      "matka": 58050.44,
+      "ojciec": 10781.82,
+      "razem": 68832.26
      },
      "okresy": [
       {
@@ -772,7 +772,7 @@
        "dni": 140,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 27382.69,
+       "kwota": 27382.6,
        "podwyzszone": false
       },
       {
@@ -783,7 +783,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 30668.62,
+       "kwota": 30667.84,
        "podwyzszone": false
       },
       {
@@ -794,7 +794,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 10781.94,
+       "kwota": 10781.82,
        "podwyzszone": false
       }
      ]
@@ -870,9 +870,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 51842.65,
+      "matka": 51842.28,
       "ojciec": 0,
-      "razem": 51842.65
+      "razem": 51842.28
      },
      "okresy": [
       {
@@ -883,7 +883,7 @@
        "dni": 140,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 24454.08,
+       "kwota": 24453.8,
        "podwyzszone": false
       },
       {
@@ -894,7 +894,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 27388.57,
+       "kwota": 27388.48,
        "podwyzszone": false
       }
      ]
@@ -909,9 +909,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 53782.83,
+      "matka": 53783.8,
       "ojciec": 0,
-      "razem": 53782.83
+      "razem": 53783.8
      },
      "okresy": [
       {
@@ -922,7 +922,7 @@
        "dni": 140,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 25369.26,
+       "kwota": 25369.4,
        "podwyzszone": false
       },
       {
@@ -933,7 +933,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 28413.57,
+       "kwota": 28414.4,
        "podwyzszone": false
       }
      ]
@@ -1004,9 +1004,9 @@
     "chorobowe_w_ciazy_120_dni": {
      "dniPracodawca": 33,
      "dniZUS": 87,
-     "kwotaPracodawca": 7079.38,
-     "kwotaZUS": 18663.82,
-     "kwotaRazem": 25743.2,
+     "kwotaPracodawca": 7079.49,
+     "kwotaZUS": 18664.11,
+     "kwotaRazem": 25743.6,
      "dzienna": 214.53,
      "ostrzezenia": []
     },
@@ -1020,9 +1020,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 63671.51,
+      "matka": 63672.28,
       "ojciec": 0,
-      "razem": 63671.51
+      "razem": 63672.28
      },
      "okresy": [
       {
@@ -1033,7 +1033,7 @@
        "dni": 140,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 30033.73,
+       "kwota": 30034.2,
        "podwyzszone": false
       },
       {
@@ -1044,7 +1044,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 33637.78,
+       "kwota": 33638.08,
        "podwyzszone": false
       }
      ]
@@ -1092,7 +1092,7 @@
     ]
    },
    "wynik_wzorcowy": {
-    "ojciec_razem": 54104.98,
+    "ojciec_razem": 54103.7,
     "plan": {
      "bledy": [],
      "ostrzezenia": [
@@ -1105,9 +1105,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 82
      },
      "sumy": {
-      "matka": 719.08,
-      "ojciec": 54104.98,
-      "razem": 54824.06
+      "matka": 719.1,
+      "ojciec": 54103.7,
+      "razem": 54822.8
      },
      "okresy": [
       {
@@ -1118,7 +1118,7 @@
        "dni": 5,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 719.08,
+       "kwota": 719.1,
        "podwyzszone": false
       },
       {
@@ -1129,7 +1129,7 @@
        "dni": 135,
        "procent": 100,
        "wspolczynnikZasilku": 1,
-       "kwota": 21745.08,
+       "kwota": 21744.45,
        "podwyzszone": false
       },
       {
@@ -1140,7 +1140,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 7103.39,
+       "kwota": 7103.25,
        "podwyzszone": false
       },
       {
@@ -1151,7 +1151,7 @@
        "dni": 224,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 25256.51,
+       "kwota": 25256,
        "podwyzszone": false
       }
      ]
@@ -1205,9 +1205,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 130
      },
      "sumy": {
-      "matka": 71517.15,
-      "ojciec": 7610.78,
-      "razem": 79127.93
+      "matka": 71518.72,
+      "ojciec": 7611.03,
+      "razem": 79129.75
      },
      "okresy": [
       {
@@ -1229,7 +1229,7 @@
        "dni": 392,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 47355.95,
+       "kwota": 47357.52,
        "podwyzszone": false
       },
       {
@@ -1240,7 +1240,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 7610.78,
+       "kwota": 7611.03,
        "podwyzszone": false
       }
      ]
@@ -1255,9 +1255,9 @@
       "rodzicielskiMaxPrzyLaczeniuTyg": 130
      },
      "sumy": {
-      "matka": 74827.24,
-      "ojciec": 7610.78,
-      "razem": 82438.02
+      "matka": 74825.8,
+      "ojciec": 7611.03,
+      "razem": 82436.83
      },
      "okresy": [
       {
@@ -1268,7 +1268,7 @@
        "dni": 140,
        "procent": 81.5,
        "wspolczynnikZasilku": 1,
-       "kwota": 19691.38,
+       "kwota": 19691,
        "podwyzszone": false
       },
       {
@@ -1279,7 +1279,7 @@
        "dni": 392,
        "procent": 81.5,
        "wspolczynnikZasilku": 1,
-       "kwota": 55135.86,
+       "kwota": 55134.8,
        "podwyzszone": false
       },
       {
@@ -1290,7 +1290,7 @@
        "dni": 63,
        "procent": 70,
        "wspolczynnikZasilku": 1,
-       "kwota": 7610.78,
+       "kwota": 7611.03,
        "podwyzszone": false
       }
      ]

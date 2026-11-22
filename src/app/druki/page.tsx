@@ -7,11 +7,11 @@ import { tlumaczDla } from "@/i18n/jezyki";
 import { jezykZSerwera } from "@/i18n/serwer";
 
 // Tytuł i nagłówek odróżnione od /formularze (strony wyboru): tu są same instrukcje do druków ZUS.
-export const metadata: Metadata = {
-  title: "Druki ZUS: kto składa i jak wypełnić – Przewodnik Przyszłego Rodzica",
-  description: "Do czego służy każdy druk ZUS, kto go składa, gdzie i w jakim terminie, z instrukcją wypełnienia krok po kroku.",
-  alternates: { canonical: kanoniczny("/druki") },
-};
+export const generateMetadata = (): Promise<Metadata> => metadane(
+  "Druki ZUS: kto składa i jak wypełnić",
+  "Do czego służy każdy druk ZUS, kto go składa, gdzie i w jakim terminie, z instrukcją wypełnienia krok po kroku.",
+  { alternates: { canonical: kanoniczny("/druki") } },
+);
 
 /** Adresy pustych wzorów na zus.pl (PDF albo strona druku). Pustych PDF-ów nie ma w public/, więc linkujemy do ZUS. */
 const LINKI = drukiLinki.druki as Record<string, { url_zus?: string; pdf_zus?: string }>;

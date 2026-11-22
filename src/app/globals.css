@@ -43,7 +43,7 @@
 html { -webkit-text-size-adjust: 100%; font-size: 16px; overflow-x: clip; }
 body {
   margin: 0;
-  font-family: var(--font-lato), "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-lato), var(--font-noto), "Lato", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: var(--bg);
   line-height: 1.5;
@@ -265,7 +265,7 @@ img { max-width: 100%; height: auto; }
 .footer a { color: #fff; }
 .footer a:hover { color: #fff; }
 .footer p { margin: 0 0 10px; }
-.footer__cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(180px, 260px); gap: 28px 36px; align-items: start; }
+.footer__cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(180px, 260px); gap: 28px 36px; align-items: start; }
 .footer__h { color: #fff; font-size: 18px; margin: 0 0 8px; padding: 0; }
 .footer__links { list-style: none; margin: 0; padding: 0; }
 .footer__links li { margin: 0; border-top: 1px solid #3d9460; }
@@ -751,7 +751,8 @@ button.tile { appearance: none; }
 
 /* stopka */
 .footer { padding: 32px 0 32px; margin-top: 24px; border-top: 0; }
-.footer__cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 300px); gap: 24px 48px; }
+.footer__cols { grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(200px, 280px); gap: 24px 48px; }
+@media (max-width: 1100px) { .footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .footer__links li { border: 0 !important; }
 .footer__links a { min-height: 44px; padding: 4px 0 4px 18px; position: relative; font-weight: 700; font-size: 14px; }
 .footer__links a::before {
@@ -832,6 +833,7 @@ button.tile { appearance: none; }
 
 .ask--glowny { background: var(--zus-green-tint); border: 1px solid var(--zus-green-line); border-radius: 16px; padding: 22px 24px 18px; margin: 0 0 24px; }
 .ask--glowny h2 { font-size: 24px; line-height: 30px; margin: 0 0 12px; color: var(--zus-navy-dark); }
+.demo-znacznik { font-size: 14px; letter-spacing: .06em; vertical-align: middle; margin-left: 6px; }
 .search { flex-wrap: nowrap; align-items: stretch; gap: 10px; margin: 0; }
 .search__box { position: relative; flex: 1 1 auto; min-width: 0; }
 .search__icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--zus-green); pointer-events: none; }
