@@ -1,7 +1,7 @@
 {
  "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
  "osoba": "Agnieszka Mazur",
- "pesel": "87040312346",
+ "pesel": "00000000007",
  "ubezpieczenie": [
   {
    "tytul": "umowa_o_prace",

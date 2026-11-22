@@ -34,11 +34,12 @@ export interface Pyt {
 
 export interface Wynik {
   glowne: string; duza?: string; podpis?: string;
+  /** Przypis do kwoty (pokazywany z gwiazdką pod kwotą). */
+  przypis?: string;
   szczegoly?: [string, string][];
   tabela?: { kolumny: string[]; wiersze: string[][]; uwaga?: string };
   ostrzezenia?: string[];
   zrob: { kiedy?: string; tekst: string; uwaga?: string }[];
-  sciaga?: { tytul: string; wiersze: [string, string, string][]; uwaga?: string };
   tekstDoKopii?: { tytul: string; tresc: string };
   info?: { tytul: string; tresc: string; zwiniete?: boolean }[];
   /** Najważniejszy termin: pokazujemy go na samej górze wyniku, nie na dole strony. */
@@ -393,13 +394,6 @@ export const SPRAWY: Sprawa[] = [
         "Przy urlopie rodzicielskim: oświadczenia o drugim rodzicu (rubryki na druku ZAM)",
         "Numer rachunku bankowego, jeśli chcesz wypłatę na konto (wpisujesz go sama na druku)",
       ];
-      const sciagaWiersze: [string, string, string][] = [
-        ["Dane wnioskodawcy", `${c.osoba ?? "Twoje imię i nazwisko"}, PESEL ${c.pesel ?? "(z dowodu osobistego)"}`, "Dowód osobisty"],
-        ["Data urodzenia dziecka", dataPL(o.dataPorodu), "Akt urodzenia (albo termin z karty ciąży przed porodem)"],
-        ["Za jaki okres wnioskujesz", [mac && `urlop macierzyński: od ${dataPL(mac.od)} do ${dataPL(mac.do)}`, rod && `urlop rodzicielski: od ${dataPL(rod.od)} do ${dataPL(rod.do)}`].filter(Boolean).join("; "), "Daty z tej strony (tabela z wyliczeniem)"],
-        ["Pełny wymiar (81,5%)", uzywa815 ? "Zaznacz pole" : porownaj ? "Zaznacz tylko, jeśli wybierasz stałą kwotę 81,5%" : "Nie zaznaczaj", "Dotyczy wyboru stałej kwoty 81,5%"],
-        ["Do kogo składasz", adresat, `Pracodawca z więcej niż ${progPlatnika} osobami wypłaca sam, w pozostałych przypadkach ZUS.`],
-      ];
       const kwotaStd = por?.zmienny_100_70?.sumy?.razem;
       const kwotaStala = por?.usredniony_81_5?.sumy?.razem;
       const porownanie = por ? [
@@ -416,14 +410,13 @@ export const SPRAWY: Sprawa[] = [
         { tytul: "Dla drugiego rodzica", zwiniete: true, tresc: `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi. Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli oboje rodzice biorą urlop, sprawdź sprawę „Podzielić urlop z drugim rodzicem”.` },
       ];
       return {
-        glowne: `Tyle dostaniesz za cały urlop (macierzyński ${tygodnie(wyn.wymiary.macierzynskiTyg)} i rodzicielski ${tygodnie(matkaMax)}):`,
-        duza: pln(wyn.sumy.razem), podpis: mac ? `Na początek ok. ${plOk(miesiecznie(mac))} miesięcznie (brutto, przed podatkiem)` : "Kwota brutto, przed podatkiem",
+        glowne: `Przewidywana kwota za cały urlop (macierzyński ${tygodnie(wyn.wymiary.macierzynskiTyg)} i rodzicielski ${tygodnie(matkaMax)}):`,
+        duza: pln(wyn.sumy.razem), przypis: "Ostateczną decyzję o wysokości zasiłku podejmuje urzędnik ZUS.", podpis: mac ? `Na początek ok. ${plOk(miesiecznie(mac))} miesięcznie (brutto, przed podatkiem)` : "Kwota brutto, przed podatkiem",
         szczegoly: [["Urlop macierzyński", mac ? `${dataPL(mac.od)} – ${dataPL(mac.do)}` : "—"], ["Urlop rodzicielski", rod ? `${dataPL(rod.od)} – ${dataPL(rod.do)}` : "—"], ["Od tej kwoty liczymy zasiłek", `${pln(podM)} miesięcznie`], ["Jak będzie wypłacany", uzywa815 ? "równa kwota co miesiąc (81,5%)" : `pierwsze ${tygodnie(wyn.wymiary.macierzynskiTyg)} po 100%, potem po 70%`]],
         pilne: uzywa815 || porownaj
           ? { do: t815, tekst: `Chcesz mieć stałą kwotę co miesiąc (81,5%)? Złóż wniosek ZAM najpóźniej ${dataPL(t815)} (${zaIle(t815)}). Tego terminu nie da się przedłużyć. Jeśli go przegapisz, zasiłek nie przepada: dostaniesz 100% za urlop macierzyński i 70% za rodzicielski – w sumie prawie tyle samo.` }
           : undefined,
         ostrzezenia: ost, terminy: terminyDlaRodzica(term), zrob, dokumenty: { tytul: "Weź ze sobą", pozycje: dokumenty },
-        sciaga: { tytul: "Ściąga: co wpisać w druku ZAM", wiersze: sciagaWiersze, uwaga: "Druk ZAM obowiązuje od 24.10.2026. Jeśli rubryka nazywa się trochę inaczej, wpisz w nią tę samą informację." },
         druki: ["ZAM", ...(o.zatrudnienie === "umowa" ? ["Z-3"] : o.zatrudnienie === "zlecenie" ? ["Z-3a"] : [])],
         status: nieznanyPlatnik ? "do_potwierdzenia" : "ok", uwagaStatus: `Zapytaj w kadrach, ilu pracowników firma zgłasza do ubezpieczenia chorobowego. Od tego zależy, gdzie złożysz wniosek (krok 1 poniżej).`,
         info, zwinTabele: true,
@@ -568,7 +561,7 @@ export const SPRAWY: Sprawa[] = [
         ostrzezenia: [...new Set([...(rZ.ostrzezenia as string[]), ...(rZ.bledy as string[])])],
         zrob: [{ kiedy: `co najmniej ${dniPrzed} dni przed startem pracy`, tekst: "Złóż pracodawcy wniosek o łączenie urlopu z pracą." }, { tekst: `Pracodawca może odmówić, jeśli nie da się tego pogodzić z organizacją pracy – odpowie w ciągu ${par.terminy_dni.odmowa_laczenia_z_praca_odpowiedz_pracodawcy} dni.` }],
         terminy: okPraca ? [{ co: "Wniosek o łączenie pracy z urlopem", do: dodajDni(okPraca.od, -dniPrzed) }] : undefined,
-        linki: [{ href: "/wnioski", etykieta: "Otwórz kreator wniosków i wybierz „Łączenie pracy z urlopem”" }, { href: "/kalkulator?tryb=laczenie", etykieta: LINK_KALK.etykieta }], status: "ok", nastepne: ["urlop-pracodawca"], jakLiczono: rZ.kroki,
+        linki: [{ href: "/kalkulator?tryb=laczenie", etykieta: LINK_KALK.etykieta }], status: "ok", nastepne: ["urlop-pracodawca"], jakLiczono: rZ.kroki,
       };
     },
   },
@@ -820,12 +813,12 @@ function faqOdmowy<T extends { id: string; pytanie: string; odpowiedz: string; k
 export async function zbudujCtx(api: Api, sesja: { osoba: string; pesel: string; personaId: string }): Promise<Ctx> {
   const naDzien = dzis();
   const c: Ctx = { osoba: sesja.osoba, pesel: sesja.pesel };
-  const dane = async (url: string, body?: unknown) => api(url, body).catch(() => null);
-  const osoba = { pesel: sesja.pesel, naDzien };
+  const dane = async (url: string) => api(url).catch(() => null);
+  const pesel = encodeURIComponent(sesja.pesel);
   const [u, e, z, sc] = await Promise.all([
-    dane("/api/zus/ubezpieczenie", osoba),
-    dane("/api/zus/ezla", { pesel: sesja.pesel }),
-    dane("/api/zus/zadluzenie", osoba),
+    dane(`/api/zus/ubezpieczenie?pesel=${pesel}&naDzien=${naDzien}`),
+    dane(`/api/zus/ezla?pesel=${pesel}`),
+    dane(`/api/zus/zadluzenie?pesel=${pesel}&naDzien=${naDzien}`),
     dane("/api/scenariusze"),
   ]);
   type Ubezpieczenie = { od: string; do: string | null; tytul: string; chorobowe: string; platnik?: { nazwa?: string; liczbaUbezpieczonych?: number } };

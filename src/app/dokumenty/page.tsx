@@ -63,7 +63,7 @@ export default function Dokumenty() {
   return (
     <>
       <h1>{t("Kto wypłaca zasiłek")}</h1>
-      <p className="lead">Sprawdź, czy zasiłek wypłaca ZUS, czy pracodawca, gdzie złożyć wniosek i ile masz na to czasu. Wszystkie swoje terminy od daty porodu znajdziesz w <Link href="/terminarz">Kalendarzu w urzędzie</Link>.</p>
+      <p className="lead">{t("Sprawdź, czy zasiłek wypłaca ZUS, czy pracodawca, gdzie złożyć wniosek i ile masz na to czasu. Wszystkie swoje terminy od daty porodu znajdziesz w")} <Link href="/terminarz">{t("Kalendarzu w urzędzie")}</Link>.</p>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
           <h2>{t("Kto wypłaca zasiłek?")}</h2>
@@ -91,18 +91,18 @@ export default function Dokumenty() {
           <h2>{t("Daty z Twojego planu")}</h2>
           {blad && <Alert t="err">{t("Nie udało się odczytać terminów z zapisanego planu.")}</Alert>}
           {datyDoPokazania.length ? <>
-            <p className="muted">Sam decydujesz, które daty trafią do Twojego planu. Wybrane zapamiętamy w tej przeglądarce.</p>
+            <p className="muted">{t("Sam decydujesz, które daty trafią do Twojego planu. Wybrane zapamiętamy w tej przeglądarce.")}</p>
             <ul className="clean">
               {datyDoPokazania.map((tm) => {
                 const k = kluczDaty(tm), wPlanie = wybrane.includes(k);
                 return <li key={k} className="mt">
                   <b>{tm.do ? `${t("Do")} ${dataPL(tm.do)}` : `${t("Od")} ${dataPL(tm.od)}`}</b>{wPlanie && <span className="badge ok"> W Twoim planie</span>}<br />{opisTerminuT(t, opisObliczenia, tm.co)}<br />
-                  <button type="button" className={wPlanie ? "btn btn-ghost btn-sm" : "btn btn-secondary btn-sm"} onClick={() => przelacz(k)}>{wPlanie ? "Usuń z mojego planu" : "Dodaj do mojego planu"}</button>
+                  <button type="button" className={wPlanie ? "btn btn-ghost btn-sm" : "btn btn-secondary btn-sm"} onClick={() => przelacz(k)}>{t(wPlanie ? "Usuń z mojego planu" : "Dodaj do mojego planu")}</button>
                 </li>;
               })}
             </ul>
-            <p className="small muted mt">Na dole: masz 6 miesięcy od końca okresu zasiłku, żeby upomnieć się o jego wypłatę.</p>
-          </> : <p><Link href="/terminarz">Zobacz swoje terminy w Kalendarzu w urzędzie</Link> lub <Link href="/kalkulator">ułóż plan urlopów w kalkulatorze</Link>.</p>}
+            <p className="small muted mt">{t("Na dole: masz 6 miesięcy od końca okresu zasiłku, żeby upomnieć się o jego wypłatę.")}</p>
+          </> : <p><Link href="/terminarz">{t("Zobacz swoje terminy w Kalendarzu w urzędzie")}</Link> {t("lub")} <Link href="/kalkulator">{t("ułóż plan urlopów w kalkulatorze")}</Link>.</p>}
         </section>
       </div>
       <section className="card mt">

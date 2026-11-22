@@ -46,7 +46,7 @@ export default function Logowanie() {
   return (
     <div className={s.wrap}>
       <h1 className={s.tytul}>{t("Logowanie testowe")}</h1>
-      <p className={s.lead}>Wypróbuj logowanie przez mObywatela na gotowym profilu. Kliknij profil, a od razu się zalogujesz. Nie wpisujesz żadnych własnych danych.</p>
+      <p className={s.lead}>{t("Wypróbuj logowanie przez mObywatela na gotowym profilu. Kliknij profil, a od razu się zalogujesz. Nie wpisujesz żadnych własnych danych.")}</p>
       <div className={s.fikcja} role="note">
         <div>
           <span className={s.znacznik}>{t("Fikcyjne dane testowe")}</span>
@@ -59,7 +59,7 @@ export default function Logowanie() {
       <section aria-labelledby="profile-h">
         <h2 id="profile-h">{t("Wybierz profil testowy")}</h2>
         {bladListy && <Alert t="err">{t("Nie udało się wczytać profili. Odśwież stronę i spróbuj ponownie.")}</Alert>}
-        {bladLogowania && <div ref={bladRef} tabIndex={-1}><Alert t="err">Nie udało się zalogować jako {bladLogowania}. Spróbuj ponownie.</Alert></div>}
+        {bladLogowania && <div ref={bladRef} tabIndex={-1}><Alert t="err">{t("Nie udało się zalogować jako {osoba}. Spróbuj ponownie.", { osoba: bladLogowania })}</Alert></div>}
         {loguje && <p role="status">{t("Logujemy…")}</p>}
         {!persony && !bladListy && <p role="status">{t("Wczytujemy profile…")}</p>}
         {persony && <ul className={s.lista}>
@@ -69,7 +69,7 @@ export default function Logowanie() {
                 <span className={s.imie}>{p.osoba}</span>
                 <span className={s.opis}>{opisProfilu(p, t)}</span>
                 <span className={s.meta}>{p.tytul ? `${nazwaUbezpieczenia(p.tytul)} · ` : ""}fikcyjny PESEL {p.pesel}</span>
-                <span className={s.wybierz} aria-hidden="true">{loguje === p.id ? "Logujemy…" : "Zaloguj się na ten profil →"}</span>
+                <span className={s.wybierz} aria-hidden="true">{loguje === p.id ? t("Logujemy…") : t("Zaloguj się na ten profil →")}</span>
               </button>
             </li>
           ))}

@@ -2,8 +2,8 @@
 import sys, glob
 from PIL import Image, ImageDraw, ImageFont
 out = sys.argv[1]
-fp = (glob.glob("/usr/share/fonts/**/DejaVuSans.ttf", recursive=True) or glob.glob("C:/Windows/Fonts/arial.ttf") or [None])[0]
-fb = (glob.glob("/usr/share/fonts/**/DejaVuSans-Bold.ttf", recursive=True) or glob.glob("C:/Windows/Fonts/arialbd.ttf") or [fp])[0]
+fp = (glob.glob("/usr/share/fonts/**/DejaVuSans.ttf", recursive=True) or [None])[0]
+fb = (glob.glob("/usr/share/fonts/**/DejaVuSans-Bold.ttf", recursive=True) or [fp])[0]
 F = lambda s, b=False: ImageFont.truetype(fb if b else fp, s)
 W, H = 1240, 1754
 
@@ -35,15 +35,15 @@ def z3(osoba, pesel, kwota, plik):
     d.text((80, y + 80), "Data: 2027-01-20        Podpis płatnika: ………………………", font=F(20), fill="black")
     im.save(f"{out}/{plik}", "PDF", resolution=150)
 
-z3("Anna Kowalska", "92031412345", 6500.00, "Z-3_przyklad_Anna_Kowalska.pdf")
-z3("Dominika Kamińska", "94053012341", 5800.00, "Z-3_przyklad_Dominika_Kaminska.pdf")
+z3("Anna Kowalska", "00000000001", 6500.00, "Z-3_przyklad_Anna_Kowalska.pdf")
+z3("Dominika Kamińska", "00000000008", 5800.00, "Z-3_przyklad_Dominika_Kaminska.pdf")
 
 # ZAM – uproszczony
 im, d = strona()
 d.rectangle([60, 50, W - 60, 130], outline="black", width=3)
 d.text((80, 62), "ZAM – Wniosek o zasiłek macierzyński", font=F(34, True), fill="black"); d.text((80, 105), "DEMONSTRACYJNY DOKUMENT – dane fikcyjne, nie jest drukiem ZUS", font=F(18), fill="#a00")
 y = 170
-for k, v in [("Imię i nazwisko", "Anna Kowalska"), ("PESEL", "92031412345"), ("Płatnik składek", "FIRMA TESTOWA SA, NIP 0000000001"), ("Wnioskuję w związku z", "☒ urodzeniem dziecka"),
+for k, v in [("Imię i nazwisko", "Anna Kowalska"), ("PESEL", "00000000001"), ("Płatnik składek", "FIRMA TESTOWA SA, NIP 0000000001"), ("Wnioskuję w związku z", "☒ urodzeniem dziecka"),
              ("Data porodu", "2027-03-15"), ("Zasiłek za okres urlopu macierzyńskiego", "☒  od 2027-03-15  do 2027-08-01"), ("Zasiłek za okres urlopu rodzicielskiego", "☒  od 2027-08-02  do 2028-03-12"),
              ("Pełny wymiar (81,5%)", "☐ nie zamierzam"), ("Dziecko z zaświadczeniem „Za życiem”", "☐ nie")]:
     d.text((80, y), k + ":", font=F(22, True), fill="black"); d.text((620, y), v, font=F(22), fill="black"); y += 46

@@ -76,7 +76,7 @@ async function demo(plik: string) {
   const { odczyt, wynik: w } = await demo("Z-3_przyklad_Anna_Kowalska.pdf");
   rowne("Z-3 Anna: skan, bez warstwy tekstowej, OCR", odczyt.strony.map((s) => s.zrodlo), ["ocr"]);
   rowne("Z-3 Anna: typ", w.dane.typ_dokumentu, "Z-3");
-  rowne("Z-3 Anna: PESEL", w.dane.ubezpieczony.pesel, "92031412345");
+  rowne("Z-3 Anna: PESEL", w.dane.ubezpieczony.pesel, "00000000001");
   rowne("Z-3 Anna: osoba", [w.dane.ubezpieczony.imie, w.dane.ubezpieczony.nazwisko], ["Anna", "Kowalska"]);
   rowne("Z-3 Anna: powyżej 20", w.dane.platnik.liczba_ubezpieczonych, "powyzej_20");
   rowne("Z-3 Anna: okres", [w.dane.wnioskowane_okresy[0]?.od, w.dane.wnioskowane_okresy[0]?.do], ["2027-03-15", "2027-08-01"]);
@@ -94,14 +94,14 @@ async function demo(plik: string) {
 }
 {
   const { wynik: w } = await demo("Z-3_przyklad_Dominika_Kaminska.pdf");
-  rowne("Z-3 Dominika: PESEL i osoba", [w.dane.ubezpieczony.pesel, w.dane.ubezpieczony.imie, w.dane.ubezpieczony.nazwisko], ["94053012341", "Dominika", "Kamińska"]);
+  rowne("Z-3 Dominika: PESEL i osoba", [w.dane.ubezpieczony.pesel, w.dane.ubezpieczony.imie, w.dane.ubezpieczony.nazwisko], ["00000000008", "Dominika", "Kamińska"]);
   rowne("Z-3 Dominika: 12 miesięcy po 5800", [w.dane.skladniki_miesieczne.length, w.dane.skladniki_miesieczne.every((r) => r.stale === 5800)], [12, true]);
   rowne("Z-3 Dominika: podstawa (5800 minus 13,71 %)", policzPodstawe(w.dane)?.wynik.podstawaMiesieczna, 5004.82);
 }
 {
   const { wynik: w } = await demo("ZAM_przyklad_Anna_Kowalska.pdf");
   rowne("ZAM: typ", w.dane.typ_dokumentu, "ZAM");
-  rowne("ZAM: PESEL", w.dane.ubezpieczony.pesel, "92031412345");
+  rowne("ZAM: PESEL", w.dane.ubezpieczony.pesel, "00000000001");
   rowne("ZAM: data porodu", w.dane.data_zdarzenia, "2027-03-15");
   rowne("ZAM: podstawa wniosku", w.dane.podstawa_wniosku, "porod");
   rowne("ZAM: okresy", w.dane.wnioskowane_okresy.map((o) => [o.rodzaj, o.od, o.do]), [["macierzynski", "2027-03-15", "2027-08-01"], ["rodzicielski", "2027-08-02", "2028-03-12"]]);

@@ -248,8 +248,8 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
     <div className={style.terminarz}>
       <h1>{t("Kalendarz w urzędzie")}</h1>
       <p className="lead">
-        Pokażemy, co złożyć w ZUS, u pracodawcy, w gminie i w urzędzie stanu cywilnego, i do kiedy, z linkami do druków.
-        Terminy możesz pobrać do kalendarza w telefonie. Wizyty lekarskie i badania znajdziesz w <Link href="/kalendarz">kalendarzu ciąży</Link>.
+        {t("Pokażemy, co złożyć w ZUS, u pracodawcy, w gminie i w urzędzie stanu cywilnego, i do kiedy, z linkami do druków.")}{" "}
+        {t("Terminy możesz pobrać do kalendarza w telefonie. Wizyty lekarskie i badania znajdziesz w")} <Link href="/kalendarz">{t("kalendarzu ciąży")}</Link>.
       </p>
 
       <form className={`card accent ${style.formularz}`} onSubmit={(e) => e.preventDefault()} noValidate aria-labelledby="tz-formularz">
@@ -257,9 +257,9 @@ function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry:
         {zProfiluPola.length > 0 && (
           <p className="alert info" role="status">
             {sesja
-              ? <>Część pól wypełniliśmy za Ciebie danymi z profilu ({sesja.osoba.split(" ")[0]}).</>
-              : <>Datę porodu wzięliśmy z tego, co wpisano wcześniej w tej przeglądarce.</>}
-            {" "}Sprawdź je i popraw, jeśli coś się zmieniło.
+              ? t("Część pól wypełniliśmy za Ciebie danymi z profilu ({imie}).", { imie: sesja.osoba.split(" ")[0] })
+              : t("Datę porodu wzięliśmy z tego, co wpisano wcześniej w tej przeglądarce.")}
+            {" "}{t("Sprawdź je i popraw, jeśli coś się zmieniło.")}
           </p>
         )}
         <div className={style.pola}>

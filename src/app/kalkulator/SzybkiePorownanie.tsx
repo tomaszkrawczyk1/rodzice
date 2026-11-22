@@ -80,7 +80,7 @@ export default function SzybkiePorownanie({ onPelny }: { onPelny: (d: DaneWstepn
         </Pole>
       </div>
       <details className="dl">
-        <summary>Znam już podstawę zasiłku (dla zaawansowanych)</summary>
+        <summary>Znam już podstawę zasiłku</summary>
         <p className={css.mala}>Podstawa to kwota po odjęciu składek, od której ZUS liczy zasiłek. Znajdziesz ją w decyzji ZUS albo w druku Z-3 od pracodawcy. Jeśli ją wpiszesz, pole z pensją pomijamy.</p>
         <Pole label="Miesięczna podstawa zasiłku (zł)"><input type="number" inputMode="decimal" min={0} value={podstawa} onChange={(e) => setPodstawa(e.target.value)} /></Pole>
       </details>

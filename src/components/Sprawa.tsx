@@ -275,8 +275,8 @@ function KrokiSprawy({ s, c, token, podglad, wstepny }: { s: Sprawa; c: Ctx; tok
               </div>
             </form>
           )}
-          <details className="dl mt"><summary>{t("Po co o to pytamy?")}</summary><p className="small">{zPojeciami(q.poCo)}</p></details>
-          {q.skad && <details className="dl"><summary>{t("Skąd to wziąć?")}</summary><p className="small">{zPojeciami(q.skad)}</p></details>}
+          <details className="dl mt"><summary>{t("Po co o to pytamy?")}</summary><p className="small">{zPojeciami(t(q.poCo))}</p></details>
+          {q.skad && <details className="dl"><summary>{t("Skąd to wziąć?")}</summary><p className="small">{zPojeciami(t(q.skad))}</p></details>}
         </div>
       )}
 
@@ -309,26 +309,9 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
       setBladKopii(true);
     }
   }
-  // Ściąga i lista dokumentów w jednym pliku tekstowym: da się go otworzyć na telefonie i wysłać sobie.
-  function pobierzPlik() {
-    const tresc = [
-      t(w.sciaga?.tytul ?? "Moje dane do wniosku"),
-      "",
-      ...(w.sciaga?.wiersze.map(([pole, wpisz]) => `${t(pole)}: ${t(wpisz)}`) ?? []),
-      ...(w.dokumenty ? ["", `${t(w.dokumenty.tytul)}:`, ...w.dokumenty.pozycje.map((p) => `[ ] ${t(p)}`)] : []),
-    ].join("\r\n");
-    const adres = URL.createObjectURL(new Blob(["﻿" + tresc], { type: "text/plain;charset=utf-8" }));
-    const a = document.createElement("a");
-    a.href = adres;
-    a.download = "moje-dane-do-wniosku.txt";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(adres), 1000);
-  }
   // Trudne pojęcia objaśniamy raz na cały wynik – przy pierwszym użyciu (kolejność jak na ekranie).
   const uzyte = new Set<string>();
-  const objasnij = (t?: string) => zPojeciami(t, uzyte);
+  const objasnij = (tekst?: string) => zPojeciami(tekst, uzyte);
   const druki = (w.druki ?? []).filter((d, i, a) => a.indexOf(d) === i);
   const powiazane = (w.nastepne ?? []).map((id) => sprawa(id)).filter(Boolean);
   const infoOtwarte = (w.info ?? []).filter((x) => !x.zwiniete);
@@ -339,23 +322,18 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
       {w.tabela.uwaga && <p className="small muted mt">{t(w.tabela.uwaga)}</p>}
     </>
   );
-  const tabelaSciagi = w.sciaga && (
-    <>
-      <div className="tbl-wrap"><table className="tbl tbl-karty"><thead><tr><th>{t("Pole na druku")}</th><th>{t("Wpisz")}</th><th>{t("Skąd to wziąć")}</th></tr></thead><tbody>{w.sciaga.wiersze.map(([a, b, c], i) => <tr key={i}><td data-label={t("Pole na druku")}>{t(a)}</td><td data-label={t("Wpisz")}><b>{t(b)}</b></td><td data-label={t("Skąd to wziąć")} className="muted">{t(c)}</td></tr>)}</tbody></table></div>
-      {w.sciaga.uwaga && <p className="small muted mt">{t(w.sciaga.uwaga)}</p>}
-    </>
-  );
   return (
     <>
       {/* Najważniejszy termin jest nad wynikiem, żeby nikt nie musiał go szukać na dole strony. */}
       {w.pilne && <div className="alert err pilne" role="note" id="w-pilne"><span className="pilne__lab">{t("Ważny termin")}</span><p>{t(w.pilne.tekst)}</p></div>}
 
       <div className={"card" + (w.lagodny ? " navy" : "")}>
-        <h2 style={{ marginTop: 0 }} data-fokus tabIndex={-1}>{w.glowne}</h2>
-        {w.duza && <div className="big">{w.duza}</div>}
-        {w.podpis && <p className="muted">{w.podpis}</p>}
-        {w.szczegoly && <dl className="kv mt" style={kolumnyDanych}>{w.szczegoly.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}
-        {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{objasnij(x)}</Alert>)}
+        <h2 style={{ marginTop: 0 }} data-fokus tabIndex={-1}>{t(w.glowne)}</h2>
+        {w.duza && <div className="big">{t(w.duza)}{w.przypis && <sup>*</sup>}</div>}
+        {w.podpis && <p className="muted">{t(w.podpis)}</p>}
+        {w.przypis && <p className="small muted">* {t(w.przypis)}</p>}
+        {w.szczegoly && <dl className="kv mt" style={kolumnyDanych}>{w.szczegoly.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{t(k)}</dt><dd>{t(v)}</dd></div>)}</dl>}
+        {w.ostrzezenia?.map((x, i) => <Alert key={i} t="warn">{objasnij(t(x))}</Alert>)}
         {w.status === "do_potwierdzenia" && (
           <Alert t="warn">
             <b>{t("Do sprawdzenia.")}</b>{" "}
@@ -375,8 +353,8 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
 
       {w.zrob.length > 0 && (
         <div className="card mt" id="w-zrob"><h2>{t("Co teraz zrobić")}</h2>
-          <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{z.kiedy}: </b>}{objasnij(z.tekst)}{z.uwaga && <div className="small muted">{objasnij(z.uwaga)}</div>}</li>)}</ol>
-          {!w.pilne && w.terminy && w.terminy.length > 0 && <><h3 className="mt">{t("Ważne terminy")}</h3><ul className="clean warnlist">{w.terminy.map((t, i) => <li key={i}><b>{dataPL(t.do)}</b> ({zaIle(t.do)}): {t.co}</li>)}</ul></>}
+          <ol className="todo">{w.zrob.map((z, i) => <li key={i}>{z.kiedy && <b className="when">{t(z.kiedy)}: </b>}{objasnij(t(z.tekst))}{z.uwaga && <div className="small muted">{objasnij(t(z.uwaga))}</div>}</li>)}</ol>
+          {!w.pilne && w.terminy && w.terminy.length > 0 && <><h3 className="mt">{t("Ważne terminy")}</h3><ul className="clean warnlist">{w.terminy.map((tm, i) => <li key={i}><b>{dataPL(tm.do)}</b> ({t(zaIle(tm.do))}): {t(tm.co)}</li>)}</ul></>}
         </div>
       )}
 
@@ -386,21 +364,12 @@ function WynikWidok({ w, bezPytan }: { w: Wynik; bezPytan: boolean }) {
         </div>
       )}
 
-      {w.sciaga && (
-        <div className="card mt" id="w-sciaga"><h2>{t(w.sciaga.tytul)}</h2><p className="small muted" style={{ marginTop: 0 }}>{t("Otwórz druk w PUE / eZUS albo pobierz go ze strony ZUS i wpisz te dane w odpowiednie rubryki.")}</p>
-          <div className="row no-print"><button className="btn btn-primary btn-sm" onClick={pobierzPlik}>{t("Pobierz moje dane do wniosku (plik)")}</button><button className="btn btn-secondary btn-sm" onClick={() => kopiuj("sciaga", w.sciaga!.wiersze.map((r) => r.slice(0, 2).map((x) => t(x)).join(": ")).join("\n"))}>{skop === "sciaga" ? t("Skopiowano do schowka ✓") : t("Skopiuj dane do wniosku")}</button><button className="btn btn-ghost btn-sm" onClick={() => window.print()}>{t("Wydrukuj ściągę")}</button></div>
-          {w.zwinTabele
-            ? <details className="dl mt"><summary>{t("Pokaż, co wpisać w którą rubrykę")}</summary>{tabelaSciagi}</details>
-            : <div className="mt">{tabelaSciagi}</div>}
-        </div>
-      )}
-
       {tabela && (w.zwinTabele
         ? <details className="dl mt" id="w-tabela"><summary>{t("Pokaż tabelę z wyliczeniem")}</summary><div className="card mt">{tabela}</div></details>
         : <div className="card mt" id="w-tabela">{tabela}</div>)}
 
-      {infoOtwarte.map((x, i) => <div key={x.tytul} id={`w-info-${i}`} className="card mt"><h3>{x.tytul}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{objasnij(x.tresc)}</p></div>)}
-      {infoZwiniete.map((x) => <details key={x.tytul} className="dl mt"><summary>{x.tytul}</summary><p className="small" style={{ whiteSpace: "pre-line" }}>{objasnij(x.tresc)}</p></details>)}
+      {infoOtwarte.map((x, i) => <div key={x.tytul} id={`w-info-${i}`} className="card mt"><h3>{t(x.tytul)}</h3><p style={{ whiteSpace: "pre-line", marginBottom: 0 }}>{objasnij(tLinie(x.tresc))}</p></div>)}
+      {infoZwiniete.map((x) => <details key={x.tytul} className="dl mt"><summary>{t(x.tytul)}</summary><p className="small" style={{ whiteSpace: "pre-line" }}>{objasnij(tLinie(x.tresc))}</p></details>)}
 
       {w.tekstDoKopii && (
         <div className="card mt" id="w-tekst"><h2>{t(w.tekstDoKopii.tytul)}</h2>{jezyk !== "pl" && <p className="small muted" style={{ marginTop: 0 }}>{t("Wersja po polsku: to dokument dla polskiego pracodawcy, dlatego zostaje w tym języku.")}</p>}<pre className="wniosek" lang="pl" style={{ overflowWrap: "anywhere" }}>{w.tekstDoKopii.tresc}</pre>

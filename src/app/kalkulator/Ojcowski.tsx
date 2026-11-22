@@ -146,7 +146,7 @@ export default function Ojcowski({ onSytuacja }: { onSytuacja: (s: Sytuacja) => 
                 <OstrzezenieZadluzenia kwota={zadluzenie} dzien={data || undefined} zProfilu={zadl === null && zadlProfil != null} />
               </>
             )}
-            <details className="dl" open={maReczna || undefined}><summary>Znam gotową podstawę zasiłku (dla zaawansowanych)</summary>
+            <details className="dl" open={maReczna || undefined}><summary>Znam gotową podstawę zasiłku</summary>
               <p className={css.mala}>Podstawa to kwota po odjęciu składek, od której ZUS liczy zasiłek. Znajdziesz ją w decyzji ZUS albo zapytasz w kadrach. Jeśli ją wpiszesz, kwotę zarobków pomijamy.</p>
               <Pole label="Miesięczna podstawa zasiłku (zł)"><input inputMode="decimal" value={podstawa} onChange={(e) => setPodstawa(e.target.value)} /></Pole>
             </details>

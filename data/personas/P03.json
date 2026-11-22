@@ -1,7 +1,7 @@
 {
  "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
  "osoba": "Katarzyna Wiśniewska",
- "pesel": "95021112344",
+ "pesel": "00000000003",
  "ubezpieczenie": [
   {
    "tytul": "zlecenie",

@@ -21,8 +21,8 @@ export default async function Formularze() {
   const t = await tZSerwera();
   return (
     <>
-      <h1>Wnioski i druki</h1>
-      <p className="lead">Wybierz, co chcesz zrobić z papierami. Nie wiesz, od czego zacząć? Otwórz <Link href="/sprawy">sprawy krok po kroku</Link>: podpowiemy, który formularz będzie Ci potrzebny.</p>
+      <h1>{t("Wnioski i druki")}</h1>
+      <p className="lead">{t("Wybierz, co chcesz zrobić z papierami. Nie wiesz, od czego zacząć? Otwórz")} <Link href="/sprawy">{t("sprawy krok po kroku")}</Link>{t(": podpowiemy, który formularz będzie Ci potrzebny.")}</p>
       <div className="grid g2">
         {POZYCJE.map((p) => <Link key={p.href} href={p.href} className="tile"><b>{t(p.tytul)}</b><span>{t(p.opis)}</span></Link>)}
       </div>

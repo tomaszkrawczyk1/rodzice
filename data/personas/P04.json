@@ -1,7 +1,7 @@
 {
  "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
  "osoba": "Joanna Zielińska",
- "pesel": "91060512349",
+ "pesel": "00000000004",
  "ubezpieczenie": [
   {
    "tytul": "umowa_o_prace",

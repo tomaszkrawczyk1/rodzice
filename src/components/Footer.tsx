@@ -28,11 +28,11 @@ export default async function Footer() {
           <nav aria-label={t("O serwisie")}>
             <ul className="footer__links">
               <li><Link href="/o-projekcie">{t("O projekcie")}</Link></li>
-              <li><Link href="/prywatnosc">Polityka prywatności</Link></li>
+              <li><Link href="/prywatnosc">{t("Polityka prywatności")}</Link></li>
             </ul>
           </nav>
           <a className="to-top" href="#header">{t("Do góry")}<span className="to-top__circle" aria-hidden="true" /></a>
-          <p className="footer__note">Bezpłatny, nieoficjalny projekt hackathonu HackNation 2026. Nie jest usługą ZUS. Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
+          <p className="footer__note">{t("Bezpłatny, nieoficjalny projekt hackathonu HackNation 2026. Nie jest usługą ZUS. Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.")}</p>
         </div>
       </div>
     </footer>

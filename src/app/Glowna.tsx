@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
-import { useT } from "@/lib/jezyk";
+import { useT, useTb } from "@/lib/jezyk";
 import { dzis } from "@/lib/format";
 import { useFormaty } from "@/lib/jezyk";
 import { nazwaUbezpieczenia, rodzajChorobowego, wynikZadluzenia, type StanZadluzeniaNaDzien, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
@@ -108,6 +108,7 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
 export default function Home() {
   const { opisTerminu, dataPL } = useFormaty();
   const t = useT();
+  const tb = useTb();
   const { sesja } = useSesja();
   const params = useSearchParams();
   const etapZAdresuUrl = etapZAdresu(params.get("etap"));
@@ -158,7 +159,7 @@ export default function Home() {
     <>
       <section className="hero" ref={gora}>
         <h1>{t("Co chcesz dzisiaj załatwić?")}</h1>
-        <p className={css.podtytul}><b>Dla osób w ciąży i rodziców po porodzie.</b> Bezpłatnie, bez logowania.</p>
+        <p className={css.podtytul}><b>{t("Dla osób w ciąży i rodziców po porodzie.")}</b> {t("Bezpłatnie, bez logowania.")}</p>
       </section>
 
       {/* Wyszukiwarka jest pierwszą rzeczą po tytule: kto wie, czego szuka, nie musi przechodzić przez kafle. */}
@@ -195,22 +196,16 @@ export default function Home() {
         <div ref={widokEtapu}>
           {/* Pasek przyklejony pod nagłówkiem strony: „Wróć" jest pod ręką także po przewinięciu listy spraw. */}
           <div className={css.pasekWroc}>
-            <button type="button" className={"btn btn-ghost " + css.wroc} onClick={wrocDoWyboru}>← Wróć do wyboru etapu</button>
+            <button type="button" className={"btn btn-ghost " + css.wroc} onClick={wrocDoWyboru}>{t("← Wróć do wyboru etapu")}</button>
           </div>
-          <h2 ref={etapy} tabIndex={-1}>{MOMENTY[moment].tytul}</h2>
+          <h2 ref={etapy} tabIndex={-1}>{t(MOMENTY[moment].tytul)}</h2>
 
           {moment === "dziecko" && (
             <section className={"card urgent " + css.pilne} aria-labelledby="pilne-po-porodzie">
-              <h3 id="pilne-po-porodzie">Pilne po porodzie: wniosek o zasiłek macierzyński</h3>
-              <p>
-                Jeśli chcesz dostawać <b>co miesiąc tyle samo (81,5%)</b> przez cały urlop macierzyński i rodzicielski,
-                złóż wniosek o oba urlopy <b>w ciągu 21 dni od porodu</b>.
-              </p>
-              <p className={css.uspokojenie}>
-                Minęło już 21 dni? Spokojnie, zasiłek nie przepada. Dostaniesz wtedy 100% za urlop macierzyński
-                i 70% za urlop rodzicielski.
-              </p>
-              <Link href="/sprawa/wniosek-zasilek" className="btn btn-primary">Złóż wniosek krok po kroku</Link>
+              <h3 id="pilne-po-porodzie">{t("Pilne po porodzie: wniosek o zasiłek macierzyński")}</h3>
+              <p>{tb("Jeśli chcesz dostawać **co miesiąc tyle samo (81,5%)** przez cały urlop macierzyński i rodzicielski, złóż wniosek o oba urlopy **w ciągu 21 dni od porodu**.")}</p>
+              <p className={css.uspokojenie}>{t("Minęło już 21 dni? Spokojnie, zasiłek nie przepada. Dostaniesz wtedy 100% za urlop macierzyński i 70% za urlop rodzicielski.")}</p>
+              <Link href="/sprawa/wniosek-zasilek" className="btn btn-primary">{t("Złóż wniosek krok po kroku")}</Link>
             </section>
           )}
 
@@ -224,8 +219,8 @@ export default function Home() {
             )}
           </div>
 
-          <h3 className={css.podsekcja}>Jeśli wychowujesz dziecko z drugim rodzicem</h3>
-          <p className={"muted " + css.podsekcjaOpis}>Urlop ojcowski, część urlopu rodzicielskiego dla drugiego rodzica i to, jak go podzielić.</p>
+          <h3 className={css.podsekcja}>{t("Jeśli wychowujesz dziecko z drugim rodzicem")}</h3>
+          <p className={"muted " + css.podsekcjaOpis}>{t("Urlop ojcowski, część urlopu rodzicielskiego dla drugiego rodzica i to, jak go podzielić.")}</p>
           <div className="grid g3">
             <Kafel href="/kreator?sciezka=ojciec" ikona="rodzina" tytul={t("Urlopy dla taty i drugiego rodzica")} opis={t("Urlop ojcowski i podział urlopu")} />
             {kafleSpraw(MOMENTY[moment].zDrugimRodzicem)}

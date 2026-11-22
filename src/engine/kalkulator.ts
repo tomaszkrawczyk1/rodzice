@@ -71,7 +71,7 @@ export interface PodstawaPracownikWejscie {
 export interface PodstawaWynik {
   sredniaBrutto: number;
   podstawaMiesieczna: number;            // po odjęciu 13,71 %
-  podstawaDzienna: number;               // = miesięczna / 30, zaokrąglona do grosza (tak liczy ZUS)
+  podstawaDzienna: number;               // = miesięczna / 30 (tylko do wyświetlenia; liczenie używa pełnej precyzji)
   zastosowanoMinimum: boolean;
   zastosowanoMaksimum: boolean;
   kroki: string[];                       // "dlaczego taki wynik" — gotowe do pokazania w UI
@@ -194,11 +194,7 @@ export function kwotaOkresu(podstawaMies: number, procent: number, dni: number, 
   // art. 31 ust. 3a, 3c: podwyższenie do 1000 zł/mies., proporcjonalnie za niepełny miesiąc.
   // Przy łączeniu z pracą NIE stosujemy (niejasne w przepisach — patrz LUKI_I_DECYZJE.md).
   if (!laczenieZPraca && dzienna < minDzienna) { dzienna = minDzienna; podwyzszone = true; }
-  // Jak w ZUS: stawkę dzienną zaokrąglamy do grosza i dopiero ją mnożymy przez liczbę dni
-  // (5 608,85 zł / 30 = 186,96 zł × 140 dni = 26 174,40 zł). Podwyższenie do świadczenia
-  // rodzicielskiego liczymy proporcjonalnie z kwoty miesięcznej (art. 31 ust. 3c).
-  const kwota = podwyzszone ? r2(dzienna * dni) : r2(r2(dzienna) * dni);
-  return { kwotaDzienna: r2(dzienna), kwota, podwyzszone };
+  return { kwotaDzienna: r2(dzienna), kwota: r2(dzienna * dni), podwyzszone };
 }
 
 function zrobOkres(base: Omit<Okres, "dni" | "do" | "kwotaDzienna" | "kwota" | "podwyzszoneDoSwiadczeniaRodzicielskiego">, dni: number, podstawa: number, laczenie: boolean, p: Parametry): Okres {
@@ -553,8 +549,7 @@ export function zasilekChorobowyWCiazy(w: ChorobowyCiazaWejscie, p: Parametry) {
   const dostepne = w.pracownik ? Math.max(0, limitPrac - (w.dniWynagrodzeniaJuzWykorzystaneWRoku ?? 0)) : 0;
   const dniPracodawca = Math.min(w.dniNiezdolnosci, dostepne);
   const dniZUS = w.dniNiezdolnosci - dniPracodawca;
-  // stawka dzienna zaokrąglona do grosza (jak w ZUS), potem × liczba dni
-  const dzienna = r2(w.podstawaMiesieczna * pr(p, "zasilek_chorobowy_w_ciazy") / 100 / p.limity_dni.dni_w_miesiacu_dla_zasilkow);
+  const dzienna = w.podstawaMiesieczna * pr(p, "zasilek_chorobowy_w_ciazy") / 100 / p.limity_dni.dni_w_miesiacu_dla_zasilkow;
   const ostrz: string[] = [];
   if (w.dniNiezdolnosci > p.limity_dni.okres_zasilkowy_ciaza_dni) ostrz.push(`Przekroczono okres zasiłkowy w ciąży (${p.limity_dni.okres_zasilkowy_ciaza_dni} dni) — rozważ świadczenie rehabilitacyjne (${pr(p, "swiadczenie_rehabilitacyjne_w_ciazy")} % w ciąży).`);
   return { dniPracodawca, dniZUS, kwotaPracodawca: r2(dzienna * dniPracodawca), kwotaZUS: r2(dzienna * dniZUS), kwotaRazem: r2(dzienna * w.dniNiezdolnosci), dzienna: r2(dzienna), ostrzezenia: ostrz };
@@ -571,8 +566,7 @@ export function swiadczenieRehabilitacyjne(w: { podstawaMiesieczna: number; dni:
   const pierwsze = Math.min(dni, 3 * M), reszta = dni - pierwsze;
   const pr1 = w.wCiazy ? pr(p, "swiadczenie_rehabilitacyjne_w_ciazy") : pr(p, "swiadczenie_rehabilitacyjne_pierwsze_3_mies");
   const pr2 = w.wCiazy ? pr(p, "swiadczenie_rehabilitacyjne_w_ciazy") : pr(p, "swiadczenie_rehabilitacyjne_po_3_mies");
-  // stawka dzienna zaokrąglona do grosza (jak w ZUS), potem × liczba dni
-  const k1 = r2(w.podstawaMiesieczna * pr1 / 100 / M) * pierwsze, k2 = r2(w.podstawaMiesieczna * pr2 / 100 / M) * reszta;
+  const k1 = w.podstawaMiesieczna * pr1 / 100 / M * pierwsze, k2 = w.podstawaMiesieczna * pr2 / 100 / M * reszta;
   return { dniPierwsze3Mies: pierwsze, procentPierwsze: pr1, dniPozniej: reszta, procentPozniej: pr2, kwota: r2(k1 + k2), ograniczonoDo12Mies: w.dni > 12 * M,
     uwaga: "Prawo do świadczenia orzeka lekarz orzecznik ZUS; waloryzacja podstawy (art. 19 ust. 2) niezaimplementowana." };
 }

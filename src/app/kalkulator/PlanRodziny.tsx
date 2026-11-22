@@ -375,7 +375,7 @@ export default function PlanRodziny({ poczatkowy, onOjciec, wstepne }: { poczatk
                 );
               })}
             </div>
-            <details className="dl"><summary>Znam gotową podstawę zasiłku (dla zaawansowanych, np. z decyzji ZUS lub druku Z-3)</summary>
+            <details className="dl"><summary>Znam gotową podstawę zasiłku (np. z decyzji ZUS lub druku Z-3)</summary>
               <p className={css.mala}>Podstawa to kwota po odjęciu składek, od której ZUS liczy zasiłek. Jeśli ją wpiszesz, kwotę powyżej pomijamy.</p>
               <div className="grid g2 mt"><Field label={`${rodzicPierwszy}: podstawa zasiłku (zł)`}><input type="number" inputMode="decimal" min={0} value={f.podstawaM} onChange={(e) => set({ podstawaM: e.target.value })} /></Field>
                 {dwoje && <Field label={`${rodzicDrugi}: podstawa zasiłku (zł)`}><input type="number" inputMode="decimal" min={0} value={f.podstawaO} onChange={(e) => set({ podstawaO: e.target.value })} /></Field>}</div></details>
