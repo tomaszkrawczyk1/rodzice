@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useJezyk } from "@/lib/jezyk";
+import { pytanieWJezyku } from "@/content/poradnik-i18n";
+import type { Pytanie } from "@/content/poradnik";
+import { naPolskieZapytanie } from "@/lib/szukaj-jezyki";
 import { PYTANIA } from "@/content/poradnik";
 import { szukaj, zapytanieMaSens } from "@/lib/sprawy";
 import { przejdzKrok } from "@/lib/adres-kroku";
@@ -21,6 +25,7 @@ const PODPOWIEDZ_BEZ_SLOW = "Nie rozpoznaliśmy w tym tekście słów do wyszuka
  * wariant "glowny": duże pole na górze strony głównej; wejście na `/#zapytaj` przenosi do niego fokus.
  */
 export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "karta" | "glowny"; zapytanie?: string }) {
+  const { t, jezyk } = useJezyk();
   const zAdresem = zapytanie !== undefined;
   const [q, setQ] = useState(zapytanie ?? "");
   const [wyslane, setWyslane] = useState(zapytanie ?? "");
@@ -77,20 +82,25 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
     if (!zapytanieMaSens(fraza)) pole.current?.focus();
   }
 
-  const wyniki = wyslane ? szukaj(wyslane, PYTANIA) : null;
-  const bezSlow = !!wyslane && !zapytanieMaSens(wyslane);
+  // Po angielsku i ukraińsku: najpierw szukamy tak, jak wpisano, a gdy nic nie wyjdzie, po polskich odpowiednikach słów kluczowych.
+  const poPolsku = wyslane ? naPolskieZapytanie(wyslane, jezyk) : "";
+  const wyniki = wyslane ? (() => {
+    const w = szukaj(wyslane, PYTANIA);
+    return w.sprawy.length || w.faq.length || poPolsku === wyslane ? w : szukaj(poPolsku, PYTANIA);
+  })() : null;
+  const bezSlow = !!wyslane && !zapytanieMaSens(wyslane) && !zapytanieMaSens(poPolsku);
   const brak = !!wyniki && !bezSlow && !wyniki.sprawy.length && !wyniki.faq.length;
-  const komunikat = puste ? PODPOWIEDZ_PUSTE : bezSlow ? PODPOWIEDZ_BEZ_SLOW : "";
+  const komunikat = puste ? t(PODPOWIEDZ_PUSTE) : bezSlow ? t(PODPOWIEDZ_BEZ_SLOW) : "";
   // Krótkie podsumowanie dla czytników ekranu: zawsze w tym samym, już istniejącym regionie, więc zmiana jest ogłaszana.
   const podsumowanie = komunikat
-    || (brak ? "Brak jednoznacznej odpowiedzi dla tego zapytania."
-      : wyniki ? `Wyniki wyszukiwania. Pasujące sprawy: ${wyniki.sprawy.length}. Pytania i odpowiedzi z poradnika: ${wyniki.faq.length}.` : "");
+    || (brak ? t("Brak jednoznacznej odpowiedzi dla tego zapytania.")
+      : wyniki ? t("Wyniki wyszukiwania. Pasujące sprawy: {a}. Pytania i odpowiedzi z poradnika: {b}.", { a: wyniki.sprawy.length, b: wyniki.faq.length }) : "");
 
   return (
     <section className={"ask " + (glowny ? "ask--glowny" : "mt")} id="zapytaj" aria-labelledby="zq" ref={sekcja}>
       {glowny
-        ? <h2 id="zq">Opisz sprawę własnymi słowami</h2>
-        : <h3 id="zq">Nie widzisz swojej sprawy? Opisz ją własnymi słowami</h3>}
+        ? <h2 id="zq">{t("Opisz sprawę własnymi słowami")} <span className="badge warn demo-znacznik">DEMO</span></h2>
+        : <h3 id="zq">{t("Nie widzisz swojej sprawy? Opisz ją własnymi słowami")}</h3>}
       <form className={"row search" + (glowny ? " search--duze" : "")} role="search" onSubmit={(e) => { e.preventDefault(); wyslij(q); }}>
         <div className="search__box">
           <Lupa />
@@ -102,19 +112,19 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
             maxLength={MAKS_ZAPYTANIA}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="np. zasiłek po porodzie, urlop u pracodawcy"
-            aria-label="Opisz, co chcesz załatwić"
+            placeholder={t("np. zasiłek po porodzie, urlop u pracodawcy")}
+            aria-label={t("Opisz, co chcesz załatwić")}
             aria-invalid={komunikat ? true : undefined}
             aria-describedby={komunikat ? "zq-komunikat" : undefined}
           />
         </div>
-        <button className="btn btn-szukaj">Znajdź sprawę</button>
+        <button className="btn btn-szukaj">{t("Znajdź sprawę")}</button>
       </form>
       <p className="small muted ask__przyklady">
-        Przykłady:{" "}
+        {t("Przykłady:")}{" "}
         {PRZYKLADY.map((p) => (
           <button key={p} type="button" className="chip" onClick={() => wyslij(p)}>
-            {p}
+            {t(p)}
           </button>
         ))}
       </p>
@@ -124,12 +134,12 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
         <div className="mt">
           {wyniki.sprawy.length > 0 && (
             <>
-              <b>Pasujące sprawy:</b>
+              <b>{t("Pasujące sprawy:")}</b>
               <div className="grid g3 mt">
                 {wyniki.sprawy.map((s) => (
                   <Link key={s.id} href={`/sprawa/${s.id}`} className="tile tile--ico">
                     <Plakietka nazwa={ikonaSprawy(s.id)} />
-                    <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
+                    <span className="tile__txt"><b>{t(s.tytul)}</b><span>{t(s.krotko)}</span></span>
                   </Link>
                 ))}
               </div>
@@ -137,11 +147,11 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
           )}
           {wyniki.faq.length > 0 && (
             <>
-              <p className="mt"><b>Pytania i odpowiedzi z poradnika:</b></p>
+              <p className="mt"><b>{t("Pytania i odpowiedzi z poradnika:")}</b></p>
               <ul className="clean">
                 {wyniki.faq.map((f) => (
                   <li key={f.id}>
-                    <Link href={`/poradnik#${f.id}`}>{f.pytanie}</Link> <StatusBadge s={f.status} />
+                    <Link href={`/poradnik#${f.id}`}>{pytanieWJezyku(f as Pytanie, jezyk).pytanie}</Link> <StatusBadge s={f.status} />
                   </li>
                 ))}
               </ul>
@@ -149,15 +159,15 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
           )}
           {brak && (
             <p>
-              Nie znaleźliśmy jednoznacznej odpowiedzi w oficjalnych przepisach.{" "}
-              <Link href="/pue">Napisz do konsultanta ZUS przez konto PUE / eZUS</Link> albo{" "}
-              <Link href="/sprawy">przejrzyj listę wszystkich spraw</Link>.
+              {t("Nie znaleźliśmy jednoznacznej odpowiedzi w oficjalnych przepisach.")}{" "}
+              <Link href="/pue">{t("Napisz do konsultanta ZUS przez konto PUE / eZUS")}</Link> {t("albo")}{" "}
+              <Link href="/sprawy">{t("przejrzyj listę wszystkich spraw")}</Link>.
             </p>
           )}
         </div>
       )}
       {wyniki && <p className="small muted ask__nota">
-        Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.
+        {t("Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.")}
       </p>}
     </section>
   );

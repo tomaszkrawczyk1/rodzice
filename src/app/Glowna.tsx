@@ -3,7 +3,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
-import { dataPL, pln, dzis, opisTerminu } from "@/lib/format";
+import { useT } from "@/lib/jezyk";
+import { dzis } from "@/lib/format";
+import { useFormaty } from "@/lib/jezyk";
 import { nazwaUbezpieczenia, rodzajChorobowego, wynikZadluzenia, type StanZadluzeniaNaDzien, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
 import { Alert, Sim } from "@/components/ui";
 import Szkielet from "@/components/Szkielet";
@@ -29,16 +31,18 @@ type Dane = {
 };
 
 function PodgladProfilu({ pesel }: { pesel: string }) {
+  const { dataPL, pln } = useFormaty();
+  const t = useT();
   const [dane, setDane] = useState<Dane | null>(null);
   const [blad, setBlad] = useState(false);
 
   useEffect(() => {
     let aktualne = true;
-    const query = new URLSearchParams({ pesel, naDzien: dzis() });
+    const zapytanie = { pesel, naDzien: dzis() };
     Promise.all([
-      api<Dane["u"]>(`/api/zus/ubezpieczenie?${query}`),
-      api<Dane["e"]>(`/api/zus/ezla?${query}`),
-      api<Dane["z"]>(`/api/zus/zadluzenie?${query}`),
+      api<Dane["u"]>("/api/zus/ubezpieczenie", zapytanie),
+      api<Dane["e"]>("/api/zus/ezla", zapytanie),
+      api<Dane["z"]>("/api/zus/zadluzenie", zapytanie),
     ]).then(([u, e, z]) => { if (aktualne) setDane({ u, e, z }); })
       .catch(() => { if (aktualne) setBlad(true); });
     return () => { aktualne = false; };
@@ -46,30 +50,30 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
 
   return (
     <section className={"card mt" + (dane || blad ? "" : " slot-profil")}>
-      <h2>Dane z profilu testowego</h2>
-      {blad && <Alert t="err">Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.</Alert>}
-      {!dane && !blad && <Szkielet etykieta="Wczytujemy dane profilu…" wiersze={3} />}
+      <h2>{t("Dane z profilu testowego")}</h2>
+      {blad && <Alert t="err">{t("Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.")}</Alert>}
+      {!dane && !blad && <Szkielet etykieta={t("Wczytujemy dane profilu…")} wiersze={3} />}
       {dane && <>
         <dl>
-          <dt>Dni ubezpieczenia chorobowego</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
-          <dt>Dni zwolnień lekarskich</dt><dd>{dane.e.lacznieDni}</dd>
+          <dt>{t("Dni ubezpieczenia chorobowego")}</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
+          <dt>{t("Dni zwolnień lekarskich")}</dt><dd>{dane.e.lacznieDni}</dd>
         </dl>
-        <h3>Stan zadłużenia na dzień {dataPL(dane.z.naDzien)} <Sim /></h3>
+        <h3>{t("Stan zadłużenia na dzień {data}", { data: dataPL(dane.z.naDzien) })} <Sim /></h3>
         {dane.z.wynik === "nie_dotyczy" ? <p>{dane.z.komunikat}</p> : (
           <dl>
-            <dt>Zaległości w składkach</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
-            <dt>Próg</dt><dd>{pln(dane.z.prog)}</dd>
-            <dt>Wynik</dt><dd>{wynikZadluzenia(dane.z)}</dd>
+            <dt>{t("Zaległości w składkach")}</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
+            <dt>{t("Próg")}</dt><dd>{pln(dane.z.prog)}</dd>
+            <dt>{t("Wynik")}</dt><dd>{t(wynikZadluzenia(dane.z))}</dd>
           </dl>
         )}
         {dane.u.ubezpieczenie.map((u, i) => (
           <p key={i}>
-            <b>{nazwaUbezpieczenia(u.tytul)}</b> od {dataPL(u.od)}{u.do && <> do {dataPL(u.do)}</>}.
-            {" Ubezpieczenie chorobowe: "}{rodzajChorobowego(u.chorobowe)}.
-            {u.platnik && <> Płatnik składek: {u.platnik.nazwa}.</>}
+            <b>{t(nazwaUbezpieczenia(u.tytul))}</b> {t("od")} {dataPL(u.od)}{u.do && <> {t("do")} {dataPL(u.do)}</>}.
+            {" " + t("Ubezpieczenie chorobowe:") + " "}{t(rodzajChorobowego(u.chorobowe))}.
+            {u.platnik && <> {t("Płatnik składek:")} {u.platnik.nazwa}.</>}
           </p>
         ))}
-        {dane.z.przekroczonyProg && <Alert t="warn">{dane.z.komunikat} Sprawdź w ZUS, jak to wygląda w Twojej sprawie.</Alert>}
+        {dane.z.przekroczonyProg && <Alert t="warn">{dane.z.komunikat} {t("Sprawdź w ZUS, jak to wygląda w Twojej sprawie.")}</Alert>}
       </>}
     </section>
   );
@@ -78,6 +82,8 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
 // Etap i zapytanie wyszukiwarki są w adresie (`/?etap=czekamy`, `/?q=urlop+ojcowski`). Każdy wybór etapu to nowy wpis
 // historii, więc „Wstecz" wraca do wyboru etapu, a adres można podlinkować i odświeżyć.
 export default function Home() {
+  const { opisTerminu, dataPL } = useFormaty();
+  const t = useT();
   const { sesja } = useSesja();
   const params = useSearchParams();
   const etapZAdresuUrl = etapZAdresu(params.get("etap"));
@@ -119,8 +125,8 @@ export default function Home() {
   return (
     <>
       <section className="hero">
-        <h1>Co chcesz dzisiaj załatwić?</h1>
-        <p>Wybierz sytuację albo opisz sprawę swoimi słowami. Bez logowania.</p>
+        <h1>{t("Co chcesz dzisiaj załatwić?")}</h1>
+        <p>{t("Wybierz sytuację albo opisz sprawę swoimi słowami. Bez logowania.")}</p>
       </section>
 
       {/* Wyszukiwarka jest pierwszą rzeczą po tytule: kto wie, czego szuka, nie musi przechodzić przez kafle. */}
@@ -131,69 +137,69 @@ export default function Home() {
         <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
           {sesja && (pilne ? (
             <section className="card urgent mb" style={{ overflowWrap: "anywhere" }}>
-              <h2>Najbliższy termin z profilu</h2>
+              <h2>{t("Najbliższy termin z profilu")}</h2>
               <p>{opisTerminu(pilne.co)}</p>
               <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
-              <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
+              <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">{t("Otwórz sprawę")}</Link>
             </section>
-          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
+          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">{t("Sprawdzam najbliższy termin z profilu…")}</p>)}
         </div>
       )}
 
       {!moment ? (
         <>
-          <h2 ref={etapy} tabIndex={-1}>Na jakim jesteście etapie?</h2>
+          <h2 ref={etapy} tabIndex={-1}>{t("Na jakim jesteście etapie?")}</h2>
           <div className="grid g3 grid--etapy">
             {KOLEJNOSC.map((id) => (
               <button key={id} type="button" className={"tile tile--ico" + (id === "dziecko" ? " tile--glowny" : "")} onClick={() => wybierzEtap(id)}>
                 <Plakietka nazwa={id} />
-                <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span>{MOMENTY[id].opis}</span></span>
+                <span className="tile__txt"><b>{t(MOMENTY[id].tytul)}</b><span>{t(MOMENTY[id].opis)}</span></span>
               </button>
             ))}
             <Link href="/kalendarz" className="tile tile--ico">
               <Plakietka nazwa="kalendarz" />
-              <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania i terminy ZUS w jednym miejscu</span></span>
+              <span className="tile__txt"><b>{t("Kalendarz ciąży i połogu")}</b><span>{t("Badania i terminy ZUS w jednym miejscu")}</span></span>
             </Link>
             <Link href="/sprawa/adopcja" className="tile tile--ico">
               <Plakietka nazwa="adopcja" />
-              <span className="tile__txt"><b>Adopcja lub rodzina zastępcza</b><span>Urlopy i zasiłek po przyjęciu dziecka</span></span>
+              <span className="tile__txt"><b>{t("Adopcja lub rodzina zastępcza")}</b><span>{t("Urlopy i zasiłek po przyjęciu dziecka")}</span></span>
             </Link>
             <Link href="/trudne" className="tile tile--ico tile--szeroki">
               <Plakietka nazwa="trudne" />
-              <span className="tile__txt"><b>Trudna sytuacja</b><span>Strata, wcześniactwo, choroba</span></span>
+              <span className="tile__txt"><b>{t("Trudna sytuacja")}</b><span>{t("Strata, wcześniactwo, choroba")}</span></span>
             </Link>
           </div>
         </>
       ) : (
         <>
-          <button type="button" className="btn btn-ghost" onClick={wrocDoWyboru}>Wróć do wyboru etapu</button>
-          <h2 className="mt" ref={etapy} tabIndex={-1}>{MOMENTY[moment].tytul}</h2>
+          <button type="button" className="btn btn-ghost" onClick={wrocDoWyboru}>{t("Wróć do wyboru etapu")}</button>
+          <h2 className="mt" ref={etapy} tabIndex={-1}>{t(MOMENTY[moment].tytul)}</h2>
           <div className="grid g3">
             {MOMENTY[moment].sprawy.map((id) => {
               const s = sprawa(id);
               return s && <Link key={id} href={`/sprawa/${id}`} className="tile tile--ico">
                 <Plakietka nazwa={ikonaSprawy(id)} />
-                <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
+                <span className="tile__txt"><b>{t(s.tytul)}</b><span>{t(s.krotko)}</span></span>
               </Link>;
             })}
             <Link href="/kreator?sciezka=ojciec" className="tile tile--ico">
               <Plakietka nazwa="rodzina" />
-              <span className="tile__txt"><b>Urlopy dla taty i drugiego rodzica</b><span>Urlop ojcowski i podział urlopu</span></span>
+              <span className="tile__txt"><b>{t("Urlopy dla taty i drugiego rodzica")}</b><span>{t("Urlop ojcowski i podział urlopu")}</span></span>
             </Link>
             {(moment === "ciaza" || moment === "dziecko") && (
               <Link href="/kalendarz" className="tile tile--ico">
                 <Plakietka nazwa="kalendarz" />
-                <span className="tile__txt"><b>Kalendarz ciąży i połogu</b><span>Badania i terminy ZUS w jednym miejscu</span></span>
+                <span className="tile__txt"><b>{t("Kalendarz ciąży i połogu")}</b><span>{t("Badania i terminy ZUS w jednym miejscu")}</span></span>
               </Link>
             )}
             {moment === "plan" && (
               <Link href="/ryzyka" className="tile tile--ico">
                 <Plakietka nazwa="praca" />
-                <span className="tile__txt"><b>Ubezpieczenie i ochrona w pracy</b><span>Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę</span></span>
+                <span className="tile__txt"><b>{t("Ubezpieczenie i ochrona w pracy")}</b><span>{t("Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę")}</span></span>
               </Link>
             )}
           </div>
-          <p className="mt"><Link href="/sprawy" className="btn btn-secondary">Zobacz wszystkie sprawy</Link></p>
+          <p className="mt"><Link href="/sprawy" className="btn btn-secondary">{t("Zobacz wszystkie sprawy")}</Link></p>
         </>
       )}
 

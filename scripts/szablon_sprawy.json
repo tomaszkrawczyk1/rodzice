@@ -25,7 +25,7 @@
     "podstawaMiesieczna": 5608.85,
     "kwotaRazem": 55490.22,
     "okresy": [
-      { "rodzaj": "macierzynski", "kto": "matka", "dni": 140, "kwota": 26174.63 },
+      { "rodzaj": "macierzynski", "kto": "matka", "dni": 140, "kwota": 26174.40 },
       { "rodzaj": "rodzicielski", "kto": "matka", "dni": 224, "kwota": 29315.59 }
     ],
     "_uwaga": "Przepisz z decyzji/zrzutu ZUS to, co jest: podstawę, kwoty, okresy. Nie musisz wszystkiego. Jeśli podasz podstawę ZUS, a nie podasz miesięcy — silnik użyje podstawy ZUS i sprawdzi sam plan."

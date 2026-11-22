@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
+import { useT } from "@/lib/jezyk";
 import PlanRodziny from "./PlanRodziny";
 import { zastap } from "./adres";
 import { przekazFokusWyboru } from "./WyborSytuacji";
@@ -8,8 +9,12 @@ import { czySytuacja, type Sytuacja, type Tryb } from "./stale";
 
 // Druga ścieżka (tata / drugi rodzic) ma własny kod i ładuje się osobno. Dalej renderuje się po stronie serwera,
 // więc treść jest w HTML (czytniki ekranu, wyszukiwarki), a kod pobiera się dopiero, gdy jest potrzebny.
+function Wczytywanie() {
+  const t = useT();
+  return <p role="status">{t("Wczytuję kalkulator…")}</p>;
+}
 const Ojcowski = dynamic(() => import("./Ojcowski"), {
-  loading: () => <p role="status">Wczytuję kalkulator…</p>,
+  loading: () => <Wczytywanie />,
 });
 
 /**

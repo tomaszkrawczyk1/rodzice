@@ -5,11 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { useSesja } from "@/lib/sesja";
 import { TYTULY_SPRAW } from "@/lib/sprawy-tytuly";
 import Dostepnosc from "./Dostepnosc";
+import Jezyk from "./Jezyk";
+import { useT } from "@/lib/jezyk";
 
 // Siedem pozycji na wierzchu plus „Więcej": cztery podstrony o papierach (druki, kreator wniosków, wgrywanie, konto w ZUS)
 // są pod jedną pozycją „Formularze", a po wejściu w którąkolwiek z nich widać ich wspólne podmenu.
 const NAV = [
-  ["/", "Start"], ["/sprawy", "Sprawy"], ["/kalendarz", "Kalendarz"], ["/terminarz", "Terminarz"], ["/kalkulator", "Kalkulator"], ["/poradnik", "Poradnik"], ["/formularze", "Formularze"],
+  ["/", "Start"], ["/sprawy", "Sprawy"], ["/kalendarz", "Kalendarz"], ["/terminarz", "Kalendarz w urzędzie"], ["/kalkulator", "Kalkulator"], ["/poradnik", "Poradnik"], ["/formularze", "Formularze"],
 ] as const;
 const FORMULARZE = [
   ["/druki", "Druki"], ["/wnioski", "Kreator wniosków"], ["/wgraj", "Wgraj wniosek"], ["/pue", "Konto w ZUS"],
@@ -26,7 +28,7 @@ const wFormularzach = (path: string) => path === "/formularze" || FORMULARZE.som
 const NAZWY: Record<string, string> = {
   "/sprawy": "Sprawy",
   "/kalendarz": "Kalendarz",
-  "/terminarz": "Terminarz",
+  "/terminarz": "Kalendarz w urzędzie",
   "/poradnik": "Poradnik",
   "/kalkulator": "Kalkulator",
   "/formularze": "Formularze",
@@ -69,6 +71,7 @@ function okruszki(path: string): { href: string; label: string; biezacy?: boolea
 
 export default function Header() {
   const path = usePathname() || "/";
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [wiecej, setWiecej] = useState(false);
   const { sesja, wyloguj } = useSesja();
@@ -169,51 +172,52 @@ export default function Header() {
 
   const imie = sesja ? sesja.osoba.split(" ")[0] : "";
   const logowanie = sesja ? (
-    <button type="button" className="pue-login" title={sesja.osoba} aria-label={`Wyloguj (${imie})`} onClick={() => { wyloguj(); zamknij(); }}>
-      <span className="pue-login__label">Wyloguj<span className="pue-login__imie"> ({imie})</span></span><span className="pue-arrow" aria-hidden="true" />
+    <button type="button" className="pue-login" title={sesja.osoba} aria-label={t("Wyloguj ({imie})", { imie })} onClick={() => { wyloguj(); zamknij(); }}>
+      <span className="pue-login__label">{t("Wyloguj")}<span className="pue-login__imie"> ({imie})</span></span><span className="pue-arrow" aria-hidden="true" />
     </button>
   ) : (
-    <Link href="/logowanie" className="pue-login login" aria-label="Zaloguj się" onClick={zamknij}><span className="pue-login__label">Zaloguj</span><span className="pue-arrow" aria-hidden="true" /></Link>
+    <Link href="/logowanie" className="pue-login login" aria-label={t("Zaloguj się")} onClick={zamknij}><span className="pue-login__label">{t("Zaloguj")}</span><span className="pue-arrow" aria-hidden="true" /></Link>
   );
 
   return (
     <div className="site-top">
       {/* Jedyny komunikat „to nie ZUS": stopka go już nie powtarza. */}
-      <div className="sim-banner" role="note">Wersja testowa. To nie jest oficjalna usługa ZUS.</div>
+      <div className="sim-banner" role="note">{t("Wersja testowa. To nie jest oficjalna usługa ZUS.")}</div>
       <header id="header" className="header zus-header">
         <div className="zus-header__bar">
-          <Link href="/" className="zus-logo brand" aria-label="Przewodnik Przyszłego Rodzica, strona główna" onClick={zamknij}>
+          <Link href="/" className="zus-logo brand" aria-label={t("Przewodnik Przyszłego Rodzica, strona główna")} onClick={zamknij}>
             <img className="zus-logo__img" src="/logo_zus_darker_with_text.svg" alt="" width={250} height={56} />
           </Link>
           <div className="zus-product brand-text">
-            <b>Przewodnik Przyszłego Rodzica</b>
-            <span>Prototyp: zasiłki i urlopy dla rodziców</span>
+            <b>{t("Przewodnik Przyszłego Rodzica")}</b>
+            <span>{t("Prototyp: zasiłki i urlopy dla rodziców")}</span>
           </div>
           <div className="zus-header__tools">
-            <Link href="/#zapytaj" className="zus-search" aria-label="Szukaj sprawy" onClick={zamknij}>
+            <Link href="/#zapytaj" className="zus-search" aria-label={t("Szukaj sprawy")} onClick={zamknij}>
               <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" focusable="false"><circle cx="19" cy="19" r="17" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="17" cy="17" r="7" fill="none" stroke="currentColor" strokeWidth="2.6" /><path d="m22.5 22.5 7 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>
-              <span className="zus-search__txt">Szukaj</span>
+              <span className="zus-search__txt">{t("Szukaj")}</span>
             </Link>
+            <Jezyk />
             <Dostepnosc />
             {logowanie}
           </div>
-          <button ref={menuBtn} type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" aria-label={open ? "Zamknij menu" : "Otwórz menu"} onClick={() => { setOpen(!open); setWiecej(!open && wiecejAktywne); }}>
+          <button ref={menuBtn} type="button" className="menu-btn" aria-expanded={open} aria-controls="nav" aria-label={open ? t("Zamknij menu") : t("Otwórz menu")} onClick={() => { setOpen(!open); setWiecej(!open && wiecejAktywne); }}>
             {open
               ? <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true" focusable="false"><path d="m5 5 16 16M21 5 5 21" stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none" /></svg>
               : <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true" focusable="false"><path d="M3 6h20M3 13h20M3 20h20" stroke="currentColor" strokeWidth="3" strokeLinecap="round" fill="none" /></svg>}
           </button>
         </div>
-        <nav id="nav" ref={navRef} className={"nav zus-nav" + (open ? " open" : "")} aria-label="Główna nawigacja">
+        <nav id="nav" ref={navRef} className={"nav zus-nav" + (open ? " open" : "")} aria-label={t("Główna nawigacja")}>
           <ul className="zus-nav__list">
-            {NAV.map(([h, t]) => {
+            {NAV.map(([h, nazwa]) => {
               const on = aktywny(path, h);
               return (
                 <li key={h} className={on ? "selected" : undefined}>
-                  <Link href={h} aria-current={on ? "page" : undefined} className={on ? "active" : ""} onClick={zamknij}>{t}</Link>
+                  <Link href={h} aria-current={on ? "page" : undefined} className={on ? "active" : ""} onClick={zamknij}>{t(nazwa)}</Link>
                   {h === "/formularze" && (
-                    <ul className="zus-nav__sub" aria-label="Formularze i konto w ZUS">
+                    <ul className="zus-nav__sub" aria-label={t("Formularze i konto w ZUS")}>
                       {FORMULARZE.map(([sh, st]) => (
-                        <li key={sh}><Link href={sh} aria-current={path === sh ? "page" : undefined} onClick={zamknij}>{st}</Link></li>
+                        <li key={sh}><Link href={sh} aria-current={path === sh ? "page" : undefined} onClick={zamknij}>{t(st)}</Link></li>
                       ))}
                     </ul>
                   )}
@@ -223,36 +227,36 @@ export default function Header() {
             <li ref={wiecejLi} className={"zus-nav__more" + (wiecejAktywne ? " selected" : "")} onKeyDown={strzalki}
               onBlur={(e) => { if (wiecej && !e.currentTarget.contains(e.relatedTarget as Node | null)) setWiecej(false); }}>
               <button ref={wiecejBtn} type="button" className={"zus-nav__more-btn" + (wiecejAktywne ? " active" : "")} aria-expanded={wiecej} aria-controls="nav-wiecej" onClick={() => setWiecej(!wiecej)}>
-                Więcej<svg className="zus-nav__chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="m2 4 4 4 4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                {t("Więcej")}<svg className="zus-nav__chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="m2 4 4 4 4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
-              <ul id="nav-wiecej" className="zus-nav__drop" aria-label="Więcej: pomoc w sytuacji i dodatkowe narzędzia" hidden={!wiecej}>
-                {WIECEJ.map(([h, t]) => (
-                  <li key={h}><Link href={h} aria-current={path === h ? "page" : undefined} onClick={zamknij}>{t}</Link></li>
+              <ul id="nav-wiecej" className="zus-nav__drop" aria-label={t("Więcej: pomoc w sytuacji i dodatkowe narzędzia")} hidden={!wiecej}>
+                {WIECEJ.map(([h, nazwa]) => (
+                  <li key={h}><Link href={h} aria-current={path === h ? "page" : undefined} onClick={zamknij}>{t(nazwa)}</Link></li>
                 ))}
               </ul>
             </li>
           </ul>
-          <div className="zus-nav__tools"><Dostepnosc wariant="menu" /></div>
+          <div className="zus-nav__tools"><Jezyk wariant="menu" /><Dostepnosc wariant="menu" /></div>
         </nav>
         {wFormularzach(path) && (
-          <nav className="zus-subnav" aria-label="Formularze i konto w ZUS">
+          <nav className="zus-subnav" aria-label={t("Formularze i konto w ZUS")}>
             <ul className="container">
               {FORMULARZE.map(([sh, st]) => (
-                <li key={sh}><Link href={sh} aria-current={path === sh ? "page" : undefined}>{st}</Link></li>
+                <li key={sh}><Link href={sh} aria-current={path === sh ? "page" : undefined}>{t(st)}</Link></li>
               ))}
             </ul>
           </nav>
         )}
         {crumbs.length > 0 && (
-          <nav className="crumbs" aria-label="Ścieżka nawigacji">
+          <nav className="crumbs" aria-label={t("Ścieżka nawigacji")}>
             <div className="container crumbs__row">
-              <Link href="/" className="crumbs__home" aria-label="Start" onClick={zamknij}>
+              <Link href="/" className="crumbs__home" aria-label={t("Start")} onClick={zamknij}>
                 <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 13.5 14 4l11 9.5M6 11.5V24h6.5v-7h3v7H22V11.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg>
               </Link>
               <ol className="crumbs__list">
                 {crumbs.map((c) => (
                   <li key={c.href} className={c.biezacy ? "last" : undefined}>
-                    {c.biezacy ? <span aria-current="page">{c.label}</span> : <Link href={c.href} onClick={zamknij}>{c.label}</Link>}
+                    {c.biezacy ? <span aria-current="page">{t(c.label)}</span> : <Link href={c.href} onClick={zamknij}>{t(c.label)}</Link>}
                   </li>
                 ))}
               </ol>

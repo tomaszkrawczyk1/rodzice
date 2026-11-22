@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { TRUDNE } from "@/content/tresci";
 import { WSPARCIE_UWAGA, podmiotyDla, telHref } from "@/lib/wsparcie";
-import { dataPL } from "@/lib/format";
+import { useT, useFormaty } from "@/lib/jezyk";
 import { Pole } from "@/components/Pole";
 import { przejdzKrok } from "@/lib/adres-kroku";
 
@@ -13,6 +13,8 @@ import { przejdzKrok } from "@/lib/adres-kroku";
 const SYTUACJE = [...TRUDNE, { id: "chore", t: "Dziecko jest ciężko chore", d: [] as string[] }];
 
 export default function Trudne() {
+  const t = useT();
+  const { dataPL } = useFormaty();
   const zAdresu = useSearchParams().get("sytuacja");
   const idZAdresu = SYTUACJE.some((x) => x.id === zAdresu) ? zAdresu! : SYTUACJE[0].id;
   // Lokalna kopia, żeby pole wyboru zmieniało się od razu (adres odświeża się chwilę później); „Wstecz" ją synchronizuje.
@@ -28,32 +30,32 @@ export default function Trudne() {
 
   return (
     <>
-      <h1>Pomoc w trudnej sytuacji</h1>
-      <p className="lead">Sprawdź, jakie wsparcie możesz otrzymać i co zrobić, gdy będziesz mieć na to siłę.</p>
+      <h1>{t("Pomoc w trudnej sytuacji")}</h1>
+      <p className="lead">{t("Sprawdź, jakie wsparcie możesz otrzymać i co zrobić, gdy będziesz mieć na to siłę.")}</p>
       <div className="card">
-        <Pole label="Wybierz sytuację">
+        <Pole label={t("Wybierz sytuację")}>
           <select value={id} onChange={(e) => wybierz(e.target.value)}>
-            {SYTUACJE.map((t) => <option key={t.id} value={t.id}>{t.t}</option>)}
+            {SYTUACJE.map((x) => <option key={x.id} value={x.id}>{t(x.t)}</option>)}
           </select>
         </Pole>
       </div>
       <div className="mt" aria-live="polite">
         <section className="card navy">
-          <h2>{sytuacja.t}</h2>
-          {sytuacja.d.length > 0 && <ul className="clean">{sytuacja.d.map((x) => <li key={x}>{x}</li>)}</ul>}
-          <p className="mt"><Link href="/sprawa/trudna-sytuacja">Sprawdź, co załatwić krok po kroku</Link></p>
+          <h2>{t(sytuacja.t)}</h2>
+          {sytuacja.d.length > 0 && <ul className="clean">{sytuacja.d.map((x) => <li key={x}>{t(x)}</li>)}</ul>}
+          <p className="mt"><Link href="/sprawa/trudna-sytuacja">{t("Sprawdź, co załatwić krok po kroku")}</Link></p>
         </section>
         {organizacje.length > 0 && <section className="card accent mt">
-          <h2>Gdzie szukać wsparcia</h2>
+          <h2>{t("Gdzie szukać wsparcia")}</h2>
           <ul className="clean">{organizacje.map((o) => (
             <li key={o.id}>
-              <b>{o.nazwa}</b><br />{o.opis}
-              <br />{o.telefon && <>Telefon: <a href={telHref(o.telefon)}>{o.telefon}</a>{o.godziny ? ` (${o.godziny})` : ""}. </>}
-              {o.email && <>E-mail: {o.email}. </>}<a href={o.www}>{o.www.replace(/^https?:\/\/(www\.)?/, "")}</a>
-              <br /><span className="muted">{o.zakres}{o.uwaga ? ` ${o.uwaga}` : ""} Sprawdzone {dataPL(o.dataSprawdzenia)}, <a href={o.zrodlo}>źródło</a>.{o.pewnosc === "do_potwierdzenia" ? " Do potwierdzenia: zadzwoń lub napisz, zanim na tym polegasz." : ""}</span>
+              <b>{o.nazwa}</b><br />{t(o.opis)}
+              <br />{o.telefon && <>{t("Telefon:")} <a href={telHref(o.telefon)}>{o.telefon}</a>{o.godziny ? ` (${t(o.godziny)})` : ""}. </>}
+              {o.email && <>{t("E-mail:")} {o.email}. </>}<a href={o.www}>{o.www.replace(/^https?:\/\/(www\.)?/, "")}</a>
+              <br /><span className="muted">{t(o.zakres)}{o.uwaga ? ` ${t(o.uwaga)}` : ""} {t("Sprawdzone")} {dataPL(o.dataSprawdzenia)}, <a href={o.zrodlo}>{t("źródło")}</a>.{o.pewnosc === "do_potwierdzenia" ? ` ${t("Do potwierdzenia: zadzwoń lub napisz, zanim na tym polegasz.")}` : ""}</span>
             </li>
           ))}</ul>
-          <p className="muted mt">{WSPARCIE_UWAGA}</p>
+          <p className="muted mt">{t(WSPARCIE_UWAGA)}</p>
         </section>}
       </div>
     </>

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useT } from "@/lib/jezyk";
 import type { Sytuacja } from "./stale";
 import css from "./kalkulator.module.css";
 
@@ -20,6 +21,7 @@ export function przekazFokusWyboru() { fokusNaWyborze = true; }
 
 /** Krok 1 obu ścieżek kalkulatora: jedna grupa przycisków radiowych (ten sam wzorzec ARIA co wariant w kroku 5). */
 export function WyborSytuacji({ wartosc, onZmiana, children }: { wartosc: Sytuacja; onZmiana: (s: Sytuacja) => void; children?: ReactNode }) {
+  const t = useT();
   const nazwa = useId();
   const zestaw = useRef<HTMLFieldSetElement>(null);
   useEffect(() => {
@@ -30,12 +32,12 @@ export function WyborSytuacji({ wartosc, onZmiana, children }: { wartosc: Sytuac
   return (
     <>
       <fieldset className={css.zestaw} ref={zestaw}>
-        <legend>Wybierz, co chcesz policzyć</legend>
+        <legend>{t("Wybierz, co chcesz policzyć")}</legend>
         <div className={css.opcje}>
           {OPCJE.map((o) => (
             <label key={o.id} className={css.opcja}>
               <input type="radio" name={nazwa} value={o.id} checked={wartosc === o.id} onChange={() => onZmiana(o.id)} />
-              <span><b>{o.tytul}</b><span className={css.opis}>{o.opis}</span></span>
+              <span><b>{t(o.tytul)}</b><span className={css.opis}>{t(o.opis)}</span></span>
             </label>
           ))}
         </div>

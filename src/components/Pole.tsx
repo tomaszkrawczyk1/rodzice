@@ -1,6 +1,7 @@
 "use client";
 import { cloneElement, useId, type ReactElement } from "react";
 import css from "./Pole.module.css";
+import { useT } from "@/lib/jezyk";
 
 type Dziecko = { id?: string; "aria-describedby"?: string; "aria-invalid"?: boolean | "true" | "false" };
 
@@ -14,6 +15,7 @@ export function Pole({ label, hint, error, children }: {
   error?: string;
   children: ReactElement<Dziecko>;
 }) {
+  const t = useT();
   const uid = useId();
   const id = children.props.id ?? uid;
   const opis = [children.props["aria-describedby"], hint ? `${id}-wskazowka` : "", error ? `${id}-blad` : ""].filter(Boolean).join(" ") || undefined;
@@ -22,7 +24,7 @@ export function Pole({ label, hint, error, children }: {
       <label htmlFor={id}>{label}</label>
       {cloneElement(children, { id, "aria-describedby": opis, ...(error ? { "aria-invalid": true } : {}) })}
       {hint && <span id={`${id}-wskazowka`} className="hint">{hint}</span>}
-      {error && <span id={`${id}-blad`} className={css.blad}><b>Błąd:</b> {error}</span>}
+      {error && <span id={`${id}-blad`} className={css.blad}><b>{t("Błąd:")}</b> {t(error)}</span>}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 {
  "_uwaga": "DANE FIKCYJNE do symulacji API ZUS/PUE (e-ZLA, zadłużenie). PESEL/NIP/seria — wymyślone.",
  "osoba": "Karolina Wójcik",
- "pesel": "00000000009",
+ "pesel": "96111212340",
  "ubezpieczenie": [
   {
    "tytul": "umowa_o_prace",

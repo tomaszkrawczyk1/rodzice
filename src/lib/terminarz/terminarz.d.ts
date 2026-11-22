@@ -43,4 +43,4 @@ export const ROLES: Rola[];
 export const EMPLOYMENT: Zatrudnienie[];
 export function getPath(obj: unknown, path: string): unknown;
 export function buildCalendar(rules: unknown, input: Wejscie, options?: Opcje): Wydarzenie[];
-export function toICS(events: Wydarzenie[], options?: { prodId?: string; now?: Date }): string;
+export function toICS(events: Wydarzenie[], options?: { prodId?: string; now?: Date; labels?: { where?: string; documents?: string; verify?: string } }): string;
