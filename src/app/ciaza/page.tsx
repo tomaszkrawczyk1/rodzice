@@ -70,15 +70,15 @@ export default function Ciaza() {
             <option value="umowa_o_prace">Umowa o pracę</option><option value="zlecenie">Umowa zlecenie</option><option value="dzialalnosc">Własna działalność gospodarcza</option>
             <option value="dzielo_lub_brak">Umowa o dzieło / inne</option><option value="bezrobotna_bez_ubezpieczenia">Brak ubezpieczenia</option></select></Field>
           {(f.tytul === "zlecenie" || f.tytul === "dzialalnosc") && <label className="check"><input type="checkbox" checked={f.dobrowolne} onChange={(e) => set({ dobrowolne: e.target.checked })} />Mam dobrowolne ubezpieczenie chorobowe</label>}
-          <Field label="Dni nieprzerwanego ubezpieczenia chorobowego" hint="Przerwa do 30 dni nie przerywa ciągłości"><input type="number" value={f.dni} onChange={(e) => set({ dni: e.target.value })} /></Field>
+          <Field label="Od ilu dni jesteś bez przerwy ubezpieczona chorobowo?" hint="Przerwa do 30 dni się nie liczy. Zasiłek chorobowy dostaniesz po 30 dniach ubezpieczenia (90 dni przy dobrowolnym) – to tzw. okres wyczekiwania."><input type="number" value={f.dni} onChange={(e) => set({ dni: e.target.value })} /></Field>
           <Field label="Planowana data porodu"><input type="date" value={f.data} onChange={(e) => set({ data: e.target.value })} /></Field>
           <label className="check"><input type="checkbox" checked={f.wDniu} onChange={(e) => set({ wDniu: e.target.checked })} />W dniu porodu nadal będę ubezpieczona chorobowo</label>
           <label className="check"><input type="checkbox" checked={f.dziesiec} onChange={(e) => set({ dziesiec: e.target.checked })} />Mam co najmniej 10 lat obowiązkowego ubezpieczenia chorobowego</label>
-          {f.tytul === "umowa_o_prace" && <Field label="Ilu ubezpieczonych zgłasza Twój pracodawca?" hint="Powyżej 20 – zasiłek wypłaca pracodawca"><input type="number" value={f.platnik} onChange={(e) => set({ platnik: e.target.value })} /></Field>}
-          {f.tytul === "dzialalnosc" && <Field label="Zadłużenie składkowe (zł)" hint="Liczone na dzień porodu"><input type="number" value={f.zadl} onChange={(e) => set({ zadl: e.target.value })} /></Field>}
+          {f.tytul === "umowa_o_prace" && <Field label="Ile osób Twój pracodawca zgłasza do ubezpieczenia chorobowego?" hint="Zapytaj w kadrach. Więcej niż 20 osób – zasiłek wypłaca pracodawca. 20 lub mniej – wypłaca ZUS."><input type="number" value={f.platnik} onChange={(e) => set({ platnik: e.target.value })} /></Field>}
+          {f.tytul === "dzialalnosc" && <Field label="Nieopłacone składki w ZUS (zł)" hint="Kwota zaległości w dniu porodu. Jeśli nie masz zaległości, wpisz 0."><input type="number" value={f.zadl} onChange={(e) => set({ zadl: e.target.value })} /></Field>}
           {f.tytul === "dzialalnosc" && zad && <Alert t={zad.przekroczonyProg ? "warn" : "info"}><b>Stan zadłużenia na dzień {dataPL(zad.naDzien)} (symulacja):</b> {pln(zad.kwotaZadluzenia)}, próg {pln(zad.prog)}. Wynik: {wynikZadluzenia(zad)}. {zad.komunikat}</Alert>}
-          <Field label="Średnie wynagrodzenie brutto / mies." hint="Do wyliczenia kwot poniżej"><input type="number" value={f.brutto} onChange={(e) => set({ brutto: e.target.value })} /></Field>
-          <Field label="Dni zwolnienia lekarskiego w ciąży (kod B)"><input type="number" value={f.niezd} onChange={(e) => set({ niezd: e.target.value })} /></Field>
+          <Field label="Średnia pensja brutto miesięcznie (z ostatnich 12 miesięcy)" hint="Od niej liczymy podstawę wymiaru, czyli kwotę, od której ZUS liczy zasiłek"><input type="number" value={f.brutto} onChange={(e) => set({ brutto: e.target.value })} /></Field>
+          <Field label="Ile dni zwolnienia lekarskiego w ciąży chcesz policzyć?" hint="Chodzi o zwolnienie z kodem B – lekarz wpisuje go, gdy zwolnienie wynika z ciąży"><input type="number" value={f.niezd} onChange={(e) => set({ niezd: e.target.value })} /></Field>
           <label className="check"><input type="checkbox" checked={f.w50} onChange={(e) => set({ w50: e.target.checked })} />Mam ukończone 50 lat</label>
           <button className="btn btn-primary" onClick={licz} disabled={busy}>{busy ? <Spin /> : "Sprawdź uprawnienia"}</button>
         </div>
@@ -90,7 +90,7 @@ export default function Ciaza() {
               <div className="card accent"><div className="row between"><h3>Zasiłek chorobowy w ciąży</h3>{tak(w.zasilekChorobowyWCiazy.przysluguje)}</div>
                 <p>{w.zasilekChorobowyWCiazy.powod}</p>
                 {ch && w.zasilekChorobowyWCiazy.przysluguje && <>
-                  <p>Przy zwolnieniu z kodem „B” zasiłek wynosi <b>100% podstawy</b>. Za <b>{f.niezd} dni</b>: <b>{pln(ch.kwotaRazem)}</b> ({pln(ch.dzienna)} dziennie).</p>
+                  <p>Przy zwolnieniu z kodem „B” (czyli związanym z ciążą) zasiłek wynosi <b>100% podstawy</b>. Za <b>{f.niezd} dni</b>: <b>{pln(ch.kwotaRazem)}</b> ({pln(ch.dzienna)} dziennie).</p>
                   <dl className="kv"><dt>Płaci pracodawca</dt><dd>{ch.dniPracodawca} dni · {pln(ch.kwotaPracodawca)} (wynagrodzenie chorobowe)</dd><dt>Płaci ZUS</dt><dd>{ch.dniZUS} dni · {pln(ch.kwotaZUS)}</dd></dl>
                   {ch.ostrzezenia?.map((o: string, i: number) => <Alert key={i} t="warn">{o}</Alert>)}</>}
               </div>
@@ -107,15 +107,15 @@ export default function Ciaza() {
                 <p className="small muted">{rod?.uwaga}</p></div>}
 
               <div className="card"><h3>Świadczenie rehabilitacyjne</h3>
-                <p>Przysługuje po wyczerpaniu zasiłku chorobowego, gdy nadal jesteś niezdolna do pracy, a dalsze leczenie rokuje powrót do pracy (maks. 12 miesięcy). W ciąży wynosi <b>100% podstawy</b>.</p>
+                <p>Przysługuje po wyczerpaniu zasiłku chorobowego, gdy nadal jesteś niezdolna do pracy, a dalsze leczenie rokuje powrót do pracy (maks. 12 miesięcy). Decyzję podejmuje lekarz orzecznik ZUS. W ciąży wynosi <b>100% podstawy</b>.</p>
                 <Field label="Przykład: ile dni świadczenia?"><input type="number" value={f.rehabDni} onChange={(e) => set({ rehabDni: e.target.value })} onBlur={licz} /></Field>
                 {reh && <p>Za {f.rehabDni} dni: <b>{pln(reh.kwota)}</b>. <span className="small muted">{reh.uwaga}</span></p>}</div>
 
               <div className="card"><h3>Zasiłek w wysokości zasiłku macierzyńskiego</h3>
                 <p>To specjalne świadczenie dla kobiety w ciąży, która <b>straciła pracę</b> w określonych okolicznościach: z powodu upadłości, likwidacji lub śmierci pracodawcy (bez zapewnienia innego zatrudnienia) albo gdy sąd prawomocnie uznał rozwiązanie umowy za sprzeczne z prawem. Wypłacany jest do dnia porodu, w wysokości 100% podstawy – jak zasiłek macierzyński.</p>
                 <Field label="Czy to Twoja sytuacja?"><select value={f.straciłaPrace} onChange={(e) => set({ straciłaPrace: e.target.value })}><option value="nie">Nie</option><option value="upadlosc">Umowa wygasła: upadłość / likwidacja / śmierć pracodawcy</option><option value="wyrok">Rozwiązanie umowy niezgodne z prawem (prawomocny wyrok)</option></select></Field>
-                {f.straciłaPrace !== "nie" && pod && <Alert t="ok">Możesz mieć prawo do tego zasiłku do dnia porodu. Szacunkowo <b>{pln(pod.podstawaMiesieczna)}</b> miesięcznie (100% podstawy). Prawo ustala płatnik składek (np. syndyk) albo ZUS.</Alert>}</div>
-              <Kroki kroki={pod?.kroki} tytul="Jak policzono podstawę wymiaru" />
+                {f.straciłaPrace !== "nie" && pod && <Alert t="ok">Możesz mieć prawo do tego zasiłku do dnia porodu. Szacunkowo <b>{pln(pod.podstawaMiesieczna)}</b> miesięcznie (100% podstawy). O prawie do zasiłku decyduje płatnik składek (czyli ten, kto opłacał za Ciebie składki – np. syndyk upadłej firmy) albo ZUS.</Alert>}</div>
+              <Kroki kroki={pod?.kroki} tytul="Jak policzono podstawę wymiaru (kwotę, od której liczy się zasiłek)" />
             </>
           )}
         </div>

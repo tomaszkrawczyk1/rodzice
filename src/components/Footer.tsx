@@ -14,6 +14,7 @@ export default function Footer() {
         </nav>
         <nav aria-label="Kontakt i dostępność">
           <ul className="footer__links">
+            <li><a href="tel:+48225601600">Infolinia ZUS: 22 560 16 00</a></li>
             <li><a href="https://www.zus.pl/o-zus/kontakt/centrum-obslugi-telefonicznej-cot-" target="_blank" rel="noreferrer">Centrum Obsługi Telefonicznej</a></li>
             <li><a href="https://www.zus.pl/o-zus/kontakt/obsluga-osob-z-niepelnosprawnosciami" target="_blank" rel="noreferrer">Obsługa osób z niepełnosprawnościami</a></li>
             <li><a href="https://www.zus.pl/dostepnosc/deklaracja-dostepnosci-zus.pl" target="_blank" rel="noreferrer">Deklaracja dostępności zus.pl</a></li>
@@ -24,12 +25,12 @@ export default function Footer() {
           {/* Strona „O projekcie" nie miała żadnego linku w serwisie. */}
           <nav aria-label="O serwisie">
             <ul className="footer__links">
-              <li><Link href="/o-projekcie">O projekcie i użyciu AI</Link></li>
+              <li><Link href="/o-projekcie">O projekcie</Link></li>
+              <li><Link href="/prywatnosc">Polityka prywatności</Link></li>
             </ul>
           </nav>
           <a className="to-top" href="#header">Do góry<span className="to-top__circle" aria-hidden="true" /></a>
-          {/* Informacja „to nie ZUS" jest tylko w pasku u góry strony. Tu zostaje uwaga o charakterze wyliczeń. */}
-          <p className="footer__note">Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
+          <p className="footer__note">Bezpłatny, nieoficjalny projekt hackathonu HackNation 2026. Nie jest usługą ZUS. Wyliczenia są orientacyjne. Wiążącą decyzję wydaje ZUS albo płatnik składek.</p>
         </div>
       </div>
     </footer>

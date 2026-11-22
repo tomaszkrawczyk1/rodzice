@@ -105,11 +105,13 @@ export default function Wgraj() {
 
   return (
     <>
-      <h1>Odczytaj dane z dokumentu</h1>
-      <p className="lead">Wybierz przykładowy formularz albo wgraj własny skan lub PDF. Odczyt odbywa się na naszym serwerze, bez zewnętrznych usług. Dokument nie jest zapisywany.</p>
+      <h1>Przetestuj odczyt ze skanu (przykłady)</h1>
+      <p className="lead">Tu sprawdzisz, jak aplikacja odczytuje dane z zaświadczenia Z-3 i wniosku ZAM. Najprościej: kliknij <b>„Odczytaj przykład”</b> przy jednym z trzech gotowych dokumentów. Mają <b>fikcyjne dane</b>. To nie jest składanie wniosku: nic nie trafia do ZUS ani do pracodawcy.</p>
+      <Alert t="warn"><b>Nie wgrywaj prawdziwych dokumentów.</b> Możesz też wybrać własny plik, ale to wersja testowa: użyj tylko przykładu albo dokumentu bez prawdziwego numeru PESEL, imienia i nazwiska. Odczyt odbywa się na naszym serwerze, bez zewnętrznych usług. Dokument nie jest zapisywany.</Alert>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
-          <h2>Wybierz dokument</h2>
+          <h2>Przykładowe dokumenty</h2>
+          <p className="small muted">Trzy przykłady z fikcyjnymi danymi. Możesz je też pobrać i obejrzeć.</p>
           <ul className="clean">{DEMO.map(([plik, etykieta]) => <li key={plik}>
             <b>{etykieta}</b>
             <div className="row">
@@ -117,7 +119,8 @@ export default function Wgraj() {
               <a className="btn btn-ghost" href={`/demo/${plik}`} download>Pobierz przykład</a>
             </div>
           </li>)}</ul>
-          <h3 className="mt">Własny plik</h3>
+          <h3 className="mt">Własny plik testowy (dla chętnych)</h3>
+          <p className="small">Tylko plik bez prawdziwych danych osobowych, np. zmieniony przykład. Nie wgrywaj skanu ze swoim numerem PESEL.</p>
           <Field label="Skan lub PDF (Z-3, Z-3a, ZAM)" hint={`PDF, JPG lub PNG, do ${MAKS_MB} MB. Odczyt skanu może potrwać kilkanaście sekund.`}>
             <input type="file" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" disabled={busy} onChange={(e) => { wybranoPlik(e.target.files?.[0]); e.target.value = ""; }} />
           </Field>

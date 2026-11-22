@@ -41,8 +41,8 @@ export default function Dokumenty() {
   const zlecenie = tytul === "zlecenie";
   return (
     <>
-      <h1>Dokumenty i terminy</h1>
-      <p className="lead">Sprawdź, gdzie złożyć wniosek o zasiłek i kiedy trzeba to zrobić.</p>
+      <h1>Kto wypłaca zasiłek</h1>
+      <p className="lead">Sprawdź, czy zasiłek wypłaca ZUS, czy pracodawca, gdzie złożyć wniosek i ile masz na to czasu. Wszystkie swoje terminy od daty porodu znajdziesz w <Link href="/terminarz">terminach w urzędach</Link>.</p>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
           <h2>Kto wypłaca zasiłek?</h2>
@@ -73,7 +73,7 @@ export default function Dokumenty() {
             {terminyPlanu.map((t, i) => <li key={i}>
               <b>{t.do ? "Do " + dataPL(t.do) : "Od " + dataPL(t.od)}</b><br />{opisTerminu(t.co)}
             </li>)}
-          </ul> : <p><Link href="/sprawa/terminy">Sprawdź terminy dla swojej sprawy</Link> lub <Link href="/kalkulator">ułóż plan urlopów w kalkulatorze</Link>.</p>}
+          </ul> : <p><Link href="/terminarz">Zobacz swoje terminy w urzędach</Link> lub <Link href="/kalkulator">ułóż plan urlopów w kalkulatorze</Link>.</p>}
         </section>
       </div>
       <section className="card mt">
@@ -87,7 +87,7 @@ export default function Dokumenty() {
         <ul className="clean">
           {DRUKI.map((d) => <li key={d.id}><Link href={`/druki#${d.id}`}>{d.nazwa}</Link></li>)}
         </ul>
-        <p className="mt"><Link href="/wnioski" className="btn btn-primary">Przygotuj wniosek</Link></p>
+        <p className="mt"><Link href="/wnioski" className="btn btn-primary">Napisz wniosek</Link></p>
       </section>
     </>
   );

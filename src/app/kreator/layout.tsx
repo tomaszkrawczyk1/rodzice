@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import "./kreator.css";
 
 export const metadata: Metadata = {
-  title: "Kreator spraw – Przewodnik Przyszłego Rodzica",
+  title: "Co mnie dotyczy? – Przewodnik Przyszłego Rodzica",
   description: "Odpowiedz na kilka pytań, a podpowiemy, jakie sprawy z ZUS i urzędów warto załatwić.",
 };
 

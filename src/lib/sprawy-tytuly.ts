@@ -8,10 +8,10 @@ export const TYTULY_SPRAW: Record<string, string> = {
   "zwolnienie-ciaza": "Zwolnienie w ciąży – ile dostanę",
   "wniosek-zasilek": "Złożyć wniosek o zasiłek po porodzie",
   "urlop-pracodawca": "Poprosić pracodawcę o urlop",
-  "podzial-urlopu": "Podzielić urlop z partnerem",
+  "podzial-urlopu": "Podzielić urlop z drugim rodzicem",
   "praca-na-urlopie": "Pracować w czasie urlopu rodzicielskiego",
   "adopcja": "Adopcja lub rodzina zastępcza",
-  "trudna-sytuacja": "Trudna sytuacja: strata, wcześniak, śmierć matki",
-  "terminy": "Sprawdzić terminy, których nie mogę przegapić",
+  "trudna-sytuacja": "Trudna sytuacja: strata, wcześniak, gdy zabrakło mamy",
+  "terminy": "Sprawdzić, ile mam czasu na wniosek",
   "odpis-aktu": "Zdobyć odpis aktu urodzenia",
 };

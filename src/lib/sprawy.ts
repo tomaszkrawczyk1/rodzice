@@ -151,9 +151,9 @@ const pDataPorodu: Pyt = {
   poCo: "Od tej daty liczymy wszystkie okresy urlopów i terminy wniosków.", skad: "Karta przebiegu ciąży albo odpis aktu urodzenia dziecka.",
 };
 const pDzieci: Pyt = {
-  id: "liczbaDzieci", typ: "wybor", tekst: "Ile dzieci urodziło się (lub urodzi) przy jednym porodzie?", opcje: DZIECI,
+  id: "liczbaDzieci", typ: "wybor", tekst: "Ile dzieci urodziło się (lub ma się urodzić) przy tym porodzie?", opcje: DZIECI,
   domyslne: (c) => (c.liczbaDzieci ? String(Math.min(c.liczbaDzieci, 5)) : undefined), etykietaDanych: "Liczba dzieci",
-  poCo: "Od liczby dzieci przy jednym porodzie zależy wymiar urlopu i zasiłku macierzyńskiego.",
+  poCo: "Od liczby dzieci zależy, jak długo trwa urlop i zasiłek macierzyński.",
 };
 const pZatrudnienie: Pyt = {
   id: "zatrudnienie", typ: "wybor", tekst: "Na jakiej podstawie pracujesz?", opcje: ZATRUDNIENIE,
@@ -181,11 +181,11 @@ const pPelnyEtat = (kto: "M" | "O"): Pyt => ({
   tekst: kto === "M" ? "Czy pracujesz na pełnym etacie?" : "Czy drugi rodzic pracuje na pełnym etacie?",
   warunek: (o, c) => kto === "M" ? pBrutto("M").warunek!(o, c) && czyPracownik(o) : pBrutto("O").warunek!(o, c) && o.zatrudnienieO === "umowa",
   zalezyOd: [kto === "M" ? "zatrudnienie" : "zatrudnienieO"],
-  poCo: "Minimalną gwarantowaną podstawę wymiaru zasiłku stosujemy przy pełnym etacie.",
+  poCo: "Przy pełnym etacie zasiłek nie może być liczony od kwoty niższej niż płaca minimalna (po odliczeniu składek).",
 });
 const pZatrudnienieO: Pyt = { ...pZatrudnienie, id: "zatrudnienieO", tekst: "Na jakiej podstawie pracuje drugi rodzic?", domyslne: undefined, warunek: (o, c) => pBrutto("O").warunek!(o, c) };
 const pPodstawaZUS = (kto: "M" | "O"): Pyt => ({
-  id: kto === "M" ? "podstawaM" : "podstawaO", typ: "liczba", min: 0.01, tekst: kto === "M" ? "Miesięczna podstawa wymiaru Twojego zasiłku (zł)" : "Miesięczna podstawa wymiaru zasiłku drugiego rodzica (zł)",
+  id: kto === "M" ? "podstawaM" : "podstawaO", typ: "liczba", min: 0.01, tekst: kto === "M" ? "Od jakiej miesięcznej kwoty liczy się Twój zasiłek (podstawa wymiaru, zł)?" : "Od jakiej miesięcznej kwoty liczy się zasiłek drugiego rodzica (podstawa wymiaru, zł)?",
   domyslne: (c) => (kto === "M" ? c.podstawaM : c.podstawaO), etykietaDanych: kto === "M" ? "Podstawa wymiaru zasiłku" : "Podstawa wymiaru zasiłku drugiego rodzica", jednostka: "zł",
   zalezyOd: kto === "M" ? ["zatrudnienie"] : undefined,
   warunek: (o, c) => {
@@ -194,7 +194,7 @@ const pPodstawaZUS = (kto: "M" | "O"): Pyt => ({
     const podstawa = kto === "M" ? c.podstawaM : c.podstawaO;
     return Number.isFinite(podstawa) && (podstawa ?? 0) > 0;
   },
-  poCo: "To kwota, od której liczymy zasiłek (średnie miesięczne wynagrodzenie z ostatnich 12 miesięcy po odliczeniu 13,71% składek).",
+  poCo: "Podstawa wymiaru to kwota, od której liczymy zasiłek: średnia miesięczna pensja brutto z ostatnich 12 miesięcy po odliczeniu składek (13,71%).",
 });
 const pBrutto = (kto: "M" | "O"): Pyt => ({
   id: kto === "M" ? "brutto" : "bruttoO", typ: "liczba", jednostka: "zł", min: 0.01, przyklad: "np. 6500",
@@ -259,14 +259,14 @@ export const SPRAWY: Sprawa[] = [
       { id: "od", typ: "data", tekst: `Od kiedy masz nieprzerwane ubezpieczenie chorobowe (bez przerw dłuższych niż ${L.przerwa_wliczana_do_karencji_dni} dni)?`, warunek: maChorobowe,
         zalezyOd: ["tytul", "dobrowolne"], sprawdz: (v) => v > dzis() ? "Data rozpoczęcia ubezpieczenia nie może być w przyszłości." : undefined,
         domyslne: (c) => (c.dniUbezpieczenia !== undefined ? dodajDni(dzis(), -c.dniUbezpieczenia + 1) : undefined), etykietaDanych: "Ubezpieczenie nieprzerwanie od",
-        poCo: "Prawo do zasiłku chorobowego wymaga wymaganego stażu ubezpieczenia: 30 dni przy umowie o pracę lub 90 dni przy ubezpieczeniu dobrowolnym. Zasiłek macierzyński po porodzie przysługuje bez tego okresu wyczekiwania.", skad: "Wpisz datę startu obecnej umowy. Jeśli wcześniej była inna umowa o pracę, a przerwa między umowami nie przekroczyła 30 dni, podaj datę ze starszej umowy." },
+        poCo: "Zasiłek chorobowy przysługuje dopiero po pewnym czasie ubezpieczenia (tzw. okres wyczekiwania): 30 dni przy umowie o pracę lub 90 dni przy ubezpieczeniu dobrowolnym. Zasiłek macierzyński po porodzie nie wymaga tego czasu.", skad: "Wpisz datę startu obecnej umowy. Jeśli wcześniej była inna umowa o pracę, a przerwa między umowami nie przekroczyła 30 dni, podaj datę ze starszej umowy." },
       { ...pDataPorodu, warunek: maChorobowe,
         poCo: "Prawo do zasiłku macierzyńskiego przysługuje, jeśli rodzic ma ważne ubezpieczenie chorobowe w dniu narodzin dziecka.", skad: "Karta przebiegu ciąży lub akt urodzenia dziecka." },
       { id: "wDniu", typ: "tak_nie", tekst: (o) => `Czy ${dataPL(o.dataPorodu)} ${o.dataPorodu < dzis() ? "trwało Twoje" : o.dataPorodu === dzis() ? "trwa Twoje" : "będzie trwało Twoje"} ubezpieczenie chorobowe (umowa o pracę lub opłacone składki)?`, domyslne: (c) => (c.wDniuPorodu === undefined ? undefined : c.wDniuPorodu ? "tak" : "nie"), etykietaDanych: "Ubezpieczenie w dniu porodu",
         warunek: maChorobowe, zalezyOd: ["tytul", "dobrowolne", "dataPorodu"],
         poCo: "To najważniejszy warunek prawa do zasiłku macierzyńskiego: ubezpieczenie musi trwać w dniu narodzin dziecka.", skad: "Sprawdź datę końcową na umowie o pracę. Jeśli masz umowę na czas nieokreślony lub regularnie opłacasz składki, wybierz «Tak»." },
-      { id: "zadluzenie", typ: "liczba", tekst: "Ile wynosi Twoje ewentualne zadłużenie składkowe w ZUS? (jeśli nie masz zaległości, wpisz 0)", jednostka: "zł", min: 0, warunek: (o) => o.tytul === "dzialalnosc" && maChorobowe(o), zalezyOd: ["tytul"],
-        domyslne: (c) => c.zadluzenie, etykietaDanych: "Zadłużenie składkowe w ZUS", poCo: "Zaległości w opłacaniu składek powyżej ustawowego limitu wstrzymują wypłatę zasiłku do czasu ich uregulowania.", skad: "Sprawdzisz to na koncie PUE / eZUS w zakładce «Rozliczenia» lub pytając księgowość." },
+      { id: "zadluzenie", typ: "liczba", tekst: "Ile wynoszą Twoje nieopłacone składki w ZUS? Jeśli nie masz zaległości, wpisz 0.", jednostka: "zł", min: 0, warunek: (o) => o.tytul === "dzialalnosc" && maChorobowe(o), zalezyOd: ["tytul"],
+        domyslne: (c) => c.zadluzenie, etykietaDanych: "Zadłużenie składkowe w ZUS", poCo: "Jeśli zaległe składki przekraczają 1% płacy minimalnej, zasiłek jest wstrzymany, dopóki ich nie spłacisz.", skad: "Sprawdzisz to na koncie PUE / eZUS w zakładce «Rozliczenia» lub pytając księgowość." },
       { ...pPlatnik, warunek: (o) => o.tytul === "umowa_o_prace" || (o.tytul === "zlecenie" && maChorobowe(o)), zalezyOd: ["tytul"] },
     ],
     async licz(o, c, api) {
@@ -370,7 +370,7 @@ export const SPRAWY: Sprawa[] = [
       const rod = okr.find((x: any) => x.rodzaj === "rodzicielski");
       const adresat = o.platnik === "duzy" ? "Twój pracodawca (kadry lub księgowość)" : nieznanyPlatnik ? `Pracodawca albo ZUS: zależy, czy firma zgłasza więcej niż ${progPlatnika} osób` : "ZUS (przez PUE / eZUS albo w placówce)";
       const ost = [...wyn.bledy, ...wyn.ostrzezenia];
-      if (wybor !== "zmienny" && poTerminie) ost.push(`Termin na stałą kwotę 81,5% minął ${dataPL(t815)}. Pokazujemy wariant standardowy: pierwsze tygodnie po 100%, potem po 70%.`);
+      if (wybor !== "zmienny" && poTerminie) ost.push(`Termin na stałą kwotę 81,5% minął ${dataPL(t815)}. Nic się nie stało – zasiłek nie przepada. Pokazujemy wariant standardowy: pierwsze tygodnie po 100%, potem po 70%. W sumie to prawie ta sama kwota.`);
       const krokGdzie = o.platnik === "duzy"
         ? { tekst: "Zanieś wniosek ZAM do pracodawcy (kadry lub księgowość)." }
         : o.platnik === "maly" || o.zatrudnienie === "dzialalnosc"
@@ -412,14 +412,14 @@ export const SPRAWY: Sprawa[] = [
       ].join("\n") : undefined;
       const info: NonNullable<Wynik["info"]> = [
         ...(porownanie ? [{ tytul: "Porównanie wariantów", tresc: porownanie, zwiniete: true }] : []),
-        { tytul: "Dla drugiego rodzica", zwiniete: true, tresc: `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi. Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli oboje rodzice biorą urlop, sprawdź sprawę „Podzielić urlop z partnerem”.` },
+        { tytul: "Dla drugiego rodzica", zwiniete: true, tresc: `Z ${tygodniDopelniacz(limit)} urlopu rodzicielskiego ${tygodnie(limit - matkaMax)} przysługuje wyłącznie drugiemu rodzicowi. Tutaj liczymy Twoje ${tygodnie(matkaMax)}. Jeśli oboje rodzice biorą urlop, sprawdź sprawę „Podzielić urlop z drugim rodzicem”.` },
       ];
       return {
         glowne: `Tyle dostaniesz za cały urlop (macierzyński ${tygodnie(wyn.wymiary.macierzynskiTyg)} i rodzicielski ${tygodnie(matkaMax)}):`,
         duza: pln(wyn.sumy.razem), podpis: mac ? `Na początek ok. ${plOk(miesiecznie(mac))} miesięcznie (brutto, przed podatkiem)` : "Kwota brutto, przed podatkiem",
         szczegoly: [["Urlop macierzyński", mac ? `${dataPL(mac.od)} – ${dataPL(mac.do)}` : "—"], ["Urlop rodzicielski", rod ? `${dataPL(rod.od)} – ${dataPL(rod.do)}` : "—"], ["Od tej kwoty liczymy zasiłek", `${pln(podM)} miesięcznie`], ["Jak będzie wypłacany", uzywa815 ? "równa kwota co miesiąc (81,5%)" : `pierwsze ${tygodnie(wyn.wymiary.macierzynskiTyg)} po 100%, potem po 70%`]],
         pilne: uzywa815 || porownaj
-          ? { do: t815, tekst: `Chcesz mieć stałą kwotę co miesiąc (81,5%)? Złóż wniosek ZAM najpóźniej ${dataPL(t815)} (${zaIle(t815)}). Tego terminu nie da się przedłużyć.` }
+          ? { do: t815, tekst: `Chcesz mieć stałą kwotę co miesiąc (81,5%)? Złóż wniosek ZAM najpóźniej ${dataPL(t815)} (${zaIle(t815)}). Tego terminu nie da się przedłużyć. Jeśli go przegapisz, zasiłek nie przepada: dostaniesz 100% za urlop macierzyński i 70% za rodzicielski – w sumie prawie tyle samo.` }
           : undefined,
         ostrzezenia: ost, terminy: terminyDlaRodzica(term), zrob, dokumenty: { tytul: "Weź ze sobą", pozycje: dokumenty },
         sciaga: { tytul: "Ściąga: co wpisać w druku ZAM", wiersze: sciagaWiersze, uwaga: "Druk ZAM obowiązuje od 24.10.2026. Jeśli rubryka nazywa się trochę inaczej, wpisz w nią tę samą informację." },
@@ -493,7 +493,7 @@ export const SPRAWY: Sprawa[] = [
 
   /* ---- 5. Podział urlopu ---- */
   {
-    id: "podzial-urlopu", tytul: "Podzielić urlop z partnerem", krotko: "Porównanie trzech podziałów: kto ile weźmie i ile to wyniesie", ikona: "👨‍👩‍👧", czas: "5 pytań · 3 min",
+    id: "podzial-urlopu", tytul: "Podzielić urlop z drugim rodzicem", krotko: "Porównanie trzech podziałów: kto ile weźmie i ile to wyniesie", ikona: "👨‍👩‍👧", czas: "5 pytań · 3 min",
     slowa: "podział urlopu partner tata ojciec mąż mama oboje rodzice rodzicielski ile wyniesie porównanie dzielić", faq: ["F11", "F12", "F14"],
     pytania: [
       pDataPorodu, pDzieci, pZatrudnienie, pPelnyEtat("M"), pPodstawaZUS("M"), pBrutto("M"), pZatrudnienieO, pPelnyEtat("O"), pPodstawaZUS("O"), pBrutto("O"),
@@ -623,10 +623,10 @@ export const SPRAWY: Sprawa[] = [
 
   /* ---- 8. Trudna sytuacja ---- */
   {
-    id: "trudna-sytuacja", tytul: "Trudna sytuacja: strata, wcześniak, śmierć matki", krotko: "Co przysługuje i gdzie szukać pomocy. Bez pośpiechu", ikona: "🕊️", czas: "1 pytanie · 1 min",
+    id: "trudna-sytuacja", tytul: "Trudna sytuacja: strata, wcześniak, gdy zabrakło mamy", krotko: "Co przysługuje i gdzie szukać pomocy. Bez pośpiechu", ikona: "🕊️", czas: "1 pytanie · 1 min",
     slowa: "strata martwe urodzenie poronienie zgon śmierć dziecka wcześniak szpital żałoba trudna sytuacja choroba matka zmarła wsparcie psycholog", faq: ["F24", "F15", "F25", "F26"],
     pytania: [
-      { id: "sytuacja", typ: "wybor", tekst: "Wybierz sytuację, w której potrzebujesz wsparcia i informacji:", opcje: [{ v: "martwe", label: "Dziecko urodziło się martwe lub doszło do poronienia" }, { v: "wczesniak", label: "Dziecko urodziło się przedwcześnie lub przebywa w szpitalu" }, { v: "zgon", label: "Mama dziecka zmarła lub nie może się nim zająć" }, { v: "chore", label: "Dziecko jest ciężko chore" }, { v: "wsparcie", label: "Potrzebuję rozmowy lub wsparcia psychologicznego" }], poCo: "Dobierzemy najważniejsze informacje prawne i kontakty. Nie musisz niczego załatwiać od razu – najważniejszy jest spokój." },
+      { id: "sytuacja", typ: "wybor", tekst: "Wybierz sytuację, w której potrzebujesz wsparcia i informacji:", opcje: [{ v: "martwe", label: "Doszło do poronienia lub dziecko urodziło się bez oznak życia" }, { v: "wczesniak", label: "Dziecko urodziło się za wcześnie lub jest w szpitalu" }, { v: "zgon", label: "Mama dziecka zmarła lub nie może się nim zająć" }, { v: "chore", label: "Dziecko jest ciężko chore" }, { v: "wsparcie", label: "Potrzebuję rozmowy lub wsparcia psychologicznego" }], poCo: "Dobierzemy najważniejsze informacje prawne i kontakty. Nie musisz niczego załatwiać od razu – najważniejszy jest spokój." },
     ],
     async licz(o) {
       const mapa: Record<string, string> = { martwe: "F24", wczesniak: "F15", zgon: "F25", wsparcie: "F26" };
@@ -643,7 +643,7 @@ export const SPRAWY: Sprawa[] = [
 
   /* ---- 9. Terminy ---- */
   {
-    id: "terminy", tytul: "Sprawdzić terminy, których nie mogę przegapić", krotko: "Lista dat: do kiedy złożyć które wnioski", ikona: "⏰", czas: "2 pytania · 1 min",
+    id: "terminy", tytul: "Sprawdzić, ile mam czasu na wniosek", krotko: "Lista dat: do kiedy złożyć które wnioski", ikona: "⏰", czas: "2 pytania · 1 min",
     slowa: "termin kiedy do kiedy nie przegapić 21 dni przedawnienie ryzyko stracić wniosek data", faq: ["F19", "F09"],
     pytania: [
       { id: "rodzajZdarzenia", typ: "wybor", tekst: "Czego dotyczą terminy, które chcesz sprawdzić?", opcje: [{ v: "porod", label: "Narodziny dziecka (poród)" }, { v: "przysposobienie", label: "Adopcja (przysposobienie)" }, { v: "rodzina_zastepcza", label: "Rodzina zastępcza" }], poCo: "Dla każdej sytuacji obowiązują inne terminy składania wniosków." },
@@ -651,7 +651,7 @@ export const SPRAWY: Sprawa[] = [
       { id: "dataPrzyjecia", typ: "data", tekst: "Kiedy dziecko zostało przyjęte do rodziny?",
         domyslne: (c) => c.dataPrzyjecia, warunek: (o) => o.rodzajZdarzenia === "przysposobienie" || o.rodzajZdarzenia === "rodzina_zastepcza",
         etykietaDanych: "Data przyjęcia dziecka", poCo: "Od tej daty liczymy ustawowe terminy.", skad: "Z dokumentu o przyjęciu dziecka na wychowanie." },
-      { id: "znaKoniec", typ: "tak_nie", tekst: "Czy znasz ostatni dzień okresu, za który chcesz dostać zasiłek?", poCo: "Od tego dnia liczymy 6-miesięczny termin na przedawnienie roszczenia o wypłatę zasiłku." },
+      { id: "znaKoniec", typ: "tak_nie", tekst: "Czy znasz ostatni dzień okresu, za który chcesz dostać zasiłek?", poCo: "Po 6 miesiącach od tego dnia nie można już upomnieć się o wypłatę zasiłku (przedawnienie)." },
       { id: "koniec", typ: "data", tekst: "Jaki jest ostatni dzień tego okresu?", warunek: (o) => o.znaKoniec === "tak",
         poCo: "Podaj ostatni dzień okresu zasiłkowego, którego dotyczy Twój wniosek." },
     ],

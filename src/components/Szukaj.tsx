@@ -2,14 +2,16 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { PYTANIA } from "@/content/poradnik";
-import { szukaj, zapytanieMaSens } from "@/lib/sprawy";
+import { szukajLuzno, maSens } from "@/lib/szukaj";
 import { przejdzKrok } from "@/lib/adres-kroku";
 import { MAKS_ZAPYTANIA, normalizujZapytanie } from "@/lib/adres-glowna";
 import { przejdzDoKroku } from "@/lib/ekran";
 import { StatusBadge } from "./StatusPytania";
 import { Plakietka, Lupa, ikonaSprawy } from "./Ikony";
 
-const PRZYKLADY = ["szef nie chce dać urlopu", "ile dostanę po porodzie", "mąż chce wziąć urlop", "adopcja"];
+const PRZYKLADY = ["urodziły nam się bliźniaki", "ile dostanę po porodzie", "urlop dla taty", "szef nie chce dać urlopu", "mam firmę (JDG)"];
+/** Krótka chwila „Szukam…": wynik liczy się od razu, ale bez tej pauzy zmiana bywa niezauważalna. */
+const CZAS_SZUKANIA = 250;
 const PODPOWIEDZ_PUSTE = "Wpisz kilka słów opisujących sprawę, np. „zasiłek po porodzie” albo „urlop ojcowski”.";
 const PODPOWIEDZ_BEZ_SLOW = "Nie rozpoznaliśmy w tym tekście słów do wyszukania. Wpisz kilka słów opisujących sprawę, np. „urlop ojcowski”.";
 
@@ -25,6 +27,7 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
   const [q, setQ] = useState(zapytanie ?? "");
   const [wyslane, setWyslane] = useState(zapytanie ?? "");
   const [puste, setPuste] = useState(false);
+  const [szukam, setSzukam] = useState(false);
   const pole = useRef<HTMLInputElement>(null);
   const sekcja = useRef<HTMLElement>(null);
   const glowny = wariant === "glowny";
@@ -67,6 +70,14 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
     };
   }, [glowny]);
 
+  // Każde nowe zapytanie (z pola, przykładu albo adresu) pokazuje na chwilę „Szukam…".
+  useEffect(() => {
+    if (!wyslane) { setSzukam(false); return; }
+    setSzukam(true);
+    const czas = window.setTimeout(() => setSzukam(false), CZAS_SZUKANIA);
+    return () => window.clearTimeout(czas);
+  }, [wyslane]);
+
   function wyslij(tekst: string) {
     const fraza = normalizujZapytanie(tekst);
     setQ(fraza);
@@ -74,16 +85,17 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
     setPuste(!fraza);
     // Wpis historii dopiero przy wysłaniu, nie przy każdym znaku. Puste pole zdejmuje `q` z adresu (wyniki znikają, więc „Wstecz" je przywraca).
     if (zAdresem) przejdzKrok({ q: fraza || null });
-    if (!zapytanieMaSens(fraza)) pole.current?.focus();
+    if (!maSens(fraza)) pole.current?.focus();
   }
 
-  const wyniki = wyslane ? szukaj(wyslane, PYTANIA) : null;
-  const bezSlow = !!wyslane && !zapytanieMaSens(wyslane);
-  const brak = !!wyniki && !bezSlow && !wyniki.sprawy.length && !wyniki.faq.length;
+  const bezSlow = !!wyslane && !maSens(wyslane);
+  const wyniki = wyslane && !bezSlow ? szukajLuzno(wyslane, PYTANIA) : null;
+  const brak = !!wyniki && !wyniki.sprawy.length;
   const komunikat = puste ? PODPOWIEDZ_PUSTE : bezSlow ? PODPOWIEDZ_BEZ_SLOW : "";
   // Krótkie podsumowanie dla czytników ekranu: zawsze w tym samym, już istniejącym regionie, więc zmiana jest ogłaszana.
   const podsumowanie = komunikat
-    || (brak ? "Brak jednoznacznej odpowiedzi dla tego zapytania."
+    || (szukam ? "Szukam pasujących spraw…"
+      : brak ? `Nie mamy jednej pewnej odpowiedzi. Pokazujemy sprawy, które mogą pasować: ${wyniki?.podobne.length ?? 0}.`
       : wyniki ? `Wyniki wyszukiwania. Pasujące sprawy: ${wyniki.sprawy.length}. Pytania i odpowiedzi z poradnika: ${wyniki.faq.length}.` : "");
 
   return (
@@ -120,8 +132,33 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
       </p>
       <p className="sr-only" role="status" aria-live="polite">{podsumowanie}</p>
       {komunikat && <p id="zq-komunikat" className="mt"><b>{komunikat}</b></p>}
-      {wyniki && !bezSlow && (
+      {wyniki && szukam && (
+        <p className="mt" aria-hidden="true"><span className="spin" /> Szukam pasujących spraw…</p>
+      )}
+      {wyniki && !szukam && (
         <div className="mt">
+          {brak && (
+            <div className="alert info" style={{ marginTop: 0 }}>
+              <p style={{ margin: 0 }}>
+                <b>{wyniki.podobneZZapytania
+                  ? "Nie mamy jednej pewnej odpowiedzi, ale te sprawy mogą pasować:"
+                  : "Nie rozpoznaliśmy jeszcze tej sprawy. Od tych spraw zaczyna najwięcej rodziców:"}</b>
+              </p>
+              <p className="small" style={{ margin: "4px 0 0" }}>
+                Wybierz najbliższą albo opisz sprawę innymi słowami, np. „urlop dla taty” czy „zasiłek po porodzie”.
+              </p>
+            </div>
+          )}
+          {brak && (
+            <div className="grid g3 mt">
+              {wyniki.podobne.map((s) => (
+                <Link key={s.id} href={`/sprawa/${s.id}`} className="tile tile--ico">
+                  <Plakietka nazwa={ikonaSprawy(s.id)} />
+                  <span className="tile__txt"><b>{s.tytul}</b><span>{s.krotko}</span></span>
+                </Link>
+              ))}
+            </div>
+          )}
           {wyniki.sprawy.length > 0 && (
             <>
               <b>Pasujące sprawy:</b>
@@ -148,15 +185,22 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
             </>
           )}
           {brak && (
-            <p>
-              Nie znaleźliśmy jednoznacznej odpowiedzi w oficjalnych przepisach.{" "}
-              <Link href="/pue">Napisz do konsultanta ZUS przez konto PUE / eZUS</Link> albo{" "}
-              <Link href="/sprawy">przejrzyj listę wszystkich spraw</Link>.
-            </p>
+            <>
+              <p className="mt"><b>Możesz też:</b></p>
+              <ul className="clean">
+                <li><Link href="/kalkulator">Policzyć w kalkulatorze, ile wyniesie zasiłek i jak długi będzie urlop</Link></li>
+                <li><Link href="/poradnik">Przejrzeć Poradnik: pytania i odpowiedzi rodziców</Link></li>
+                <li><Link href="/sprawy">Zobaczyć listę wszystkich spraw</Link></li>
+              </ul>
+              <p className="small muted mt">
+                Jeśli nic tu nie pasuje, możesz zapytać konsultanta ZUS:{" "}
+                <Link href="/pue">napisz przez konto PUE / eZUS</Link>.
+              </p>
+            </>
           )}
         </div>
       )}
-      {wyniki && <p className="small muted ask__nota">
+      {wyniki && !szukam && <p className="small muted ask__nota">
         Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.
       </p>}
     </section>

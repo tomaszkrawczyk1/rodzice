@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { DataPole } from "@/components/DataPole";
 import { dataPL } from "@/lib/format";
+import { api, useSesja, type Sesja } from "@/lib/sesja";
+import type { UbezpieczenieProfilu } from "@/lib/dane-profilu";
 import { buildCalendar, toICS, ROLES, EMPLOYMENT } from "@/lib/terminarz/terminarz.js";
-import type { Kategoria, Wydarzenie } from "@/lib/terminarz/terminarz.js";
+import type { Kategoria, Rola, Wydarzenie, Zatrudnienie } from "@/lib/terminarz/terminarz.js";
 import reguly from "@/lib/terminarz/rules.json";
 import drukiLinki from "@/lib/terminarz/druki-linki.json";
 import drukiJson from "@/content/poradnik/druki.json";
@@ -23,6 +25,67 @@ const zapasowe = drukiLinki.druki as Record<string, { nazwa?: string; url_zus?: 
 
 function magazyn(): Storage | undefined {
   try { return window.localStorage; } catch { return undefined; }
+}
+
+type Magazyn = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+/** Osobny zapis dla każdego profilu testowego (jak w Kalendarzu ciąży), żeby dane Anny nie trafiały do Marka. Gość: dotychczasowy klucz. */
+function magazynProfilu(personaId?: string): Magazyn | undefined {
+  const m = magazyn();
+  if (!m || !personaId) return m;
+  const k = (klucz: string) => `${klucz}:profil:${personaId}`;
+  return { getItem: (x) => m.getItem(k(x)), setItem: (x, v) => m.setItem(k(x), v), removeItem: (x) => m.removeItem(k(x)) };
+}
+
+interface Scenariusze { przypadki?: { id: string; wejscie?: { tytul?: string; dataZdarzenia?: string; liczbaDzieci?: number } }[] }
+
+const ZATRUDNIENIE_Z_PROFILU: Record<string, Zatrudnienie> = { umowa_o_prace: "umowa", zlecenie: "zlecenie", dzialalnosc: "jdg" };
+const dataOk = (d: unknown): d is string => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
+
+/** Data porodu wpisana wcześniej w Kalendarzu ciąży (ten sam profil), żeby nie wpisywać jej drugi raz. */
+function dataZKalendarza(personaId?: string): string {
+  try {
+    const zapis = JSON.parse(localStorage.getItem("rodzice.kalendarz") ?? "{}")?.[personaId ? `profil:${personaId}` : "gosc"];
+    if (dataOk(zapis?.dataPorodu)) return zapis.dataPorodu;
+    if (dataOk(zapis?.terminPorodu)) return zapis.terminPorodu;
+  } catch { /* bez zapisu */ }
+  return "";
+}
+
+/**
+ * Podpowiedzi z profilu: data porodu (z Kalendarza ciąży, ze scenariusza profilu testowego albo z planu z kalkulatora),
+ * rola (z imienia: polskie imiona żeńskie zwykle kończą się na „a"), forma zatrudnienia (z danych o ubezpieczeniu)
+ * i liczba dzieci z porodu. Każde pole można potem zmienić.
+ */
+async function daneZProfilu(sesja: Sesja | null, dzis: string): Promise<Partial<Formularz>> {
+  const wynik: Partial<Formularz> = {};
+  const zKalendarza = dataZKalendarza(sesja?.personaId);
+  if (zKalendarza) wynik.birthDate = zKalendarza;
+  if (!sesja) {
+    try {
+      const plan = JSON.parse(localStorage.getItem("rodzice.plan") ?? "null")?.wejscie;
+      if (plan?.tytul === "porod" && dataOk(plan.dataZdarzenia)) {
+        wynik.birthDate ||= plan.dataZdarzenia;
+        if (typeof plan.liczbaDzieci === "number" && plan.liczbaDzieci > 0) wynik.children = String(plan.liczbaDzieci);
+      }
+    } catch { /* bez planu */ }
+    return wynik;
+  }
+  const imie = sesja.osoba.split(" ")[0] ?? "";
+  wynik.role = (/a$/i.test(imie) ? "mama" : "tata") as Rola;
+  const [sc, ub] = await Promise.all([
+    api<Scenariusze>("/api/scenariusze").catch(() => null),
+    api<{ ubezpieczenie?: UbezpieczenieProfilu[] }>(`/api/zus/ubezpieczenie?${new URLSearchParams({ pesel: sesja.pesel, naDzien: dzis })}`).catch(() => null),
+  ]);
+  const wejscie = sc?.przypadki?.find((p) => p.id === sesja.personaId.replace(/[ab]$/, ""))?.wejscie;
+  if (wejscie?.tytul === "porod" && dataOk(wejscie.dataZdarzenia)) {
+    wynik.birthDate ||= wejscie.dataZdarzenia;
+    if (typeof wejscie.liczbaDzieci === "number" && wejscie.liczbaDzieci > 0) wynik.children = String(wejscie.liczbaDzieci);
+  }
+  const lista = ub?.ubezpieczenie ?? [];
+  const biezace = lista.find((u) => u.od <= dzis && (!u.do || u.do >= dzis)) ?? lista[lista.length - 1];
+  if (biezace && ZATRUDNIENIE_Z_PROFILU[biezace.tytul]) wynik.employment = ZATRUDNIENIE_Z_PROFILU[biezace.tytul];
+  return wynik;
 }
 
 function Znacznik({ kind }: { kind: Wydarzenie["kind"] }) {
@@ -94,6 +157,14 @@ function pobierzICS(zdarzenia: Wydarzenie[]) {
 }
 
 export default function Terminarz({ parametry }: { parametry: unknown }) {
+  const { sesja, gotowa } = useSesja();
+  // Czekamy na sesję, a potem montujemy widok osobno dla każdego profilu (jak w Kalendarzu ciąży).
+  if (!gotowa) return <div className={style.terminarz}><h1>Terminy w urzędach</h1></div>;
+  return <WidokTerminarza key={sesja?.personaId ?? "gosc"} sesja={sesja} parametry={parametry} />;
+}
+
+function WidokTerminarza({ sesja, parametry }: { sesja: Sesja | null; parametry: unknown }) {
+  const [zProfilu, setZProfilu] = useState<Partial<Formularz>>({});
   const [formularz, setFormularz] = useState<Formularz>(PUSTY_FORMULARZ);
   const [wczytano, setWczytano] = useState(false);
   const [dzis, setDzis] = useState("");
@@ -102,14 +173,29 @@ export default function Terminarz({ parametry }: { parametry: unknown }) {
   const [pobrano, setPobrano] = useState(false);
 
   // Zapis formularza zostaje w przeglądarce (localStorage), nic nie jest wysyłane.
+  // Zapis formularza zostaje w przeglądarce. Puste pola uzupełniamy danymi z profilu, a to, co już wpisano, zostaje.
   useEffect(() => {
-    setFormularz(wczytajFormularz(magazyn(), ROLES, EMPLOYMENT));
-    setDzis(dzisISO());
+    const dzien = dzisISO();
+    setFormularz(wczytajFormularz(magazynProfilu(sesja?.personaId), ROLES, EMPLOYMENT));
+    setDzis(dzien);
     setWczytano(true);
-  }, []);
+    let aktywny = true;
+    daneZProfilu(sesja, dzien).then((p) => {
+      if (!aktywny) return;
+      setZProfilu(p);
+      setFormularz((f) => ({
+        birthDate: f.birthDate || p.birthDate || "",
+        role: f.role || p.role || "",
+        employment: f.employment || p.employment || "",
+        children: f.children || p.children || "",
+      }));
+    }).catch(() => { /* dane można wpisać samodzielnie */ });
+    return () => { aktywny = false; };
+  }, [sesja]);
   useEffect(() => {
-    if (wczytano) zapiszFormularz(magazyn(), formularz);
-  }, [formularz, wczytano]);
+    if (wczytano) zapiszFormularz(magazynProfilu(sesja?.personaId), formularz);
+  }, [formularz, wczytano, sesja?.personaId]);
+  const zProfiluPola = (Object.keys(zProfilu) as (keyof Formularz)[]).filter((k) => zProfilu[k] && formularz[k] === zProfilu[k]);
 
   const walidacja = useMemo(() => waliduj(formularz, ROLES, EMPLOYMENT), [formularz]);
 
@@ -139,11 +225,22 @@ export default function Terminarz({ parametry }: { parametry: unknown }) {
 
   return (
     <div className={style.terminarz}>
-      <h1>Terminarz</h1>
-      <p className="lead">Podaj datę porodu i swoją sytuację. Pokażemy, co złożyć, gdzie i do kiedy, z linkami do druków. Terminy możesz pobrać do kalendarza w telefonie.</p>
+      <h1>Terminy w urzędach</h1>
+      <p className="lead">
+        Pokażemy, co złożyć w ZUS, u pracodawcy, w gminie i w urzędzie stanu cywilnego, i do kiedy, z linkami do druków.
+        Terminy możesz pobrać do kalendarza w telefonie. Wizyty lekarskie i badania znajdziesz w <Link href="/kalendarz">kalendarzu ciąży</Link>.
+      </p>
 
       <form className={`card accent ${style.formularz}`} onSubmit={(e) => e.preventDefault()} noValidate aria-labelledby="tz-formularz">
         <h2 id="tz-formularz">Twoje dane</h2>
+        {zProfiluPola.length > 0 && (
+          <p className="alert info" role="status">
+            {sesja
+              ? <>Część pól wypełniliśmy za Ciebie danymi z profilu ({sesja.osoba.split(" ")[0]}).</>
+              : <>Datę porodu wzięliśmy z tego, co wpisano wcześniej w tej przeglądarce.</>}
+            {" "}Sprawdź je i popraw, jeśli coś się zmieniło.
+          </p>
+        )}
         <div className={style.pola}>
           <DataPole
             key={odswiez}
@@ -186,10 +283,10 @@ export default function Terminarz({ parametry }: { parametry: unknown }) {
         {walidacja.bladDaty && <p className={style.blad} role="alert">{walidacja.bladDaty}</p>}
         <div className={style.akcje}>
           <button type="button" className="btn btn-ghost btn-sm"
-            onClick={() => { wyczyscZapis(magazyn()); setFormularz({ ...PUSTY_FORMULARZ }); setKategoria(""); setOdswiez((n) => n + 1); setPobrano(false); }}>
+            onClick={() => { wyczyscZapis(magazynProfilu(sesja?.personaId)); setZProfilu({}); setFormularz({ ...PUSTY_FORMULARZ }); setKategoria(""); setOdswiez((n) => n + 1); setPobrano(false); }}>
             Wyczyść dane
           </button>
-          <span className={style.prywatnosc}>Dane zostają w tej przeglądarce. Nie wysyłamy ich nigdzie i nie pytamy o PESEL.</span>
+          <span className={style.prywatnosc}>Dane zostają w tej przeglądarce. Nie wysyłamy ich nigdzie.</span>
         </div>
       </form>
 

@@ -20,6 +20,8 @@ export interface Parametry {
   limity_dni: Record<string, number>;
   terminy_dni: Record<string, number>;
   platnik: { prog_liczby_ubezpieczonych_powyzej: number };
+  /** Tylko do orientacyjnej kwoty „na rękę" (zaliczka PIT). Brak sekcji = kalkulator nie pokazuje netto. */
+  podatek?: { zaliczka_pit_proc: number; kwota_zmniejszajaca_miesieczna: number };
 }
 
 // ---------- pomocnicze: daty i zaokrąglenia ----------
@@ -369,6 +371,73 @@ export function porownajWarianty(w: Omit<PlanWejscie, "wariant">, p: Parametry) 
   const a = planZasilku({ ...w, wariant: "zmienny_100_70" }, p);
   const b = planZasilku({ ...w, wariant: "usredniony_81_5" }, p);
   return { zmienny_100_70: a, usredniony_81_5: b, roznicaRazem: r2(b.sumy.razem - a.sumy.razem) };
+}
+
+// =====================================================================
+// 4a. ORIENTACYJNE NETTO („na rękę") — uproszczony model z parametry.podatek
+// Zasiłek macierzyński: bez składek ZUS i zdrowotnej, płatnik pobiera tylko zaliczkę na PIT.
+// Zaliczka miesięczna = zaokrąglona do zł (podstawa w pełnych zł × stawka − kwota zmniejszająca), nie mniej niż 0.
+// Za niepełny miesiąc zaliczkę liczymy proporcjonalnie do dni (miesiąc = 30 dni) — to uproszczenie, nie rozliczenie roczne.
+// =====================================================================
+export interface Netto { brutto: number; zaliczka: number; netto: number }
+export function nettoMiesieczne(bruttoMies: number, p: Parametry): Netto | null {
+  const t = p.podatek;
+  if (!t || !(bruttoMies >= 0)) return null;
+  const zaliczka = Math.max(0, Math.round(Math.round(bruttoMies) * t.zaliczka_pit_proc / 100 - t.kwota_zmniejszajaca_miesieczna));
+  return { brutto: r2(bruttoMies), zaliczka, netto: r2(bruttoMies - zaliczka) };
+}
+/** Netto za okres `dni` przy stałej kwocie dziennej (zaliczka proporcjonalna do dni). */
+export function nettoOkresu(kwotaDzienna: number, dni: number, kwota: number, p: Parametry): number | null {
+  const M = p.limity_dni.dni_w_miesiacu_dla_zasilkow;
+  const n = nettoMiesieczne(kwotaDzienna * M, p);
+  return n ? r2(kwota - n.zaliczka * dni / M) : null;
+}
+
+export interface OkresZNetto extends Okres { miesiecznieBrutto: number; miesiecznieNetto: number | null; kwotaNetto: number | null }
+/** Plan uzupełniony o orientacyjne kwoty netto (miesięcznie i za okres) oraz sumy netto. Kwoty brutto bez zmian. */
+export function planZNetto(plan: PlanWynik, p: Parametry): PlanWynik & { okresy: OkresZNetto[]; sumyNetto: { matka: number; ojciec: number; razem: number } | null } {
+  const M = p.limity_dni.dni_w_miesiacu_dla_zasilkow;
+  const okresy: OkresZNetto[] = plan.okresy.map((o) => ({
+    ...o, miesiecznieBrutto: r2(o.kwotaDzienna * M),
+    miesiecznieNetto: nettoMiesieczne(o.kwotaDzienna * M, p)?.netto ?? null,
+    kwotaNetto: nettoOkresu(o.kwotaDzienna, o.dni, o.kwota, p),
+  }));
+  if (!p.podatek) return { ...plan, okresy, sumyNetto: null };
+  const suma = (k: Kto) => r2(okresy.filter((o) => o.kto === k).reduce((s, o) => s + (o.kwotaNetto ?? 0), 0));
+  const m = suma("matka"), o = suma("ojciec");
+  return { ...plan, okresy, sumyNetto: { matka: m, ojciec: o, razem: r2(m + o) } };
+}
+
+// ---- szybkie porównanie wariantów bez dat (mama bierze macierzyński i swoją część rodzicielskiego) ----
+export interface EtapPorownania { etap: "macierzynski" | "rodzicielski"; tygodnie: number; standard: Netto & { procent: number; razem: number; razemNetto: number | null }; usredniony: Netto & { procent: number; razem: number; razemNetto: number | null } }
+export function szybkiePorownanie(w: { podstawaMiesieczna: number; liczbaDzieci: number; zaZyciem?: boolean }, p: Parametry) {
+  const M = p.limity_dni.dni_w_miesiacu_dla_zasilkow;
+  const macTyg = wymiarMacierzynski(w.liczbaDzieci, p);
+  const rodzTyg = wymiarRodzicielski(w.liczbaDzieci, !!w.zaZyciem, p) - p.wymiary_tygodnie.niezbywalne_prawo_kazdego_rodzica_rodzicielski;
+  const p815 = pr(p, "wariant_pelny_wymiar_81_5");
+  const licz = (procent: number, tyg: number) => {
+    const mies = kwotaOkresu(w.podstawaMiesieczna, procent, M, 1, false, p);
+    const razem = kwotaOkresu(w.podstawaMiesieczna, procent, tyg * 7, 1, false, p);
+    const n = nettoMiesieczne(mies.kwota, p) ?? { brutto: mies.kwota, zaliczka: 0, netto: mies.kwota };
+    const razemNetto = p.podatek ? nettoOkresu(razem.kwotaDzienna, tyg * 7, razem.kwota, p) : null;
+    return { procent, ...n, razem: razem.kwota, razemNetto };
+  };
+  const etapy: EtapPorownania[] = [
+    { etap: "macierzynski", tygodnie: macTyg, standard: licz(pr(p, "zasilek_za_urlop_macierzynski"), macTyg), usredniony: licz(p815, macTyg) },
+    { etap: "rodzicielski", tygodnie: rodzTyg, standard: licz(pr(p, "zasilek_za_urlop_rodzicielski"), rodzTyg), usredniony: licz(p815, rodzTyg) },
+  ];
+  const sum = (k: "standard" | "usredniony", pole: "razem" | "razemNetto") => r2(etapy.reduce((s, e) => s + (e[k][pole] ?? 0), 0));
+  const razem = { standard: sum("standard", "razem"), usredniony: sum("usredniony", "razem") };
+  const razemNetto = p.podatek ? { standard: sum("standard", "razemNetto"), usredniony: sum("usredniony", "razemNetto") } : null;
+  return { tygodnieRazem: macTyg + rodzTyg, etapy, razem, razemNetto, roznicaRazem: r2(razem.usredniony - razem.standard) };
+}
+
+/** Podstawa zasiłku z jednej miesięcznej kwoty, zależnie od rodzaju zatrudnienia (12 jednakowych miesięcy). */
+export type RodzajZatrudnienia = "umowa_o_prace" | "zlecenie" | "dzialalnosc";
+export function podstawaZKwoty(kwota: number, rodzaj: RodzajZatrudnienia, p: Parametry): PodstawaWynik {
+  if (!(kwota >= 0)) throw new Error("Podaj kwotę (liczba ≥ 0).");
+  if (rodzaj === "umowa_o_prace") return podstawaPracownik({ miesiace: Array.from({ length: 12 }, (_, i) => ({ miesiac: `m${i + 1}`, kwota })), pelnyWymiarEtatu: true }, p);
+  return podstawaNiepracownik({ miesiace: Array.from({ length: 12 }, (_, i) => ({ miesiac: `m${i + 1}`, podstawaSkladek: kwota })), zadeklarowanaKwota: rodzaj === "dzialalnosc" }, p);
 }
 
 // =====================================================================

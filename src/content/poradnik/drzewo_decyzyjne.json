@@ -1,5 +1,5 @@
 {
-  "_opis": "Drzewko decyzyjne: prowadzi użytkownika za rączkę od sytuacji do konkretnego wyniku. Węzły typu 'pytanie' mają opcje z odnośnikiem do następnego węzła; węzły typu 'wynik' wskazują pytania z faq.json (pytania[]), druki z druki.json (druki[]) i opcjonalnie tryb kalkulatora. Żadna treść merytoryczna nie jest tu zapisana – wszystko bierze się z faq.json (a ono z JSON/Excela). Węzeł z status 'luka' ma pokazać komunikat o luce w bazie, nie wynik.",
+  "_opis": "Drzewko decyzyjne: prowadzi użytkownika za rączkę od sytuacji do konkretnego wyniku. Węzły typu 'pytanie' mają opcje z odnośnikiem do następnego węzła; węzły typu 'wynik' wskazują pytania z faq.json (pytania[]), druki z druki.json (druki[]) i opcjonalnie tryb kalkulatora. Opcjonalnie: 'wstep' (jedno zdanie na górze wyniku), 'cta' (inna etykieta lub adres głównego przycisku niż domyślne z kalkulatorLink), 'link' (dodatkowy odnośnik), 'inne_swiadczenia' (klucze z src/app/kreator/inne-swiadczenia.ts, np. 800+ i becikowe). Tryb 'swiadczenie_rodzicielskie' kreator pokazuje na miejscu (mini-kalkulator), zamiast odsyłać na stronę o ciąży. Żadna treść merytoryczna nie jest tu zapisana – wszystko bierze się z faq.json (a ono z JSON/Excela). Węzeł z status 'luka' ma pokazać komunikat o luce w bazie, nie wynik.",
   "start": "start",
   "wezly": {
     "start": {
@@ -22,9 +22,9 @@
         { "etykieta": "Nie mam ubezpieczenia chorobowego", "nastepny": "wynik_plan_brak" }
       ]
     },
-    "wynik_plan_praca": { "typ": "wynik", "tytul": "Planujesz dziecko, masz umowę o pracę", "pytania": ["F05", "F06", "F22", "F10"], "druki": ["Z-3"], "kalkulator": { "tryb": "uprawnienia" } },
-    "wynik_plan_firma": { "typ": "wynik", "tytul": "Planujesz dziecko, masz działalność lub zlecenie", "pytania": ["F20", "F22", "F02"], "druki": ["ZAM", "ZAS-53"], "kalkulator": { "tryb": "uprawnienia", "opcja": "dzialalnosc" } },
-    "wynik_plan_brak": { "typ": "wynik", "tytul": "Planujesz dziecko, nie masz ubezpieczenia chorobowego", "pytania": ["F21", "F22"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" } },
+    "wynik_plan_praca": { "typ": "wynik", "tytul": "Planujesz dziecko, masz umowę o pracę", "pytania": ["F05", "F06", "F22", "F10"], "druki": ["Z-3"], "kalkulator": { "tryb": "uprawnienia" }, "cta": { "etykieta": "Sprawdź, co Ci przysługuje" } },
+    "wynik_plan_firma": { "typ": "wynik", "tytul": "Planujesz dziecko, masz działalność lub zlecenie", "pytania": ["F20", "F22", "F02"], "druki": ["ZAM", "ZAS-53"], "kalkulator": { "tryb": "uprawnienia", "opcja": "dzialalnosc" }, "cta": { "etykieta": "Sprawdź, co Ci przysługuje" } },
+    "wynik_plan_brak": { "typ": "wynik", "tytul": "Planujesz dziecko, nie masz ubezpieczenia chorobowego", "pytania": ["F21", "F22"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" }, "wstep": "Bez ubezpieczenia chorobowego ZUS nie wypłaci zasiłku macierzyńskiego. Po narodzinach dziecka możesz jednak dostać świadczenie rodzicielskie (tzw. kosiniakowe) – 1000 zł miesięcznie.", "inne_swiadczenia": ["800plus", "becikowe"] },
 
     "kogo_dotyczy_ciaza": {
       "typ": "pytanie",
@@ -87,8 +87,8 @@
         { "etykieta": "Tak", "nastepny": "wynik_ile_za_zyciem" }
       ]
     },
-    "wynik_ile_standard": { "typ": "wynik", "tytul": "Ile trwa urlop i ile wynosi zasiłek", "pytania": ["F07", "F08", "F09", "F10"], "druki": ["ZAM"], "kalkulator": { "tryb": "matka" } },
-    "wynik_ile_za_zyciem": { "typ": "wynik", "tytul": "Urlop i zasiłek – dziecko z zaświadczeniem „Za życiem”", "pytania": ["F16", "F07", "F08"], "druki": ["ZAM"], "kalkulator": { "tryb": "matka", "opcja": "za_zyciem" } },
+    "wynik_ile_standard": { "typ": "wynik", "tytul": "Ile trwa urlop i ile wynosi zasiłek", "pytania": ["F07", "F08", "F09", "F10"], "druki": ["ZAM"], "kalkulator": { "tryb": "matka" }, "inne_swiadczenia": ["800plus", "becikowe"] },
+    "wynik_ile_za_zyciem": { "typ": "wynik", "tytul": "Urlop i zasiłek – dziecko z zaświadczeniem „Za życiem”", "pytania": ["F16", "F07", "F08"], "druki": ["ZAM"], "kalkulator": { "tryb": "matka", "opcja": "za_zyciem" }, "inne_swiadczenia": ["800plus", "becikowe"] },
     "po_podzial": {
       "typ": "pytanie", "tekst": "Co chcecie zrobić?",
       "opcje": [
@@ -100,11 +100,11 @@
     },
     "wynik_podzial_rodzicielski": { "typ": "wynik", "tytul": "Podział urlopu rodzicielskiego między rodziców", "pytania": ["F12", "F08"], "druki": ["ZAM"], "kalkulator": { "tryb": "oboje_rodzice" } },
     "wynik_tata_przejmuje": { "typ": "wynik", "tytul": "Tata przejmuje część urlopu macierzyńskiego", "pytania": ["F11", "F12"], "druki": ["ZAM", "Z-3"], "kalkulator": { "tryb": "oboje_rodzice" } },
-    "wynik_ojcowski": { "typ": "wynik", "tytul": "Urlop ojcowski", "pytania": ["F14"], "druki": ["ZAM"], "kalkulator": { "tryb": "ojciec" } },
+    "wynik_ojcowski": { "typ": "wynik", "tytul": "Urlop ojcowski", "pytania": ["F14"], "druki": ["ZAM"], "kalkulator": { "tryb": "ojciec" }, "cta": { "etykieta": "Policz zasiłek dla taty" }, "link": { "href": "/wnioski?urlop=ojcowski", "etykieta": "Przygotuj wniosek do pracodawcy" } },
     "wynik_praca_urlop": { "typ": "wynik", "tytul": "Praca w czasie urlopu rodzicielskiego", "pytania": ["F13", "F12"], "druki": [], "kalkulator": { "tryb": "praca_i_urlop" } },
     "wynik_wczesniak": { "typ": "wynik", "tytul": "Wcześniak lub dziecko w szpitalu – uzupełniający urlop", "pytania": ["F15", "F26"], "druki": ["ZAM"], "kalkulator": { "tryb": "wczesniak" } },
     "wynik_terminy": { "typ": "wynik", "tytul": "Terminy, których nie można przegapić", "pytania": ["F19", "F09"], "druki": ["ZAM"], "kalkulator": { "tryb": "terminy" } },
-    "wynik_brak_zasilku": { "typ": "wynik", "tytul": "Brak prawa do zasiłku macierzyńskiego", "pytania": ["F21", "F20"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" } },
+    "wynik_brak_zasilku": { "typ": "wynik", "tytul": "Bez zasiłku macierzyńskiego też dostaniesz pieniądze", "pytania": ["F21", "F20"], "druki": [], "kalkulator": { "tryb": "swiadczenie_rodzicielskie" }, "wstep": "Jeśli nie masz prawa do zasiłku macierzyńskiego (np. nie pracujesz, studiujesz albo masz umowę o dzieło), przysługuje Ci świadczenie rodzicielskie, tzw. kosiniakowe – 1000 zł miesięcznie, bez względu na dochód.", "inne_swiadczenia": ["800plus", "becikowe"] },
     "wynik_druga_ciaza": { "typ": "wynik", "status": "luka", "tytul": "Kolejna ciąża po poprzednim urlopie", "pytania": ["F28", "F07", "F22"], "druki": [], "komunikat_luki": "Ta sytuacja wymaga indywidualnej oceny w ZUS ze względu na zbieg uprawnień. Poniżej przedstawiamy powiązane zasady, ale ostateczną decyzję skonsultuj z ZUS." },
 
     "adopcja_typ": {
