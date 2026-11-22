@@ -21,6 +21,9 @@ const terminy = [
   ["Wniosek o urlop na warunkach urlopu macierzyńskiego", `Do ${T.adopcja_wniosek_o_urlop_po_przyjeciu_dziecka} dni od przyjęcia dziecka.`],
 ] as const;
 
+const KLUCZ_DAT = "rodzice.plan.daty";
+const kluczDaty = (t: Termin) => `${t.co}|${t.do ?? t.od ?? ""}`;
+
 export default function Dokumenty() {
   const [tytul, setTytul] = useState("umowa_o_prace");
   const [liczbaOsob, setLiczbaOsob] = useState("");
@@ -37,12 +40,25 @@ export default function Dokumenty() {
     }
   }, []);
 
+  const [wybrane, setWybrane] = useState<string[]>([]);
+  useEffect(() => {
+    try { const z = JSON.parse(localStorage.getItem(KLUCZ_DAT) ?? "[]"); if (Array.isArray(z)) setWybrane(z); } catch { /* brak localStorage */ }
+  }, []);
+  const przelacz = (k: string) => setWybrane((w) => {
+    const nowe = w.includes(k) ? w.filter((x) => x !== k) : [...w, k];
+    try { localStorage.setItem(KLUCZ_DAT, JSON.stringify(nowe)); } catch { /* działa też bez zapisu */ }
+    return nowe;
+  });
+  // Pokazujemy tylko to, co rodzic sam musi zrobić (przedawnienie to nie wniosek), od najwcześniejszej daty.
+  const datyDoPokazania = (terminyPlanu ?? []).filter((t) => !/Przedawnienie/i.test(t.co))
+    .sort((a, b) => (a.do ?? a.od ?? "").localeCompare(b.do ?? b.od ?? ""));
+
   const firma = tytul === "dzialalnosc";
   const zlecenie = tytul === "zlecenie";
   return (
     <>
       <h1>Kto wypłaca zasiłek</h1>
-      <p className="lead">Sprawdź, czy zasiłek wypłaca ZUS, czy pracodawca, gdzie złożyć wniosek i ile masz na to czasu. Wszystkie swoje terminy od daty porodu znajdziesz w <Link href="/terminarz">terminach w urzędach</Link>.</p>
+      <p className="lead">Sprawdź, czy zasiłek wypłaca ZUS, czy pracodawca, gdzie złożyć wniosek i ile masz na to czasu. Wszystkie swoje terminy od daty porodu znajdziesz w <Link href="/terminarz">Kalendarzu w urzędzie</Link>.</p>
       <div className="grid g2" style={{ alignItems: "start" }}>
         <section className="card">
           <h2>Kto wypłaca zasiłek?</h2>
@@ -69,11 +85,19 @@ export default function Dokumenty() {
         <section className="card">
           <h2>Daty z Twojego planu</h2>
           {blad && <Alert t="err">Nie udało się odczytać terminów z zapisanego planu.</Alert>}
-          {terminyPlanu?.length ? <ul className="clean">
-            {terminyPlanu.map((t, i) => <li key={i}>
-              <b>{t.do ? "Do " + dataPL(t.do) : "Od " + dataPL(t.od)}</b><br />{opisTerminu(t.co)}
-            </li>)}
-          </ul> : <p><Link href="/terminarz">Zobacz swoje terminy w urzędach</Link> lub <Link href="/kalkulator">ułóż plan urlopów w kalkulatorze</Link>.</p>}
+          {datyDoPokazania.length ? <>
+            <p className="muted">Sam decydujesz, które daty trafią do Twojego planu. Wybrane zapamiętamy w tej przeglądarce.</p>
+            <ul className="clean">
+              {datyDoPokazania.map((t) => {
+                const k = kluczDaty(t), wPlanie = wybrane.includes(k);
+                return <li key={k} className="mt">
+                  <b>{t.do ? "Do " + dataPL(t.do) : "Od " + dataPL(t.od)}</b>{wPlanie && <span className="badge ok"> W Twoim planie</span>}<br />{opisTerminu(t.co)}<br />
+                  <button type="button" className={wPlanie ? "btn btn-ghost btn-sm" : "btn btn-secondary btn-sm"} onClick={() => przelacz(k)}>{wPlanie ? "Usuń z mojego planu" : "Dodaj do mojego planu"}</button>
+                </li>;
+              })}
+            </ul>
+            <p className="small muted mt">Na dole: masz 6 miesięcy od końca okresu zasiłku, żeby upomnieć się o jego wypłatę.</p>
+          </> : <p><Link href="/terminarz">Zobacz swoje terminy w Kalendarzu w urzędzie</Link> lub <Link href="/kalkulator">ułóż plan urlopów w kalkulatorze</Link>.</p>}
         </section>
       </div>
       <section className="card mt">

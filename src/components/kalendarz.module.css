@@ -33,6 +33,9 @@
   font-weight: 700;
   color: var(--zus-green-link);
 }
+.tryb { margin: 0 0 1rem; padding: 0; border: 0; min-width: 0; }
+.tryb legend { margin-bottom: .5rem; padding: 0; font-weight: 700; }
+.tryby { display: flex; flex-wrap: wrap; gap: .5rem; }
 .glownaData { max-width: 24rem; }
 .kalendarz input[type="text"] { font-size: 1em; min-width: 0; border-color: var(--zus-navy); }
 .kalendarz input[aria-invalid="true"] { border-width: 2px; }
@@ -50,6 +53,24 @@
 .teraz ul { margin-bottom: 0; }
 .teraz li + li { margin-top: .75rem; }
 .teraz a { display: inline-block; align-content: center; min-height: 44px; font-weight: 700; }
+
+/* Tytuł otwiera panel z boku: przycisk wyglądający jak zielony link. */
+.przyciskTytul {
+  display: inline-block;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--zus-green-link);
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.przyciskTytul:hover { text-decoration-thickness: 2px; }
+.przyciskTytul:focus-visible { outline: 3px solid var(--zus-green-link); outline-offset: 2px; }
+:global(html.hc) .przyciskTytul { color: var(--hc-accent); }
 
 ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-block: 1.5rem; list-style: none; }
 .nawigacja li + li { margin: 0; }
@@ -121,7 +142,7 @@ ul.nawigacja { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin-bl
 ol.zadania { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; }
 .zadania li { margin: 0; padding: .75rem 1rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
 .zadania li + li { margin-top: 0; }
-.zadania a { display: inline-block; align-content: center; min-height: 44px; font-size: 1.125em; font-weight: 700; }
+.zadania :is(a, .przyciskTytul) { display: inline-block; align-content: center; min-height: 44px; font-size: 1.125em; font-weight: 700; }
 .ile { display: block; font-weight: 700; color: var(--zus-navy); font-size: 1.0625em; }
 .kiedyZadanie { display: block; color: var(--muted); }
 .najblizsze .reszta { margin: .75rem 0 0; color: var(--muted); }

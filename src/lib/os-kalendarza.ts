@@ -137,6 +137,11 @@ export function kamienieMilowe(
   return { kamienie, pominieteCykliczne: pominiete, brakPlanuUrlopu: !planPasuje };
 }
 
+/** Czy pozycję da się „zrobić” (badanie, wizyta, wniosek…). Poród i okresy urlopu to nie zadania. */
+export function czyZadanie(k: Kamien): boolean {
+  return k.rodzaj !== "porod" && k.rodzaj !== "urlop";
+}
+
 export type StanKamienia = "minelo" | "trwa" | "przed";
 export function stanKamienia(k: Kamien, dzis: string): StanKamienia {
   return k.do < dzis ? "minelo" : k.od <= dzis ? "trwa" : "przed";

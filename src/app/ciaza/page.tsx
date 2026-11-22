@@ -6,11 +6,11 @@ import { pln, dataKrotka, dataPL, dzis, tygodnie } from "@/lib/format";
 import { wynikZadluzenia } from "@/lib/dane-profilu";
 import { Alert, Field, Kroki, Spin } from "@/components/ui";
 
-const plus = (n: number) => { const d = new Date(); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const DATA_OK = /^\d{4}-\d{2}-\d{2}$/;
 
 export default function Ciaza() {
   const { sesja } = useSesja();
-  const [f, setF] = useState<any>({ tytul: "umowa_o_prace", dobrowolne: false, dni: 400, wDniu: true, zadl: 0, platnik: 50, dziesiec: false, data: plus(150), brutto: "6500", niezd: 60, w50: false, rehabDni: 90, straciłaPrace: "nie", dzieci: 1 });
+  const [f, setF] = useState<any>({ tytul: "", dobrowolne: false, dni: "", wDniu: false, zadl: "", platnik: "", dziesiec: false, data: "", brutto: "", niezd: "", w50: false, rehabDni: "", straciłaPrace: "nie", dzieci: 1 });
   const [w, setW] = useState<any>(null); const [ch, setCh] = useState<any>(null); const [reh, setReh] = useState<any>(null); const [rod, setRod] = useState<any>(null); const [pod, setPod] = useState<any>(null);
   const [skad, setSkad] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
   const [zad, setZad] = useState<any>(null);
@@ -21,7 +21,8 @@ export default function Ciaza() {
     if (!sesja) return;
     (async () => {
       try {
-        const [u, e, z] = await Promise.all([api(`/api/zus/ubezpieczenie?pesel=${sesja.pesel}&naDzien=${f.data}`), api(`/api/zus/ezla?pesel=${sesja.pesel}`), api(`/api/zus/zadluzenie?pesel=${sesja.pesel}&naDzien=${f.data}`)]);
+        const dzien = DATA_OK.test(f.data) ? f.data : new Date().toISOString().slice(0, 10);
+        const [u, e, z] = await Promise.all([api(`/api/zus/ubezpieczenie?pesel=${sesja.pesel}&naDzien=${dzien}`), api(`/api/zus/ezla?pesel=${sesja.pesel}`), api(`/api/zus/zadluzenie?pesel=${sesja.pesel}&naDzien=${dzien}`)]);
         const ub = u.ubezpieczenie[u.ubezpieczenie.length - 1];
         setF((x: any) => ({ ...x, tytul: ub?.tytul ?? x.tytul, dobrowolne: ub?.chorobowe === "dobrowolne", dni: u.dniNieprzerwanegoUbezpieczeniaChorobowego, wDniu: u.ubezpieczonaWDniu, platnik: ub?.platnik?.liczbaUbezpieczonych ?? x.platnik, zadl: z.kwotaZadluzenia, niezd: e.lacznieDni || x.niezd }));
         setSkad(`Dane pobrane z ZUS (symulacja) dla: ${sesja.osoba}`);
@@ -31,7 +32,7 @@ export default function Ciaza() {
 
   // zadłużenie zależy od dnia powstania prawa, więc przy zmianie daty porodu pobieramy je ponownie
   useEffect(() => {
-    if (!sesja || !/^\d{4}-\d{2}-\d{2}$/.test(f.data)) return;
+    if (!sesja || !DATA_OK.test(f.data)) return;
     let aktualne = true;
     api(`/api/zus/zadluzenie?pesel=${sesja.pesel}&naDzien=${f.data}`)
       .then((z: any) => { if (aktualne) { setZad(z); setF((x: any) => ({ ...x, zadl: z.kwotaZadluzenia })); } })
@@ -40,21 +41,29 @@ export default function Ciaza() {
   }, [sesja, f.data]);
 
   async function licz() {
+    // Bez danych nie liczymy: pola są puste, dopóki ktoś się nie zaloguje albo sam ich nie wpisze.
+    const braki: string[] = [];
+    if (!f.tytul) braki.push("na jakiej podstawie pracujesz");
+    if (f.dni === "" || !(+f.dni >= 0)) braki.push("od ilu dni jesteś ubezpieczona");
+    if (!DATA_OK.test(f.data)) braki.push("planowaną datę porodu");
+    if (f.tytul === "umowa_o_prace" && (f.platnik === "" || !(+f.platnik >= 0))) braki.push("ile osób zgłasza pracodawca");
+    if (f.brutto === "" || !(+f.brutto >= 0)) braki.push("średnią pensję brutto");
+    if (braki.length) { setErr("Uzupełnij: " + braki.join(", ") + "."); setW(null); return; }
     setBusy(true); setErr("");
     try {
       const pr = await api("/api/oblicz/podstawa", { typ: "pracownik", sredniaBrutto: +f.brutto });
       setPod(pr);
       const prac = f.tytul === "umowa_o_prace";
+      const niezd = f.niezd !== "" && +f.niezd > 0, rehab = f.rehabDni !== "" && +f.rehabDni > 0;
       const [u, c, r, sr] = await Promise.all([
-        api("/api/oblicz/uprawnienia", { tytul: f.tytul, dobrowolneChorobowe: f.dobrowolne, dniNieprzerwanegoUbezpieczeniaChorobowego: +f.dni, ubezpieczonaWDniuPorodu: f.wDniu, zadluzenieSkladkowePLN: +f.zadl, liczbaUbezpieczonychPlatnika: +f.platnik, przynajmniej10LatObowiazkowegoUbezp: f.dziesiec }),
-        api("/api/oblicz/chorobowe-ciaza", { podstawaMiesieczna: pr.podstawaMiesieczna, dniNiezdolnosci: +f.niezd, pracownik: prac, wiek50Plus: f.w50 }),
-        api("/api/oblicz/rehabilitacja", { podstawaMiesieczna: pr.podstawaMiesieczna, dni: +f.rehabDni, wCiazy: true }),
+        api("/api/oblicz/uprawnienia", { tytul: f.tytul, dobrowolneChorobowe: f.dobrowolne, dniNieprzerwanegoUbezpieczeniaChorobowego: +f.dni, ubezpieczonaWDniuPorodu: f.wDniu, zadluzenieSkladkowePLN: +f.zadl || 0, liczbaUbezpieczonychPlatnika: +f.platnik || 0, przynajmniej10LatObowiazkowegoUbezp: f.dziesiec }),
+        niezd ? api("/api/oblicz/chorobowe-ciaza", { podstawaMiesieczna: pr.podstawaMiesieczna, dniNiezdolnosci: +f.niezd, pracownik: prac, wiek50Plus: f.w50 }) : Promise.resolve(null),
+        rehab ? api("/api/oblicz/rehabilitacja", { podstawaMiesieczna: pr.podstawaMiesieczna, dni: +f.rehabDni, wCiazy: true }) : Promise.resolve(null),
         api("/api/oblicz/swiadczenie-rodzicielskie", { liczbaDzieci: +f.dzieci, odDnia: f.data }),
       ]);
       setW(u); setCh(c); setReh(r); setRod(sr);
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
-  useEffect(() => { licz(); }, []); // eslint-disable-line
 
   const tak = (b: boolean) => <span className={"badge " + (b ? "ok" : "no")}>{b ? "Przysługuje" : "Nie przysługuje"}</span>;
   return (
@@ -67,7 +76,7 @@ export default function Ciaza() {
         <div className="card">
           <h3>Twoja sytuacja</h3>
           <Field label="Na jakiej podstawie pracujesz?"><select value={f.tytul} onChange={(e) => set({ tytul: e.target.value })}>
-            <option value="umowa_o_prace">Umowa o pracę</option><option value="zlecenie">Umowa zlecenie</option><option value="dzialalnosc">Własna działalność gospodarcza</option>
+            <option value="" disabled>Wybierz…</option><option value="umowa_o_prace">Umowa o pracę</option><option value="zlecenie">Umowa zlecenie</option><option value="dzialalnosc">Własna działalność gospodarcza</option>
             <option value="dzielo_lub_brak">Umowa o dzieło / inne</option><option value="bezrobotna_bez_ubezpieczenia">Brak ubezpieczenia</option></select></Field>
           {(f.tytul === "zlecenie" || f.tytul === "dzialalnosc") && <label className="check"><input type="checkbox" checked={f.dobrowolne} onChange={(e) => set({ dobrowolne: e.target.checked })} />Mam dobrowolne ubezpieczenie chorobowe</label>}
           <Field label="Od ilu dni jesteś bez przerwy ubezpieczona chorobowo?" hint="Przerwa do 30 dni się nie liczy. Zasiłek chorobowy dostaniesz po 30 dniach ubezpieczenia (90 dni przy dobrowolnym) – to tzw. okres wyczekiwania."><input type="number" value={f.dni} onChange={(e) => set({ dni: e.target.value })} /></Field>
@@ -108,8 +117,8 @@ export default function Ciaza() {
 
               <div className="card"><h3>Świadczenie rehabilitacyjne</h3>
                 <p>Przysługuje po wyczerpaniu zasiłku chorobowego, gdy nadal jesteś niezdolna do pracy, a dalsze leczenie rokuje powrót do pracy (maks. 12 miesięcy). Decyzję podejmuje lekarz orzecznik ZUS. W ciąży wynosi <b>100% podstawy</b>.</p>
-                <Field label="Przykład: ile dni świadczenia?"><input type="number" value={f.rehabDni} onChange={(e) => set({ rehabDni: e.target.value })} onBlur={licz} /></Field>
-                {reh && <p>Za {f.rehabDni} dni: <b>{pln(reh.kwota)}</b>. <span className="small muted">{reh.uwaga}</span></p>}</div>
+                <Field label="Przykład: ile dni świadczenia?"><input type="number" value={f.rehabDni} onChange={(e) => set({ rehabDni: e.target.value })} onBlur={() => { if (w) licz(); }} /></Field>
+                {reh ? <p>Za {f.rehabDni} dni: <b>{pln(reh.kwota)}</b>. <span className="small muted">{reh.uwaga}</span></p> : <p className="small muted">Wpisz liczbę dni, a policzymy kwotę.</p>}</div>
 
               <div className="card"><h3>Zasiłek w wysokości zasiłku macierzyńskiego</h3>
                 <p>To specjalne świadczenie dla kobiety w ciąży, która <b>straciła pracę</b> w określonych okolicznościach: z powodu upadłości, likwidacji lub śmierci pracodawcy (bez zapewnienia innego zatrudnienia) albo gdy sąd prawomocnie uznał rozwiązanie umowy za sprzeczne z prawem. Wypłacany jest do dnia porodu, w wysokości 100% podstawy – jak zasiłek macierzyński.</p>

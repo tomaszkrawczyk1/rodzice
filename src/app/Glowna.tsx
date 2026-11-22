@@ -21,16 +21,16 @@ const MOMENTY = {
   ciaza: { tytul: "Czekamy na dziecko", opis: "Zwolnienie, urlopy, wnioski", sprawy: ["co-przysluguje", "zwolnienie-ciaza", "wniosek-zasilek"], zDrugimRodzicem: ["podzial-urlopu"] },
   dziecko: { tytul: "Dziecko już jest z nami", opis: "Zasiłek, urlopy, terminy", sprawy: ["wniosek-zasilek", "terminy", "urlop-pracodawca"], zDrugimRodzicem: ["podzial-urlopu"] },
 } satisfies Record<Moment, { tytul: string; opis: string; sprawy: string[]; zDrugimRodzicem: string[] }>;
-// Dwa główne etapy są równorzędne i stoją obok siebie na pierwszym ekranie (także na telefonie), w kolejności życia.
-const GLOWNE_ETAPY: Moment[] = ["ciaza", "dziecko"];
+// „Dziecko już jest z nami" jest pierwsze i wyróżnione: kto jest po porodzie, ma najmniej sił i najkrótszy czas na wnioski.
+const KOLEJNOSC: Moment[] = ["dziecko", "ciaza", "plan"];
 
 /** Kafel-link, który od razu po kliknięciu pokazuje „Otwieram…” (nowa strona ładuje się chwilę później). */
-function Kafel({ href, ikona, tytul, opis }: { href: string; ikona: string; tytul: string; opis: string }) {
+function Kafel({ href, ikona, tytul, opis, klasa }: { href: string; ikona: string; tytul: string; opis: string; klasa?: string }) {
   const [otwieram, setOtwieram] = useState(false);
   return (
     <Link
       href={href}
-      className={"tile tile--ico " + css.kafel}
+      className={"tile tile--ico " + css.kafel + (klasa ? " " + klasa : "")}
       aria-busy={otwieram || undefined}
       onClick={(e) => {
         // Otwarcie w nowej karcie (Ctrl/Cmd/Shift, środkowy przycisk) nie zmienia tej strony, więc bez „Otwieram…”.
@@ -155,22 +155,35 @@ export default function Home() {
         <p className={css.podtytul}><b>Dla osób w ciąży i rodziców po porodzie.</b> Bezpłatnie, bez logowania.</p>
       </section>
 
+      {/* Wyszukiwarka jest pierwszą rzeczą po tytule: kto wie, czego szuka, nie musi przechodzić przez kafle. */}
+      <Szukaj wariant="glowny" zapytanie={zapytanie} />
+
+      {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
+      <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
+        {sesja && (pilne ? (
+          <section className="card urgent mb mt" style={{ overflowWrap: "anywhere" }}>
+            <h2>Najbliższy termin z profilu</h2>
+            <p>{opisTerminu(pilne.co)}</p>
+            <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
+            <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
+          </section>
+        ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
+      </div>
+
       {!moment ? (
         <>
-          {/* Oba etapy na pierwszym ekranie, równorzędne; pod nimi dyskretne skróty, a wyszukiwarka niżej. */}
-          <h2 ref={etapy} tabIndex={-1} className={css.etapyNaglowek}>Na jakim jesteście etapie?</h2>
-          <div className={css.etapy}>
-            {GLOWNE_ETAPY.map((id) => (
-              <button key={id} type="button" className={"tile " + css.etap} onClick={() => wybierzEtap(id)}>
+          <h2 ref={etapy} tabIndex={-1}>Na jakim jesteście etapie?</h2>
+          <div className="grid g3 grid--etapy">
+            {KOLEJNOSC.map((id) => (
+              <button key={id} type="button" className={"tile tile--ico " + css.kafel + (id === "dziecko" ? " tile--glowny" : "")} onClick={() => wybierzEtap(id)}>
                 <Plakietka nazwa={id} />
-                <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span className={css.etapOpis}>{MOMENTY[id].opis}</span></span>
+                <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span>{MOMENTY[id].opis}</span></span>
               </button>
             ))}
+            <Kafel href="/kalendarz" ikona="kalendarz" tytul="Kalendarz ciąży i połogu" opis="Badania i terminy ZUS w jednym miejscu" />
+            <Kafel href="/sprawa/adopcja" ikona="adopcja" tytul="Adopcja lub rodzina zastępcza" opis="Urlopy i zasiłek po przyjęciu dziecka" />
+            <Kafel href="/trudne" ikona="trudne" tytul="Trudna sytuacja" opis="Strata, wcześniactwo, choroba" klasa="tile--szeroki" />
           </div>
-          <ul className={css.skroty} aria-label="Na skróty">
-            <li><Link href="/kalkulator" className={css.skrot}>Kalkulator zasiłku</Link></li>
-            <li><Link href="/trudne" className={css.skrot}>Pomoc w trudnej sytuacji</Link></li>
-          </ul>
         </>
       ) : (
         <div ref={widokEtapu}>
@@ -214,36 +227,6 @@ export default function Home() {
 
           <p className="mt"><Link href="/sprawy" className="btn btn-secondary">Zobacz wszystkie sprawy</Link></p>
         </div>
-      )}
-
-      {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
-      <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
-        {sesja && (pilne ? (
-          <section className="card urgent mb mt" style={{ overflowWrap: "anywhere" }}>
-            <h2>Najbliższy termin z profilu</h2>
-            <p>{opisTerminu(pilne.co)}</p>
-            <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
-            <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
-          </section>
-        ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
-      </div>
-
-      {/* Kto wie, czego szuka, wpisuje to swoimi słowami; wyszukiwarka nie wypycha już etapów poza pierwszy ekran. */}
-      <Szukaj wariant="glowny" zapytanie={zapytanie} />
-
-      {!moment && (
-        <section className={css.inne} aria-labelledby="inne-sytuacje">
-          <h2 id="inne-sytuacje" className={css.inneNaglowek}>Inne sytuacje</h2>
-          <div className="grid g3">
-            <button type="button" className={"tile tile--ico " + css.kafel} onClick={() => wybierzEtap("plan")}>
-              <Plakietka nazwa="plan" />
-              <span className="tile__txt"><b>{MOMENTY.plan.tytul}</b><span>{MOMENTY.plan.opis}</span></span>
-            </button>
-            <Kafel href="/kalendarz" ikona="kalendarz" tytul="Kalendarz ciąży i połogu" opis="Badania i terminy ZUS w jednym miejscu" />
-            <Kafel href="/sprawa/adopcja" ikona="adopcja" tytul="Adopcja lub rodzina zastępcza" opis="Urlopy i zasiłek po przyjęciu dziecka" />
-            <Kafel href="/trudne" ikona="trudne" tytul="Trudna sytuacja" opis="Strata, wcześniactwo, choroba" />
-          </div>
-        </section>
       )}
 
       {sesja && <PodgladProfilu key={sesja.token} pesel={sesja.pesel} />}

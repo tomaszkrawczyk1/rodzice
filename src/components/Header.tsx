@@ -16,7 +16,7 @@ import s from "./Header.module.css";
  *   /ciaza       „Co mi przysługuje w ciąży"
  *   /kalkulator  „Kalkulator zasiłku"
  *   /kalendarz   „Kalendarz ciąży"              wizyty, badania i terminy liczone od terminu porodu z profilu
- *   /terminarz   „Terminy w urzędach"           co złożyć w ZUS, u pracodawcy, w gminie i USC i do kiedy (+ plik .ics)
+ *   /terminarz   „Kalendarz w urzędzie"       co złożyć w ZUS, u pracodawcy, w gminie i USC i do kiedy (+ plik .ics)
  *   /dokumenty   „Kto wypłaca zasiłek"          ZUS czy pracodawca, ile masz czasu na wniosek
  *   /formularze  „Wnioski i druki"              strona wyboru, pod nią:
  *   /wnioski     „Napisz wniosek"               kreator tekstu wniosku do wydruku
@@ -35,7 +35,7 @@ const P: Record<string, Pozycja> = {
   ciaza: { href: "/ciaza", nazwa: "Co mi przysługuje w ciąży", krotko: "W ciąży" },
   kalkulator: { href: "/kalkulator", nazwa: "Kalkulator zasiłku", krotko: "Kalkulator" },
   kalendarz: { href: "/kalendarz", nazwa: "Kalendarz ciąży", opis: "Wizyty i badania, termin porodu z profilu" },
-  terminarz: { href: "/terminarz", nazwa: "Terminy w urzędach", opis: "Co złożyć i do kiedy: ZUS, praca, gmina" },
+  terminarz: { href: "/terminarz", nazwa: "Kalendarz w urzędzie", opis: "Co złożyć i do kiedy: ZUS, praca, gmina" },
   formularze: { href: "/formularze", nazwa: "Wnioski i druki", opis: "Wszystkie formularze w jednym miejscu" },
   wnioski: { href: "/wnioski", nazwa: "Napisz wniosek" },
   druki: { href: "/druki", nazwa: "Jak wypełnić druk ZUS" },
@@ -227,9 +227,8 @@ export default function Header() {
       <PasekDemo />
       <header id="header" className={"header zus-header " + s.naglowek + (open ? " " + s.naglowekOtwarty : "")}>
         <div className={"zus-header__bar " + s.bar}>
-          {/* Neutralne logo projektu, nie logo ZUS: serwis nie może wyglądać na oficjalną stronę ZUS. */}
           <Link href="/" className={"zus-logo brand " + s.logo} aria-label="Przewodnik Przyszłego Rodzica, strona główna" onClick={zamknij}>
-            <svg className={s.logoIkona} viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="12" fill="#007834" /><path d="M32 49C19 40 13 33.5 13 26.5 13 20.7 17.4 16.5 23 16.5c3.7 0 7.1 2 9 5.1 1.9-3.1 5.3-5.1 9-5.1 5.6 0 10 4.2 10 10 0 7-6 13.5-19 22.5Z" fill="#fff" /></svg>
+            <img className={"zus-logo__img " + s.logoImg} src="/logo_zus_darker_with_text.svg" alt="" width={250} height={56} />
           </Link>
           <div className={"zus-product brand-text " + s.produkt}>
             <b>Przewodnik Przyszłego Rodzica</b>

@@ -1,12 +1,3 @@
-/* :global(.sim-banner) podbija specyficzność, żeby wygrać z .sim-banner z globals.css niezależnie od kolejności CSS. */
-:global(.sim-banner).pasek {
-  background: #fff4ce;
-  color: #1b1b1b;
-  border-bottom: 2px solid #c99700;
-  font-size: 15px;
-  line-height: 22px;
-  text-align: center;
-  padding: 8px 16px;
-}
+:global(.sim-banner).pasek { text-align: center; padding: 6px 16px; line-height: 22px; }
 .pasek a { color: inherit; font-weight: 700; text-decoration: underline; }
 .etykieta { font-weight: 700; margin-right: 6px; }

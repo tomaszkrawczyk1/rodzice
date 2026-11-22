@@ -6,6 +6,8 @@ import dane from "../../data/kalendarz_medyczny.json";
 import { dniMiedzy, type Parametry, type PlanWejscie } from "@/engine/kalkulator";
 import { DataPole } from "@/components/DataPole";
 import OsKalendarza from "@/components/OsKalendarza";
+import PanelBoczny from "@/components/PanelBoczny";
+import { useZrobione } from "@/lib/zrobione";
 import { dataPL, liczba, tygodnie } from "@/lib/format";
 import {
   kalendarz, najblizszeZadania, poprawnaData, terminyKalendarza,
@@ -19,7 +21,11 @@ const warunkiBazy = baza.warunki ?? [];
 const klucz = "rodzice.kalendarz";
 type Daty = "terminPorodu" | "dataPorodu" | "dataWypisu";
 
+type Tryb = "ciaza" | "urodzone";
+
 interface Formularz {
+  /** Wybrany etap: „Jestem w ciąży” albo „Dziecko już się urodziło”. Pokazujemy tylko pola wybranej opcji. */
+  tryb?: Tryb;
   terminPorodu?: string;
   dataPorodu?: string;
   dataWypisu?: string;
@@ -39,6 +45,9 @@ function odczytajFormularz(profil: string): Formularz {
   try {
     const zapis = odczytajFormularze()[profil];
     if (zapis) return {
+      // Zapisy sprzed wyboru etapu: dziecko urodzone, jeśli wpisano datę porodu albo wypisu.
+      tryb: zapis.tryb === "ciaza" || zapis.tryb === "urodzone" ? zapis.tryb
+        : zapis.dataPorodu || zapis.dataWypisu ? "urodzone" : "ciaza",
       terminPorodu: zapis.terminPorodu === "" || poprawnaData(zapis.terminPorodu) ? zapis.terminPorodu : undefined,
       dataPorodu: poprawnaData(zapis.dataPorodu) ? zapis.dataPorodu : undefined,
       dataWypisu: poprawnaData(zapis.dataWypisu) ? zapis.dataWypisu : undefined,
@@ -91,9 +100,9 @@ function Podsumowanie({ wynik, dzis }: { wynik: KalendarzWynik; dzis: string }) 
       {!wynik.dataPorodu && pozostalo === 0 && <p>Planowany termin porodu wypada dziś.</p>}
       {!wynik.dataPorodu && dni < 0 && <p>Według wpisanego terminu początek ciąży wypada po dzisiejszej dacie.</p>}
       {!wynik.dataPorodu && (
-        <p>Terminy po porodzie są orientacyjne. Wpisz datę porodu, aby je przeliczyć.</p>
+        <p>Terminy po porodzie są orientacyjne. Gdy dziecko się urodzi, wybierz „Dziecko już się urodziło” i wpisz datę porodu, a przeliczymy je dokładnie.</p>
       )}
-      {wynik.uzytoZalozonegoWypisu && (
+      {wynik.dataPorodu && wynik.uzytoZalozonegoWypisu && (
         <p>Przyjęta data wypisu to <Data value={wynik.wypis.data} />. Możesz wpisać datę wypisu ze szpitala, aby przeliczyć związane z nim terminy.</p>
       )}
     </section>
@@ -127,15 +136,19 @@ function odslon(e: MouseEvent<HTMLElement>) {
 
 const ID_ZUS = "kalendarz-zus";
 
-function Najblizsze({ wynik, dzis, plan, parametry }: {
+/** Id pozycji w panelu i na osi czasu: wydarzenia z bazy to „w-<id>”, wniosek do ZUS to „wniosek-zus”. */
+const idPozycji = (id: string) => id === ID_ZUS ? "wniosek-zus" : `w-${id}`;
+
+function Najblizsze({ wynik, dzis, plan, parametry, zrobione, onOtworz }: {
   wynik: KalendarzWynik; dzis: string; plan?: PlanWejscie; parametry: Parametry;
+  zrobione: ReadonlySet<string>; onOtworz: (id: string) => void;
 }) {
   const { wniosek } = terminyKalendarza(wynik, parametry, plan);
   const zus = {
     id: ID_ZUS, nazwa: "Wniosek do ZUS o zasiłek macierzyński",
     od: wynik.dataPorodu ?? wynik.terminPorodu, do: wniosek, szacunkowe: !wynik.dataPorodu,
   };
-  const zadania = najblizszeZadania([...wynik.oś, zus], dzis, 2);
+  const zadania = najblizszeZadania([...wynik.oś, zus].filter(p => !zrobione.has(idPozycji(p.id))), dzis, 2);
   return (
     <section className={`card ${style.najblizsze}`} aria-labelledby="kalendarz-najblizsze">
       <h2 id="kalendarz-najblizsze">Najbliższe zadania dla Ciebie</h2>
@@ -148,7 +161,7 @@ function Najblizsze({ wynik, dzis, plan, parametry }: {
                   ? z.dni === 0 ? "Ostatni dzień: dziś" : `Zostało ${ileDni(z.dni)}`
                   : z.dni === 0 ? "Zaczyna się dziś" : `Za ${ileDni(z.dni)}`}
               </span>
-              <a href={z.id === ID_ZUS ? `#${ID_ZUS}` : `#kalendarz-w-${z.id}`}>{z.nazwa}</a>
+              <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(z.id))}>{z.nazwa}</button>
               <span className={style.kiedyZadanie}>
                 {z.trwa ? <>Do <Data value={z.do} /></>
                   : z.od === z.do ? <Data value={z.od} />
@@ -159,7 +172,7 @@ function Najblizsze({ wynik, dzis, plan, parametry }: {
           ))}
         </ol>
       ) : <p>Na razie nie masz zbliżających się terminów.</p>}
-      <p className={style.reszta}>Pozostałe terminy są niżej, pogrupowane według etapów. Rozwiń etap, żeby je zobaczyć.</p>
+      <p className={style.reszta}>Kliknij tytuł, żeby zobaczyć krótki opis. Pozostałe terminy są niżej, na osi czasu i w etapach.</p>
     </section>
   );
 }
@@ -310,8 +323,59 @@ function Zus({ wynik, plan, parametry }: { wynik: KalendarzWynik; plan?: PlanWej
   );
 }
 
-function Os({ wynik, dzis, plan, parametry }: {
+/** Krótki opis pozycji do panelu z boku. Zwraca null, gdy pozycja nie ma opisu (np. poród, okres urlopu). */
+function szczegolyPozycji(id: string, wynik: KalendarzWynik, parametry: Parametry, plan?: PlanWejscie): { tytul: string; tresc: ReactNode } | null {
+  if (id.startsWith("w-")) {
+    const e = wynik.oś.find(x => x.id === id.slice(2));
+    if (!e) return null;
+    return {
+      tytul: e.nazwa,
+      tresc: (
+        <>
+          <p>
+            <strong>{e.od === e.do ? <Data value={e.od} /> : <><Data value={e.od} /> – <Data value={e.do} /></>}</strong>
+            {e.szacunkowe && " · orientacyjnie"}
+          </p>
+          {e.kiedy && <p>{e.kiedy}</p>}
+          {e.najpozniej && <p>Najpóźniej <Data value={e.najpozniej} /></p>}
+          {e.opis && <p>{e.opis}</p>}
+          {!!e.pozycje?.length && <><h3>Co obejmuje</h3><Lista pozycje={e.pozycje} /></>}
+          {!!e.uwagi?.length && <><h3>Warto wiedzieć</h3><Lista pozycje={e.uwagi} /></>}
+          {e.skutek && <><h3>Gdy pominiesz termin</h3><p>{e.skutek} Sprawdź u lekarza prowadzącego, co to oznacza w Twoim przypadku.</p></>}
+        </>
+      ),
+    };
+  }
+  const { wniosek, doPracodawcy } = terminyKalendarza(wynik, parametry, plan);
+  if (id === "wniosek-zus") {
+    return {
+      tytul: "Wniosek o zasiłek macierzyński",
+      tresc: (
+        <>
+          <p><strong>Do <Data value={wniosek} /></strong>{!wynik.dataPorodu && " · orientacyjnie"}</p>
+          <p>{wynik.dataPorodu ? "Termin liczony od wpisanej daty porodu." : "Termin orientacyjny. Liczymy od planowanego terminu porodu."}</p>
+          <p><Link href="/dokumenty">Sprawdź, kto wypłaca zasiłek i gdzie złożyć wniosek</Link></p>
+        </>
+      ),
+    };
+  }
+  const m = /^wniosek-pracodawca-(\d+)$/.exec(id);
+  const t = m ? doPracodawcy[+m[1]] : undefined;
+  if (!t?.do) return null;
+  return {
+    tytul: t.co.replace(/\d{4}-\d{2}-\d{2}/g, dataPL),
+    tresc: (
+      <>
+        <p><strong>Złóż do pracodawcy do <Data value={t.do} /></strong></p>
+        <p><Link href="/sprawa/urlop-pracodawca">Sprawdź termin dla wybranej daty urlopu</Link></p>
+      </>
+    ),
+  };
+}
+
+function Os({ wynik, dzis, plan, parametry, zrobione, onZrobione, onOtworz }: {
   wynik: KalendarzWynik; dzis: string; plan?: PlanWejscie; parametry: Parametry;
+  zrobione: ReadonlySet<string>; onZrobione: (id: string) => void; onOtworz: (id: string) => void;
 }) {
   const teraz = wynik.oś.filter(e => trwa(e, dzis)).sort((a, b) => a.do.localeCompare(b.do));
   const sytuacje = wynik.informacje.filter(i => i.rodzaj === "sytuacja_szczegolna");
@@ -335,7 +399,7 @@ function Os({ wynik, dzis, plan, parametry }: {
             <ul>
               {teraz.map(e => (
                 <li key={e.id}>
-                  <a href={`#kalendarz-w-${e.id}`}>{e.nazwa}</a>
+                  <button type="button" className={style.przyciskTytul} onClick={() => onOtworz(idPozycji(e.id))}>{e.nazwa}</button>
                   <div>Do <Data value={e.do} />{e.szacunkowe && " · orientacyjnie"}</div>
                 </li>
               ))}
@@ -343,7 +407,8 @@ function Os({ wynik, dzis, plan, parametry }: {
           </details>
         ) : <p>Na dziś w kalendarzu nie ma zaplanowanych wizyt ani badań.</p>}
       </section>
-      <OsKalendarza wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />
+      <OsKalendarza wynik={wynik} dzis={dzis} plan={plan} parametry={parametry}
+        zrobione={zrobione} onZrobione={onZrobione} onOtworz={onOtworz} />
       <nav aria-label="Etapy kalendarza">
         <ul className={style.nawigacja}>
           {etapy.map(e => (
@@ -393,15 +458,15 @@ function Os({ wynik, dzis, plan, parametry }: {
 function FormularzKalendarza({ personaId, parametry }: { personaId?: string; parametry: Parametry }) {
   const profil = personaId ? `profil:${personaId}` : "gosc";
   const [stan, setStan] = useState<Formularz | null>(null);
-  const [pokazPorod, setPokazPorod] = useState(false);
   const [pokazWarunki, setPokazWarunki] = useState(false);
   const [scenariusz, setScenariusz] = useState<Partial<PlanWejscie>>();
   const [zapisanyPlan, setZapisanyPlan] = useState<PlanWejscie>();
+  const [panel, setPanel] = useState<string | null>(null);
+  const { zrobione, przelacz } = useZrobione(`${klucz}.zrobione.${profil}`);
 
   useEffect(() => {
     const zapis = odczytajFormularz(profil);
     setStan(zapis);
-    setPokazPorod(!!(zapis.dataPorodu || zapis.dataWypisu));
     setPokazWarunki(zapis.warunki.length > 0);
     if (!personaId) {
       try {
@@ -421,9 +486,16 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
   if (stan === null) return null;
 
   const terminProfilu = poprawnaData(scenariusz?.dataZdarzenia) ? scenariusz.dataZdarzenia : "";
-  const terminPorodu = stan.terminPorodu ?? terminProfilu;
-  const { dataPorodu, dataWypisu, warunki } = stan;
-  const daty = { terminPorodu, dataPorodu, dataWypisu };
+  const tryb: Tryb = stan.tryb ?? "ciaza";
+  const urodzone = tryb === "urodzone";
+  const { warunki } = stan;
+  // Pola drugiej opcji zostają zapisane, ale nie wpływają na kalendarz, dopóki nie wybierzesz tamtego etapu.
+  const dataPorodu = urodzone ? stan.dataPorodu : undefined;
+  const dataWypisu = urodzone ? stan.dataWypisu : undefined;
+  const terminWpisany = stan.terminPorodu ?? terminProfilu;
+  // Gdy dziecko już jest na świecie, kalendarz liczymy od daty porodu.
+  const terminPorodu = urodzone ? dataPorodu ?? "" : terminWpisany;
+  const daty = urodzone ? { dataPorodu, dataWypisu } : { terminPorodu };
   const niepoprawneDaty = Object.entries(daty).filter(([, data]) => data && !poprawnaData(data)).map(([pole]) => pole);
   const wypisZaWczesnie = !niepoprawneDaty.length && !!(dataWypisu && terminPorodu && dataWypisu < (dataPorodu || terminPorodu));
   const wynik = terminPorodu && !niepoprawneDaty.length && !wypisZaWczesnie ? kalendarz({
@@ -435,30 +507,44 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
     zapiszFormularz(profil, nowy);
   };
   const ustawDate = (pole: Daty, value: string) => aktualizuj({ ...stan, [pole]: value });
+  const ustawTryb = (nowy: Tryb) => aktualizuj({ ...stan, tryb: nowy });
   const plan = czyPlanPorodu(scenariusz) ? scenariusz : zapisanyPlan;
   const pobyt = baza.zalozenia?.pobyt_w_szpitalu_dni ?? 0;
   const dzis = dzisLokalnie();
 
   return (
     <>
-      {wynik && <Najblizsze wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />}
+      {wynik && <Najblizsze wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} zrobione={zrobione} onOtworz={setPanel} />}
+      {wynik && panel && (() => {
+        const s = szczegolyPozycji(panel, wynik, parametry, plan);
+        return s && <PanelBoczny key={panel} tytul={s.tytul} onZamknij={() => setPanel(null)}>{s.tresc}</PanelBoczny>;
+      })()}
       <form className={`card ${style.formularz}`} aria-labelledby="kalendarz-dane" onSubmit={e => e.preventDefault()}>
         <h2 id="kalendarz-dane">Twoje dane</h2>
-        <div className={style.glownaData}>
-          <DataPole label="Planowany termin porodu" value={terminPorodu}
-            hint={terminProfilu && stan.terminPorodu === undefined ? "Termin z profilu testowego. Możesz go zmienić." : "Znajdziesz go w karcie ciąży."}
-            onChange={value => ustawDate("terminPorodu", value)} />
-        </div>
-        <details open={pokazPorod} onToggle={e => setPokazPorod(e.currentTarget.open)}>
-          <summary>Dziecko już się urodziło?</summary>
+        <fieldset className={style.tryb}>
+          <legend>Na jakim jesteś etapie?</legend>
+          <div className={style.tryby}>
+            <button type="button" className={`btn ${urodzone ? "btn-ghost" : "btn-primary"}`} aria-pressed={!urodzone}
+              onClick={() => ustawTryb("ciaza")}>Jestem w ciąży</button>
+            <button type="button" className={`btn ${urodzone ? "btn-primary" : "btn-ghost"}`} aria-pressed={urodzone}
+              onClick={() => ustawTryb("urodzone")}>Dziecko już się urodziło</button>
+          </div>
+        </fieldset>
+        {urodzone ? (
           <div className={style.dwieDaty}>
-            <DataPole label="Data porodu" value={dataPorodu ?? ""}
+            <DataPole label="Data porodu" value={stan.dataPorodu ?? ""}
               hint="Terminy po porodzie przeliczą się od tej daty." onChange={value => ustawDate("dataPorodu", value)} />
-            <DataPole label="Data wypisu ze szpitala" value={dataWypisu ?? ""}
+            <DataPole label="Data wypisu ze szpitala" value={stan.dataWypisu ?? ""}
               hint={`Bez tej daty przyjmujemy wypis ${pobyt} ${pobyt === 1 ? "dzień" : "dni"} po porodzie.`}
               onChange={value => ustawDate("dataWypisu", value)} />
           </div>
-        </details>
+        ) : (
+          <div className={style.glownaData}>
+            <DataPole label="Planowany termin porodu" value={terminWpisany}
+              hint={terminProfilu && stan.terminPorodu === undefined ? "Termin z profilu testowego. Możesz go zmienić." : "Znajdziesz go w karcie ciąży."}
+              onChange={value => ustawDate("terminPorodu", value)} />
+          </div>
+        )}
         <details open={pokazWarunki} onToggle={e => setPokazWarunki(e.currentTarget.open)}>
           <summary>Czy lekarz powiedział Ci, że…?</summary>
           <p className="muted">Zaznacz to, co Cię dotyczy, aby zobaczyć dodatkowe pozycje w kalendarzu.</p>
@@ -479,10 +565,11 @@ function FormularzKalendarza({ personaId, parametry }: { personaId?: string; par
           </p>
         )}
         <button type="button" className={`btn btn-ghost ${style.wyczysc}`}
-          onClick={() => aktualizuj({ terminPorodu: "", warunki: [] })}>Wyczyść formularz</button>
+          onClick={() => aktualizuj({ tryb, terminPorodu: "", warunki: [] })}>Wyczyść formularz</button>
       </form>
-      {wynik && <Os wynik={wynik} dzis={dzis} plan={plan} parametry={parametry} />}
-      {!terminPorodu && <p className={style.start} role="status">Wpisz termin porodu, aby zobaczyć swój kalendarz.</p>}
+      {wynik && <Os wynik={wynik} dzis={dzis} plan={plan} parametry={parametry}
+        zrobione={zrobione} onZrobione={przelacz} onOtworz={setPanel} />}
+      {!terminPorodu && <p className={style.start} role="status">{urodzone ? "Wpisz datę porodu, aby zobaczyć swój kalendarz." : "Wpisz termin porodu, aby zobaczyć swój kalendarz."}</p>}
     </>
   );
 }

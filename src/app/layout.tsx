@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             i karta „Najbliższy termin" doskakiwały po hydratacji i przesuwały całą stronę. */}
         <script dangerouslySetInnerHTML={{ __html: PRZED_MALOWANIEM }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <a className="skip" href="#tresc">Przejdź do treści</a>
         <SesjaProvider>
           <Header />
