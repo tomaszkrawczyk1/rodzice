@@ -18,7 +18,8 @@ const hook = registerHooks({
     return nextLoad(url, context);
   },
 });
-const { szukajLuzno, maSens, pojecia } = await import("../src/lib/szukaj.ts").finally(() => hook.deregister());
+const { szukajLuzno, maSens, pojecia } = await import("../src/lib/szukaj.ts");
+const { trafienia } = await import("../src/lib/indeks-szukaj.ts").finally(() => hook.deregister());
 
 const faq = JSON.parse(readFileSync(new URL("../src/content/poradnik/faq.json", import.meta.url), "utf8")).pytania;
 let ok = 0, fail = 0;
@@ -69,5 +70,23 @@ for (const q of ["pogoda jutro w Łodzi", "coś tam", "urlop", "chcę wiedzieć 
 }
 sprawdz("Bez pojęć: najczęstsze sprawy (nie z zapytania)", wynik("pogoda jutro w Łodzi").zZapytania === false);
 
+
+// Indeks „co można zrobić na stronie": druki, wyniki drzewka, od pierwszej litery.
+const top = (q: string, ile = 3) => trafienia(q, ile);
+sprawdz("indeks: ZAM → druk ZAM na pierwszym miejscu", top("ZAM")[0]?.href === "/druki#ZAM", top("ZAM"));
+sprawdz("indeks: kod druku bez wielkich liter i z myślnikiem (z-3a)", top("z-3a")[0]?.href === "/druki#Z-3a", top("z-3a"));
+sprawdz("indeks: Z-3 przed Z-3a", top("Z-3")[0]?.href === "/druki#Z-3" && top("Z-3")[1]?.href === "/druki#Z-3a", top("Z-3"));
+sprawdz("indeks: jedna litera „z” pokazuje druki na z", top("z").length === 3 && top("z").every((r) => r.rodzaj === "druk"), top("z"));
+sprawdz("indeks: jedna litera „n” to początki słów, nie środek", top("n").length === 3 && top("n").every((r) => /(^|[\s–-])n/i.test(r.tytul)), top("n"));
+sprawdz("indeks: jedna litera zawsze ma trafienia, nigdy więcej niż 3", "abcdefgijklmnoprstuwz".split("").every((l) => top(l).length >= 1 && top(l).length <= 3), "abcdefgijklmnoprstuwz".split("").filter((l) => !top(l).length));
+sprawdz("indeks: wszystkie 29 wyników drzewka da się znaleźć po początku tytułu",
+  trafienia("", 9).length === 0 && new Set("abcdefghijklmnopqrstuvwxyz".split("").flatMap((l) => trafienia(l, 999, ["wynik"]).map((r) => r.id))).size === 29);
+sprawdz("indeks: wynik liczący zasiłek prowadzi do kroku „dziecko” kalkulatora", top("ile trwa urlop")[0]?.href === "/kalkulator?tryb=matka&krok=dziecko", top("ile trwa urlop"));
+sprawdz("indeks: wynik bez liczenia prowadzi do kreatora (krok z adresu)", top("odpis aktu", 5).some((r) => r.rodzaj === "wynik" && /^\/kreator\?krok=\d+(\.\d+)*$/.test(r.href)), top("odpis aktu", 5));
+sprawdz("indeks: „tata” → wynik o podziale urlopu między rodziców", top("tata").some((r) => r.href === "/kalkulator?tryb=oboje&krok=dziecko"), top("tata"));
+sprawdz("indeks: literówka „urlpo ojcowski”", top("urlpo ojcowski").some((r) => /ojcowski/i.test(r.tytul)), top("urlpo ojcowski"));
+sprawdz("indeks: bez bzdur (xyzqw) → brak trafień", top("xyzqw").length === 0, top("xyzqw"));
+sprawdz("indeks: kod druku nie ciągnie wyników, które tylko wspominają ZAM", !top("ZAM", 5).some((r) => r.rodzaj === "wynik"), top("ZAM", 5));
+sprawdz("indeks: zawężenie do rodzajów", trafienia("zam", 5, ["druk"]).every((r) => r.rodzaj === "druk"));
 console.log(`Wyszukiwarka: ${ok} OK, ${fail} FAIL`);
 if (fail) process.exit(1);

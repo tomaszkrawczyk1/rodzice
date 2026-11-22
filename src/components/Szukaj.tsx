@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { PYTANIA } from "@/content/poradnik";
 import { szukajLuzno, maSens } from "@/lib/szukaj";
+import { trafienia, type Rekord } from "@/lib/indeks-szukaj";
 import { przejdzKrok } from "@/lib/adres-kroku";
 import { MAKS_ZAPYTANIA, normalizujZapytanie } from "@/lib/adres-glowna";
 import { przejdzDoKroku } from "@/lib/ekran";
@@ -10,8 +11,8 @@ import { StatusBadge } from "./StatusPytania";
 import { Plakietka, Lupa, ikonaSprawy } from "./Ikony";
 
 const PRZYKLADY = ["urodziły nam się bliźniaki", "ile dostanę po porodzie", "urlop dla taty", "szef nie chce dać urlopu", "mam firmę (JDG)"];
-/** Krótka chwila „Szukam…": wynik liczy się od razu, ale bez tej pauzy zmiana bywa niezauważalna. */
-const CZAS_SZUKANIA = 250;
+const IKONY_STRON: Record<string, string> = { kalkulator: "plan", kalendarz: "kalendarz", terminarz: "zegar", ryzyka: "tarcza", trudne: "trudne", pue: "budynek", wnioski: "formularz" };
+const ikonaRekordu = (r: Rekord) => r.rodzaj === "sprawa" ? ikonaSprawy(r.id) : r.rodzaj === "druk" ? "formularz" : r.rodzaj === "wynik" ? "plan" : r.rodzaj === "strona" ? (IKONY_STRON[r.id] ?? "dokument") : "dokument";
 const PODPOWIEDZ_PUSTE = "Wpisz kilka słów opisujących sprawę, np. „zasiłek po porodzie” albo „urlop ojcowski”.";
 const PODPOWIEDZ_BEZ_SLOW = "Nie rozpoznaliśmy w tym tekście słów do wyszukania. Wpisz kilka słów opisujących sprawę, np. „urlop ojcowski”.";
 
@@ -25,9 +26,7 @@ const PODPOWIEDZ_BEZ_SLOW = "Nie rozpoznaliśmy w tym tekście słów do wyszuka
 export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "karta" | "glowny"; zapytanie?: string }) {
   const zAdresem = zapytanie !== undefined;
   const [q, setQ] = useState(zapytanie ?? "");
-  const [wyslane, setWyslane] = useState(zapytanie ?? "");
   const [puste, setPuste] = useState(false);
-  const [szukam, setSzukam] = useState(false);
   const pole = useRef<HTMLInputElement>(null);
   const sekcja = useRef<HTMLElement>(null);
   const glowny = wariant === "glowny";
@@ -36,7 +35,6 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
   useEffect(() => {
     if (zapytanie === undefined) return;
     setQ(zapytanie);
-    setWyslane(zapytanie);
     if (zapytanie) setPuste(false);
   }, [zapytanie]);
 
@@ -70,33 +68,27 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
     };
   }, [glowny]);
 
-  // Każde nowe zapytanie (z pola, przykładu albo adresu) pokazuje na chwilę „Szukam…".
-  useEffect(() => {
-    if (!wyslane) { setSzukam(false); return; }
-    setSzukam(true);
-    const czas = window.setTimeout(() => setSzukam(false), CZAS_SZUKANIA);
-    return () => window.clearTimeout(czas);
-  }, [wyslane]);
-
   function wyslij(tekst: string) {
     const fraza = normalizujZapytanie(tekst);
     setQ(fraza);
-    setWyslane(fraza);
     setPuste(!fraza);
     // Wpis historii dopiero przy wysłaniu, nie przy każdym znaku. Puste pole zdejmuje `q` z adresu (wyniki znikają, więc „Wstecz" je przywraca).
     if (zAdresem) przejdzKrok({ q: fraza || null });
-    if (!maSens(fraza)) pole.current?.focus();
+    if (!maSens(fraza) && !trafienia(fraza, 1).length) pole.current?.focus();
   }
 
-  const bezSlow = !!wyslane && !maSens(wyslane);
-  const wyniki = wyslane && !bezSlow ? szukajLuzno(wyslane, PYTANIA) : null;
-  const brak = !!wyniki && !wyniki.sprawy.length;
-  const komunikat = puste ? PODPOWIEDZ_PUSTE : bezSlow ? PODPOWIEDZ_BEZ_SLOW : "";
+  // Wyniki liczą się od razu, przy każdym znaku (lokalnie, bez opóźnienia). Enter i przykłady dodatkowo zapisują `?q=` w adresie.
+  const tekst = normalizujZapytanie(q);
+  const wyniki = tekst && maSens(tekst) ? szukajLuzno(tekst, PYTANIA) : null;
+  const pewny = !!wyniki && wyniki.sprawy.length > 0;
+  const nowe = tekst ? trafienia(tekst, 3, pewny ? ["wynik", "druk", "strona"] : undefined) : [];
+  const brak = !!wyniki && !pewny && !nowe.length;
+  const bezSlow = tekst.length >= 2 && !wyniki && !nowe.length;
+  const komunikat = puste && !tekst ? PODPOWIEDZ_PUSTE : bezSlow ? PODPOWIEDZ_BEZ_SLOW : "";
   // Krótkie podsumowanie dla czytników ekranu: zawsze w tym samym, już istniejącym regionie, więc zmiana jest ogłaszana.
   const podsumowanie = komunikat
-    || (szukam ? "Szukam pasujących spraw…"
-      : brak ? `Nie mamy jednej pewnej odpowiedzi. Pokazujemy sprawy, które mogą pasować: ${wyniki?.podobne.length ?? 0}.`
-      : wyniki ? `Wyniki wyszukiwania. Pasujące sprawy: ${wyniki.sprawy.length}. Pytania i odpowiedzi z poradnika: ${wyniki.faq.length}.` : "");
+    || (brak ? `Nie mamy jednej pewnej odpowiedzi. Pokazujemy sprawy, które mogą pasować: ${wyniki?.podobne.length ?? 0}.`
+      : wyniki || nowe.length ? `Wyniki wyszukiwania. Najlepsze trafienia: ${nowe.length}. Pasujące sprawy: ${wyniki?.sprawy.length ?? 0}. Pytania i odpowiedzi z poradnika: ${wyniki?.faq.length ?? 0}.` : "");
 
   return (
     <section className={"ask " + (glowny ? "ask--glowny" : "mt")} id="zapytaj" aria-labelledby="zq" ref={sekcja}>
@@ -132,12 +124,22 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
       </p>
       <p className="sr-only" role="status" aria-live="polite">{podsumowanie}</p>
       {komunikat && <p id="zq-komunikat" className="mt"><b>{komunikat}</b></p>}
-      {wyniki && szukam && (
-        <p className="mt" aria-hidden="true"><span className="spin" /> Szukam pasujących spraw…</p>
-      )}
-      {wyniki && !szukam && (
+      {(wyniki || nowe.length > 0) && (
         <div className="mt">
-          {brak && (
+          {nowe.length > 0 && (
+            <>
+              <b>Najlepsze trafienia:</b>
+              <div className="grid g3 mt">
+                {nowe.map((r) => (
+                  <Link key={r.rodzaj + r.id} href={r.href} className="tile tile--ico">
+                    <Plakietka nazwa={ikonaRekordu(r)} />
+                    <span className="tile__txt"><b>{r.tytul}</b><span>{r.opis}</span></span>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+          {wyniki && brak && (
             <div className="alert info" style={{ marginTop: 0 }}>
               <p style={{ margin: 0 }}>
                 <b>{wyniki.podobneZZapytania
@@ -149,7 +151,7 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
               </p>
             </div>
           )}
-          {brak && (
+          {wyniki && brak && (
             <div className="grid g3 mt">
               {wyniki.podobne.map((s) => (
                 <Link key={s.id} href={`/sprawa/${s.id}`} className="tile tile--ico">
@@ -159,7 +161,7 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
               ))}
             </div>
           )}
-          {wyniki.sprawy.length > 0 && (
+          {wyniki && wyniki.sprawy.length > 0 && (
             <>
               <b>Pasujące sprawy:</b>
               <div className="grid g3 mt">
@@ -172,7 +174,7 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
               </div>
             </>
           )}
-          {wyniki.faq.length > 0 && (
+          {wyniki && wyniki.faq.length > 0 && (
             <>
               <p className="mt"><b>Pytania i odpowiedzi z poradnika:</b></p>
               <ul className="clean">
@@ -200,7 +202,7 @@ export default function Szukaj({ wariant = "karta", zapytanie }: { wariant?: "ka
           )}
         </div>
       )}
-      {wyniki && !szukam && <p className="small muted ask__nota">
+      {(wyniki || nowe.length > 0) && <p className="small muted ask__nota">
         Wyszukiwarka korzysta z oficjalnych przepisów ZUS i Kodeksu pracy. Jeśli Twoja sprawa wymaga indywidualnej oceny, wskażemy właściwy kontakt.
       </p>}
     </section>

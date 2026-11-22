@@ -62,7 +62,7 @@ const POJECIA: Record<string, { p?: string[]; d?: string[] }> = {
 };
 
 /** Jedna litera różnicy (literówka), tylko dla dłuższych słów. */
-function jednaRoznica(a: string, b: string): boolean {
+export function jednaRoznica(a: string, b: string): boolean {
   if (Math.abs(a.length - b.length) > 1 || Math.min(a.length, b.length) < 5) return false;
   let i = 0;
   while (i < a.length && a[i] === b[i]) i++;
