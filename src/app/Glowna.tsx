@@ -3,7 +3,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api, useSesja } from "@/lib/sesja";
-import { dataPL, pln, dzis, opisTerminu } from "@/lib/format";
+import { useT } from "@/lib/jezyk";
+import { dzis } from "@/lib/format";
+import { useFormaty } from "@/lib/jezyk";
 import { nazwaUbezpieczenia, rodzajChorobowego, wynikZadluzenia, type StanZadluzeniaNaDzien, type UbezpieczenieProfilu } from "@/lib/dane-profilu";
 import { Alert, Sim } from "@/components/ui";
 import Szkielet from "@/components/Szkielet";
@@ -53,16 +55,18 @@ type Dane = {
 };
 
 function PodgladProfilu({ pesel }: { pesel: string }) {
+  const { dataPL, pln } = useFormaty();
+  const t = useT();
   const [dane, setDane] = useState<Dane | null>(null);
   const [blad, setBlad] = useState(false);
 
   useEffect(() => {
     let aktualne = true;
-    const query = new URLSearchParams({ pesel, naDzien: dzis() });
+    const zapytanie = { pesel, naDzien: dzis() };
     Promise.all([
-      api<Dane["u"]>(`/api/zus/ubezpieczenie?${query}`),
-      api<Dane["e"]>(`/api/zus/ezla?${query}`),
-      api<Dane["z"]>(`/api/zus/zadluzenie?${query}`),
+      api<Dane["u"]>("/api/zus/ubezpieczenie", zapytanie),
+      api<Dane["e"]>("/api/zus/ezla", zapytanie),
+      api<Dane["z"]>("/api/zus/zadluzenie", zapytanie),
     ]).then(([u, e, z]) => { if (aktualne) setDane({ u, e, z }); })
       .catch(() => { if (aktualne) setBlad(true); });
     return () => { aktualne = false; };
@@ -70,30 +74,30 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
 
   return (
     <section className={"card mt" + (dane || blad ? "" : " slot-profil")}>
-      <h2>Dane z profilu testowego</h2>
-      {blad && <Alert t="err">Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.</Alert>}
-      {!dane && !blad && <Szkielet etykieta="Wczytujemy dane profilu…" wiersze={3} />}
+      <h2>{t("Dane z profilu testowego")}</h2>
+      {blad && <Alert t="err">{t("Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.")}</Alert>}
+      {!dane && !blad && <Szkielet etykieta={t("Wczytujemy dane profilu…")} wiersze={3} />}
       {dane && <>
         <dl>
-          <dt>Dni ubezpieczenia chorobowego</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
-          <dt>Dni zwolnień lekarskich</dt><dd>{dane.e.lacznieDni}</dd>
+          <dt>{t("Dni ubezpieczenia chorobowego")}</dt><dd>{dane.u.dniNieprzerwanegoUbezpieczeniaChorobowego}</dd>
+          <dt>{t("Dni zwolnień lekarskich")}</dt><dd>{dane.e.lacznieDni}</dd>
         </dl>
-        <h3>Stan zadłużenia na dzień {dataPL(dane.z.naDzien)} <Sim /></h3>
+        <h3>{t("Stan zadłużenia na dzień {data}", { data: dataPL(dane.z.naDzien) })} <Sim /></h3>
         {dane.z.wynik === "nie_dotyczy" ? <p>{dane.z.komunikat}</p> : (
           <dl>
-            <dt>Zaległości w składkach</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
-            <dt>Próg</dt><dd>{pln(dane.z.prog)}</dd>
-            <dt>Wynik</dt><dd>{wynikZadluzenia(dane.z)}</dd>
+            <dt>{t("Zaległości w składkach")}</dt><dd>{pln(dane.z.kwotaZadluzenia)}</dd>
+            <dt>{t("Próg")}</dt><dd>{pln(dane.z.prog)}</dd>
+            <dt>{t("Wynik")}</dt><dd>{t(wynikZadluzenia(dane.z))}</dd>
           </dl>
         )}
         {dane.u.ubezpieczenie.map((u, i) => (
           <p key={i}>
-            <b>{nazwaUbezpieczenia(u.tytul)}</b> od {dataPL(u.od)}{u.do && <> do {dataPL(u.do)}</>}.
-            {" Ubezpieczenie chorobowe: "}{rodzajChorobowego(u.chorobowe)}.
-            {u.platnik && <> Płatnik składek: {u.platnik.nazwa}.</>}
+            <b>{t(nazwaUbezpieczenia(u.tytul))}</b> {t("od")} {dataPL(u.od)}{u.do && <> {t("do")} {dataPL(u.do)}</>}.
+            {" " + t("Ubezpieczenie chorobowe:") + " "}{t(rodzajChorobowego(u.chorobowe))}.
+            {u.platnik && <> {t("Płatnik składek:")} {u.platnik.nazwa}.</>}
           </p>
         ))}
-        {dane.z.przekroczonyProg && <Alert t="warn">{dane.z.komunikat} Sprawdź w ZUS, jak to wygląda w Twojej sprawie.</Alert>}
+        {dane.z.przekroczonyProg && <Alert t="warn">{dane.z.komunikat} {t("Sprawdź w ZUS, jak to wygląda w Twojej sprawie.")}</Alert>}
       </>}
     </section>
   );
@@ -102,6 +106,8 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
 // Etap i zapytanie wyszukiwarki są w adresie (`/?etap=czekamy`, `/?q=urlop+ojcowski`). Każdy wybór etapu to nowy wpis
 // historii, więc „Wstecz" wraca do wyboru etapu, a adres można podlinkować i odświeżyć.
 export default function Home() {
+  const { opisTerminu, dataPL } = useFormaty();
+  const t = useT();
   const { sesja } = useSesja();
   const params = useSearchParams();
   const etapZAdresuUrl = etapZAdresu(params.get("etap"));
@@ -151,7 +157,7 @@ export default function Home() {
   return (
     <>
       <section className="hero" ref={gora}>
-        <h1>Co chcesz dzisiaj załatwić?</h1>
+        <h1>{t("Co chcesz dzisiaj załatwić?")}</h1>
         <p className={css.podtytul}><b>Dla osób w ciąży i rodziców po porodzie.</b> Bezpłatnie, bez logowania.</p>
       </section>
 
@@ -159,30 +165,30 @@ export default function Home() {
       <Szukaj wariant="glowny" zapytanie={zapytanie} />
 
       {/* Miejsce na kartę rezerwuje CSS od pierwszego malowania, jeśli w przeglądarce jest zapisana sesja (html[data-sesja]). */}
-      <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
-        {sesja && (pilne ? (
+        <div className={sesja && pilnaSprawa?.token === sesja.token ? undefined : "slot-pilne"}>
+          {sesja && (pilne ? (
           <section className="card urgent mb mt" style={{ overflowWrap: "anywhere" }}>
-            <h2>Najbliższy termin z profilu</h2>
-            <p>{opisTerminu(pilne.co)}</p>
-            <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
-            <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">Otwórz sprawę</Link>
-          </section>
-        ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">Sprawdzam najbliższy termin z profilu…</p>)}
-      </div>
+              <h2>{t("Najbliższy termin z profilu")}</h2>
+              <p>{opisTerminu(pilne.co)}</p>
+              <p><b>{dataPL(pilne.do)}</b> ({zaIle(pilne.do)})</p>
+              <Link href={`/sprawa/${pilne.sprawa}`} className="btn btn-primary">{t("Otwórz sprawę")}</Link>
+            </section>
+          ) : pilnaSprawa?.token !== sesja.token && <p className="muted" role="status">{t("Sprawdzam najbliższy termin z profilu…")}</p>)}
+        </div>
 
       {!moment ? (
         <>
-          <h2 ref={etapy} tabIndex={-1}>Na jakim jesteście etapie?</h2>
+          <h2 ref={etapy} tabIndex={-1}>{t("Na jakim jesteście etapie?")}</h2>
           <div className="grid g3 grid--etapy">
             {KOLEJNOSC.map((id) => (
               <button key={id} type="button" className={"tile tile--ico " + css.kafel + (id === "dziecko" ? " tile--glowny" : "")} onClick={() => wybierzEtap(id)}>
                 <Plakietka nazwa={id} />
-                <span className="tile__txt"><b>{MOMENTY[id].tytul}</b><span>{MOMENTY[id].opis}</span></span>
+                <span className="tile__txt"><b>{t(MOMENTY[id].tytul)}</b><span>{t(MOMENTY[id].opis)}</span></span>
               </button>
             ))}
-            <Kafel href="/kalendarz" ikona="kalendarz" tytul="Kalendarz ciąży i połogu" opis="Badania i terminy ZUS w jednym miejscu" />
-            <Kafel href="/sprawa/adopcja" ikona="adopcja" tytul="Adopcja lub rodzina zastępcza" opis="Urlopy i zasiłek po przyjęciu dziecka" />
-            <Kafel href="/trudne" ikona="trudne" tytul="Trudna sytuacja" opis="Strata, wcześniactwo, choroba" klasa="tile--szeroki" />
+            <Kafel href="/kalendarz" ikona="kalendarz" tytul={t("Kalendarz ciąży i połogu")} opis={t("Badania i terminy ZUS w jednym miejscu")} />
+            <Kafel href="/sprawa/adopcja" ikona="adopcja" tytul={t("Adopcja lub rodzina zastępcza")} opis={t("Urlopy i zasiłek po przyjęciu dziecka")} />
+            <Kafel href="/trudne" ikona="trudne" tytul={t("Trudna sytuacja")} opis={t("Strata, wcześniactwo, choroba")} klasa="tile--szeroki" />
           </div>
         </>
       ) : (
@@ -211,21 +217,21 @@ export default function Home() {
           <div className="grid g3">
             {kafleSpraw(MOMENTY[moment].sprawy)}
             {(moment === "ciaza" || moment === "dziecko") && (
-              <Kafel href="/kalendarz" ikona="kalendarz" tytul="Kalendarz ciąży i połogu" opis="Badania i terminy ZUS w jednym miejscu" />
+              <Kafel href="/kalendarz" ikona="kalendarz" tytul={t("Kalendarz ciąży i połogu")} opis={t("Badania i terminy ZUS w jednym miejscu")} />
             )}
             {moment === "plan" && (
-              <Kafel href="/ryzyka" ikona="praca" tytul="Ubezpieczenie i ochrona w pracy" opis="Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę" />
+              <Kafel href="/ryzyka" ikona="praca" tytul={t("Ubezpieczenie i ochrona w pracy")} opis={t("Co może wpłynąć na zasiłek i kiedy prawo chroni umowę o pracę")} />
             )}
           </div>
 
           <h3 className={css.podsekcja}>Jeśli wychowujesz dziecko z drugim rodzicem</h3>
           <p className={"muted " + css.podsekcjaOpis}>Urlop ojcowski, część urlopu rodzicielskiego dla drugiego rodzica i to, jak go podzielić.</p>
           <div className="grid g3">
-            <Kafel href="/kreator?sciezka=ojciec" ikona="rodzina" tytul="Urlopy dla taty i drugiego rodzica" opis="Urlop ojcowski i podział urlopu" />
+            <Kafel href="/kreator?sciezka=ojciec" ikona="rodzina" tytul={t("Urlopy dla taty i drugiego rodzica")} opis={t("Urlop ojcowski i podział urlopu")} />
             {kafleSpraw(MOMENTY[moment].zDrugimRodzicem)}
           </div>
 
-          <p className="mt"><Link href="/sprawy" className="btn btn-secondary">Zobacz wszystkie sprawy</Link></p>
+          <p className="mt"><Link href="/sprawy" className="btn btn-secondary">{t("Zobacz wszystkie sprawy")}</Link></p>
         </div>
       )}
 
