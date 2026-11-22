@@ -72,10 +72,11 @@ function PodgladProfilu({ pesel }: { pesel: string }) {
     return () => { aktualne = false; };
   }, [pesel]);
 
+  if (blad) return null;
+
   return (
-    <section className={"card mt" + (dane || blad ? "" : " slot-profil")}>
+    <section className={"card mt" + (dane ? "" : " slot-profil")}>
       <h2>{t("Dane z profilu testowego")}</h2>
-      {blad && <Alert t="err">{t("Nie udało się pobrać danych profilu. Nadal możesz wybrać sprawę i wpisać dane samodzielnie.")}</Alert>}
       {!dane && !blad && <Szkielet etykieta={t("Wczytujemy dane profilu…")} wiersze={3} />}
       {dane && <>
         <dl>
